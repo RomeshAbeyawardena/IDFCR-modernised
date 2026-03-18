@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/IDCR.Abstractions/">
+    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Builders/IDCR.Abstractions.Builders.csproj" />
+    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Results/IDCR.Abstractions.Results.csproj" />
+  </Folder>
+</Solution>
