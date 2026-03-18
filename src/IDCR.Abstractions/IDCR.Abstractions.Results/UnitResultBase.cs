@@ -5,10 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace IDCR.Abstractions.Results;
 
-public abstract record UnitResultBase(Exception? Exception = null, UnitAction Action = UnitAction.None,
-    bool IsSuccess = false, FailureReason? FailureReason = null) : IUnitResult
+public static class UnitResult
 {
-    public static IUnitResult<T> NotFound<T>(object id, Exception? innerException = null, FailureReason? failureReason = Results.FailureReason.NotFound)
+    public static IUnitResult<T> NotFound<T>(object id, Exception? innerException = null, FailureReason? failureReason = FailureReason.NotFound)
         => Failed<T>(new EntityNotFoundException(typeof(T), id, innerException), UnitAction.None, failureReason);
 
     public static IUnitResult<T> Failed<T>(Exception exception, UnitAction action = UnitAction.None, FailureReason? FailureReason = null)
@@ -19,7 +18,11 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
     {
         return new DefaultUnitResult<T>(result, action, isSuccess, exception);
     }
+}
 
+public abstract record UnitResultBase(Exception? Exception = null, UnitAction Action = UnitAction.None,
+    bool IsSuccess = false, FailureReason? FailureReason = null) : IUnitResult
+{
     internal readonly ConcurrentDictionary<string, object?> _metaProperties = [];
     public object? this[string key] { get => _metaProperties[key]; }
 
@@ -68,7 +71,7 @@ public abstract record UnitResultBase<TResult>(TResult? Result = default, UnitAc
     {
         if (Result is not T result)
         {
-            throw new InvalidCastException($"Unable to cast from {typeof(T)} and {typeof(TResult)}");
+            throw new InvalidCastException($"Unable to cast result of type {typeof(TResult)} to {typeof(T)}");
         }
 
         return base.As(value ?? result);
@@ -78,7 +81,7 @@ public abstract record UnitResultBase<TResult>(TResult? Result = default, UnitAc
     {
         if (Result is not IEnumerable<T> result)
         {
-            throw new InvalidCastException($"Unable to cast from {typeof(T)} and {typeof(TResult)}");
+            throw new InvalidCastException($"Unable to cast result of type {typeof(TResult)} to {typeof(T)}");
         }
 
         return base.AsCollection(value ?? result);
