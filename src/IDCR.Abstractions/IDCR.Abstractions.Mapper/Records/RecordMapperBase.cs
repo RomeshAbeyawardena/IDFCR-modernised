@@ -1,7 +1,11 @@
 ﻿namespace IDCR.Abstractions.Mapper.Records;
 
-public abstract record MapperBase<TSource>() : IMapper<TSource>
+public abstract record RecordMapperBase<TSource>() : IRecordMapper<TSource>
 {
+    private long mappedState = 0;
+
+    public MappingState MappingState => (MappingState)Interlocked.Read(ref mappedState);
+
     public T? Map<T>(TSource source, params object[] parameters) where T : class, IMapper<TSource>
     {
         var instance = Activator.CreateInstance(typeof(T), parameters);
@@ -22,6 +26,16 @@ public abstract record MapperBase<TSource>() : IMapper<TSource>
 
         return result;
     }
-    public abstract void Map(TSource source);
 
+    public virtual void Map(TSource source)
+    {
+        if (Interlocked.Exchange(ref mappedState, 1) == 1)
+        {
+            throw new InvalidOperationException("Mapping has already occured once with this record");
+        }
+
+        MapMembers(source);
+    }
+
+    public abstract void MapMembers(TSource source);
 }
