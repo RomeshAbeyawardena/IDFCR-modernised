@@ -4,5 +4,5 @@ public interface IEntityInterceptorContext
 {
     EntityContextBehaviorStage Stage { get; }
     EntityContextBehavior Behavior { get; }
-    object Model { get; }
+    object? Model { get; }
 }
