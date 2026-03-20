@@ -2,6 +2,18 @@
 
 public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, EntityContextBehavior behavior, int? orderIndex = null) : IEntityInterceptor
 {
+    protected static void WithContext<TEntityInterceptorContext>(IEntityInterceptorContext context,
+        Action<TEntityInterceptorContext> apply)
+        where TEntityInterceptorContext : IEntityInterceptorContext
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (context is TEntityInterceptorContext interceptorContext)
+        {
+            apply(interceptorContext);
+        }
+    }
+
     public int? OrderIndex { get; } = orderIndex;
 
     public virtual bool ShouldIntercept(IEntityInterceptorContext context) => true;
