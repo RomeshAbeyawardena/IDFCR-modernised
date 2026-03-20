@@ -5,4 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+  </ItemGroup>
 </Project>
