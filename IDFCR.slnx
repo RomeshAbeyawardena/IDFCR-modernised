@@ -2,7 +2,9 @@
   <Folder Name="/src/" />
   <Folder Name="/src/IDCR.Abstractions/">
     <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Builders/IDCR.Abstractions.Builders.csproj" />
+	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.DependencyInjection/IDCR.Abstractions.DependencyInjection.csproj" />
 	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Interceptors/IDCR.Abstractions.Interceptors.csproj" />
+	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Interceptors.DependencyInjection/IDCR.Abstractions.Interceptors.DependencyInjection.csproj" />
     <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Mapper/IDCR.Abstractions.Mapper.csproj" />
 	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Metadata/IDCR.Abstractions.Metadata.csproj" />
 	<Project Path="src/IDCR.Abstractions/IDFCR.Abstractions.Persistence/IDCR.Abstractions.Persistence.csproj" />
