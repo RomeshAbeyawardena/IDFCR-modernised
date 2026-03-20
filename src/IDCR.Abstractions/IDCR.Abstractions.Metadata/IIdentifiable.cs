@@ -1,4 +1,4 @@
-﻿namespace IDCR.Abstractions.Persistence;
+﻿namespace IDCR.Abstractions.Metadata;
 
 public interface IIdentifiable<TKey>
     where TKey : struct

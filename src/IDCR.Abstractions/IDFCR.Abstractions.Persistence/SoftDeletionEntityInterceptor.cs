@@ -1,12 +1,8 @@
 ﻿using IDCR.Abstractions.Interceptors;
+using IDCR.Abstractions.Metadata;
 using Microsoft.Extensions.Options;
 
 namespace IDCR.Abstractions.Persistence;
-
-public interface ISuppressable
-{
-    bool Suppressed { get; set; }
-}
 
 public class SoftDeletionEntityInterceptor(IOptions<DatabaseConfiguration> options)
     : EntityInterceptorBase(EntityContextBehaviorStage.Pre, EntityContextBehavior.Delete, 0)

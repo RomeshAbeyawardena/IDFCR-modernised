@@ -4,7 +4,8 @@
     <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Builders/IDCR.Abstractions.Builders.csproj" />
 	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Interceptors/IDCR.Abstractions.Interceptors.csproj" />
     <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Mapper/IDCR.Abstractions.Mapper.csproj" />
-    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Results/IDCR.Abstractions.Results.csproj" />
+	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Metadata/IDCR.Abstractions.Metadata.csproj" />
 	<Project Path="src/IDCR.Abstractions/IDFCR.Abstractions.Persistence/IDCR.Abstractions.Persistence.csproj" />
+    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Results/IDCR.Abstractions.Results.csproj" />
   </Folder>
 </Solution>

@@ -1,4 +1,6 @@
-﻿namespace IDCR.Abstractions.Interceptors;
+﻿using IDCR.Abstractions.Metadata;
+
+namespace IDCR.Abstractions.Interceptors.Interceptors;
 
 public sealed class AuditCreatedTimestampEntityInterceptor(TimeProvider timeProvider) 
     : EntityInterceptorBase(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, 0)

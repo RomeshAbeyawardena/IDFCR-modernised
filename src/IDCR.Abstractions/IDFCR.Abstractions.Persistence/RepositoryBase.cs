@@ -1,5 +1,6 @@
 ﻿using IDCR.Abstractions.Interceptors;
 using IDCR.Abstractions.Mapper;
+using IDCR.Abstractions.Metadata;
 using IDCR.Abstractions.Persistence.Extensions;
 using IDCR.Abstractions.Results;
 using IDCR.Abstractions.Results.Exceptions;

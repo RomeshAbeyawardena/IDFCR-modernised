@@ -1,4 +1,4 @@
-﻿namespace IDCR.Abstractions.Interceptors;
+﻿namespace IDCR.Abstractions.Metadata;
 
 public interface IAuditModifiedTimestamp
 {
