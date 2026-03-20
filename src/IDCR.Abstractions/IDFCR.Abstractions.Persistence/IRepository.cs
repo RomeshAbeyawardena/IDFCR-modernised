@@ -8,7 +8,7 @@ namespace IDCR.Abstractions.Persistence
     public interface IRepository<T, TKey>
         where TKey : struct
     {
-        ValueTask<IUnitResult<T>> FindAsync(CancellationToken cancellationToken, params object[] keys);
+        ValueTask<IUnitResult<T>> FindAsync(object[] keys, CancellationToken cancellationToken);
         ValueTask<IUnitResult<T>> FindAsync(TKey key, CancellationToken cancellationToken);
         ValueTask<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken);
         ValueTask<IUnitResult> DeleteAsync(TKey key, CancellationToken cancellationToken);
@@ -32,7 +32,7 @@ namespace IDCR.Abstractions.Persistence
         protected abstract Task<TKey> OnAddAsync(TDb entry, T rawEntry, CancellationToken cancellationToken);
         protected abstract Task<TKey> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken);
         protected abstract Task<TDb> OnFindAsync(TKey key, bool trackChanges, CancellationToken cancellationToken);
-        protected abstract Task<TDb> OnFindAsync(CancellationToken cancellationToken, bool trackChanges, params object[] keys);
+        protected abstract Task<TDb> OnFindAsync(object[] keys, bool trackChanges, CancellationToken cancellationToken);
         protected abstract Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken);
 
         protected abstract bool IsHandled(Exception exception);
@@ -53,14 +53,14 @@ namespace IDCR.Abstractions.Persistence
             return UnitResult.FromResult(key, UnitAction.Delete, success, caughtException);
         }
 
-        public async ValueTask<IUnitResult<T>> FindAsync(CancellationToken cancellationToken, params object[] keys)
+        public async ValueTask<IUnitResult<T>> FindAsync(object[] keys, CancellationToken cancellationToken)
         {
             Exception? caughtException = null;
             bool success = false;
             T? value = null;
             try
             {
-                var result = await OnFindAsync(cancellationToken, false, keys);
+                var result = await OnFindAsync(keys, false, cancellationToken);
 
                 if (result is not null)
                 {
@@ -105,7 +105,7 @@ namespace IDCR.Abstractions.Persistence
         {
             try
             {
-                var dbValue = Map(entry) ?? throw new NullReferenceException("Mapping failed");
+                var dbValue = Map(entry) ?? throw new NullReferenceException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
