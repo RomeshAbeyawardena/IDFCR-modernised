@@ -9,5 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\IDCR.Abstractions.Builders\IDCR.Abstractions.Builders.csproj" />
     <ProjectReference Include="..\IDCR.Abstractions.Mapper\IDCR.Abstractions.Mapper.csproj" />
+    <ProjectReference Include="..\IDCR.Abstractions.Results\IDCR.Abstractions.Results.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace IDCR.Abstractions.Mapper;
+﻿using System.Linq.Expressions;
+
+namespace IDCR.Abstractions.Mapper;
 
 public interface IMapper<TSource>
 {

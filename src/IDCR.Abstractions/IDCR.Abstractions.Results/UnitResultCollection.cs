@@ -25,7 +25,7 @@ public static class UnitResultCollection
 }
 
 
-internal record UnitResultCollection<TResult>(IEnumerable<TResult>? Result = null, UnitAction Action = UnitAction.Get,
+public record UnitResultCollection<TResult>(IEnumerable<TResult>? Result = null, UnitAction Action = UnitAction.Get,
     bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null)
         : UnitResultBase<IEnumerable<TResult>>(Result, Action, IsSuccess, Exception, FailureReason), IUnitResultCollection<TResult>
 {
