@@ -27,7 +27,13 @@ namespace IDCR.Abstractions.Persistence
         public EntityContextBehavior Behavior { get; init; }
         public object? Model { get; init; }
         /// <summary>
-        /// Gets or sets a value that will cause the behaviour operation to be bypassed, where supported.
+        /// Indicates that the underlying persistence operation (e.g. Add, Update, Delete)
+        /// should be skipped by the repository where supported.
+        /// 
+        /// Interceptors may still run before and after the operation.
+        /// 
+        /// This is primarily intended for scenarios such as soft deletes,
+        /// no-op updates, or environment-based write suppression.
         /// </summary>
         public bool BypassOperation { get; set; }
     }
@@ -108,10 +114,15 @@ namespace IDCR.Abstractions.Persistence
                 var dbValue = await OnFindAsync(key, true, cancellationToken);
                 var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Delete, dbValue);
-                if (!context.BypassOperation)
+
+                if (context.BypassOperation)
                 {
-                    success = await OnDeleteAsync(key, cancellationToken);
+                    return UnitResult.FromResult(key, UnitAction.None)
+                            .AddMeta("bypassed", true).As<TKey>();
                 }
+
+                success = await OnDeleteAsync(key, cancellationToken);
+
                 await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
                         EntityContextBehavior.Delete, dbValue);
             }
@@ -141,8 +152,14 @@ namespace IDCR.Abstractions.Persistence
 
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
-                    await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre, 
+                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre, 
                         EntityContextBehavior.Insert, dbValue);
+
+                    if (context.BypassOperation)
+                    {
+                        return UnitResult.FromResult(default(TKey), UnitAction.None)
+                            .AddMeta("bypassed", true).As<TKey>();
+                    }
 
                     var id = await OnAddAsync(dbValue, entry, cancellationToken);
 
@@ -159,8 +176,16 @@ namespace IDCR.Abstractions.Persistence
                     {
                         return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                     }
-                    await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
+                    
+                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Update, dbValue);
+
+                    if (context.BypassOperation)
+                    {
+                        return UnitResult.FromResult(dbValue.Id, UnitAction.None)
+                            .AddMeta("bypassed", true).As<TKey>();
+                    }
+
                     foundEntry.Apply(dbValue);
                     var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
