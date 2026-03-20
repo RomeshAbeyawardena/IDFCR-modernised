@@ -11,7 +11,7 @@ public sealed class AuditCreatedTimestampEntityInterceptor(TimeProvider timeProv
             && auditCreatedTimestamp.CreatedTimestampUtc == default;
     }
 
-    public override  void Intercept(IEntityInterceptorContext context)
+    public override void Intercept(IEntityInterceptorContext context)
     {
         if (context.Model is IAuditCreatedTimestamp auditCreatedTimestamp)
         {

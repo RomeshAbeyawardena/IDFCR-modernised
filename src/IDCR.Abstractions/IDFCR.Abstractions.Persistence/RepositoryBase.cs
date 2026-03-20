@@ -42,16 +42,11 @@ namespace IDCR.Abstractions.Persistence
         
         private async Task<RepositoryInterceptorContext> InvokeInterceptorsAsync(EntityContextBehaviorStage stage,
             EntityContextBehavior behavior,
-            object model)
+            object model, CancellationToken cancellationToken)
         {
             var context = RepositoryInterceptorContext.Create(stage, behavior, model);
-            var interceptors = entityInterceptorFactory
-                .GetEntityInterceptors(context);
-
-            foreach (var interceptor in interceptors.OrderBy(x => x.OrderIndex))
-            {
-                await interceptor.InterceptAsync(context);
-            }
+            await entityInterceptorFactory.InvokeAsync(await entityInterceptorFactory.
+                GetEntityInterceptorsAsync(context, cancellationToken), context, cancellationToken);
 
             return context;
         }
@@ -82,7 +77,7 @@ namespace IDCR.Abstractions.Persistence
             {
                 var dbValue = await OnFindAsync(key, true, cancellationToken);
                 var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Delete, dbValue);
+                        EntityContextBehavior.Delete, dbValue, cancellationToken);
 
                 if (context.BypassOperation)
                 {
@@ -93,7 +88,7 @@ namespace IDCR.Abstractions.Persistence
                 success = await OnDeleteAsync(key, cancellationToken);
 
                 await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Delete, dbValue);
+                        EntityContextBehavior.Delete, dbValue, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -122,7 +117,7 @@ namespace IDCR.Abstractions.Persistence
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre, 
-                        EntityContextBehavior.Insert, dbValue);
+                        EntityContextBehavior.Insert, dbValue, cancellationToken);
 
                     if (context.BypassOperation)
                     {
@@ -133,7 +128,7 @@ namespace IDCR.Abstractions.Persistence
                     var id = await OnAddAsync(dbValue, entry, cancellationToken);
 
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Insert, dbValue);
+                        EntityContextBehavior.Insert, dbValue, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Add);
                 }
@@ -147,7 +142,7 @@ namespace IDCR.Abstractions.Persistence
                     }
                     
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Update, dbValue);
+                        EntityContextBehavior.Update, dbValue, cancellationToken);
 
                     if (context.BypassOperation)
                     {
@@ -158,7 +153,7 @@ namespace IDCR.Abstractions.Persistence
                     foundEntry.Apply(dbValue);
                     var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Update, dbValue);
+                        EntityContextBehavior.Update, dbValue, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Update);
                 }

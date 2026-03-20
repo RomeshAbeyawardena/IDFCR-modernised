@@ -8,5 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IDCR.Abstractions.DependencyInjection\IDCR.Abstractions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\IDCR.Abstractions.Interceptors\IDCR.Abstractions.Interceptors.csproj" />
   </ItemGroup>
 </Project>

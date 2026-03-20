@@ -2,5 +2,6 @@
 
 public interface IEntityInterceptorFactory
 {
-    IEnumerable<IEntityInterceptor> GetEntityInterceptors(IEntityInterceptorContext context);
+    ValueTask<IEnumerable<IEntityInterceptor>> GetEntityInterceptorsAsync(IEntityInterceptorContext context, CancellationToken cancellationToken);
+    Task InvokeAsync(IEnumerable<IEntityInterceptor> entityInterceptors, IEntityInterceptorContext context, CancellationToken cancellationToken);
 }
