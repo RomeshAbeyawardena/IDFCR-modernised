@@ -102,4 +102,70 @@ public class EntityInterceptorFactoryTests
         Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(default(DateTimeOffset)));
         Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
     }
+
+    [Test]
+    public async Task InvokeAsync_PreInsert_DoesNotOverrideExistingCreatedTimestamp()
+    {
+        var existingTimestamp = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var subject = new Customer { CreatedTimestampUtc = existingTimestamp };
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        Assert.That(interceptors, Is.Empty, "Should not return interceptor when timestamp already set");
+        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(existingTimestamp), "Should preserve existing timestamp");
+    }
+
+    [Test]
+    public async Task InvokeAsync_PreUpdate_AlwaysUpdatesModifiedTimestamp()
+    {
+        var existingTimestamp = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var subject = new Customer { ModifiedTimestampUtc = existingTimestamp };
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Update, subject);
+
+        var interceptors = (await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None)).ToArray();
+
+        await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
+
+        Assert.That(interceptors, Has.Length.EqualTo(1), "Should always run for updates to track latest modification");
+        Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)), 
+            "Should always update to current time to track latest modification, not preserve old value");
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_NullModel_ReturnsNoInterceptors()
+    {
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, null);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        Assert.That(interceptors, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_ModelWithoutAuditInterfaces_ReturnsNoInterceptors()
+    {
+        var subject = new { Id = 1, Name = "Test" };
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        Assert.That(interceptors, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_PostStage_ReturnsNoInterceptors()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Post, EntityContextBehavior.Insert, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        Assert.That(interceptors, Is.Empty, "Current interceptors only work on Pre stage");
+    }
 }
