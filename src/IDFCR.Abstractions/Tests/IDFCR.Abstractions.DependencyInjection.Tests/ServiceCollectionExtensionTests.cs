@@ -24,13 +24,24 @@ public class ServiceCollectionExtensionTests
         services.AddGenericServices<IService>(ServiceLifetime.Singleton, typeof(ServiceCollectionExtensionTests).Assembly);
 
         Assert.That(services, Has.Count.EqualTo(2));
+
         var firstService = services.FirstOrDefault();
         Assert.That(firstService, Is.Not.Null);
-        Assert.That(firstService.ImplementationType, Is.EqualTo(typeof(MyService)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(firstService.ServiceType, Is.EqualTo(typeof(IService)));
+            Assert.That(firstService.ImplementationType, Is.EqualTo(typeof(MyService)));
+            Assert.That(firstService.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        }
 
         var secondService = services.ElementAtOrDefault(1);
         Assert.That(secondService, Is.Not.Null);
-        Assert.That(secondService.ImplementationType, Is.EqualTo(typeof(MyService2)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(secondService.ServiceType, Is.EqualTo(typeof(IService)));
+            Assert.That(secondService.ImplementationType, Is.EqualTo(typeof(MyService2)));
+            Assert.That(secondService.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        }
     }
 
 }

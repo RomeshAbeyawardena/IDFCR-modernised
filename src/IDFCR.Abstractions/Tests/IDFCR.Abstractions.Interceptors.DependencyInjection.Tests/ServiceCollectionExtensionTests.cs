@@ -24,15 +24,31 @@ public class ServiceCollectionExtensionTests
 
         Assert.That(services, Has.Count.EqualTo(3));
 
-        var implementationTypes = services.Select(x => x.ImplementationType).ToArray();
-
-        Type[] expectedTypes = [typeof(DefaultEntityInterceptorFactory), 
-            typeof(AuditCreatedTimestampEntityInterceptor), 
-            typeof(AuditModifiedTimestampEntityInterceptor)];
-
-        foreach (var expectedType in expectedTypes)
+        var factoryService = services.FirstOrDefault(x => x.ImplementationType == typeof(DefaultEntityInterceptorFactory));
+        Assert.That(factoryService, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(implementationTypes, Contains.Item(expectedType));
+            Assert.That(factoryService.ServiceType, Is.EqualTo(typeof(IEntityInterceptorFactory)));
+            Assert.That(factoryService.ImplementationType, Is.EqualTo(typeof(DefaultEntityInterceptorFactory)));
+            Assert.That(factoryService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+        }
+
+        var auditCreatedService = services.FirstOrDefault(x => x.ImplementationType == typeof(AuditCreatedTimestampEntityInterceptor));
+        Assert.That(auditCreatedService, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(auditCreatedService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
+            Assert.That(auditCreatedService.ImplementationType, Is.EqualTo(typeof(AuditCreatedTimestampEntityInterceptor)));
+            Assert.That(auditCreatedService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+        }
+
+        var auditModifiedService = services.FirstOrDefault(x => x.ImplementationType == typeof(AuditModifiedTimestampEntityInterceptor));
+        Assert.That(auditModifiedService, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(auditModifiedService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
+            Assert.That(auditModifiedService.ImplementationType, Is.EqualTo(typeof(AuditModifiedTimestampEntityInterceptor)));
+            Assert.That(auditModifiedService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
         }
     }
 }
