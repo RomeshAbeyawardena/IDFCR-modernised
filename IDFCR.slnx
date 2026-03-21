@@ -1,16 +1,17 @@
 <Solution>
   <Folder Name="/src/" />
-  <Folder Name="/src/IDCR.Abstractions/">
-    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Builders/IDCR.Abstractions.Builders.csproj" />
-	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.DependencyInjection/IDCR.Abstractions.DependencyInjection.csproj" />
-	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Interceptors/IDCR.Abstractions.Interceptors.csproj" />
-	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Interceptors.DependencyInjection/IDCR.Abstractions.Interceptors.DependencyInjection.csproj" />
-    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Mapper/IDCR.Abstractions.Mapper.csproj" />
-	<Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Metadata/IDCR.Abstractions.Metadata.csproj" />
-	<Project Path="src/IDCR.Abstractions/IDFCR.Abstractions.Persistence/IDCR.Abstractions.Persistence.csproj" />
-    <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Results/IDCR.Abstractions.Results.csproj" />
+  <Folder Name="/src/IDFCR.Abstractions/">
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Builders/IDFCR.Abstractions.Builders.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DependencyInjection/IDFCR.Abstractions.DependencyInjection.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors/IDFCR.Abstractions.Interceptors.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mapper/IDFCR.Abstractions.Mapper.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
   </Folder>
-  <Folder Name="/src/IDCR.Abstractions/Tests/">
-    <Project Path="src/IDCR.Abstractions/Tests/IDCR.Abstractions.DependencyInjection.Tests/IDCR.Abstractions.DependencyInjection.Tests.csproj" />
+  <Folder Name="/src/IDFCR.Abstractions/Tests/">
+    <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DependencyInjection.Tests/IDFCR.Abstractions.DependencyInjection.Tests.csproj" />
+	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests.csproj" />
   </Folder>
 </Solution>

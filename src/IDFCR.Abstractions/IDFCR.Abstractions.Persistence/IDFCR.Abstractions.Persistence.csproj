@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IDFCR.Abstractions.Builders\IDFCR.Abstractions.Builders.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Interceptors\IDFCR.Abstractions.Interceptors.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Mapper\IDFCR.Abstractions.Mapper.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
+  </ItemGroup>
+</Project>
