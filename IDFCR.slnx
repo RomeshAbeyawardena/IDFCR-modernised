@@ -11,6 +11,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Abstractions/Tests/">
+	<Project Path="src/IDFCR.TestUtilities/IDFCR.TestUtilities.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DependencyInjection.Tests/IDFCR.Abstractions.DependencyInjection.Tests.csproj" />
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests.csproj" />
   </Folder>
