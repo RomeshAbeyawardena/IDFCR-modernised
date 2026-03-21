@@ -15,5 +15,6 @@
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DependencyInjection.Tests/IDFCR.Abstractions.DependencyInjection.Tests.csproj" />
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.Tests/IDFCR.Abstractions.Interceptors.Tests.csproj" />
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests.csproj" />
+	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
   </Folder>
 </Solution>

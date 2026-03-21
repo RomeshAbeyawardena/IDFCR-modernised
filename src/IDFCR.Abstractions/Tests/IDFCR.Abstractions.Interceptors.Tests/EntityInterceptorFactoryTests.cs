@@ -1,19 +1,9 @@
 ﻿using IDFCR.Abstractions.Interceptors.Interceptors;
-using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Interceptors.Tests.Assets;
 using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Interceptors.Tests;
-
-internal record TestEntityInterceptContext(EntityContextBehaviorStage Stage,
-    EntityContextBehavior Behavior,
-    object? Model) : IEntityInterceptorContext;
-
-internal record Customer : IAuditCreatedTimestamp, IAuditModifiedTimestamp
-{
-    public DateTimeOffset CreatedTimestampUtc { get; set; }
-    public DateTimeOffset? ModifiedTimestampUtc { get; set; }
-}
 
 [TestFixture]
 public class EntityInterceptorFactoryTests
