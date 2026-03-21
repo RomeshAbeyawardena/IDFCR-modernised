@@ -19,7 +19,7 @@ public class ServiceCollectionExtensionTests
 
 
     [Test]
-    public void AddGenericServices()
+    public void AddGenericServices_FindsAndRegistersTwoServiceImplementations()
     {
         services.AddGenericServices<IService>(ServiceLifetime.Singleton, typeof(ServiceCollectionExtensionTests).Assembly);
 
