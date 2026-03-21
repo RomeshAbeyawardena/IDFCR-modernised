@@ -1,0 +1,105 @@
+﻿using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Metadata;
+using Microsoft.Extensions.Time.Testing;
+using NUnit.Framework;
+
+namespace IDFCR.Abstractions.Interceptors.Tests;
+
+internal record TestEntityInterceptContext(EntityContextBehaviorStage Stage,
+    EntityContextBehavior Behavior,
+    object? Model) : IEntityInterceptorContext;
+
+internal record Customer : IAuditCreatedTimestamp, IAuditModifiedTimestamp
+{
+    public DateTimeOffset CreatedTimestampUtc { get; set; }
+    public DateTimeOffset? ModifiedTimestampUtc { get; set; }
+}
+
+[TestFixture]
+public class EntityInterceptorFactoryTests
+{
+    private DefaultEntityInterceptorFactory _entityInterceptorFactory;
+    private List<IEntityInterceptor> _entityInterceptorList;
+    private FakeTimeProvider _timeProvider;
+    [SetUp]
+    public void SetUp()
+    {
+        _timeProvider = new(new DateTimeOffset(2025,03, 1, 10, 40, 0, TimeSpan.Zero));
+        _entityInterceptorList = [
+            new AuditCreatedTimestampEntityInterceptor(_timeProvider), 
+            new AuditModifiedTimestampEntityInterceptor(_timeProvider)];
+        _entityInterceptorFactory = new(_entityInterceptorList);
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_PreInsert_ReturnsCreatedTimestampInterceptor()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, subject);
+
+        var interceptors = (await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None)).ToArray();
+
+        Assert.That(interceptors, Has.Length.EqualTo(1));
+        var interceptor = interceptors.FirstOrDefault();
+        Assert.That(interceptor, Is.Not.Null);
+        Assert.That(interceptor, Is.AssignableTo<AuditCreatedTimestampEntityInterceptor>());
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_PreUpdate_ReturnsModifiedTimestampInterceptor()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Update, subject);
+
+        var interceptors = (await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None)).ToArray();
+
+        Assert.That(interceptors, Has.Length.EqualTo(1));
+        var interceptor = interceptors.FirstOrDefault();
+        Assert.That(interceptor, Is.Not.Null);
+        Assert.That(interceptor, Is.AssignableTo<AuditModifiedTimestampEntityInterceptor>());
+    }
+
+    [Test]
+    public async Task GetEntityInterceptorsAsync_PreDelete_ReturnsNoInterceptors()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Delete, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        Assert.That(interceptors, Is.Empty);
+    }
+
+    [Test]
+    public async Task InvokeAsync_PreInsert_SetsCreatedTimestamp()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
+
+        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
+        Assert.That(subject.ModifiedTimestampUtc, Is.Null);
+    }
+
+    [Test]
+    public async Task InvokeAsync_PreUpdate_SetsModifiedTimestamp()
+    {
+        var subject = new Customer();
+        var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Pre, EntityContextBehavior.Update, subject);
+
+        var interceptors = await _entityInterceptorFactory
+            .GetEntityInterceptorsAsync(context, CancellationToken.None);
+
+        await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
+
+        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(default(DateTimeOffset)));
+        Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
+    }
+}
