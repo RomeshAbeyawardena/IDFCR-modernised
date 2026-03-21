@@ -1,6 +1,5 @@
 ﻿using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
 using IDFCR.Abstractions.Interceptors.Interceptors;
-using IDFCR.Abstractions.Metadata;
 using IDFCR.TestUtilities.Fakes;
 using NUnit.Framework;
 
