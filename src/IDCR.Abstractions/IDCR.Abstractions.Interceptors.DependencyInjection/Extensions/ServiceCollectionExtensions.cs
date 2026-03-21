@@ -10,6 +10,6 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
-            .AddGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, assemblies);
+            .AddGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, [.. assemblies.Union([typeof(ServiceCollectionExtensions).Assembly])]);
     }
 }

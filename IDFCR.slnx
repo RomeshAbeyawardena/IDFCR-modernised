@@ -10,4 +10,7 @@
 	<Project Path="src/IDCR.Abstractions/IDFCR.Abstractions.Persistence/IDCR.Abstractions.Persistence.csproj" />
     <Project Path="src/IDCR.Abstractions/IDCR.Abstractions.Results/IDCR.Abstractions.Results.csproj" />
   </Folder>
+  <Folder Name="/src/IDCR.Abstractions/Tests/">
+    <Project Path="src/IDCR.Abstractions/Tests/IDCR.Abstractions.DependencyInjection.Tests/IDCR.Abstractions.DependencyInjection.Tests.csproj" />
+  </Folder>
 </Solution>

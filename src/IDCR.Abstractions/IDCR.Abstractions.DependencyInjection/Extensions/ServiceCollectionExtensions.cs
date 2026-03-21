@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     {
         return services.Scan(s => s.FromAssemblies(assemblies)
             .AddClasses(c => c.AssignableTo<TGenericServiceType>(), false)
-            .AsMatchingInterface()
+            .AsImplementedInterfaces()
             .WithLifetime(lifetime)
         );
     }
