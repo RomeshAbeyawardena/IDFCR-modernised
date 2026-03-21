@@ -7,12 +7,12 @@ using IDFCR.Abstractions.Results.Exceptions;
 
 namespace IDFCR.Abstractions.Persistence
 {
-    public abstract class RepositoryBase<TDbContext, TCommon, TDb, T, TKey>(IEntityInterceptorFactory entityInterceptorFactory) : IRepository<T, TKey>
+    public abstract class RepositoryBase<TCommon, TDb, T, TKey>(IEntityInterceptorFactory entityInterceptorFactory) : IRepository<T, TKey>
         where TKey : struct
         where TDb: class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
         where T: class, IMapper<TCommon>, TCommon
     {
-        private async ValueTask<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb>> onFindAsync, object key, CancellationToken cancellationToken)
+        private async ValueTask<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
         {
             Exception? caughtException;
             bool success = false;
@@ -63,8 +63,8 @@ namespace IDFCR.Abstractions.Persistence
 
         protected abstract Task<TKey> OnAddAsync(TDb entry, T rawEntry, CancellationToken cancellationToken);
         protected abstract Task<TKey> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken);
-        protected abstract Task<TDb> OnFindAsync(TKey key, bool trackChanges, CancellationToken cancellationToken);
-        protected abstract Task<TDb> OnFindAsync(object[] keys, bool trackChanges, CancellationToken cancellationToken);
+        protected abstract Task<TDb?> OnFindAsync(TKey key, bool trackChanges, CancellationToken cancellationToken);
+        protected abstract Task<TDb?> OnFindAsync(object[] keys, bool trackChanges, CancellationToken cancellationToken);
         protected abstract Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken);
 
         protected abstract bool IsHandled(Exception exception);
@@ -76,6 +76,12 @@ namespace IDFCR.Abstractions.Persistence
             try
             {
                 var dbValue = await OnFindAsync(key, true, cancellationToken);
+
+                if (dbValue is null)
+                {
+                    return UnitResult.NotFound<TKey>(key, caughtException);
+                }
+
                 var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Delete, dbValue, cancellationToken);
 
