@@ -7,7 +7,7 @@ public sealed class AuditModifiedTimestampEntityInterceptor(TimeProvider timePro
 {
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
-        return context.Model is IAuditModifiedTimestamp auditModifiedTimestamp;
+        return context.Model is IAuditModifiedTimestamp;
     }
 
     public override void Intercept(IEntityInterceptorContext context)

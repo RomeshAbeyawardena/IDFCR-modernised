@@ -84,8 +84,11 @@ public class EntityInterceptorFactoryTests
 
         await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
 
-        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
-        Assert.That(subject.ModifiedTimestampUtc, Is.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
+            Assert.That(subject.ModifiedTimestampUtc, Is.Null);
+        }
     }
 
     [Test]
@@ -99,8 +102,11 @@ public class EntityInterceptorFactoryTests
 
         await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
 
-        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(default(DateTimeOffset)));
-        Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(subject.CreatedTimestampUtc, Is.Default);
+            Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)));
+        }
     }
 
     [Test]
@@ -113,8 +119,11 @@ public class EntityInterceptorFactoryTests
         var interceptors = await _entityInterceptorFactory
             .GetEntityInterceptorsAsync(context, CancellationToken.None);
 
-        Assert.That(interceptors, Is.Empty, "Should not return interceptor when timestamp already set");
-        Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(existingTimestamp), "Should preserve existing timestamp");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(interceptors, Is.Empty, "Should not return interceptor when timestamp already set");
+            Assert.That(subject.CreatedTimestampUtc, Is.EqualTo(existingTimestamp), "Should preserve existing timestamp");
+        }
     }
 
     [Test]
@@ -129,9 +138,12 @@ public class EntityInterceptorFactoryTests
 
         await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
 
-        Assert.That(interceptors, Has.Length.EqualTo(1), "Should always run for updates to track latest modification");
-        Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)), 
-            "Should always update to current time to track latest modification, not preserve old value");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(interceptors, Has.Length.EqualTo(1), "Should always run for updates to track latest modification");
+            Assert.That(subject.ModifiedTimestampUtc, Is.EqualTo(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero)),
+                "Should always update to current time to track latest modification, not preserve old value");
+        }
     }
 
     [Test]
