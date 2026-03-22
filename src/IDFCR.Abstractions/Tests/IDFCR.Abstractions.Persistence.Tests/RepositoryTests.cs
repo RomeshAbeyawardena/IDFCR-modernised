@@ -103,10 +103,14 @@ public class RepositoryTests
         // Assert
         Assert.That(result.IsSuccess, Is.True);
 
-        var data = result.Result.ToList();
+        var data = result.GetResultOrDefault()?.ToArray();
 
-        Assert.That(data, Has.Count.EqualTo(2));
-        Assert.That(result.TotalRows, Is.EqualTo(2));
+        Assert.That(data, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(data, Has.Length.EqualTo(2));
+            Assert.That(result.TotalRows, Is.EqualTo(2));
+        }
         Assert.That(data.All(x => x.FirstName.Contains("Ali")), Is.True);
     }
 }

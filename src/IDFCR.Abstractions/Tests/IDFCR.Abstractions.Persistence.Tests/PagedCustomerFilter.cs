@@ -13,7 +13,7 @@ internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCus
         if (!string.IsNullOrWhiteSpace(request.NameContains))
         {
             innerExpression.And(x => x.FirstName.Contains(request.NameContains));
-            innerExpression.Or(x => string.IsNullOrWhiteSpace(x.MiddleName) || x.MiddleName.Contains(request.NameContains));
+            innerExpression.Or(x => !string.IsNullOrWhiteSpace(x.MiddleName) && x.MiddleName.Contains(request.NameContains));
             innerExpression.Or(x => x.LastName.Contains(request.NameContains));
         }
 
