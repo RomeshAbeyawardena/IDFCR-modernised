@@ -1,12 +1,21 @@
 ﻿using IDFCR.Abstractions.Results;
+using Microsoft.Extensions.DependencyInjection;
+using static System.Net.WebRequestMethods;
 
 namespace IDFCR.Abstractions.Filters;
 
-internal class DefaultFilterFactory(IEnumerable<IFilter> filters) : IFilterFactory
+internal class DefaultFilterFactory(IEnumerable<IFilter> filters, IServiceProvider serviceProvider) : IFilterFactory
 {
     public IEnumerable<IFilter<TRequest, TDb>> GetFilters<TRequest, TDb>()
     {
-        return filters.OfType<IFilter<TRequest, TDb>>();
+        var filterList = filters.OfType<IFilter<TRequest, TDb>>()
+            .Cast<IFilter<TRequest, TDb>>()
+            .ToList();
+
+        var genericFilters = serviceProvider.GetServices<IFilter<TRequest, TDb>>();
+        filterList.AddRange(genericFilters);
+
+        return filterList;
     }
 
     public IEnumerable<IPagedFilter<TRequest, TDb>> GetPagedFilters<TRequest, TDb>() where TRequest : IPagedQuery
@@ -17,6 +26,7 @@ internal class DefaultFilterFactory(IEnumerable<IFilter> filters) : IFilterFacto
     public IQueryable<TDb> Apply<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request)
     {
         IQueryable<TDb> query = queryable;
+        
         foreach (var filter in GetFilters<TRequest, TDb>())
         {
             if (filter.CanFilter(request))

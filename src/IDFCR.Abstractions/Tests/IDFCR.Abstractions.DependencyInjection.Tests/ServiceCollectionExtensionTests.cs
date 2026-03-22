@@ -21,7 +21,7 @@ public class ServiceCollectionExtensionTests
     [Test]
     public void AddGenericServices_FindsAndRegistersTwoServiceImplementations()
     {
-        services.AddGenericServices<IService>(ServiceLifetime.Singleton, typeof(ServiceCollectionExtensionTests).Assembly);
+        services.ScanGenericServices<IService>(ServiceLifetime.Singleton, typeof(ServiceCollectionExtensionTests).Assembly);
 
         Assert.That(services, Has.Count.EqualTo(2));
 

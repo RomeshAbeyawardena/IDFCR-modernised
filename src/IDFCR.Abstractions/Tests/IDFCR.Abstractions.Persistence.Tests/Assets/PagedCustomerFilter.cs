@@ -1,7 +1,7 @@
 ﻿using IDFCR.Abstractions.Filters;
 using System.Linq.Expressions;
 
-namespace IDFCR.Abstractions.Persistence.Tests;
+namespace IDFCR.Abstractions.Persistence.Tests.Assets;
 
 internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCustomer>
 {
@@ -12,9 +12,9 @@ internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCus
 
         if (!string.IsNullOrWhiteSpace(request.NameContains))
         {
-            innerExpression.And(x => x.FirstName.Contains(request.NameContains));
-            innerExpression.Or(x => !string.IsNullOrWhiteSpace(x.MiddleName) && x.MiddleName.Contains(request.NameContains));
-            innerExpression.Or(x => x.LastName.Contains(request.NameContains));
+            innerExpression = innerExpression.And(x => x.FirstName.Contains(request.NameContains));
+            innerExpression = innerExpression.Or(x => !string.IsNullOrWhiteSpace(x.MiddleName) && x.MiddleName.Contains(request.NameContains));
+            innerExpression = innerExpression.Or(x => x.LastName.Contains(request.NameContains));
         }
 
         return expression.And(innerExpression);

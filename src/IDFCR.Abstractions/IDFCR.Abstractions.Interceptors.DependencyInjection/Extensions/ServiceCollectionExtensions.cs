@@ -14,6 +14,6 @@ public static class ServiceCollectionExtensions
 
         return services
             .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
-            .AddGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, [.. allAssemblies]);
+            .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, [.. allAssemblies]);
     }
 }

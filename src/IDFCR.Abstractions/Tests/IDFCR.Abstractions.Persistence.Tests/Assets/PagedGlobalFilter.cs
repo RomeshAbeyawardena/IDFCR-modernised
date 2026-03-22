@@ -2,7 +2,7 @@
 using IDFCR.Abstractions.Metadata;
 using System.Linq.Expressions;
 
-namespace IDFCR.Abstractions.Persistence.Tests;
+namespace IDFCR.Abstractions.Persistence.Tests.Assets;
 
 internal class PagedGlobalFilter<TRequest, TDb> : PagedFilterBase<TRequest, TDb>
     where TRequest : IPagedGlobalRequest

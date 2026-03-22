@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Mapper;
 
-namespace IDFCR.Abstractions.Persistence.Tests
+namespace IDFCR.Abstractions.Persistence.Tests.Assets
 {
     public class DbCustomer : MapperBase<ICustomer>, ICustomer
     {

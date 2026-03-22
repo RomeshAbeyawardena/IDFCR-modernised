@@ -1,8 +1,10 @@
 ﻿using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Persistence.Tests.Assets;
 using IDFCR.Abstractions.Results.Extensions;
 using Microsoft.Extensions.Time.Testing;
+using Moq;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Persistence.Tests;
@@ -13,20 +15,22 @@ public class RepositoryTests
     private DefaultFilterFactory _defaultFilterFactory;
     private DefaultEntityInterceptorFactory _factory;
     private InternalMemoryMockRepository<ICustomer, DbCustomer, Customer> _mockRepository;
+    private Mock<IServiceProvider> _serviceProviderMock;
     private FakeTimeProvider _timeProvider;
     [SetUp]
     public void SetUp()
     {
+        
         _timeProvider = new FakeTimeProvider(
             new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero));
-
 
         _factory = new([
             new AuditCreatedTimestampEntityInterceptor(_timeProvider),
             new AuditModifiedTimestampEntityInterceptor(_timeProvider)
         ]);
 
-        _defaultFilterFactory = new([new PagedCustomerFilter(), new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>()]);
+        _serviceProviderMock = new();
+        _defaultFilterFactory = new([new PagedCustomerFilter(), new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>()], _serviceProviderMock.Object);
         
         _mockRepository = new(_factory, _defaultFilterFactory);
     }
