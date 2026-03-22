@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Interceptors;
+﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence.Extensions;
@@ -7,9 +8,7 @@ using Moq;
 
 namespace IDFCR.Abstractions.Persistence.Tests
 {
-
-
-    internal class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory)
+    internal class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory)
         : RepositoryBase<TCommon, TDb, T, Guid>(entityInterceptorFactory)
         where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<Guid>
         where T : class, IMapper<TCommon>, TCommon
@@ -65,7 +64,9 @@ namespace IDFCR.Abstractions.Persistence.Tests
 
         protected override Task<(IEnumerable<TDb> Data, int TotalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var filter = filterFactory.GetPagedFilter<TRequest, TDb>(entries.AsQueryable());
+
+            return Task.FromResult<(IEnumerable<TDb> Data, int TotalRows)>(filter.Apply(request));
         }
 
         protected override Task<Guid> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
