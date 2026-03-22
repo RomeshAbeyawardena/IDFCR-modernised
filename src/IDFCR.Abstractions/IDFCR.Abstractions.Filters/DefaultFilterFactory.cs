@@ -28,7 +28,7 @@ internal class DefaultFilterFactory(IEnumerable<IFilter> filters) : IFilterFacto
         return query;
     }
 
-    public (IQueryable<TDb> query, int totalRows) ApplyWithTotalRowsReturned<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request) where TRequest : IPagedQuery
+    public (IQueryable<TDb> query, int totalRows) ApplyPaged<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request, Func<IQueryable<TDb>, int>? customCount) where TRequest : IPagedQuery
     {
         IQueryable<TDb> query = queryable;
         int totalEntries;
@@ -45,7 +45,7 @@ internal class DefaultFilterFactory(IEnumerable<IFilter> filters) : IFilterFacto
             }
         }
 
-        (query, totalEntries) = PagedFilter.ApplyPaging(query, request);
+        (query, totalEntries) = PagedFilter.ApplyPaging(query, request, customCount: customCount);
         
         return (query, totalEntries);
     }

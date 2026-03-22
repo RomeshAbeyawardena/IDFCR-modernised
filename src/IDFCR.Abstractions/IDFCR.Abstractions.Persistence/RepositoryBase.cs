@@ -67,7 +67,7 @@ namespace IDFCR.Abstractions.Persistence
         protected abstract Task<TDb?> OnFindAsync(object[] keys, bool trackChanges, CancellationToken cancellationToken);
         protected abstract Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken);
 
-        protected abstract Task<(IEnumerable<TDb> Data,int TotalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+        protected abstract Task<(IEnumerable<TDb> data,int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
             where TRequest : IPagedQuery;
 
         protected abstract bool IsHandled(Exception exception);

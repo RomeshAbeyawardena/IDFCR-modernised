@@ -62,11 +62,10 @@ namespace IDFCR.Abstractions.Persistence.Tests
             return OnFindAsync(id, trackChanges, cancellationToken);
         }
 
-        protected override Task<(IEnumerable<TDb> Data, int TotalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+        protected override Task<(IEnumerable<TDb> data, int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
         {
-            var filter = filterFactory.GetPagedFilter<TRequest, TDb>(entries.AsQueryable());
-
-            return Task.FromResult<(IEnumerable<TDb> Data, int TotalRows)>(filter.Apply(request));
+            var (data, totalRows) = filterFactory.ApplyPaged(entries.AsQueryable(), request);
+            return Task.FromResult<(IEnumerable<TDb> data, int totalRows)>((data.ToArray(), totalRows));
         }
 
         protected override Task<Guid> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
