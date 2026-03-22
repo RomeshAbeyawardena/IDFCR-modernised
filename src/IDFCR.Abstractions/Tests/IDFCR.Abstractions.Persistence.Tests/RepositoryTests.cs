@@ -2,7 +2,6 @@
 using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Results.Extensions;
-using LinqKit;
 using Microsoft.Extensions.Time.Testing;
 using NUnit.Framework;
 
