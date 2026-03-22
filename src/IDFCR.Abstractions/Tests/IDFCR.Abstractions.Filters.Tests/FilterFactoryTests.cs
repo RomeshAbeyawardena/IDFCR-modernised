@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IDFCR.Abstractions.Filters.Extensions;
+using IDFCR.Abstractions.Filters.Tests.Assets;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Filters.Tests;
@@ -6,14 +8,17 @@ namespace IDFCR.Abstractions.Filters.Tests;
 [TestFixture]
 public class FilterFactoryTests
 {
-    private DefaultFilterFactory _factory;
+    private IFilterFactory _factory;
     private ServiceCollection _services;
     [SetUp]
     public void SetUp()
     {
         _services = new ServiceCollection();
-        _services.AddTransient(typeof(IFilter<,>), typeof(GenericTestFilter<,>));
-        _factory = new([new TestFilter()], _services.BuildServiceProvider());
+        _services
+            .ScanFilters(typeof(FilterFactoryTests).Assembly)
+            .AddGenericFilter(typeof(GenericTestFilter<,>));
+
+        _factory = _services.BuildServiceProvider().GetRequiredService<IFilterFactory>();
     }
 
     [Test]

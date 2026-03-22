@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Filters.Tests;
+﻿namespace IDFCR.Abstractions.Filters.Tests.Assets;
 
 public class TestFilter : FilterBase<TestFilterRequest, Customer>
 {

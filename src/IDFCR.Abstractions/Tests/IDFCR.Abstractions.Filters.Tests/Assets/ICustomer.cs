@@ -1,7 +1,7 @@
 ﻿using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 
-namespace IDFCR.Abstractions.Filters.Tests;
+namespace IDFCR.Abstractions.Filters.Tests.Assets;
 
 public interface ICustomer : IMapper<ICustomer>, IIdentifiable<Guid>, IAuditCreatedTimestamp, IAuditModifiedTimestamp, ISuppressable
 {

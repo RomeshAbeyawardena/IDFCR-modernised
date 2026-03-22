@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Mapper;
 
-namespace IDFCR.Abstractions.Filters.Tests;
+namespace IDFCR.Abstractions.Filters.Tests.Assets;
 
 public class Customer : MapperBase<ICustomer>, ICustomer
 {

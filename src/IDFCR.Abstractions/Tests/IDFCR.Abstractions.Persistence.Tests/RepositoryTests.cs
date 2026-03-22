@@ -30,7 +30,13 @@ public class RepositoryTests
         ]);
 
         _serviceProviderMock = new();
-        _defaultFilterFactory = new([new PagedCustomerFilter(), new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>()], _serviceProviderMock.Object);
+
+        _serviceProviderMock.Setup(x => x.GetService(typeof(IEnumerable<IPagedFilter<PagedCustomerRequest, DbCustomer>>)))
+            .Returns(new IPagedFilter<PagedCustomerRequest, DbCustomer>[] {
+                new PagedCustomerFilter(),
+                new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>() });
+            
+        _defaultFilterFactory = new(_serviceProviderMock.Object);
         
         _mockRepository = new(_factory, _defaultFilterFactory);
     }
