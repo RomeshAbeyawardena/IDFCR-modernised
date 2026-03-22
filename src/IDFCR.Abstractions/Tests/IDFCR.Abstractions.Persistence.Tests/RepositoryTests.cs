@@ -12,43 +12,71 @@ namespace IDFCR.Abstractions.Persistence.Tests
     public class RepositoryTests
     {
 
-        private Mock<IEntityInterceptorFactory> _factoryMock;
+        private DefaultEntityInterceptorFactory _factory;
         private InternalMemoryMockRepository<ICustomer, DbCustomer, Customer> _mockRepository;
+        private FakeTimeProvider _timeProvider;
         [SetUp]
         public void SetUp()
         {
-            _factoryMock = new();
-            var timeProvider = new FakeTimeProvider(
+            _timeProvider = new FakeTimeProvider(
                 new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero));
 
-            IEnumerable<IEntityInterceptor> interceptors = [
-                new AuditCreatedTimestampEntityInterceptor(timeProvider),
-                new AuditModifiedTimestampEntityInterceptor(timeProvider)
-            ];
 
-            _factoryMock.Setup(x => x.GetEntityInterceptorsAsync(It.IsAny<IEntityInterceptorContext>(),
-                It.IsAny<CancellationToken>()))
-                .ReturnsAsync(interceptors);
-
-            _mockRepository = new(_factoryMock.Object);
+            _factory = new([
+                new AuditCreatedTimestampEntityInterceptor(_timeProvider),
+                new AuditModifiedTimestampEntityInterceptor(_timeProvider)
+            ]);
+            
+            _mockRepository = new(_factory);
         }
 
         [Test]
         public async Task AddAsync_Should_SetCreatedTimestamp_And_NotModified()
         {
-            
-            var repo = new InternalMemoryMockRepository<ICustomer, DbCustomer, Customer>(_factoryMock.Object);
-
             var entity = new Customer();
 
-            var id = (await repo.UpsertAsync(entity, CancellationToken.None)).GetResultOrDefault();
+            var upsertResult = await _mockRepository.UpsertAsync(entity, CancellationToken.None);
 
-            var stored = (await repo.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
+            Assert.That(upsertResult.IsSuccess, Is.True, $"Internal error: {upsertResult.Exception?.Message}");
+
+            var id = upsertResult.GetResultOrDefault();
+
+            var stored = (await _mockRepository.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
 
             Assert.That(stored, Is.Not.Null);
-            Assert.That(stored!.CreatedTimestampUtc,
-                Is.EqualTo(timeProvider.GetUtcNow()));
-            Assert.That(stored.ModifiedTimestampUtc, Is.Null);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(stored!.CreatedTimestampUtc,
+                            Is.EqualTo(_timeProvider.GetUtcNow()));
+                Assert.That(stored.ModifiedTimestampUtc, Is.Null);
+            }
+        }
+
+        [Test]
+        public async Task UpsertAsync_Update_Should_SetModifiedTimestamp_And_PreserveCreated()
+        {
+            var entity = new Customer();
+
+            var insertResult = await _mockRepository.UpsertAsync(entity, CancellationToken.None);
+            var id = insertResult.GetResultOrDefault();
+
+            var stored = (await _mockRepository.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
+
+            var originalCreated = stored!.CreatedTimestampUtc;
+
+            _timeProvider.Advance(TimeSpan.FromHours(1));
+
+            var updateResult = await _mockRepository.UpsertAsync(stored, CancellationToken.None);
+
+            Assert.That(updateResult.IsSuccess, Is.True);
+
+            var updated = (await _mockRepository.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(updated!.CreatedTimestampUtc, Is.EqualTo(originalCreated));
+                Assert.That(updated.ModifiedTimestampUtc, Is.EqualTo(_timeProvider.GetUtcNow()));
+            }
         }
     }
 }
