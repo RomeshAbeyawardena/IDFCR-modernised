@@ -1,17 +1,42 @@
-﻿using IDFCR.Abstractions.Interceptors;
+﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
+using LinqKit;
 using Microsoft.Extensions.Time.Testing;
-using Moq;
 using NUnit.Framework;
+using System.Linq.Expressions;
 
 namespace IDFCR.Abstractions.Persistence.Tests
 {
+    internal record PagedCustomerRequest : PagedQuery
+    {
+        public string? NameContains { get; set; }
+    }
+
+    internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCustomer>
+    {
+        protected override Expression<Func<DbCustomer, bool>> BuildPredicate(IQueryable<DbCustomer> queryable, PagedCustomerRequest request)
+        {
+            var expression = base.StarterExpression;
+            var innerExpression =  base.StarterExpression;
+
+            if (!string.IsNullOrWhiteSpace(request.NameContains))
+            {
+                innerExpression.And(x => x.FirstName.Contains(request.NameContains));
+                innerExpression.Or(x => string.IsNullOrWhiteSpace(x.MiddleName) || x.MiddleName.Contains(request.NameContains));
+                innerExpression.Or(x => x.LastName.Contains(request.NameContains));
+            }
+
+            return expression.And(innerExpression);
+        }
+    }
 
     [TestFixture]
     public class RepositoryTests
     {
-
+        private DefaultFilterFactory _defaultFilterFactory;
         private DefaultEntityInterceptorFactory _factory;
         private InternalMemoryMockRepository<ICustomer, DbCustomer, Customer> _mockRepository;
         private FakeTimeProvider _timeProvider;
@@ -26,8 +51,10 @@ namespace IDFCR.Abstractions.Persistence.Tests
                 new AuditCreatedTimestampEntityInterceptor(_timeProvider),
                 new AuditModifiedTimestampEntityInterceptor(_timeProvider)
             ]);
+
+            _defaultFilterFactory = new([new PagedCustomerFilter()]);
             
-            _mockRepository = new(_factory);
+            _mockRepository = new(_factory, _defaultFilterFactory);
         }
 
         [Test]

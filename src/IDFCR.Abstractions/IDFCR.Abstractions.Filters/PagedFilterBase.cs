@@ -8,8 +8,7 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
 {
     protected (IQueryable<TDb> query, int totalEntries) Apply_protected(IQueryable<TDb> queryable, TRequest request)
     {
-        var expression = StarterExpression;
-        expression = BuildPredicate(queryable, expression);
+        var expression = BuildPredicate(queryable, request);
 
         var query = queryable.Where(expression);
 
@@ -19,7 +18,7 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
     }
 
     protected virtual int DefaultSize { get; } = 500;
-    protected abstract Expression<Func<TDb, bool>> BuildPredicate(IQueryable<TDb> queryable, LinqKit.ExpressionStarter<TDb> builder);
+    protected abstract Expression<Func<TDb, bool>> BuildPredicate(IQueryable<TDb> queryable, TRequest request);
     
     public override IQueryable<TDb> Apply(IQueryable<TDb> queryable, TRequest request)
     {

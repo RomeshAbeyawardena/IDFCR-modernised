@@ -5,6 +5,9 @@ namespace IDFCR.Abstractions.Persistence.Tests
 {
     public interface ICustomer : IMapper<ICustomer>, IIdentifiable<Guid>, IAuditCreatedTimestamp, IAuditModifiedTimestamp
     {
+        string FirstName { get; }
+        string? MiddleName { get; }
+        string LastName { get; }
 
     }
 }

@@ -1,24 +1,4 @@
-﻿using IDFCR.Abstractions.Mapper;
-
-namespace IDFCR.Abstractions.Results;
-
-public interface IUnitPagedResult<TResult> : IUnitResult<IEnumerable<TResult>>
-{
-    int TotalRows { get; }
-    IPagedQuery PagedQuery { get; }
-}
-
-public interface IConventionalPagedQuery : IMapper<IConventionalPagedQuery>, IMapper<IPagedQuery>
-{
-    int? Take { get; }
-    int? Skip { get; }
-}
-
-public interface IPagedQuery : IMapper<IPagedQuery>, IMapper<IConventionalPagedQuery>
-{
-    int? PageSize { get; }
-    int? PageIndex { get; }
-}
+﻿namespace IDFCR.Abstractions.Results;
 
 public static class UnitPagedResult
 {

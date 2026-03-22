@@ -2,7 +2,7 @@
 
 public abstract class FilterBase<TRequest, TDb> : IFilter<TRequest, TDb>
 {
-    protected LinqKit.ExpressionStarter<TDb> StarterExpression => LinqKit.PredicateBuilder.New<TDb>(x => true);
+    protected LinqKit.ExpressionStarter<TDb> StarterExpression => LinqKit.PredicateBuilder.New<TDb>().DefaultExpression = x => true;
     public virtual bool CanFilter(TRequest request)
     {
         return true;
