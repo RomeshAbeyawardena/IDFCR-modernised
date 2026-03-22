@@ -27,7 +27,7 @@ public class RepositoryTests
             new AuditModifiedTimestampEntityInterceptor(_timeProvider)
         ]);
 
-        _defaultFilterFactory = new([new PagedCustomerFilter()]);
+        _defaultFilterFactory = new([new PagedCustomerFilter(), new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>()]);
         
         _mockRepository = new(_factory, _defaultFilterFactory);
     }
@@ -89,6 +89,8 @@ public class RepositoryTests
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Alice", LastName = "Smith" }, default);
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Bob", LastName = "Jones" }, default);
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Alicia", LastName = "Brown" }, default);
+        await _mockRepository.UpsertAsync(new Customer { FirstName = "Alicia", LastName = "Thomas", Suppressed = true }, default);
+        await _mockRepository.UpsertAsync(new Customer { FirstName = "Aliyanna", LastName = "Humphreys", Suppressed = true }, default);
 
         var request = new PagedCustomerRequest
         {

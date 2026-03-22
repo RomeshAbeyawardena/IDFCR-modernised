@@ -10,6 +10,7 @@ namespace IDFCR.Abstractions.Persistence.Tests
         public string FirstName { get; set; } = null!;
         public string? MiddleName { get; set; }
         public string LastName { get; set; } = null!;
+        public bool Suppressed { get; set; }
 
         public override void Map(ICustomer source)
         {
@@ -19,6 +20,7 @@ namespace IDFCR.Abstractions.Persistence.Tests
             LastName = source.LastName;
             CreatedTimestampUtc = source.CreatedTimestampUtc;
             ModifiedTimestampUtc = source.ModifiedTimestampUtc;
+            Suppressed = source.Suppressed;
         }
     }
 }

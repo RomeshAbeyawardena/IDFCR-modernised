@@ -1,7 +1,31 @@
 ﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 using System.Linq.Expressions;
 
 namespace IDFCR.Abstractions.Persistence.Tests;
+
+internal interface IPagedGlobalRequest : IPagedQuery
+{
+    bool ShowAll { get; set; }
+}
+
+internal class PagedGlobalFilter<TRequest, TDb> : PagedFilterBase<TRequest, TDb>
+    where TRequest : IPagedGlobalRequest
+    where TDb : ISuppressable
+{
+    protected override Expression<Func<TDb, bool>> BuildPredicate(IQueryable<TDb> queryable, TRequest request)
+    {
+        var expression = base.StarterExpression;
+
+        if (!request.ShowAll)
+        {
+            expression = expression.And(x => !x.Suppressed);
+        }
+
+        return expression;
+    }
+}
 
 internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCustomer>
 {
