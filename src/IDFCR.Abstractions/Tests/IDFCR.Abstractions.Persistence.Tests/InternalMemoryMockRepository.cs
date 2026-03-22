@@ -7,6 +7,8 @@ using Moq;
 
 namespace IDFCR.Abstractions.Persistence.Tests
 {
+
+
     internal class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory)
         : RepositoryBase<TCommon, TDb, T, Guid>(entityInterceptorFactory)
         where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<Guid>

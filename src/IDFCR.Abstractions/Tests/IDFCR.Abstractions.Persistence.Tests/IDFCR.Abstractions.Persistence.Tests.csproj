@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Filters\IDFCR.Abstractions.Filters.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
   </ItemGroup>
 </Project>
