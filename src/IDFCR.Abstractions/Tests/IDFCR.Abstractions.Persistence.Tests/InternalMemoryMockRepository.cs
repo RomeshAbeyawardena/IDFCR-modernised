@@ -61,6 +61,11 @@ namespace IDFCR.Abstractions.Persistence.Tests
             return OnFindAsync(id, trackChanges, cancellationToken);
         }
 
+        protected override Task<(IEnumerable<TDb> Data, int TotalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task<Guid> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
         {
             var foundEntry = entries.Find(x => x.Id == entry.Id) ?? throw new EntityNotFoundException(typeof(TDb), entry.Id);

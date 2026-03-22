@@ -12,7 +12,7 @@ namespace IDFCR.Abstractions.Persistence
         where TDb: class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
         where T: class, IMapper<TCommon>, TCommon
     {
-        private async ValueTask<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
+        private async Task<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
         {
             Exception? caughtException;
             bool success = false;
@@ -45,8 +45,8 @@ namespace IDFCR.Abstractions.Persistence
             object model, CancellationToken cancellationToken)
         {
             var context = RepositoryInterceptorContext.Create(stage, behavior, model);
-            await entityInterceptorFactory.InvokeAsync(await entityInterceptorFactory.
-                GetEntityInterceptorsAsync(context, cancellationToken), context, cancellationToken);
+            var interceptors = await entityInterceptorFactory.GetEntityInterceptorsAsync(context, cancellationToken);
+            await entityInterceptorFactory.InvokeAsync(interceptors, context, cancellationToken);
 
             return context;
         }
@@ -67,9 +67,12 @@ namespace IDFCR.Abstractions.Persistence
         protected abstract Task<TDb?> OnFindAsync(object[] keys, bool trackChanges, CancellationToken cancellationToken);
         protected abstract Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken);
 
+        protected abstract Task<(IEnumerable<TDb> Data,int TotalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+            where TRequest : IPagedQuery;
+
         protected abstract bool IsHandled(Exception exception);
 
-        public async ValueTask<IUnitResult> DeleteAsync(TKey key, CancellationToken cancellationToken)
+        public async Task<IUnitResult> DeleteAsync(TKey key, CancellationToken cancellationToken)
         {
             Exception? caughtException = null;
             bool success = false;
@@ -104,17 +107,17 @@ namespace IDFCR.Abstractions.Persistence
             return UnitResult.FromResult(key, UnitAction.Delete, success, caughtException);
         }
 
-        public ValueTask<IUnitResult<T>> FindAsync(object[] keys, CancellationToken cancellationToken)
+        public Task<IUnitResult<T>> FindAsync(object[] keys, CancellationToken cancellationToken)
         {
             return WrapFindResult(ct => OnFindAsync(keys, false, ct), keys, cancellationToken);
         }
 
-        public ValueTask<IUnitResult<T>> FindAsync(TKey key, CancellationToken cancellationToken)
+        public Task<IUnitResult<T>> FindAsync(TKey key, CancellationToken cancellationToken)
         {
             return WrapFindResult(ct => OnFindAsync(key, false, ct), key, cancellationToken);
         }
 
-        public async ValueTask<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
+        public async Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
         {
             try
             {
@@ -146,20 +149,19 @@ namespace IDFCR.Abstractions.Persistence
                     {
                         return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                     }
-                    
+
+                    foundEntry.Apply(dbValue);
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Update, dbValue, cancellationToken);
+                        EntityContextBehavior.Update, foundEntry, cancellationToken);
 
                     if (context.BypassOperation)
                     {
                         return UnitResult.FromResult(dbValue.Id, UnitAction.None)
                             .AddMeta("bypassed", true).As<TKey>();
                     }
-
-                    foundEntry.Apply(dbValue);
                     var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Update, dbValue, cancellationToken);
+                        EntityContextBehavior.Update, foundEntry, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Update);
                 }
@@ -173,6 +175,16 @@ namespace IDFCR.Abstractions.Persistence
                 //alert the consumer that the exception was not expected
                 return UnitResult.Failed<TKey>(exception).AddMeta("unexpected", "true").As<TKey>();
             }
+        }
+
+        public async virtual Task<IUnitPagedResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
+        {
+            var (data, totalRows) = await OnGetPagedAsync(request, cancellationToken);
+
+            var mappedData = data.Select(Map) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
+
+            return UnitPagedResult.FromResult<T>(mappedData!, 
+                totalRows, request, UnitAction.Get);
         }
     }
 }
