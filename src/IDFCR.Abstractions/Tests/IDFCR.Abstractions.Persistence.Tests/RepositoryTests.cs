@@ -68,13 +68,14 @@ namespace IDFCR.Abstractions.Persistence.Tests
 
             var updateResult = await _mockRepository.UpsertAsync(stored, CancellationToken.None);
 
-            Assert.That(updateResult.IsSuccess, Is.True);
+            Assert.That(updateResult.IsSuccess, Is.True, $"Internal error: {updateResult.Exception?.Message}");
 
             var updated = (await _mockRepository.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
+            Assert.That(updated, Is.Not.Null);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(updated!.CreatedTimestampUtc, Is.EqualTo(originalCreated));
+                Assert.That(updated.CreatedTimestampUtc, Is.EqualTo(originalCreated));
                 Assert.That(updated.ModifiedTimestampUtc, Is.EqualTo(_timeProvider.GetUtcNow()));
             }
         }
