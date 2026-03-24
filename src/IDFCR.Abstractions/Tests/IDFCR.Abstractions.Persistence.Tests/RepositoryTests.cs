@@ -1,10 +1,11 @@
-﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Filters.Extensions;
 using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Persistence.Tests.Assets;
 using IDFCR.Abstractions.Results.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
-using Moq;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Persistence.Tests;
@@ -12,33 +13,38 @@ namespace IDFCR.Abstractions.Persistence.Tests;
 [TestFixture]
 public class RepositoryTests
 {
-    private DefaultFilterFactory _defaultFilterFactory;
-    private DefaultEntityInterceptorFactory _factory;
+    private IFilterFactory _filterFactory;
+    private IEntityInterceptorFactory _entityInterceptorFactory;
     private InternalMemoryMockRepository<ICustomer, DbCustomer, Customer> _mockRepository;
-    private Mock<IServiceProvider> _serviceProviderMock;
+    private IServiceProvider _serviceProvider;
     private FakeTimeProvider _timeProvider;
+
     [SetUp]
     public void SetUp()
     {
-        
         _timeProvider = new FakeTimeProvider(
             new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero));
 
-        _factory = new([
-            new AuditCreatedTimestampEntityInterceptor(_timeProvider),
-            new AuditModifiedTimestampEntityInterceptor(_timeProvider)
-        ]);
+        var services = new ServiceCollection();
 
-        _serviceProviderMock = new();
+        services
+            .AddSingleton<TimeProvider>(_timeProvider)
+            .AddTransient<IEntityInterceptor, AuditCreatedTimestampEntityInterceptor>()
+            .AddTransient<IEntityInterceptor, AuditModifiedTimestampEntityInterceptor>()
+            .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
+            .ScanFilters(typeof(RepositoryTests).Assembly)
+            .AddGenericFilter(typeof(PagedGlobalFilter<,>));
 
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IEnumerable<IPagedFilter<PagedCustomerRequest, DbCustomer>>)))
-            .Returns(new IPagedFilter<PagedCustomerRequest, DbCustomer>[] {
-                new PagedCustomerFilter(),
-                new PagedGlobalFilter<PagedCustomerRequest, DbCustomer>() });
-            
-        _defaultFilterFactory = new(_serviceProviderMock.Object);
-        
-        _mockRepository = new(_factory, _defaultFilterFactory);
+        _serviceProvider = services.BuildServiceProvider();
+        _entityInterceptorFactory = _serviceProvider.GetRequiredService<IEntityInterceptorFactory>();
+        _filterFactory = _serviceProvider.GetRequiredService<IFilterFactory>();
+        _mockRepository = new(_entityInterceptorFactory, _filterFactory);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        (_serviceProvider as IDisposable)?.Dispose();
     }
 
     [Test]
@@ -94,7 +100,6 @@ public class RepositoryTests
     [Test]
     public async Task GetPaged_Should_Filter_By_NameContains_And_Return_Correct_Total()
     {
-        // Arrange
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Alice", LastName = "Smith" }, default);
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Bob", LastName = "Jones" }, default);
         await _mockRepository.UpsertAsync(new Customer { FirstName = "Alicia", LastName = "Brown" }, default);
@@ -108,10 +113,8 @@ public class RepositoryTests
             PageSize = 10
         };
 
-        // Act
         var result = await _mockRepository.GetPagedAsync(request, default);
 
-        // Assert
         Assert.That(result.IsSuccess, Is.True);
 
         var data = result.GetResultOrDefault()?.ToArray();
@@ -122,6 +125,7 @@ public class RepositoryTests
             Assert.That(data, Has.Length.EqualTo(2));
             Assert.That(result.TotalRows, Is.EqualTo(2));
         }
+
         Assert.That(data.All(x => x.FirstName.Contains("Ali")), Is.True);
     }
 }

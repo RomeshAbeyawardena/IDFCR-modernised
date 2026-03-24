@@ -18,9 +18,19 @@ public static class ServiceCollectionExtensions
             throw new InvalidCastException($"Unable to add a generic filter that has not been marked as a {nameof(GlobalFilterAttribute)}.");
         }
 
+        services.AddTransient(typeof(IFilter<,>), genericType);
 
-        return services.AddTransient(typeof(IFilter<,>), genericType);
+        var interfaces = genericType.GetInterfaces();
+
+        if (interfaces.Any(a => a.Name.StartsWith(nameof(IPagedFilter<,>))))
+        {
+            services.AddTransient(typeof(IPagedFilter<,>), genericType);
+        }
+
+        return services;
     }
+
+    
 
     public static IServiceCollection ScanFilters(this IServiceCollection services, params Assembly[] assemblies)
     {

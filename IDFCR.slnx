@@ -19,4 +19,13 @@
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests.csproj" />
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
   </Folder>
+  <Folder Name="/src/IDFCR.AI/">
+    <Project Path="src/IDFCR.AI/IDFCR.AI.Abstractions/IDFCR.AI.Abstractions.csproj" />
+    <Project Path="src/IDFCR.AI/IDFCR.AI.Http/IDFCR.AI.Http.csproj" />
+    <Project Path="src/IDFCR.AI/IDFCR.AI.OpenAI/IDFCR.AI.OpenAI.csproj" />
+  </Folder>
+  <Folder Name="/src/IDFCR.AI/Tests/">
+    <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.Http.Tests/IDFCR.AI.Http.Tests.csproj" />
+    <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.OpenAI.Tests/IDFCR.AI.OpenAI.Tests.csproj" />
+  </Folder>
 </Solution>
