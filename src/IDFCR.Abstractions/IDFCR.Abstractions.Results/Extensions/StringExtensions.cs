@@ -1,21 +1,26 @@
-﻿using System.Globalization;
-using System.Security.Authentication;
-using System.Security.Cryptography;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace IDFCR.Abstractions.Results.Extensions;
 
+/// <summary>
+/// String utility extensions used by the result and exception helpers.
+/// </summary>
 public static class StringExtensions
 {
+    /// <summary>
+    /// Normalizes spacing and title-cases the supplied value.
+    /// </summary>
     public static string NormaliseName(this string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return value;
-        // Replace multiple spaces with a single space
         value = Regex.Replace(value, @"\s+", " ").Trim();
-        // Capitalize the first letter of each word
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.ToLowerInvariant());
     }
+    /// <summary>
+    /// Pads, trims, or elides the value to a fixed length.
+    /// </summary>
     public static string FixedLength(this string value, int length)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -37,6 +42,9 @@ public static class StringExtensions
         return value;
     }
 
+    /// <summary>
+    /// Converts the value to kebab-case.
+    /// </summary>
     public static string ToKebabCase(this string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -68,7 +76,6 @@ public static class StringExtensions
             }
             else
             {
-                // Insert hyphen between digit & letter or vice versa
                 if (prev.HasValue && (
                     (char.IsDigit(prev.Value) && char.IsLetter(current)) ||
                     (char.IsLetter(prev.Value) && char.IsDigit(current))))
@@ -83,6 +90,9 @@ public static class StringExtensions
         return new string([.. result]).Trim('-');
     }
 
+    /// <summary>
+    /// Converts the value to camel case while preserving acronym casing.
+    /// </summary>
     public static string ToCamelCasePreservingAcronyms(this string input)
     {
         var upperCaseWordRegex = new Regex("[A-Z]+");
@@ -124,11 +134,17 @@ public static class StringExtensions
     private static bool IsAllUpper(string word) =>
         word.All(char.IsLetter) && word.Equals(word, StringComparison.InvariantCultureIgnoreCase);
 
+    /// <summary>
+    /// Replaces all occurrences of the supplied values.
+    /// </summary>
     public static string ReplaceAll(this string value, string newValue, params string[] values)
     {
         return ReplaceAll(value, newValue, default, values);
     }
 
+    /// <summary>
+    /// Replaces all occurrences of the supplied values using the specified comparison rules.
+    /// </summary>
     public static string ReplaceAll(this string value, string newValue, StringComparison stringComparison, params string[] values)
     {
         if (values == null || values.Length == 0)
@@ -140,10 +156,16 @@ public static class StringExtensions
         return value;
     }
 
+    /// <summary>
+    /// Prepends a URL segment using a forward slash separator.
+    /// </summary>
     public static string PrependUrl(this string value, string source)
     {
         return Prepend(value, source, '/');
     }
+    /// <summary>
+    /// Prepends a string using the supplied separator.
+    /// </summary>
     public static string Prepend(this string value, string source, char? separator)
     {
         return $"{source}{separator}{value}";

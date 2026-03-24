@@ -1,4 +1,4 @@
-﻿using IDFCR.Abstractions.DependencyInjection.Extensions;
+using IDFCR.Abstractions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

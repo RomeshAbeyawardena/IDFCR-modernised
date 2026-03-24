@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Mapper.Records;
+namespace IDFCR.Abstractions.Mapper.Records;
 
 public abstract record RecordMapperBase<TSource>() : IRecordMapper<TSource>
 {

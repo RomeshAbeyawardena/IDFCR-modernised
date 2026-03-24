@@ -4,8 +4,12 @@ using System.Net.Http.Headers;
 
 namespace IDFCR.AI.Http;
 
+/// <summary>
+/// Default <see cref="IAIService"/> implementation that sends requests with <see cref="HttpClient"/>.
+/// </summary>
 public sealed class HttpAIService(HttpClient httpClient) : IAIService
 {
+    /// <inheritdoc />
     public async Task<VerifiedConnectionResult> VerifyConnection<TConfiguration>(TConfiguration configuration, CancellationToken cancellationToken)
         where TConfiguration : IAIServiceConfiguration
     {
@@ -31,6 +35,7 @@ public sealed class HttpAIService(HttpClient httpClient) : IAIService
         }
     }
 
+    /// <inheritdoc />
     public async Task<AIServiceResponse> SendAsync<TConfiguration>(TConfiguration configuration, AIServiceRequest request, CancellationToken cancellationToken)
         where TConfiguration : IAIServiceConfiguration
     {

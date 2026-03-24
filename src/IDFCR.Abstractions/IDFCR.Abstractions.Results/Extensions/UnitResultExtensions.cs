@@ -1,7 +1,10 @@
-﻿using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Mapper;
 
 namespace IDFCR.Abstractions.Results.Extensions;
 
+/// <summary>
+/// Extension helpers for unit results.
+/// </summary>
 public static class UnitResultExtensions
 {
     private static void CloneMeta<TDestination>(IReadOnlyDictionary<string, object?> data, IUnitResult<TDestination> target)
@@ -12,6 +15,9 @@ public static class UnitResultExtensions
         }
     }
 
+    /// <summary>
+    /// Returns the result value when available, otherwise a supplied default value.
+    /// </summary>
     public static T? GetResultOrDefault<T>(this IUnitResult<T> value, T? @default = default)
     {
         if (value.HasValue)
@@ -22,6 +28,9 @@ public static class UnitResultExtensions
         return @default;
     }
 
+    /// <summary>
+    /// Converts a collection result using the supplied converter.
+    /// </summary>
     public static IUnitResultCollection<TDestination> Convert<T, TDestination>(this IUnitResultCollection<T> unitResultCollection, Func<T, TDestination> converter)
     {
         if (unitResultCollection.Result is null)
@@ -37,6 +46,9 @@ public static class UnitResultExtensions
         return result;
     }
 
+    /// <summary>
+    /// Converts a unit result using the supplied converter.
+    /// </summary>
     public static IUnitResult<TDestination> Convert<T, TDestination>(this IUnitResult<T> unitResult, Func<T, TDestination> converter)
     {
         if (unitResult.Result is null)
@@ -51,6 +63,9 @@ public static class UnitResultExtensions
         return result;
     }
 
+    /// <summary>
+    /// Converts a paged result using the supplied converter.
+    /// </summary>
     public static IUnitPagedResult<TDestination> Convert<T, TDestination>(this IUnitPagedResult<T> unitResult, Func<T, TDestination> converter)
     {
         var convertedResults = unitResult.Result?.Select(converter).ToList() ?? [];
@@ -59,6 +74,9 @@ public static class UnitResultExtensions
         return results;
     }
 
+    /// <summary>
+    /// Converts a unit result by mapping between two mapper implementations.
+    /// </summary>
     public static IUnitResult<TDestination> Convert<TAbstraction, T, TDestination>(this IUnitResult<T> unitResult)
     where T : IMapper<TAbstraction>, TAbstraction, new()
     where TDestination : IMapper<TAbstraction>, TAbstraction, new()

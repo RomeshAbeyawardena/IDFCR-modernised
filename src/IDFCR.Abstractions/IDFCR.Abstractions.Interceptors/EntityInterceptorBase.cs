@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Interceptors;
+namespace IDFCR.Abstractions.Interceptors;
 
 public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, EntityContextBehavior behavior, int? orderIndex = null) : IEntityInterceptor
 {

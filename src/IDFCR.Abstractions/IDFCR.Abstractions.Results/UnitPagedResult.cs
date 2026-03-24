@@ -1,7 +1,22 @@
-﻿namespace IDFCR.Abstractions.Results;
+namespace IDFCR.Abstractions.Results;
 
+/// <summary>
+/// Factory helpers for paged unit results.
+/// </summary>
 public static class UnitPagedResult
 {
+    /// <summary>
+    /// Creates a paged result from the supplied data and paging request.
+    /// </summary>
+    /// <typeparam name="TResult">The element type.</typeparam>
+    /// <param name="result">The page payload.</param>
+    /// <param name="totalRows">The total row count before paging.</param>
+    /// <param name="pagedQuery">The paging request that produced the result.</param>
+    /// <param name="action">The associated action.</param>
+    /// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
+    /// <param name="exception">The captured exception.</param>
+    /// <param name="failureReason">The failure reason.</param>
+    /// <returns>A paged unit result.</returns>
     public static UnitPagedResult<TResult> FromResult<TResult>(
         IEnumerable<TResult>? result,
         int totalRows,
@@ -15,10 +30,32 @@ public static class UnitPagedResult
     }
 }
 
+/// <summary>
+/// Represents a paged collection result.
+/// </summary>
+/// <typeparam name="TResult">The element type.</typeparam>
+/// <param name="result">The page payload.</param>
+/// <param name="totalRows">The total row count before paging.</param>
+/// <param name="pagedQuery">The paging request that produced the result.</param>
+/// <param name="action">The associated action.</param>
+/// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
+/// <param name="exception">The captured exception.</param>
+/// <param name="failureReason">The failure reason.</param>
 public sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
 {
+    /// <summary>
+    /// Gets the paging request used to produce this result.
+    /// </summary>
     public IPagedQuery PagedQuery { get; }
+
+    /// <summary>
+    /// Gets the total number of rows before paging.
+    /// </summary>
     public int TotalRows { get; }
+
+    /// <summary>
+    /// Creates a paged result from the supplied data and paging request.
+    /// </summary>
     public UnitPagedResult(
         IEnumerable<TResult>? result,
         int totalRows,
@@ -43,6 +80,9 @@ public sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, I
         }
     }
 
+    /// <summary>
+    /// Creates a paged result without paging metadata.
+    /// </summary>
     public UnitPagedResult(IEnumerable<TResult>? result, UnitAction action = UnitAction.None, bool isSuccess = true, Exception? exception = null,
         FailureReason? failureReason = null)
         : this(result, 0, null!, action, isSuccess, exception, failureReason)

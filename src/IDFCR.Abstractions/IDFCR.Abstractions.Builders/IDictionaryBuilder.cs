@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Builders
+namespace IDFCR.Abstractions.Builders
 {
     public interface IDictionaryBuilder<TKey, TValue>
     where TKey : notnull

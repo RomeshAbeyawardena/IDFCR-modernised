@@ -1,20 +1,26 @@
-﻿using IDFCR.Abstractions.Results;
+using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Filters;
 
+/// <summary>
+/// Default <see cref="IFilterFactory"/> backed by the service provider.
+/// </summary>
 internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterFactory
 {
+    /// <inheritdoc />
     public IEnumerable<IFilter<TRequest, TDb>> GetFilters<TRequest, TDb>()
     {
         return serviceProvider.GetServices<IFilter<TRequest, TDb>>();
     }
 
+    /// <inheritdoc />
     public IEnumerable<IPagedFilter<TRequest, TDb>> GetPagedFilters<TRequest, TDb>() where TRequest : IPagedQuery
     {
         return serviceProvider.GetServices<IPagedFilter<TRequest, TDb>>();
     }
 
+    /// <inheritdoc />
     public IQueryable<TDb> Apply<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request)
     {
         IQueryable<TDb> query = queryable;
@@ -30,6 +36,7 @@ internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterF
         return query;
     }
 
+    /// <inheritdoc />
     public (IQueryable<TDb> query, int totalRows) ApplyPaged<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request, Func<IQueryable<TDb>, int>? customCount) where TRequest : IPagedQuery
     {
         IQueryable<TDb> query = queryable;

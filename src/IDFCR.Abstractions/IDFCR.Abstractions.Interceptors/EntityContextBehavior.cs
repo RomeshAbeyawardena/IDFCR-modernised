@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Interceptors;
+namespace IDFCR.Abstractions.Interceptors;
 
 public enum EntityContextBehavior
 {

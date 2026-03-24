@@ -1,12 +1,21 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
 namespace IDFCR.Abstractions.Persistence.Extensions;
 
+/// <summary>
+/// Object copy helpers for repository models.
+/// </summary>
 public static class ObjectExtensions
 {
     private static readonly ConcurrentDictionary<(Type Source, Type Target), Action<object, object>> _applyCache = new();
 
+    /// <summary>
+    /// Copies matching writable properties from <paramref name="source"/> to <paramref name="target"/>.
+    /// </summary>
+    /// <remarks>
+    /// Only properties with the same name and exact type are copied, and equal values are skipped.
+    /// </remarks>
     public static void Apply(this object target, object source)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -39,7 +48,6 @@ public static class ObjectExtensions
                 var sourceValue = Expression.Property(sourceCast, sourceProp);
                 var targetValue = Expression.Property(targetCast, targetProp);
 
-                // if (!Equals(targetValue, sourceValue))
                 var notEqual = Expression.Not(
                     Expression.Call(
                         typeof(object),
@@ -50,10 +58,7 @@ public static class ObjectExtensions
                     )
                 );
 
-                // target.Property = source.Property;
                 var assign = Expression.Assign(targetValue, sourceValue);
-
-                // if (!Equals(...)) { target.Property = source.Property; }
                 var ifNotEqualAssign = Expression.IfThen(notEqual, assign);
 
                 blockExpressions.Add(ifNotEqualAssign);

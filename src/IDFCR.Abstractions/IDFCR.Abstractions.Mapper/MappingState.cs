@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Mapper;
+namespace IDFCR.Abstractions.Mapper;
 
 public enum MappingState
 {

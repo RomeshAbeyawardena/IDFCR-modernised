@@ -1,9 +1,15 @@
-﻿namespace IDFCR.Abstractions.Results.Exceptions;
+namespace IDFCR.Abstractions.Results.Exceptions;
 
+/// <summary>
+/// Exception thrown when an entity cannot be found.
+/// </summary>
 public class EntityNotFoundException(string entityType,
     object id, Exception? innerException = null)
     : EntityExceptionBase(entityType, $"Unable to find entity of {{entity-type}} with id '{id}'", innerException), IExposableException
 {
+    /// <summary>
+    /// Creates a new not-found exception for the supplied entity type.
+    /// </summary>
     public EntityNotFoundException(Type entityType, object id, Exception? innerException = null)
         : this(entityType.Name, id, innerException)
     {

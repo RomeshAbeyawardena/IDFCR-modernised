@@ -6,15 +6,20 @@ using IDFCR.AI.OpenAI.Models;
 
 namespace IDFCR.AI.OpenAI;
 
+/// <summary>
+/// OpenAI-specific wrapper around <see cref="IAIService"/>.
+/// </summary>
 public sealed class OpenAIService(IAIService aiService) : IOpenAIService
 {
     private const string JsonContentType = "application/json";
 
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
+    /// <inheritdoc />
     public Task<VerifiedConnectionResult> VerifyConnection(OpenAIConfiguration configuration, CancellationToken cancellationToken)
         => VerifyConnectionCoreAsync(configuration, cancellationToken);
 
+    /// <inheritdoc />
     public async Task<OpenAITextResponse> GenerateTextAsync(OpenAIConfiguration configuration, OpenAITextRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(configuration);

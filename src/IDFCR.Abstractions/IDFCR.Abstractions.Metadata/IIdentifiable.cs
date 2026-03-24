@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Metadata;
+namespace IDFCR.Abstractions.Metadata;
 
 public interface IIdentifiable<TKey>
     where TKey : struct
