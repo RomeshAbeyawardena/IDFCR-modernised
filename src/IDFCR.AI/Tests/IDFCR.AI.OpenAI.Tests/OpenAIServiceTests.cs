@@ -12,18 +12,31 @@ namespace IDFCR.AI.OpenAI.Tests;
 public class OpenAIServiceTests
 {
     [Test]
-    public async Task VerifyConnection_Should_Delegate_To_Base_AI_Service()
+    public async Task VerifyConnection_Should_Send_OpenAI_Headers()
     {
         var aiService = new Mock<IAIService>(MockBehavior.Strict);
-        var configuration = OpenAIConfiguration.Create("test-key");
+        var configuration = OpenAIConfiguration.Create("test-key") with
+        {
+            Organization = "org_123",
+            Project = "proj_456"
+        };
+        AIServiceRequest? capturedRequest = null;
 
-        aiService.Setup(service => service.VerifyConnection(configuration, CancellationToken.None))
-            .ReturnsAsync(VerifiedConnectionResult.Success());
+        aiService.Setup(service => service.SendAsync(configuration, It.IsAny<AIServiceRequest>(), CancellationToken.None))
+            .Callback<OpenAIConfiguration, AIServiceRequest, CancellationToken>((_, request, _) => capturedRequest = request)
+            .ReturnsAsync(new AIServiceResponse(HttpStatusCode.OK, null, new Dictionary<string, IReadOnlyCollection<string>>()));
 
         var service = new OpenAIService(aiService.Object);
         var result = await service.VerifyConnection(configuration, CancellationToken.None);
 
-        Assert.That(result.IsSuccessful, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccessful, Is.True);
+            Assert.That(capturedRequest, Is.Not.Null);
+            Assert.That(capturedRequest!.Headers["Authorization"], Is.EqualTo("Bearer test-key"));
+            Assert.That(capturedRequest.Headers["OpenAI-Organization"], Is.EqualTo("org_123"));
+            Assert.That(capturedRequest.Headers["OpenAI-Project"], Is.EqualTo("proj_456"));
+        });
     }
 
     [Test]
@@ -32,7 +45,10 @@ public class OpenAIServiceTests
         var aiService = new Mock<IAIService>(MockBehavior.Strict);
         var configuration = OpenAIConfiguration.Create("test-key") with
         {
-            Model = "gpt-5-mini"
+            ApiKey = "updated-key",
+            Model = "gpt-5-mini",
+            Organization = "org_123",
+            Project = "proj_456"
         };
         AIServiceRequest? capturedRequest = null;
 
@@ -59,6 +75,9 @@ public class OpenAIServiceTests
             Assert.That(capturedRequest!.Method, Is.EqualTo(HttpMethod.Post.Method));
             Assert.That(capturedRequest.RelativePath, Is.EqualTo("v1/responses"));
             Assert.That(capturedRequest.ContentType, Is.EqualTo("application/json"));
+            Assert.That(capturedRequest.Headers["Authorization"], Is.EqualTo("Bearer updated-key"));
+            Assert.That(capturedRequest.Headers["OpenAI-Organization"], Is.EqualTo("org_123"));
+            Assert.That(capturedRequest.Headers["OpenAI-Project"], Is.EqualTo("proj_456"));
             Assert.That(capturedRequest.Headers["x-request-id"], Is.EqualTo("req-123"));
         });
 
@@ -103,6 +122,44 @@ public class OpenAIServiceTests
         }, CancellationToken.None);
 
         Assert.That(response.OutputText, Is.EqualTo("Nested hello"));
+    }
+
+    [Test]
+    public async Task GenerateTextAsync_Should_Ignore_Non_Output_Text_Content_Items()
+    {
+        var aiService = new Mock<IAIService>(MockBehavior.Strict);
+        var configuration = OpenAIConfiguration.Create("test-key");
+        const string content = """
+            {
+              "id": "resp_nested",
+              "status": "completed",
+              "output": [
+                {
+                  "content": [
+                    {
+                      "type": "reasoning",
+                      "text": "Internal note"
+                    },
+                    {
+                      "type": "output_text",
+                      "text": "Visible answer"
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        aiService.Setup(service => service.SendAsync(configuration, It.IsAny<AIServiceRequest>(), CancellationToken.None))
+            .ReturnsAsync(new AIServiceResponse(HttpStatusCode.OK, content, new Dictionary<string, IReadOnlyCollection<string>>()));
+
+        var service = new OpenAIService(aiService.Object);
+        var response = await service.GenerateTextAsync(configuration, new OpenAITextRequest
+        {
+            Prompt = "Say hello"
+        }, CancellationToken.None);
+
+        Assert.That(response.OutputText, Is.EqualTo("Visible answer"));
     }
 
     [Test]

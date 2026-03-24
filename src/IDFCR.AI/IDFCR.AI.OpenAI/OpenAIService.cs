@@ -13,10 +13,7 @@ public sealed class OpenAIService(IAIService aiService) : IOpenAIService
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public Task<VerifiedConnectionResult> VerifyConnection(OpenAIConfiguration configuration, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(configuration);
-        return aiService.VerifyConnection(configuration, cancellationToken);
-    }
+        => VerifyConnectionCoreAsync(configuration, cancellationToken);
 
     public async Task<OpenAITextResponse> GenerateTextAsync(OpenAIConfiguration configuration, OpenAITextRequest request, CancellationToken cancellationToken)
     {
@@ -46,7 +43,7 @@ public sealed class OpenAIService(IAIService aiService) : IOpenAIService
             RelativePath = "v1/responses",
             Content = JsonSerializer.Serialize(payload, SerializerOptions),
             ContentType = JsonContentType,
-            Headers = new Dictionary<string, string>(request.Headers, StringComparer.OrdinalIgnoreCase)
+            Headers = BuildHeaders(configuration, request.Headers)
         }, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -96,7 +93,9 @@ public sealed class OpenAIService(IAIService aiService) : IOpenAIService
 
             foreach (var contentItem in content.EnumerateArray())
             {
-                if (TryGetOptionalString(contentItem, "text", out var text))
+                if (TryGetOptionalString(contentItem, "type", out var contentType)
+                    && string.Equals(contentType, "output_text", StringComparison.Ordinal)
+                    && TryGetOptionalString(contentItem, "text", out var text))
                 {
                     return text;
                 }
@@ -122,5 +121,59 @@ public sealed class OpenAIService(IAIService aiService) : IOpenAIService
 
         value = property.GetString();
         return value is not null;
+    }
+
+    private async Task<VerifiedConnectionResult> VerifyConnectionCoreAsync(OpenAIConfiguration configuration, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        try
+        {
+            var response = await aiService.SendAsync(configuration, new AIServiceRequest
+            {
+                Method = configuration.VerificationMethod,
+                RelativePath = configuration.VerificationPath,
+                Content = configuration.VerificationContent,
+                ContentType = configuration.VerificationContentType,
+                Headers = BuildHeaders(configuration)
+            }, cancellationToken);
+
+            return response.IsSuccessStatusCode
+                ? VerifiedConnectionResult.Success(response.StatusCode)
+                : VerifiedConnectionResult.Failure("The AI service responded, but the connection was not accepted.", response.StatusCode);
+        }
+        catch (Exception exception)
+        {
+            return VerifiedConnectionResult.Failure(exception.Message);
+        }
+    }
+
+    private static Dictionary<string, string> BuildHeaders(OpenAIConfiguration configuration, IDictionary<string, string>? requestHeaders = null)
+    {
+        var headers = new Dictionary<string, string>(configuration.DefaultHeaders, StringComparer.OrdinalIgnoreCase);
+
+        headers["Authorization"] = $"Bearer {configuration.ApiKey}";
+
+        if (!string.IsNullOrWhiteSpace(configuration.Organization))
+        {
+            headers["OpenAI-Organization"] = configuration.Organization;
+        }
+
+        if (!string.IsNullOrWhiteSpace(configuration.Project))
+        {
+            headers["OpenAI-Project"] = configuration.Project;
+        }
+
+        if (requestHeaders is null)
+        {
+            return headers;
+        }
+
+        foreach (var (key, value) in requestHeaders)
+        {
+            headers[key] = value;
+        }
+
+        return headers;
     }
 }

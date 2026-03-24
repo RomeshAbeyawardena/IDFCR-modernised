@@ -16,11 +16,6 @@ public sealed record OpenAIConfiguration : HttpAIServiceConfiguration
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
-        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["Authorization"] = $"Bearer {apiKey}"
-        };
-
         return new OpenAIConfiguration
         {
             ServiceName = "OpenAI",
@@ -28,8 +23,7 @@ public sealed record OpenAIConfiguration : HttpAIServiceConfiguration
             BaseAddress = new Uri("https://api.openai.com/"),
             VerificationPath = "v1/models",
             VerificationMethod = HttpMethod.Get.Method,
-            Timeout = TimeSpan.FromSeconds(60),
-            DefaultHeaders = headers
+            Timeout = TimeSpan.FromSeconds(60)
         };
     }
 }
