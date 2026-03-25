@@ -36,16 +36,20 @@ Write-Verbose("Currently recorded version data.");
 Write-Verbose("`tAssembly version: $($propertyGroup.AssemblyVersion)")
 Write-Verbose("`tInformational version: $($propertyGroup.InformationalVersion)")
 Write-Verbose("`tFile version: $($propertyGroup.FileVersion)")
-Write-Verbose("`tPackage version: $($propertyGroup.PackageVersion)")
-Write-Verbose("`tVersion: $($propertyGroup.Version)")
+Write-Verbose("`tPackage version: $($propertyGroup.PackageVersion)`t")
+Write-Output("Current Version: $($propertyGroup.Version)")
 
 $assemblyVersion = [Version]::Parse($propertyGroup.AssemblyVersion);
 
 $newVer = [Version]::Parse($newVersion);
 
-if ($newVer.Major -ge $assemblyVersion.Major) {
+if ($newVer.Major -ne $assemblyVersion.Major) {
+    Write-Output("`Current Assembly Version: $($propertyGroup.AssemblyVersion)")
+    
     $assemblyVersion = [System.Version]::new($newVer.Major, 0, 0, 0);
     $propertyGroup.AssemblyVersion = $assemblyVersion.ToString();
+
+    Write-Output("`New Assembly Version: $($propertyGroup.AssemblyVersion)")
 }
 
 $propertyGroup.InformationalVersion = $newVer.ToString()
@@ -57,7 +61,7 @@ Write-Verbose("New version data.");
 Write-Verbose("`tAssembly version: $($propertyGroup.AssemblyVersion)")
 Write-Verbose("`tInformational version: $($propertyGroup.InformationalVersion)")
 Write-Verbose("`tFile version: $($propertyGroup.FileVersion)")
-Write-Verbose("`tPackage version: $($propertyGroup.PackageVersion)")
-Write-Verbose("`tVersion: $($propertyGroup.Version)")
+Write-Verbose("`tPackage version: $($propertyGroup.PackageVersion)`t")
+Write-Output("New version: $($propertyGroup.Version)")
 
 $xml.Save($propsFile);
