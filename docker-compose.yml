@@ -1,0 +1,17 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: sqlserver-local
+
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SA_PASSWORD}
+
+    ports:
+      - "5050:1433"
+
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
