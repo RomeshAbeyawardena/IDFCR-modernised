@@ -94,9 +94,10 @@ END";
 
         $command.ExecuteNonQuery()
         $command.Dispose();
-        $conn.Close();
     }
 }
 finally {
-    $conn.Dispose();
+    if ($null -ne $conn) {
+        $conn.Dispose()
+    }
 }
