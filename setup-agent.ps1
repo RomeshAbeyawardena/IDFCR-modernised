@@ -16,9 +16,11 @@ try {
         $command = $conn.CreateCommand();
         $command.CommandText = "CREATE TABLE dbo.PackageVersions (
     PackageName NVARCHAR(255) NOT NULL,
+    VersionPrefix NVARCHAR(50) NOT NULL, -- e.g., '1.0.0'
     CurrentVersion INT NOT NULL,
     LastUpdated DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT PK_PackageVersions PRIMARY KEY CLUSTERED (PackageName));"
+    CONSTRAINT PK_PackageVersions PRIMARY KEY CLUSTERED (PackageName, VersionPrefix)
+);"
 
         $command.ExecuteNonQuery()
         $command.Dispose();
@@ -38,7 +40,8 @@ try {
     if ($result -eq [System.DBNull]::Value) {
         $command = $conn.CreateCommand();
         $command.CommandText = "CREATE OR ALTER PROCEDURE dbo.GetNextPackageVersion
-    @PackageName NVARCHAR(255)
+    @PackageName NVARCHAR(255),
+    @VersionPrefix NVARCHAR(50)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -51,39 +54,37 @@ BEGIN
     WHILE @RetryCount < @MaxRetries
     BEGIN
         BEGIN TRY
-            DELETE FROM @Allocated; -- Reset for this attempt
+            DELETE FROM @Allocated;
 
             BEGIN TRANSACTION;
 
+            -- Try to increment the specific version branch
             UPDATE dbo.PackageVersions WITH (UPDLOCK, HOLDLOCK, ROWLOCK)
             SET CurrentVersion = CurrentVersion + 1,
                 LastUpdated = SYSUTCDATETIME()
             OUTPUT inserted.CurrentVersion INTO @Allocated(Version)
-            WHERE PackageName = @PackageName;
+            WHERE PackageName = @PackageName 
+              AND VersionPrefix = @VersionPrefix;
 
-            
+            -- If this branch (e.g. 1.0.1) is new, start at 1
             IF NOT EXISTS (SELECT 1 FROM @Allocated)
             BEGIN
-                INSERT INTO dbo.PackageVersions (PackageName, CurrentVersion)
+                INSERT INTO dbo.PackageVersions (PackageName, VersionPrefix, CurrentVersion)
                 OUTPUT inserted.CurrentVersion INTO @Allocated(Version)
-                VALUES (@PackageName, 1);
+                VALUES (@PackageName, @VersionPrefix, 1);
             END
 
             COMMIT TRANSACTION;
 
-            -- Hand the ticket to the agent
             SELECT Version FROM @Allocated;
             RETURN;
         END TRY
         BEGIN CATCH
             IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 
-            -- 1205: Deadlock (two agents reached for the same ticket at once)
-            -- 2627/2601: Race condition where two agents tried to 'start' the dispenser at once
             IF ERROR_NUMBER() IN (1205, 2627, 2601)
             BEGIN
                 SET @RetryCount += 1;
-                
                 DECLARE @Delay CHAR(12) = '00:00:00.' + CAST(25 + (ABS(CHECKSUM(NEWID())) % 75) AS VARCHAR(3));
                 WAITFOR DELAY @Delay;
                 CONTINUE;
