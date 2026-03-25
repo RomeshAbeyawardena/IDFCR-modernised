@@ -66,12 +66,12 @@ BEGIN
             WHERE PackageName = @PackageName 
               AND VersionPrefix = @VersionPrefix;
 
-            -- If this branch (e.g. 1.0.1) is new, start at 1
+            -- If this branch (e.g. 1.0.1) is new, start at 0
             IF NOT EXISTS (SELECT 1 FROM @Allocated)
             BEGIN
                 INSERT INTO dbo.PackageVersions (PackageName, VersionPrefix, CurrentVersion)
                 OUTPUT inserted.CurrentVersion INTO @Allocated(Version)
-                VALUES (@PackageName, @VersionPrefix, 1);
+                VALUES (@PackageName, @VersionPrefix, 0);
             END
 
             COMMIT TRANSACTION;
