@@ -3,6 +3,19 @@ param (
     [bool] $cleanRestore
 )
 try {
+    if ($cleanRestore -eq $true) {
+        $answer = Read-Host("This will wipe all data, are you sure? Type 'YES' to proceed");
+        
+        if ($answer -ne "YES") {
+            $cleanRestore = $false;
+            Write-Verbose("Clean restore flag reset");
+        }
+        else 
+        {
+            Write-Verbose("Clean restore flag remains");
+        }
+    }
+
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
 
     $fileParts = ('initial.sql', 'initial.storedproc.sql');
@@ -15,12 +28,12 @@ try {
         $sql = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($currentDirectory, $filePart));
         if ($sql.Contains("@cleanRestore"))
         {
-            $command.Parameters.AddWithValue("cleanRestore",$cleanRestore);
+            [void]$command.Parameters.AddWithValue("cleanRestore",$cleanRestore);
         }
 
         $command.CommandText = $sql;
         
-        $command.ExecuteScalar()
+        [void]$command.ExecuteNonQuery()
         $command.Dispose();
     }
 }

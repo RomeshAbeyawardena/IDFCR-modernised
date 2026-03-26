@@ -1,28 +1,26 @@
 param (
     [string] $connectionString,
     [string] $packageName,
+    [string] $packageAlias,
+    [string] $packageDescription,
     [string] $versionPrefix
 )
 try {
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
     $conn.Open();
     $command = $conn.CreateCommand();
-    $command.CommandText = "EXEC dbo.GetNextPackageVersion 
-         @PackageName = @PackageName
-        ,@VersionPrefix=@VersionPrefix";
-    $parameter = $command.CreateParameter();
-    $parameter.ParameterName = "PackageName"
-    $parameter.DbType = 'String';
-    $parameter.Value = $packageName;
+    $command.CommandText = "USE PackageManager;
+    
+    EXEC dbo.GetNextPackageVersion
+        @packageName = @packageName,
+        @packageAlias = @packageAlias,
+        @packageDescription = @packageDescription,
+        @versionPrefix = @versionPrefix";
 
-    [void]$command.Parameters.Add($parameter);
-
-    $parameter = $command.CreateParameter();
-    $parameter.ParameterName = "VersionPrefix"
-    $parameter.DbType = 'String';
-    $parameter.Value = $versionPrefix;
-
-    [void]$command.Parameters.Add($parameter);
+    [void]$command.Parameters.AddWithValue("packageName", $packageName)
+    [void]$command.Parameters.AddWithValue("packageAlias", $packageAlias)
+    [void]$command.Parameters.AddWithValue("packageDescription", $packageDescription)
+    [void]$command.Parameters.AddWithValue("versionPrefix", $versionPrefix)
 
     $result = $command.ExecuteScalar();
     Write-Output $result;
