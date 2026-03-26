@@ -2,14 +2,28 @@ param (
     [Parameter(Mandatory)]
     [string] $connectionString,
     [Parameter(Mandatory)]
-    [string] $propsFile,
-    [Parameter(Mandatory)]
     [string] $packageName,
     [Parameter(Mandatory)]
-    [ValidateSet("Major", "Minor", "Patch", "Build")]
-    [string] $targetComponent
+    [ValidateSet("Major", "Minor", "Build", "Revision")]
+    [string] $targetComponent,
+    [string] $propsFile
 )
 
+$currentDirectory = Get-Location;
+
+if ([string]::IsNullOrWhiteSpace($propsFile)) {
+    $propsFile = "$currentDirectory\Directory.Build.props";
+}
+
+
+if ([System.IO.File]::Exists($propsFile) -eq $false) {
+    $propsFile = [System.IO.File]::Combine($currentDirectory, $propsFile);
+
+    if ([System.IO.File]::Exists($propsFile) -eq $false) {
+        Write-Error("Unable to find path '$propsFile'");
+        exit 1;
+    }
+}
 
 $xml = New-Object -TypeName "System.Xml.XmlDocument"
 
@@ -31,7 +45,8 @@ Write-Verbose("`tFile version: $($propertyGroup.FileVersion)");
 Write-Verbose("`tPackage version: $($propertyGroup.PackageVersion)`t");
 Write-Output("Current Version: $($propertyGroup.Version)");
 
-$currentVersion = [version]::Parse($propertyGroup);
+$currentVersion = [version]::Parse($propertyGroup.Version);
+
 $newVersion = [version]::new();
 
 switch ($targetComponent) {
@@ -42,12 +57,23 @@ switch ($targetComponent) {
     "Minor" {
         $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor + 1, 0, 0);
         break;
-     }
-    "Patch" {
-        $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Patch + 1, 0);
-        break;
     }
     "Build" {
+        $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build + 1, 0);
+    }
+    "Revision" {
+        $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, 0);
+        break;
+    }
+    "Default" {
+        $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, 0);
         break;
     }
 }
+
+$versionPrefix = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)"
+
+Write-Output "New version suffix: $versionPrefix"
+
+$newVersion = . ./get-next-package-version.ps1 "-connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix"
+
