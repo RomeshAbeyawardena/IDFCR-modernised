@@ -17,12 +17,12 @@ try {
         $command.CommandText = "CREATE TABLE dbo.PackageVersions (
     PackageVersionId UNIQUEIDENTIFIER NOT NULL
         CONSTRAINT PK_PackageVersionID PRIMARY KEY
-        CONSTRAINT DF_PackageVersionID DEFAULT SEQUENTIALID()
+        CONSTRAINT DF_PackageVersionID DEFAULT NEWSEQUENTIALID(),
     PackageName NVARCHAR(255) NOT NULL,
     VersionPrefix NVARCHAR(50) NOT NULL, -- e.g., '1.0.0'
     CurrentVersion INT NOT NULL,
     LastUpdated DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT PK_PackageVersions PRIMARY KEY CLUSTERED (PackageName, VersionPrefix)
+    CONSTRAINT UQ_PackageVersions UNIQUE CLUSTERED (PackageName, VersionPrefix)
 );"
 
         $command.ExecuteNonQuery()
