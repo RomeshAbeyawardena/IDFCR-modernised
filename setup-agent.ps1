@@ -15,6 +15,9 @@ try {
     if ($result -eq [System.DBNull]::Value) {
         $command = $conn.CreateCommand();
         $command.CommandText = "CREATE TABLE dbo.PackageVersions (
+    PackageVersionId UNIQUEIDENTIFIER NOT NULL
+        CONSTRAINT PK_PackageVersionID PRIMARY KEY
+        CONSTRAINT DF_PackageVersionID DEFAULT SEQUENTIALID()
     PackageName NVARCHAR(255) NOT NULL,
     VersionPrefix NVARCHAR(50) NOT NULL, -- e.g., '1.0.0'
     CurrentVersion INT NOT NULL,

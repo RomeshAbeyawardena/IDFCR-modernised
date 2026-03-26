@@ -60,12 +60,13 @@ switch ($targetComponent) {
     }
     "Build" {
         $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build + 1, 0);
+        break;
     }
     "Revision" {
         $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, 0);
         break;
     }
-    "Default" {
+    default {
         $newVersion = [version]::new($currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, 0);
         break;
     }
@@ -75,5 +76,6 @@ $versionPrefix = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)
 
 Write-Output "New version suffix: $versionPrefix"
 
-$newVersion = . ./get-next-package-version.ps1 "-connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix"
+$newVersion = . ./get-next-package-version.ps1 -connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix
 
+$newVersion
