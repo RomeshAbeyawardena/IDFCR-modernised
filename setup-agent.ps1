@@ -10,25 +10,22 @@ try {
             $cleanRestore = $false;
             Write-Verbose("Clean restore flag reset");
         }
-        else 
-        {
+        else {
             Write-Verbose("Clean restore flag remains");
         }
     }
 
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
 
-    $fileParts = ('initial.sql', 'initial.storedproc.sql');
+    $fileParts = ('initial-db-setup.sql', 'initial.sql', 'initial.storedproc.sql');
     $conn.Open();
 
-    foreach ($filePart in $fileParts)
-    {
+    foreach ($filePart in $fileParts) {
         $command = $conn.CreateCommand();
         $currentDirectory = Get-Location;
         $sql = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($currentDirectory, $filePart));
-        if ($sql.Contains("@cleanRestore"))
-        {
-            [void]$command.Parameters.AddWithValue("cleanRestore",$cleanRestore);
+        if ($sql.Contains("@cleanRestore")) {
+            [void]$command.Parameters.AddWithValue("cleanRestore", $cleanRestore);
         }
 
         $command.CommandText = $sql;

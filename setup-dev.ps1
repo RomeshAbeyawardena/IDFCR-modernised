@@ -7,3 +7,5 @@ $env:DEV_CONN_STRING = "Server=localhost,5050;Initial Catalog=master;TrustServer
 
 $currentDirectory = Get-Location;
 [System.IO.File]::WriteAllText([System.IO.Path]::Combine($currentDirectory, ".env"), "SA_PASSWORD=$secret");
+
+docker compose up -d

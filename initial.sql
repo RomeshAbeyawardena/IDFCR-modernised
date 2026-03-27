@@ -1,19 +1,3 @@
-USE master;
-
-IF (@cleanRestore = 1)
-BEGIN
-	ALTER DATABASE [PackageManager] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-
-	DROP DATABASE IF EXISTS [PackageManager];
-END
-
-
-IF ((SELECT DB_ID('PackageManager')) IS NULL)
-	BEGIN
-	CREATE DATABASE [PackageManager];
-END
-
-
 USE [PackageManager];
 
 IF ((SELECT OBJECT_ID('[dbo].[Package]', 'U')) IS NULL)
@@ -51,7 +35,7 @@ BEGIN
 	(
 		[TagId] UNIQUEIDENTIFIER NOT NULL
 			CONSTRAINT PK_Tag PRIMARY KEY
-			CONSTRAINT DF_Tag_TagId DEFAULT GETSEQUENTIALID(),
+			CONSTRAINT DF_Tag_TagId DEFAULT NEWSEQUENTIALID(),
 		[Name] NVARCHAR(50) NOT NULL
 			CONSTRAINT UQ_Tag_Name UNIQUE ([Name]),
 		[DisplayName] NVARCHAR(2000) NULL,
@@ -63,14 +47,14 @@ BEGIN
 	CREATE TABLE [dbo].[PackageTag]
 	(
 		[PackageTagId] UNIQUEIDENTIFIER NOT NULL
-			CONSTRAINT PK_PackageVersionTag PRIMARY KEY,
+			CONSTRAINT PK_PackageTag PRIMARY KEY,
 		[PackageId] UNIQUEIDENTIFIER NOT NULL
 			CONSTRAINT FK_PackageTag_Package FOREIGN KEY 
-			REFERENCES [dbo].[Package].[PackageId],
+			REFERENCES [dbo].[Package]([PackageId]),
 		[TagId] UNIQUEIDENTIFIER NOT NULL
 			CONSTRAINT FK_PackageTag_Tag FOREIGN KEY 
-			REFERENCES [dbo].[Tag].[TagId],
-		CONSTRAINT UQ_PackageVersionTag UNIQUE ([PackageId], [TagId])
+			REFERENCES [dbo].[Tag]([TagId]),
+		CONSTRAINT UQ_PackageTag UNIQUE ([PackageId], [TagId])
 	)
 END
 
@@ -80,12 +64,12 @@ BEGIN
 	(
 		[PackageVersionTagId] UNIQUEIDENTIFIER NOT NULL
 			CONSTRAINT PK_PackageVersionTag PRIMARY KEY,
-		[PackageVersionId] UNIQUEIDENTIFIER NOT NULL
+		[PackageVersionId] INT NOT NULL
 			CONSTRAINT FK_PackageVersionTag_PackageVersion FOREIGN KEY
-			REFERENCES [dbo].[PackageVersion].[PackageVersionId],
+			REFERENCES [dbo].[PackageVersion]([PackageVersionId]),
 		[TagId] UNIQUEIDENTIFIER NOT NULL
 			CONSTRAINT FK_PackageVersionTag_Tag FOREIGN KEY 
-			REFERENCES [dbo].[Tag].[TagId],
+			REFERENCES [dbo].[Tag]([TagId]),
 		CONSTRAINT UQ_PackageVersionTag UNIQUE ([PackageVersionId], [TagId])
 	)
 END
