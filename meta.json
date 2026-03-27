@@ -1,0 +1,61 @@
+{
+    "packageName": "IDFCR",
+    "packageDescription": "Intent Driven factories and context Repositories",
+    "tags": [],
+    "profiles": {
+        "dev": {
+            "tags": [
+                {
+                    "name": "dev",
+                    "displayName": "Development"
+                },
+                {
+                    "condition": "build:failed",
+                    "displayName": "Development build failed",
+                    "name": "dev-failed"
+                },
+                {
+                    "condition": "build:passed",
+                    "displayName": "Development build passed",
+                    "name": "dev-released"
+                }
+            ]
+        },
+        "sandbox": {
+            "tags": [
+                {
+                    "name": "sandbox",
+                    "displayName": "Sanbox"
+                },
+                {
+                    "condition": "build:failed",
+                    "displayName": "Sandbox build failed",
+                    "name": "sandbox-failed"
+                },
+                {
+                    "condition": "build:passed",
+                    "displayName": "Sandbox build passed",
+                    "name": "sandbox-released"
+                }
+            ]
+        },
+        "production": {
+            "tags": [
+                {
+                    "name": "release-candidate",
+                    "displayName": "Release candidate"
+                },
+                {
+                    "condition": "build:failed",
+                    "displayName": "Release build failed",
+                    "name": "release-failed"
+                },
+                {
+                    "condition": "build:passed",
+                    "displayName": "Re;ease build passed",
+                    "name": "released"
+                }
+            ]
+        }
+    }
+}

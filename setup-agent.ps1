@@ -4,7 +4,7 @@ param (
 )
 try {
     if ($cleanRestore -eq $true) {
-        $answer = Read-Host("This will wipe all data, are you sure? Type 'YES' to proceed");
+        $answer = Read-Host("This will wipe all data, are you sure? Type 'YES' as it is written to proceed");
         
         if ($answer -ne "YES") {
             $cleanRestore = $false;
