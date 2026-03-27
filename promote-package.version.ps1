@@ -76,7 +76,7 @@ Write-Output "New version suffix: $versionPrefix"
 
 . ./meta.ps1
 
-$metaData = . ./get-meta-data.ps1 
+$metaData = . ./get-meta-data.ps1
 
 $meta = [MetaProfile]::LoadMeta($metaData)
 

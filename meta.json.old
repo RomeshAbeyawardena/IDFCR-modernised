@@ -1,14 +1,27 @@
 {
-    "packageDescription": "Intent Driven factories and context Repositories",
     "packageName": "IDFCR",
-    "packageAlias": "IDFCR",
+    "packageDescription": "Intent Driven factories and context Repositories",
+    "tags": [
+        {
+            "name": "framework",
+            "displayName": "Framework focused"
+        },
+        {
+            "name": "low-level",
+            "displayName": "Low-level API"
+        },
+        {
+            "name": "Utility",
+            "displayName": "Utilities"
+        }
+    ],
     "profiles": {
         "dev": {
             "name": "dev",
             "tags": [
                 {
-                    "displayName": "Development",
-                    "name": "dev"
+                    "name": "dev",
+                    "displayName": "Development"
                 },
                 {
                     "condition": "build:failed",
@@ -26,8 +39,8 @@
             "name": "sandbox",
             "tags": [
                 {
-                    "displayName": "Sandbox",
-                    "name": "sandbox"
+                    "name": "sandbox",
+                    "displayName": "Sandbox"
                 },
                 {
                     "condition": "build:failed",
@@ -45,8 +58,8 @@
             "name": "production",
             "tags": [
                 {
-                    "displayName": "Release candidate",
-                    "name": "release-candidate"
+                    "name": "release-candidate",
+                    "displayName": "Release candidate"
                 },
                 {
                     "condition": "build:failed",
@@ -60,19 +73,5 @@
                 }
             ]
         }
-    },
-    "tags": [
-        {
-            "displayName": "Framework focused",
-            "name": "framework"
-        },
-        {
-            "displayName": "Low-level API",
-            "name": "low-level"
-        },
-        {
-            "displayName": "Utilities",
-            "name": "Utility"
-        }
-    ]
+    }
 }
