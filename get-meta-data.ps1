@@ -10,6 +10,30 @@ class Profile {
     [System.Collections.Generic.List[Tag]] $Tags;
 }
 
+class MetaProfile {
+    [string] $PackageDescription;
+    [string] $PackageName;
+    [Profile] $MetaProfile;
+    [Meta] $Context;
+
+    MetaProfile([Meta] $meta, [string] $profileName) {
+        $this.Context = $meta;
+        $this.PackageDescription = $meta.PackageDescription;
+        $this.PackageName = $meta.PackageName;
+
+        if (-not $meta.Profiles.ContainsKey($profileName)) {
+            throw "Profile '$profileName' not found in meta.json"
+        }
+
+        $this.MetaProfile = $meta.Profiles[$profileName];
+    }
+
+    [string] ToJson() {
+        $options = [System.Text.Json.JsonSerializerOptions]::Web;
+        return [System.Text.Json.JsonSerializer]::Serialize($this, [MetaProfile], $options);
+    }
+}
+
 class Meta {
     [string] $PackageDescription;
     [string] $PackageName;
@@ -29,8 +53,6 @@ class Meta {
     }
 }
 
-
-
 $env = Get-Content ".\.env" -Raw;
 
 $envDict = [System.Collections.Generic.Dictionary[string, string]]::new();
@@ -41,7 +63,7 @@ foreach ($line in $env.Split([System.Environment]::NewLine)) {
         continue;
     }
 
-    $lineItems = $line.Split("=");
+    $lineItems = $line.Split("=", 2);
     
     if ($lineItems.Length -eq 2) {
         $envDict.Add($lineItems[0], $lineItems[1]);
@@ -49,6 +71,12 @@ foreach ($line in $env.Split([System.Environment]::NewLine)) {
 }
 
 $currentProfile = $envDict["profile"];
+
+if ([string]::IsNullOrWhiteSpace($currentProfile) -eq $true) {
+    Write-Error("Must provide a profile");
+    exit 1;
+}
+
 $v = [Meta]::LoadMeta("./meta.json")
 
-$v.Profiles;
+Write-Output([MetaProfile]::new($v, $currentProfile).ToJson());
