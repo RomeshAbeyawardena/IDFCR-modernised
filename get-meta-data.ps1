@@ -1,4 +1,3 @@
-Add-Type -AssemblyName System.Text.Json
 
 class Tag {
     [string] $Condition;
@@ -30,6 +29,26 @@ class Meta {
     }
 }
 
+
+
+$env = Get-Content ".\.env" -Raw;
+
+$envDict = [System.Collections.Generic.Dictionary[string, string]]::new();
+
+foreach ($line in $env.Split([System.Environment]::NewLine)) {
+    
+    if ([string]::IsNullOrWhiteSpace($line)) {
+        continue;
+    }
+
+    $lineItems = $line.Split("=");
+    
+    if ($lineItems.Length -eq 2) {
+        $envDict.Add($lineItems[0], $lineItems[1]);
+    }
+}
+
+$currentProfile = $envDict["profile"];
 $v = [Meta]::LoadMeta("./meta.json")
 
 $v.Profiles;
