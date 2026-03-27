@@ -80,10 +80,24 @@ $metaData = . ./get-meta-data.ps1
 
 $meta = [MetaProfile]::LoadMeta($metaData)
 
-$meta.PackageName;
-$meta.PackageDescription;
-$meta.SelectedProfile
-$meta.Tags
+[string[]] $packageTags = $meta.Tags 
+| Select-Object -ExpandProperty Name
 
-#$newVersion = . ./get-next-package-version.ps1 -connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix
-#$newVersion
+[string[]] $tags = $meta.SelectedProfile.Tags 
+| Where-Object { -not $_.Condition } 
+| Select-Object -ExpandProperty Name
+
+$params = @{
+    connectionString = $connectionString
+    packageName = $meta.PackageName
+    packageAlias = $meta.PackageName
+    packageDescription = $meta.PackageDescription
+    versionPrefix = $versionPrefix
+    packageTags = $packageTags
+    packageVersionTags = $tags
+}
+
+$newRevision = . ./get-next-package-version.ps1 @params
+$version = "$versionPrefix.$newRevision"
+$version
+.\update-version.ps1 -newVersion $version

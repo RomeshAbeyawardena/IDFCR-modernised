@@ -14,7 +14,7 @@ class MetaProfile {
     [string] $PackageName;
     [Profile] $SelectedProfile;
     [Meta] $Context;
-[System.Collections.Generic.List[Tag]] $Tags;
+    [System.Collections.Generic.List[Tag]] $Tags;
 
     MetaProfile() {
 
@@ -25,7 +25,7 @@ class MetaProfile {
         $this.PackageDescription = $meta.PackageDescription;
         $this.PackageName = $meta.PackageName;
         $this.Tags = $meta.Tags;
-        
+
         if (-not $meta.Profiles.ContainsKey($profileName)) {
             throw "Profile '$profileName' not found in meta.json"
         }
