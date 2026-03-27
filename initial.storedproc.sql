@@ -35,6 +35,19 @@ BEGIN
 		SET @revisionId = 0;
 	END
 		ELSE BEGIN
+		UPDATE dbo.Package
+		SET [Alias] = @packageAlias,
+			[Description] = @packageDescription
+		WHERE [PackageId] = @packageId
+			AND (
+				([Alias] IS NULL AND @packageAlias IS NOT NULL)
+				OR ([Alias] IS NOT NULL AND @packageAlias IS NULL)
+				OR ([Alias] <> @packageAlias)
+				OR ([Description] IS NULL AND @packageDescription IS NOT NULL)
+				OR ([Description] IS NOT NULL AND @packageDescription IS NULL)
+				OR ([Description] <> @packageDescription)
+			);
+
 		SELECT @revisionId = ISNULL(MAX(RevisionNumber), -1) + 1
 		FROM dbo.PackageVersion WITH (UPDLOCK, HOLDLOCK)
 		WHERE PackageId = @packageId AND VersionSuffix = @versionPrefix
