@@ -9,6 +9,8 @@ param (
     [string] $propsFile
 )
 
+[System.Text.Json]
+
 $currentDirectory = Get-Location;
 
 if ([string]::IsNullOrWhiteSpace($propsFile)) {
