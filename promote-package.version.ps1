@@ -2,14 +2,10 @@ param (
     [Parameter(Mandatory)]
     [string] $connectionString,
     [Parameter(Mandatory)]
-    [string] $packageName,
-    [Parameter(Mandatory)]
     [ValidateSet("Major", "Minor", "Build", "Revision")]
     [string] $targetComponent,
     [string] $propsFile
 )
-
-[System.Text.Json]
 
 $currentDirectory = Get-Location;
 
@@ -78,6 +74,16 @@ $versionPrefix = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)
 
 Write-Output "New version suffix: $versionPrefix"
 
-$newVersion = . ./get-next-package-version.ps1 -connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix
+. ./meta.ps1
 
-$newVersion
+$metaData = . ./get-meta-data.ps1 
+
+$meta = [MetaProfile]::LoadMeta($metaData)
+
+$meta.PackageName;
+$meta.PackageDescription;
+$meta.SelectedProfile
+$meta.Tags
+
+#$newVersion = . ./get-next-package-version.ps1 -connectionString $connectionString -packageName $packageName -versionPrefix $versionPrefix
+#$newVersion

@@ -12,27 +12,33 @@ class Profile {
 class MetaProfile {
     [string] $PackageDescription;
     [string] $PackageName;
-    [Profile] $MetaProfile;
+    [Profile] $SelectedProfile;
     [Meta] $Context;
+[System.Collections.Generic.List[Tag]] $Tags;
+
+    MetaProfile() {
+
+    }
 
     MetaProfile([Meta] $meta, [string] $profileName) {
         $this.Context = $meta;
         $this.PackageDescription = $meta.PackageDescription;
         $this.PackageName = $meta.PackageName;
-
+        $this.Tags = $meta.Tags;
+        
         if (-not $meta.Profiles.ContainsKey($profileName)) {
             throw "Profile '$profileName' not found in meta.json"
         }
 
-        $this.MetaProfile = $meta.Profiles[$profileName];
+        $this.SelectedProfile = $meta.Profiles[$profileName];
     }
 
-    static [Meta] LoadMeta([string] $json) {
+    static [MetaProfile] LoadMeta([string] $json) {
         $options = [System.Text.Json.JsonSerializerOptions]::new();
         $options.PropertyNameCaseInsensitive = $true;
 
         return [System.Text.Json.JsonSerializer]::Deserialize(
-            $json, [Meta], $options
+            $json, [MetaProfile], $options
         );
     }
 
