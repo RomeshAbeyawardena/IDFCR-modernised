@@ -6,22 +6,16 @@ try {
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
     $conn.Open();
     if ($cleanRestore -eq $true) {
-
+        $currentDirectory = Get-Location;
+        $sqlPath = [System.IO.Path]::Combine($currentDirectory, 'sql', 'verify-wipe-process.sql') 
+        $sql = Get-Content $sqlPath -Raw
         $command = $conn.CreateCommand();
-        $command.CommandText = "USE [PackageManager]; SELECT [Value] FROM SYSTEM_CONFIG.Setting WHERE [Key] = @settingKey";
+        $command.CommandText = $sql;
         [void]$command.Parameters.AddWithValue("settingKey", "CAN_AGENTS_WIPE_DATA");
         $settingValue = $command.ExecuteScalar();
         $command.Dispose();
-        $parsed = $true
         
-        if ($settingValue -ne [DBNull]::Value) {
-            if (-not [bool]::TryParse($settingValue, [ref]$parsed)) {
-                Write-Warning("Invalid CAN_AGENTS_WIPE_DATA value in DB, this will continue as if a value is not set");
-                $parsed = $true;
-            }
-        }
-
-        if ($parsed -eq $false) {
+        if ($settingValue -eq $false) {
             Write-Error("Unable to proceed with wipe down, the database does not support this operation")
             exit 1
         }

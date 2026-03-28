@@ -24,7 +24,8 @@ BEGIN
 		SELECT TOP(1)
 		@packageId = PackageId
 	FROM dbo.Package WITH (UPDLOCK, HOLDLOCK)
-	WHERE Name = @trimmedPackageName;
+	WHERE Name = @trimmedPackageName
+	AND [Namespace] = @packageNamespace;
 
 		IF @packageId IS NULL
 		BEGIN
