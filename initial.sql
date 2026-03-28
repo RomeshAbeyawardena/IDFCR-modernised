@@ -1,5 +1,25 @@
 USE [PackageManager];
 
+IF ((SELECT OBJECT_ID('[SYSTEM_CONFIG].[Setting]', 'U')) IS NULL)
+BEGIN
+	CREATE TABLE [SYSTEM_CONFIG].[Setting] (
+		 [SettingId] UNIQUEIDENTIFIER NOT NULL
+			CONSTRAINT PK_SettingId PRIMARY KEY
+			CONSTRAINT DF_SettingId DEFAULT NEWSEQUENTIALID()
+		,[Type] NVARCHAR(100) NOT NULL
+		,[Key] NVARCHAR(200) NOT NULL
+			CONSTRAINT UQ_SystemConfig_Setting_Key UNIQUE NONCLUSTERED
+		,[Value] NVARCHAR(MAX) NULL
+			CONSTRAINT CK_Setting_Boolean CHECK (
+    		[Type] != 'Boolean'
+    		OR [Value] IN ('true','false')
+			)
+		,[LastUpdatedTimestampUtc] DATETIME2 NOT NULL
+			CONSTRAINT DF_SystemConfig_Setting_LastUpdatedTimestampUtc 
+			DEFAULT GETUTCDATE()
+	)
+END
+
 IF ((SELECT OBJECT_ID('[dbo].[Package]', 'U')) IS NULL)
 BEGIN
 	CREATE TABLE [dbo].[Package]
