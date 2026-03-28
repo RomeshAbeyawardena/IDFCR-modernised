@@ -6,6 +6,7 @@ class Tag {
 
 class Profile {
     [string] $Name;
+    [string] $Namespace;
     [System.Collections.Generic.List[Tag]] $Tags;
 }
 
@@ -13,6 +14,7 @@ class MetaProfile {
     [string] $PackageDescription;
     [string] $PackageName;
     [string] $PackageAlias;
+    [string] $DefaultNamespace;
     [Profile] $SelectedProfile;
     [Meta] $Context;
     [System.Collections.Generic.List[Tag]] $Tags;
@@ -25,6 +27,7 @@ class MetaProfile {
         $this.Context = $meta;
         $this.PackageDescription = $meta.PackageDescription;
         $this.PackageName = $meta.PackageName;
+        $this.DefaultNamespace = $meta.DefaultNamespace;
         $this.PackageAlias = $meta.PackageAlias;
         $this.Tags = $meta.Tags;
 
@@ -54,6 +57,7 @@ class Meta {
     [string] $PackageDescription;
     [string] $PackageName;
     [string] $PackageAlias;
+    [string] $DefaultNamespace;
     [System.Collections.Generic.Dictionary[string, Profile]] $Profiles;
     [System.Collections.Generic.List[Tag]] $Tags;
 
@@ -64,6 +68,7 @@ class Meta {
         $model.PackageAlias = '';
         $model.PackageDescription = '';
         $model.PackageName = '';
+        $model.DefaultNamespace = '';
         $model.Profiles = [System.Collections.Generic.Dictionary[string, Profile]]::new()
         $dummyProfile = [Profile]::new();
         $dummyProfile.Name = '';
@@ -72,8 +77,8 @@ class Meta {
         $tag.Condition = '';
         $tag.DisplayName = '';
         $tag.Name = '';
+        $dummyProfile.Namespace = '';
         $dummyProfile.Tags.Add($tag);
-
         $model.Profiles.Add("", $dummyProfile)
         $model.Tags = [System.Collections.Generic.List[Tag]]::new();
         $model.Tags.Add($tag);

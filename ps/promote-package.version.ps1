@@ -88,9 +88,12 @@ $meta = [MetaProfile]::LoadMeta($metaData)
 | Where-Object { -not $_.Condition } 
 | Select-Object -ExpandProperty Name
 
+$namespace = $meta.SelectedProfile.Namespace ?? $meta.Namespace
+$meta.SelectedProfile
 $params = @{
     connectionString = $connectionString
     packageName = $meta.PackageName
+    packageNamespace = $namespace
     packageAlias = $meta.PackageAlias
     packageDescription = $meta.PackageDescription
     versionPrefix = $versionPrefix

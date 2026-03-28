@@ -2,9 +2,11 @@
     "packageDescription": "Intent Driven factories and context Repositories",
     "packageName": "IDFCR",
     "packageAlias": "IDFCR",
+    "defaultNamespace": "uk.hsinet.idfcr",
     "profiles": {
         "dev": {
             "name": "dev",
+            "namespace": "uk.hsinet.idfcr.dev",
             "tags": [
                 {
                     "displayName": "Development",
@@ -24,6 +26,7 @@
         },
         "sandbox": {
             "name": "sandbox",
+            "namespace": "uk.hsinet.idfcr.sandbox",
             "tags": [
                 {
                     "displayName": "Sandbox",
@@ -43,6 +46,7 @@
         },
         "production": {
             "name": "production",
+            "namespace": "uk.hsinet.idfcr.prod",
             "tags": [
                 {
                     "displayName": "Release candidate",

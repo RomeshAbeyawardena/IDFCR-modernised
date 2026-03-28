@@ -29,4 +29,6 @@ if ([string]::IsNullOrWhiteSpace($currentProfile) -eq $true) {
 
 $v = [Meta]::LoadMeta([System.IO.Path]::Combine($currentDirectory, './meta.json'))
 
-Write-Output([MetaProfile]::new($v, $currentProfile).ToJson());
+$json = [MetaProfile]::new($v, $currentProfile).ToJson();
+
+Write-Output($json);

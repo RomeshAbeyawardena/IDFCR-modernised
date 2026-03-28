@@ -4,11 +4,12 @@ param (
 )
 
 $currentDirectory = Get-Location;
-
+$scriptRoot = $PSScriptRoot;
 $metaPath = [System.IO.Path]::Combine($currentDirectory, "meta.json");
 if ([System.IO.File]::Exists($metaPath) -eq $false)
 {
-    . [System.IO.Path]::Combine($currentDirectory, 'meta.ps1')
+    $metaFunctions = [System.IO.Path]::Combine($scriptRoot, "meta.ps1");
+    . $metaFunctions
     $json = [Meta]::GenerateBlankJsonTemplate();
     [System.IO.File]::WriteAllText($metaPath, $json);
 }

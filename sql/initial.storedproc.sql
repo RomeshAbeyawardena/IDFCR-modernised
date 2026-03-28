@@ -1,5 +1,6 @@
 CREATE OR ALTER PROCEDURE dbo.GetNextPackageVersion
 	@packageName NVARCHAR(255),
+	@packageNamespace NVARCHAR(255),
 	@packageAlias NVARCHAR(255),
 	@packageDescription NVARCHAR(2000),
 	@versionPrefix NVARCHAR(50),
@@ -29,23 +30,30 @@ BEGIN
 		BEGIN
 		SET @packageId = NEWID();
 		INSERT INTO dbo.Package
-			([PackageId], [Name], [Alias], [Description])
+			([PackageId], [Name], [Alias], [Description], [Namespace])
 		VALUES
-			(@packageId, @trimmedPackageName, @packageAlias, @packageDescription);
+			(@packageId, @trimmedPackageName, @packageAlias, @packageDescription, @packageNamespace);
 		SET @revisionId = 0;
 	END
 		ELSE BEGIN
 		UPDATE dbo.Package
 		SET [Alias] = @packageAlias,
-			[Description] = @packageDescription
+			[Description] = @packageDescription,
+			[Namespace] = @packageNamespace
 		WHERE [PackageId] = @packageId
 			AND (
 				([Alias] IS NULL AND @packageAlias IS NOT NULL)
 				OR ([Alias] IS NOT NULL AND @packageAlias IS NULL)
 				OR ([Alias] <> @packageAlias)
+				
 				OR ([Description] IS NULL AND @packageDescription IS NOT NULL)
 				OR ([Description] IS NOT NULL AND @packageDescription IS NULL)
 				OR ([Description] <> @packageDescription)
+				
+				OR ([Namespace] IS NULL AND @packageNamespace IS NOT NULL)
+				OR ([Namespace] IS NOT NULL AND @packageNamespace IS NULL)
+				OR ([Namespace] <> @packageNamespace)
+
 			);
 
 		SELECT @revisionId = ISNULL(MAX(RevisionNumber), -1) + 1

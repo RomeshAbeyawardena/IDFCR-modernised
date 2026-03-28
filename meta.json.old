@@ -1,27 +1,14 @@
 {
-    "packageName": "IDFCR",
     "packageDescription": "Intent Driven factories and context Repositories",
-    "tags": [
-        {
-            "name": "framework",
-            "displayName": "Framework focused"
-        },
-        {
-            "name": "low-level",
-            "displayName": "Low-level API"
-        },
-        {
-            "name": "Utility",
-            "displayName": "Utilities"
-        }
-    ],
+    "packageName": "IDFCR",
+    "packageAlias": "IDFCR",
     "profiles": {
         "dev": {
             "name": "dev",
             "tags": [
                 {
-                    "name": "dev",
-                    "displayName": "Development"
+                    "displayName": "Development",
+                    "name": "dev"
                 },
                 {
                     "condition": "build:failed",
@@ -39,8 +26,8 @@
             "name": "sandbox",
             "tags": [
                 {
-                    "name": "sandbox",
-                    "displayName": "Sandbox"
+                    "displayName": "Sandbox",
+                    "name": "sandbox"
                 },
                 {
                     "condition": "build:failed",
@@ -58,8 +45,8 @@
             "name": "production",
             "tags": [
                 {
-                    "name": "release-candidate",
-                    "displayName": "Release candidate"
+                    "displayName": "Release candidate",
+                    "name": "release-candidate"
                 },
                 {
                     "condition": "build:failed",
@@ -73,5 +60,19 @@
                 }
             ]
         }
-    }
+    },
+    "tags": [
+        {
+            "displayName": "Framework focused",
+            "name": "framework"
+        },
+        {
+            "displayName": "Low-level API",
+            "name": "low-level"
+        },
+        {
+            "displayName": "Utilities",
+            "name": "Utility"
+        }
+    ]
 }
