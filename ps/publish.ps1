@@ -15,8 +15,8 @@ $json = . $metaDataScriptPath
 $meta = [MetaProfile]::LoadMeta($json)
 
 $selectedProfile = $meta.SelectedProfile
-
-Write-Information("1/4 Checking if this commit ID has already been released...")
+$partsCount = 5;
+Write-Information("1/$partsCount Checking if this commit ID has already been released...")
 try {
     $commitID = git rev-parse HEAD
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString)
@@ -49,7 +49,7 @@ finally {
 }
 Write-Information("Commit ID: [OK]");
 
-Write-Information("2/4 Attempting a build, test and package on a first pass to ensure this this a worthwhile build")
+Write-Information("2/$partsCount Attempting a build, test and package on a first pass to ensure this this a worthwhile build")
 
 dotnet build $solutionPath
 if ($LASTEXITCODE -ne 0) {
@@ -77,8 +77,22 @@ $params = @{
     propsFile = $propsFile
 }
 
-Write-Information("3/4 Publishing release data")
+Write-Information("3/$partsCount Publishing release data")
 
 . $promotePackageVersion $params
 
-Write-Information("4/4 Final release build and publishing package")
+Write-Information("4/$partsCount Final release build and publishing package")
+
+Write-Information("5/$partsCount Creating final package")
+dotnet pack $solutionPath
+if ($LASTEXITCODE -ne 0) { 
+    Write-Error("Unable to pack package on final pass");
+
+    $buildFailTag = $selectedProfile.tags 
+        | Where-Object { $.Condition -eq "build:failed" }
+        | Select-Object { $.Name }
+
+    
+
+    exit $LASTEXITCODE 
+}

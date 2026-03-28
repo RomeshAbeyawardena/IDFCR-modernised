@@ -1,10 +1,15 @@
+$scriptRoot = $PSScriptRoot;
+
+$metaScript = [System.IO.Path]::Combine($scriptRoot, 'meta.ps1');
+. $metaScript;
+
 param (
     [Parameter(Mandatory)]
     [string] $connectionString,
-    [Parameter(Mandatory)]
     [string] $packageName,
+    [string] $packageNamespace,
     [Parameter(Mandatory)]
-    [string[]] $packageTags
+    [Tag[]] $packageTags
 )
 $currentDirectory = Get-Location;
 
@@ -17,7 +22,7 @@ try {
         $command.CommandText = "USE PackageManager;
         $sql";
 
-        [void]$command.Parameters.AddWithValue("packageName", [string]::Join(',', $packageName))
+        [void]$command.Parameters.AddWithValue("packageName", $packageName)
         [void]$command.Parameters.AddWithValue("tags", [string]::Join(',', $packageTags))
 
         [void]$command.ExecuteNonQuery();
