@@ -1,5 +1,8 @@
-. ./meta.ps1
+$scriptRoot = $PSScriptRoot;
 
+. $scriptRoot/meta.ps1
+
+$currentDirectory = Get-Location;
 $env = Get-Content ".\.env" -Raw;
 
 $envDict = [System.Collections.Generic.Dictionary[string, string]]::new();
@@ -24,6 +27,6 @@ if ([string]::IsNullOrWhiteSpace($currentProfile) -eq $true) {
     exit 1;
 }
 
-$v = [Meta]::LoadMeta("./meta.json")
+$v = [Meta]::LoadMeta([System.IO.Path]::Combine($currentDirectory, './meta.json'))
 
 Write-Output([MetaProfile]::new($v, $currentProfile).ToJson());

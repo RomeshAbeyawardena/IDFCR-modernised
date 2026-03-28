@@ -8,7 +8,7 @@ $currentDirectory = Get-Location;
 $metaPath = [System.IO.Path]::Combine($currentDirectory, "meta.json");
 if ([System.IO.File]::Exists($metaPath) -eq $false)
 {
-    . ./meta.ps1
+    . [System.IO.Path]::Combine($currentDirectory, 'meta.ps1')
     $json = [Meta]::GenerateBlankJsonTemplate();
     [System.IO.File]::WriteAllText($metaPath, $json);
 }

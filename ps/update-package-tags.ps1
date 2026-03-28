@@ -6,9 +6,11 @@ param (
     [Parameter(Mandatory)]
     [string[]] $packageTags
 )
+$currentDirectory = Get-Location;
 
 try {
-    $sql = Get-Content 'UpdatePackageTags.sql' -Raw
+    $sqlPath = [System.IO.Path]::Combine($currentDirectory, 'sql', "UpdatePackageTags.sql")
+    $sql = Get-Content $sqlPath -Raw
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
         $conn.Open();
         $command = $conn.CreateCommand();

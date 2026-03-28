@@ -42,7 +42,7 @@ try {
     foreach ($filePart in $fileParts) {
         $command = $conn.CreateCommand();
         $currentDirectory = Get-Location;
-        $sql = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($currentDirectory, $filePart));
+        $sql = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($currentDirectory, 'sql', $filePart));
         if ($sql.Contains("@cleanRestore")) {
             [void]$command.Parameters.AddWithValue("cleanRestore", $cleanRestore);
         }

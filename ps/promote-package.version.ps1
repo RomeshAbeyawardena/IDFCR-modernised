@@ -8,9 +8,10 @@ param (
 )
 
 $currentDirectory = Get-Location;
+$scriptRoot = $PSScriptRoot;
 
 if ([string]::IsNullOrWhiteSpace($propsFile)) {
-    $propsFile = "$currentDirectory\Directory.Build.props";
+    $propsFile = [System.IO.Path]::Combine($currentDirectory, 'Directory.Build.props');
 }
 
 
@@ -74,9 +75,9 @@ $versionPrefix = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)
 
 Write-Output "New version suffix: $versionPrefix"
 
-. ./meta.ps1
+. $scriptRoot/meta.ps1
 
-$metaData = . ./get-meta-data.ps1
+$metaData = . $scriptRoot/get-meta-data.ps1
 
 $meta = [MetaProfile]::LoadMeta($metaData)
 
@@ -96,9 +97,9 @@ $params = @{
     packageVersionTags = $tags
 }
 
-$newRevision = . ./get-next-package-version.ps1 @params
+$newRevision = . $scriptRoot/get-next-package-version.ps1 @params
 $version = "$versionPrefix.$newRevision"
 
-.\update-package-tags.ps1 -connectionString $connectionString -packageName $meta.PackageName -packageTags $packageTags
+. $scriptRoot\update-package-tags.ps1 -connectionString $connectionString -packageName $meta.PackageName -packageTags $packageTags
 
-.\update-version.ps1 -newVersion $version
+. $scriptRoot\update-version.ps1 -newVersion $version
