@@ -1,6 +1,10 @@
 param (
     [string]$connectionString,
-    [string]$solutionPath
+    [string]$solutionPath,
+    [Parameter(Mandatory)]
+    [ValidateSet("Major", "Minor", "Build", "Revision")]
+    [string] $targetComponent,
+    [string] $propsFile
 )
 
 $scriptRoot = $PSScriptRoot;
@@ -9,11 +13,10 @@ $metaDataScriptPath = [System.IO.Path]::Combine($scriptRoot, 'get-meta-data.ps1'
 $json = . $metaDataScriptPath
 
 $meta = [MetaProfile]::LoadMeta($json)
-$meta.SelectedProfile
 
 $selectedProfile = $meta.SelectedProfile
 
-Write-Information("Checking if this commit ID has already been released...")
+Write-Information("1/4 Checking if this commit ID has already been released...")
 try {
     $commitID = git rev-parse HEAD
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString)
@@ -44,9 +47,9 @@ END'
 finally {
     $conn.Dispose();
 }
+Write-Information("Commit ID: [OK]");
 
-
-Write-Information("1/3 Attempting a build, test and package on a first pass to ensure this this a worthwhile build")
+Write-Information("2/4 Attempting a build, test and package on a first pass to ensure this this a worthwhile build")
 
 dotnet build $solutionPath
 if ($LASTEXITCODE -ne 0) {
@@ -56,12 +59,26 @@ if ($LASTEXITCODE -ne 0) {
 
 dotnet test $solutionPath --no-build
 if ($LASTEXITCODE -ne 0) { 
-    Write-Error("Unable to build package on first pass");
+    Write-Error("Unable to test package on first pass");
     exit $LASTEXITCODE 
 }
 
 dotnet pack $solutionPath
 if ($LASTEXITCODE -ne 0) { 
-    Write-Error("Unable to build package on first pass");
+    Write-Error("Unable to pack package on first pass");
     exit $LASTEXITCODE 
 }
+
+$promotePackageVersion = [System.IO.Path]::Combine($scriptRoot, 'promote-package.version.ps1');
+
+$params = @{
+    connectionString = $connectionString
+    targetComponent = $targetComponent
+    propsFile = $propsFile
+}
+
+Write-Information("3/4 Publishing release data")
+
+. $promotePackageVersion $params
+
+Write-Information("4/4 Final release build and publishing package")

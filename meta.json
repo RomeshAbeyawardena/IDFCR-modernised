@@ -21,6 +21,16 @@
                     "condition": "build:passed",
                     "displayName": "Development build passed",
                     "name": "dev-released"
+                },
+                {
+                    "condition": "publish:failed",
+                    "displayName": "Development publish failed",
+                    "name": "dev-publish-failed"
+                },
+                {
+                    "condition": "publish:passed",
+                    "displayName": "Development publish passed",
+                    "name": "dev-published"
                 }
             ]
         },
@@ -41,6 +51,16 @@
                     "condition": "build:passed",
                     "displayName": "Sandbox build passed",
                     "name": "sandbox-released"
+                },
+                {
+                    "condition": "publish:failed",
+                    "displayName": "Sandbox publish failed",
+                    "name": "sandbox-publish-failed"
+                },
+                {
+                    "condition": "publish:passed",
+                    "displayName": "Sandbox publish passed",
+                    "name": "sandbox-published"
                 }
             ]
         },
@@ -61,6 +81,16 @@
                     "condition": "build:passed",
                     "displayName": "Release build passed",
                     "name": "released"
+                },
+                {
+                    "condition": "publish:failed",
+                    "displayName": "Release publish failed",
+                    "name": "release-publish-failed"
+                },
+                {
+                    "condition": "publish:passed",
+                    "displayName": "Release publish passed",
+                    "name": "release-published"
                 }
             ]
         }
