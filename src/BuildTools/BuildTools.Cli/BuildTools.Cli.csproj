@@ -11,11 +11,23 @@
     <PackageReference Include="Scrutor" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BuildTools.Shared\BuildTools.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="IDFCR.Abstractions.Builders">
       <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Results\bin\Release\net10.0\IDFCR.Abstractions.Builders.dll</HintPath>
     </Reference>
+    <Reference Include="IDFCR.Abstractions.Interceptors">
+      <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Persistence\bin\Release\net10.0\IDFCR.Abstractions.Interceptors.dll</HintPath>
+    </Reference>
     <Reference Include="IDFCR.Abstractions.Mapper">
       <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Mapper\bin\Release\net10.0\IDFCR.Abstractions.Mapper.dll</HintPath>
+    </Reference>
+    <Reference Include="IDFCR.Abstractions.Metadata">
+      <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Persistence\bin\Release\net10.0\IDFCR.Abstractions.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="IDFCR.Abstractions.Persistence">
+      <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Persistence\bin\Release\net10.0\IDFCR.Abstractions.Persistence.dll</HintPath>
     </Reference>
     <Reference Include="IDFCR.Abstractions.Results">
       <HintPath>..\..\IDFCR.Abstractions\IDFCR.Abstractions.Results\bin\Release\net10.0\IDFCR.Abstractions.Results.dll</HintPath>
