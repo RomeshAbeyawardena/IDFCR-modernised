@@ -93,11 +93,12 @@ $params = @{
     packageAlias = $meta.PackageAlias
     packageDescription = $meta.PackageDescription
     versionPrefix = $versionPrefix
-    packageTags = $packageTags
     packageVersionTags = $tags
 }
 
 $newRevision = . ./get-next-package-version.ps1 @params
 $version = "$versionPrefix.$newRevision"
-$version
+
+.\update-package-tags.ps1 -connectionString $connectionString -packageName $meta.PackageName -packageTags $packageTags
+
 .\update-version.ps1 -newVersion $version

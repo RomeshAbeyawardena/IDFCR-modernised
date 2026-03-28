@@ -10,8 +10,6 @@ param (
     [Parameter(Mandatory)]
     [string] $versionPrefix,
     [Parameter(Mandatory)]
-    [string[]] $packageTags,
-    [Parameter(Mandatory)]
     [string[]] $packageVersionTags
 )
 try {
