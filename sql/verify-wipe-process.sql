@@ -1,5 +1,7 @@
 USE [PackageManager]
-
+-- @settingKey is a stored procedure parameter; it is provided at execution time.
+-- Returns 1 if: table missing, setting key not found, or setting value is true
+-- Returns 0 otherwise
 IF (OBJECT_ID('SYSTEM_CONFIG.Setting','U') IS NULL)
 BEGIN
     SELECT 1;

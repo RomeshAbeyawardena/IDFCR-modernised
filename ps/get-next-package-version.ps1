@@ -15,6 +15,7 @@ param (
     [string[]] $packageVersionTags
 )
 try {
+    $commitID = git rev-parse HEAD
     $conn = [System.Data.SqlClient.SqlConnection]::new($connectionString);
     $conn.Open();
     $command = $conn.CreateCommand();
@@ -26,6 +27,7 @@ try {
         @packageNamespace = @packageNamespace,
         @packageDescription = @packageDescription,
         @versionPrefix = @versionPrefix,
+        @commitId = @commitId,
         @tags = @tags";
 
     [void]$command.Parameters.AddWithValue("packageName", $packageName)
@@ -33,6 +35,7 @@ try {
     [void]$command.Parameters.AddWithValue("packageNamespace", $packageNamespace)
     [void]$command.Parameters.AddWithValue("packageDescription", $packageDescription)
     [void]$command.Parameters.AddWithValue("versionPrefix", $versionPrefix)
+    [void]$command.Parameters.AddWithValue("commitId", $commitID)
     [void]$command.Parameters.AddWithValue("tags", [string]::Join(',', $packageVersionTags))
 
     $result = $command.ExecuteScalar();

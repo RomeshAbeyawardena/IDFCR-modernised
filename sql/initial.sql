@@ -29,7 +29,8 @@ BEGIN
 		[Alias] NVARCHAR(255) NULL,
 		[Namespace] NVARCHAR(255) NOT NULL,
 		[Description] NVARCHAR(2000) NULL,
-		CONSTRAINT UQ_Package UNIQUE ([Name], [Namespace])
+		CONSTRAINT UQ_Package UNIQUE ([Name], [Namespace]),
+		INDEX IDX_Package_Namespace NONCLUSTERED
 	)
 END
 
@@ -44,6 +45,12 @@ BEGIN
 		[VersionSuffix] NVARCHAR(50) NOT NULL,
 		[RevisionNumber] INT NOT NULL,
 		[ReleaseDateTimestampUtc] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+		[CommitId] NVARCHAR(80) NOT NULL,
+		[PublishedToFeed] BIT NULL,
+		[LastErrorOnPublishAttempt] NVARCHAR(2000) NULL,
+		[PublishedTimestampUtc] DATETIME2 NULL
+
+		INDEX IX_PackageVersion_PackageId_CommitId (PackageId, CommitId)
 		CONSTRAINT UQ_PackageVersion UNIQUE NONCLUSTERED (PackageId, VersionSuffix, RevisionNumber)
 	)
 END;

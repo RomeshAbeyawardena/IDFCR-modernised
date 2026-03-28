@@ -4,6 +4,7 @@ CREATE OR ALTER PROCEDURE dbo.GetNextPackageVersion
 	@packageAlias NVARCHAR(255),
 	@packageDescription NVARCHAR(2000),
 	@versionPrefix NVARCHAR(50),
+	@commitID NVARCHAR(80),
 	@tags NVARCHAR(2000)
 AS
 BEGIN
@@ -82,9 +83,9 @@ BEGIN
 		END
 
 		INSERT INTO [dbo].[PackageVersion]
-		([PackageId], [VersionSuffix], [RevisionNumber])
+		([PackageId], [VersionSuffix], [RevisionNumber], [CommitId])
 	VALUES
-		(@packageId, @versionPrefix, @revisionId);
+		(@packageId, @versionPrefix, @revisionId, @commitID);
 		SET @packageVersionId = CAST(SCOPE_IDENTITY() AS INT);
 
 		IF NULLIF(LTRIM(RTRIM(@tags)), '') IS NOT NULL
