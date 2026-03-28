@@ -16,8 +16,8 @@ try {
         
         if ($settingValue -ne [DBNull]::Value) {
             if (-not [bool]::TryParse($settingValue, [ref]$parsed)) {
-                Write-Error("Invalid CAN_AGENTS_WIPE_DATA value in DB")
-                exit 1
+                Write-Warning("Invalid CAN_AGENTS_WIPE_DATA value in DB, this will continue as if a value is not set");
+                $parsed = $true;
             }
         }
 

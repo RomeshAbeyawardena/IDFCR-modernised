@@ -10,13 +10,12 @@ BEGIN
 		,[Key] NVARCHAR(200) NOT NULL
 			CONSTRAINT UQ_SystemConfig_Setting_Key UNIQUE NONCLUSTERED
 		,[Value] NVARCHAR(MAX) NULL
-			CONSTRAINT CK_Setting_Boolean CHECK (
-    		[Type] != 'Boolean'
-    		OR [Value] IN ('true','false')
-			)
 		,[LastUpdatedTimestampUtc] DATETIME2 NOT NULL
 			CONSTRAINT DF_SystemConfig_Setting_LastUpdatedTimestampUtc 
 			DEFAULT GETUTCDATE()
+		,CONSTRAINT CK_Setting_Boolean CHECK (
+    		[Type] != 'Boolean'
+    		OR [Value] IN ('true','false'))
 	)
 END
 
