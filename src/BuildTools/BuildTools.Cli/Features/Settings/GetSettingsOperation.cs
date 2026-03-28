@@ -2,34 +2,6 @@
 using BuildTools.Cli.Features.Settings;
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
-using BuildTools.Shared.Features.Settings;
-using IDFCR.Abstractions.Mapper;
-using IDFCR.Abstractions.Results;
-
-public record GetPagedSettingsQuery : PagedQuery
-{
-
-}
-
-public class SettingDto : MapperBase<ISetting>, ISetting
-{
-    /// <inheritdoc/>
-    public string Type { get; set; } = null!;
-    /// <inheritdoc/>
-    public string Key { get; set; } = null!;
-    /// <inheritdoc/>
-    public string? Value { get; set; } = null!;
-    /// <inheritdoc/>
-    public DateTime LastUpdatedTimestampUtc { get; set; }
-    /// <inheritdoc/>
-    public override void Map(ISetting source)
-    {
-        Type = source.Type;
-        Key = source.Key;
-        Value = source.Value;
-        LastUpdatedTimestampUtc = source.LastUpdatedTimestampUtc;
-    }
-}
 
 [FeatureCommand(SettingsRootOperation.Prefix, CommandName)]
 public class GetSettingsOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository) 
