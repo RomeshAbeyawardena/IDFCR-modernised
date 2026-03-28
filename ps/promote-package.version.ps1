@@ -89,7 +89,7 @@ $meta = [MetaProfile]::LoadMeta($metaData)
 | Select-Object -ExpandProperty Name
 
 $namespace = $meta.SelectedProfile.Namespace ?? $meta.Namespace
-$meta.SelectedProfile
+
 $params = @{
     connectionString = $connectionString
     packageName = $meta.PackageName

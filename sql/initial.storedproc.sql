@@ -104,7 +104,7 @@ BEGIN
 		END
 
 		COMMIT TRANSACTION;
-		SELECT @packageVersionId AS PackageVersionId;
+		SELECT @revisionId AS PackageVersionId;
 	END TRY
 	BEGIN CATCH
 		IF XACT_STATE() <> 0
