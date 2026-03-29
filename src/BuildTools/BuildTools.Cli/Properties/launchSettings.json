@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "settings write CAN_AGENTS_WIPE_DATA Boolean false"
+      "commandLineArgs": "settings read"
     }
   }
 }

@@ -21,6 +21,7 @@ public class ReadSettingsOperation(IServiceProvider serviceProvider, IManagedStr
             //generate paged list
             var pagedResult = await settingRepository.GetPagedAsync(new GetPagedSettingsQuery 
             {
+                PageSize = 20,
                 Key = key,
                 Type = type
             }, cancellationToken);
