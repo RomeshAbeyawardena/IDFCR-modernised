@@ -31,7 +31,10 @@ public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream m
                     return;
                 }
 
-                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<TagDto>(t), cancellationToken);
+                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<TagDto>(t), cancellationToken,
+                    new TableField<TagDto> { Field = t => t.Name, Title = "Tag name", RowWidth = 20 },
+                    new TableField<TagDto> { Field = t => t.DisplayName, Title = "Friendly name", RowWidth = 20 }
+                    );
             }
             return;
         }

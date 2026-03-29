@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Tags;
 
+[RegisteredRepository]
 public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ITag, TagEntity, Tag, Guid>(db, filterFactory, entityInterceptorFactory), ITagRepository
 {
