@@ -41,6 +41,8 @@ public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStr
             if (result.IsSuccess)
             {
                 await settingRepository.SaveChangesAsync(cancellationToken);
+                var verb = foundEntry is null ? "added" : "updated";
+                await managedStream.Out.WriteLineAsync($"System setting '{key}' successfully {verb}.", cancellationToken);
                 return;
             }
 

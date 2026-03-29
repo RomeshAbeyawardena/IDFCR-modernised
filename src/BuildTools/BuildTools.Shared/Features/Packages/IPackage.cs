@@ -9,6 +9,7 @@
 /// </remarks>
 public interface IPackage
 {
+    object? Id { get; }
     /// <summary>
     /// Gets the canonical package name used by the tooling ecosystem.
     /// </summary>

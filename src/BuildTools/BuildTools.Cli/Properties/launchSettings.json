@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "settings read --key can_agents_wipe_data"
+      "commandLineArgs": "package read"
     }
   }
 }
