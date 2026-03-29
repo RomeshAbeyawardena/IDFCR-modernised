@@ -15,6 +15,9 @@ public class SettingDto : MapperBase<ISetting>, ISetting
     public DateTimeOffset CreatedTimestampUtc { get; set; }
     /// <inheritdoc/>
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
+
+    public string LastUpdated => ModifiedTimestampUtc?.ToLocalTime().ToString("dd MMM yyyy HH:mm") ?? "No data";
+
     /// <inheritdoc/>
     public override void Map(ISetting source)
     {

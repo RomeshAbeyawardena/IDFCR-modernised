@@ -29,9 +29,9 @@ public class ReadSettingsOperation(IServiceProvider serviceProvider, IManagedStr
             if (pagedResult.HasValue)
             {
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<SettingDto>(t), cancellationToken, 
-                    new TableField<SettingDto> { Field = s => s.Key, Title = "Setting Key", RowWidth = 32 },
-                    new TableField<SettingDto> { Field = s => s.Value ?? "Not set", Title = "Value", RowWidth = 32 },
-                    new TableField<SettingDto> { Field = s => s.ModifiedTimestampUtc!, Title = "Last updated", RowWidth = 32, Format = x => x is DateTimeOffset date ? date.ToString() : string.Empty }
+                    new TableField<SettingDto> { Field = s => s.Key, Title = "Setting Key", RowWidth = 20 },
+                    new TableField<SettingDto> { Field = s => s.Value ?? "Not set", Title = "Value", RowWidth = 20 },
+                    new TableField<SettingDto> { Field = s => s.LastUpdated!, Title = "Last updated", RowWidth = 32 }
                 );
             }
 
