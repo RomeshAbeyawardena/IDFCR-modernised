@@ -5,9 +5,9 @@ using BuildTools.Infrastructure.Features.Settings;
 
 namespace BuildTools.Cli.Features.Settings;
 
-[FeatureCommand(SettingsRootOperation.Prefix, CommandName)]
-public class SettingsReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository) 
-    : InjectableCommandOperationBase<SettingsReadOperation>(serviceProvider, SettingsRootOperation.Prefix, CommandName, typeof(SettingsRootOperation))
+[FeatureCommand(SettingRootOperation.Prefix, CommandName)]
+public class SettingReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository) 
+    : InjectableCommandOperationBase<SettingReadOperation>(serviceProvider, SettingRootOperation.Prefix, CommandName, typeof(SettingRootOperation))
 {
     public const string CommandName = "read";
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
