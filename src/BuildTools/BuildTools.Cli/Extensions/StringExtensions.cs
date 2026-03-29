@@ -1,7 +1,18 @@
-﻿namespace BuildTools.Cli.Extensions;
+﻿using System.Text.Json;
+
+namespace BuildTools.Cli.Extensions;
 
 public static class StringExtensions
 {
+    public static string Jsonify<T>(this T? value, JsonSerializerOptions options)
+    {
+        if(value is null)
+        {
+            return "{}";
+        }
+
+        return JsonSerializer.Serialize(value, options);
+    }
     public static string? Limit(this string? value, int limit)
     {
         if (string.IsNullOrWhiteSpace(value) || limit == 0)

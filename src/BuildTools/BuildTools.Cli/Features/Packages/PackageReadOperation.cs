@@ -1,6 +1,7 @@
 ﻿using BuildTools.Cli.Extensions;
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
+using BuildTools.Infrastructure.Features.Packages;
 
 namespace BuildTools.Cli.Features.Packages;
 

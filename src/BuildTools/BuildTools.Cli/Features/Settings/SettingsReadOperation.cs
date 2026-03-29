@@ -41,6 +41,11 @@ public class SettingsReadOperation(IServiceProvider serviceProvider, IManagedStr
 
         if (valueResult.HasValue)
         {
+            if (outputType == "Powershell")
+            {
+                await managedStream.Out.WriteLineAsync(valueResult.Result, cancellationToken);
+                return;
+            }
             await managedStream.Out.WriteLineAsync($"{key}: {valueResult.Result}", cancellationToken);
             return;
         }
