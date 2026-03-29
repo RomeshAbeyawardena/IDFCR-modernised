@@ -1,0 +1,27 @@
+﻿using BuildTools.Shared.Features.Packages;
+using IDFCR.Abstractions.Mapper;
+
+namespace BuildTools.Cli.Features.Packages;
+
+public class PackageDto : MapperBase<IPackage>, IPackage
+{
+    /// <inheritdoc/>
+    public string Name { get; set; } = null!;
+    /// <inheritdoc/>
+    public string? Alias { get; set; } = null!;
+    /// <inheritdoc/>
+    public string Namespace { get; set; } = null!;
+    /// <inheritdoc/>
+    public string? Description { get; set; } = null!;
+    public object? Id { get; set; }
+
+    /// <inheritdoc/>
+    public override void Map(IPackage source)
+    {
+        Id = source.Id;
+        Name = source.Name;
+        Alias = source.Alias;
+        Namespace = source.Namespace;
+        Description = source.Description;
+    }
+}
