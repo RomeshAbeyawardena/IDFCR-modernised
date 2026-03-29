@@ -37,8 +37,8 @@ public class SettingWriteOperation(IServiceProvider serviceProvider, IManagedStr
         var result = await settingRepository.UpsertAsync(new Shared.Features.Settings.Setting
         {
             Id = foundEntry?.Id,
-            Key = key!,
-            Type = type!,
+            Key = foundEntry?.Key ?? key!,
+            Type = foundEntry?.Type ?? type!,
             Value = value
         }, cancellationToken);
 

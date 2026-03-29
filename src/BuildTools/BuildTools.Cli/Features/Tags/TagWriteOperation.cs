@@ -12,7 +12,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 {
     public const string CommandName = "write";
 
-    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
+    private async Task SimpleUpsert(IEnumerable<string> command, CancellationToken cancellationToken)
     {
         var (hasName, name) = (await this.GetRequiredField(managedStream, command, 0, "Tag name", cancellationToken, false, "name"))
             .AsValueOrDefault(out var isParameter);
@@ -29,7 +29,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
         var result = await tagRepository.UpsertAsync(new Shared.Features.Tags.Tag
         {
             Id = foundEntry?.Id,
-            Name = name!,
+            Name = foundEntry?.Name ?? name!,
             DisplayName = displayName
         }, cancellationToken);
 
@@ -42,5 +42,16 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
         }
 
         await managedStream.Error.WriteLineAsync($"Unable to write tag: {result.Exception?.Message ?? "Unknown error"}", cancellationToken);
+    }
+
+    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
+    {
+        if(Parameters!.TryGetValue("mult-mode", out var multiMode))
+        {
+
+            return;
+        }
+
+        await SimpleUpsert(command, cancellationToken);
     }
 }

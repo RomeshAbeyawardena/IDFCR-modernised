@@ -35,8 +35,8 @@ public class PackageWriteOperation(IServiceProvider serviceProvider, IManagedStr
             Id = foundEntry?.Id,
             Alias = alias,
             Description = description,
-            Name = name!,
-            Namespace = @namespace!
+            Name = foundEntry?.Name ?? name!,
+            Namespace = foundEntry?.Namespace ?? @namespace!
         }, cancellationToken);
 
         if (result.IsSuccess)
