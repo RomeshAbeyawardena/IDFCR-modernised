@@ -60,6 +60,9 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
                     valueResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
                 return;
             }
+            await managedStream.Error.WriteLineAsync("Unsupported format:  Please provide a valid output-type", cancellationToken);
+
+            return;
         }
 
         await managedStream.Error.WriteLineAsync($"Unable to read package: {valueResult.Exception?.Message ?? "Unknown issue"}", cancellationToken);

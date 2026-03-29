@@ -1,10 +1,13 @@
-﻿namespace BuildTools.Shared.Features.Settings;
+﻿using IDFCR.Abstractions.Mapper;
+
+namespace BuildTools.Shared.Features.Tags;
 
 /// <summary>
 /// Represents a tag used to label and classify entities in tooling metadata.
 /// </summary>
-public interface ITag
+public interface ITag : IMapper<ITag>
 {
+    object? Id { get; }
     /// <summary>
     /// Gets the stable tag identifier used in code and storage.
     /// </summary>
