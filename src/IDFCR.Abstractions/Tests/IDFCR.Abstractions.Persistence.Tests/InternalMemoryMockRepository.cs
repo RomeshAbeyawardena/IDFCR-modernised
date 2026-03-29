@@ -74,5 +74,11 @@ namespace IDFCR.Abstractions.Persistence.Tests
             foundEntry.Apply(entry);
             return Task.FromResult(foundEntry.Id);
         }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            //No-op in an in-memory list
+            return Task.FromResult(0);
+        }
     }
 }

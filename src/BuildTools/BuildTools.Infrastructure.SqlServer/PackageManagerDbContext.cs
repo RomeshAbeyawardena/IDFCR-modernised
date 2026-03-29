@@ -1,9 +1,11 @@
 ﻿using BuildTools.Infrastructure.SqlServer.Features.Settings;
+using IDFCR.Abstractions.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer;
 
-public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> options) : DbContext(options)
+public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> options) 
+    : DbContext(options), IUnitOfWork
 {
     public DbSet<SettingEntity> Settings { get; set; }
 

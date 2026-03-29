@@ -225,5 +225,7 @@ namespace IDFCR.Abstractions.Persistence
             return UnitPagedResult.FromResult<T>(mappedData!, 
                 totalRows, request, UnitAction.Get);
         }
+
+        public abstract Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

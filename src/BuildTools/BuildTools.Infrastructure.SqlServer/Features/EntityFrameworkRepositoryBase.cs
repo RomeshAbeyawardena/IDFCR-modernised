@@ -75,4 +75,9 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         DbSet.Update(entry);
         return entry.Id;
     }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        return db.SaveChangesAsync(cancellationToken);
+    }
 }

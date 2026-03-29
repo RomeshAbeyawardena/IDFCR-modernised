@@ -35,8 +35,10 @@ public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStr
 
             if (result.IsSuccess)
             {
-                
+                await settingRepository.SaveChangesAsync(cancellationToken);
             }
+
+            await managedStream.Error.WriteLineAsync($"Unable to write setting: {result.Exception?.Message ?? "Unknown error"}", cancellationToken);
         }
 
     }
