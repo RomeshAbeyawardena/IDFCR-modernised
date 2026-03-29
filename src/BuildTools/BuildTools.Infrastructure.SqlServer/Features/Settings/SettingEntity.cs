@@ -14,8 +14,9 @@ public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
     public string Key { get; set; } = null!;
     /// <inheritdoc/>
     public string? Value { get; set; } = null!;
+    public DateTimeOffset CreatedTimestampUtc { get; set; }
     /// <inheritdoc/>
-    public DateTime LastUpdatedTimestampUtc { get; set; }
+    public DateTimeOffset? ModifiedTimestampUtc { get; set; }
     /// <inheritdoc/>
     public override void Map(ISetting source)
     {
@@ -27,6 +28,7 @@ public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
         Type = source.Type;
         Key = source.Key;
         Value = source.Value;
-        LastUpdatedTimestampUtc = source.LastUpdatedTimestampUtc;
+        CreatedTimestampUtc = source.CreatedTimestampUtc;
+        ModifiedTimestampUtc = source.ModifiedTimestampUtc;
     }
 }

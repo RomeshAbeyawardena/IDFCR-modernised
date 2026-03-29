@@ -11,6 +11,11 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory), ISettingRepository
 {
+    protected override Task<Guid> OnAddAsync(SettingEntity entry, Setting rawEntry, CancellationToken cancellationToken)
+    {
+        entry.ModifiedTimestampUtc = entry.CreatedTimestampUtc;
+        return base.OnAddAsync(entry, rawEntry, cancellationToken);
+    }
     public async Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken)
     {
         var query = FilterFactory.Apply(DbSet.AsNoTracking(), new GetPagedSettingsQuery

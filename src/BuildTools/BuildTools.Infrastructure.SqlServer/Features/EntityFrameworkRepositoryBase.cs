@@ -24,7 +24,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
 
     protected override async Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken)
     {
-        var item = await DbSet.FindAsync(key, cancellationToken);
+        var item = await DbSet.FindAsync([key], cancellationToken);
 
         if (item is null)
         {

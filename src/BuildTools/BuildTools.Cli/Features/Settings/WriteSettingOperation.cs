@@ -7,7 +7,7 @@ using IDFCR.Abstractions.Results.Extensions;
 namespace BuildTools.Cli.Features.Settings;
 
 [FeatureCommand(SettingsRootOperation.Prefix, CommandName)]
-public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository, TimeProvider timeProvider)
+public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository)
     : InjectableCommandOperationBase<WriteSettingOperation>(serviceProvider, SettingsRootOperation.Prefix, CommandName, typeof(SettingsRootOperation))
 {
     public const string CommandName = "write";
@@ -24,11 +24,16 @@ public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStr
         {
             var foundEntry = (await settingRepository.GetSettingAsync(key!, type, cancellationToken)).GetResultOrDefault();
 
+            if (foundEntry is not null && StringComparer.OrdinalIgnoreCase.Equals(foundEntry.Value, value))
+            {
+                await managedStream.Error.WriteLineAsync("No changes detected", cancellationToken);
+                return;
+            }
+
             var result = await settingRepository.UpsertAsync(new Shared.Features.Settings.Setting
             {
                 Id = foundEntry?.Id,
                 Key = key!,
-                LastUpdatedTimestampUtc = timeProvider.GetUtcNow().UtcDateTime,
                 Type = type!,
                 Value = value
             }, cancellationToken);
@@ -36,6 +41,7 @@ public class WriteSettingOperation(IServiceProvider serviceProvider, IManagedStr
             if (result.IsSuccess)
             {
                 await settingRepository.SaveChangesAsync(cancellationToken);
+                return;
             }
 
             await managedStream.Error.WriteLineAsync($"Unable to write setting: {result.Exception?.Message ?? "Unknown error"}", cancellationToken);

@@ -33,8 +33,14 @@ public class SettingEntityConfiguration : IEntityTypeConfiguration<SettingEntity
             .HasColumnType("nvarchar(max)")
             .IsRequired(false);
 
-        builder.Property(e => e.LastUpdatedTimestampUtc)
-            .HasColumnType("datetime2")
+        builder.Property(e => e.CreatedTimestampUtc)
+            .HasColumnName("CreatedTimestampUtc")
+            .HasColumnType("DATETIMEOFFSET(7)")
+            .IsRequired();
+
+        builder.Property(e => e.ModifiedTimestampUtc)
+            .HasColumnName("LastUpdatedTimestampUtc")
+            .HasColumnType("DATETIMEOFFSET(7)")
             .HasDefaultValueSql("GETUTCDATE()", "DF_SystemConfig_Setting_LastUpdatedTimestampUtc")
             .IsRequired();
     }

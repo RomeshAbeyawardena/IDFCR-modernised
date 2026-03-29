@@ -10,7 +10,8 @@ BEGIN
 		,[Key] NVARCHAR(200) NOT NULL
 			CONSTRAINT UQ_SystemConfig_Setting_Key UNIQUE NONCLUSTERED
 		,[Value] NVARCHAR(MAX) NULL
-		,[LastUpdatedTimestampUtc] DATETIME2 NOT NULL
+		,[CreatedTimestampUtc] DATETIMEOFFSET(7) NOT NULL
+		,[LastUpdatedTimestampUtc] DATETIMEOFFSET(7) NOT NULL
 			CONSTRAINT DF_SystemConfig_Setting_LastUpdatedTimestampUtc 
 			DEFAULT GETUTCDATE()
 		,CONSTRAINT CK_Setting_Boolean CHECK (
@@ -30,7 +31,7 @@ BEGIN
 		[Namespace] NVARCHAR(255) NOT NULL,
 		[Description] NVARCHAR(2000) NULL,
 		CONSTRAINT UQ_Package UNIQUE ([Name], [Namespace]),
-		INDEX IDX_Package_Namespace NONCLUSTERED
+		INDEX IDX_Package_Namespace NONCLUSTERED ([Namespace])
 	)
 END
 
@@ -44,13 +45,13 @@ BEGIN
 			CONSTRAINT FK_PackageVersion_Package FOREIGN KEY REFERENCES [dbo].[Package](PackageId),
 		[VersionSuffix] NVARCHAR(50) NOT NULL,
 		[RevisionNumber] INT NOT NULL,
-		[ReleaseDateTimestampUtc] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+		[ReleaseDateTimestampUtc] DATETIMEOFFSET(7) NOT NULL DEFAULT GETUTCDATE(),
 		[CommitId] NVARCHAR(80) NOT NULL,
 		[PublishedToFeed] BIT NULL,
 		[LastErrorOnPublishAttempt] NVARCHAR(2000) NULL,
-		[PublishedTimestampUtc] DATETIME2 NULL
+		[PublishedTimestampUtc] DATETIMEOFFSET(7) NULL,
 
-		INDEX IX_PackageVersion_PackageId_CommitId (PackageId, CommitId)
+		INDEX IX_PackageVersion_PackageId_CommitId (PackageId, CommitId),
 		CONSTRAINT UQ_PackageVersion UNIQUE NONCLUSTERED (PackageId, VersionSuffix, RevisionNumber)
 	)
 END;

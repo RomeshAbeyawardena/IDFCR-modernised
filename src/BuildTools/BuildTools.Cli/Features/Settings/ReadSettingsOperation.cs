@@ -30,7 +30,7 @@ public class ReadSettingsOperation(IServiceProvider serviceProvider, IManagedStr
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<SettingDto>(t), cancellationToken, 
                     new TableField<SettingDto> { Field = s => s.Key, Title = "Setting Key", RowWidth = 32 },
                     new TableField<SettingDto> { Field = s => s.Value ?? "Not set", Title = "Value", RowWidth = 32 },
-                    new TableField<SettingDto> { Field = s => s.LastUpdatedTimestampUtc, Title = "Last updated", RowWidth = 32, Format = x => x is DateTime date ? date.ToString() : string.Empty }
+                    new TableField<SettingDto> { Field = s => s.ModifiedTimestampUtc!, Title = "Last updated", RowWidth = 32, Format = x => x is DateTimeOffset date ? date.ToString() : string.Empty }
                 );
             }
 

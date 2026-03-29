@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="IDFCR.Abstractions.Mapper" Version="1.0.0.4" />
+    <PackageReference Include="IDFCR.Abstractions.Metadata" Version="1.0.0.4" />
   </ItemGroup>
 
 </Project>

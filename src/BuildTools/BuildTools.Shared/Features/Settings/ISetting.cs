@@ -1,11 +1,12 @@
 ﻿using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Metadata;
 
 namespace BuildTools.Shared.Features.Settings;
 
 /// <summary>
 /// Represents a persisted configuration entry identified by a setting <see cref="Type"/> and <see cref="Key"/>.
 /// </summary>
-public interface ISetting : IMapper<ISetting>
+public interface ISetting : IMapper<ISetting>, IAuditCreatedTimestamp, IAuditModifiedTimestamp
 {
     object? Id { get; }
     /// <summary>
@@ -23,5 +24,4 @@ public interface ISetting : IMapper<ISetting>
     /// <summary>
     /// Gets the UTC timestamp of the most recent successful update to this setting.
     /// </summary>
-    DateTime LastUpdatedTimestampUtc { get; }
 }
