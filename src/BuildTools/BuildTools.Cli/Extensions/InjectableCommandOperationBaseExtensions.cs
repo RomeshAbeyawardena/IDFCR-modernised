@@ -8,10 +8,36 @@ namespace BuildTools.Cli.Extensions;
 
 public static class InjectableCommandOperationBaseExtensions
 {
+    /// <summary>
+    /// Searches the dictionary for the first parameter whose key matches any of the specified values.
+    /// </summary>
+    /// <param name="parameters">The dictionary of parameters to search, where each key is a parameter name and each value is a corresponding
+    /// parameter object. Cannot be null.</param>
+    /// <param name="values">The collection of parameter names to search for in the dictionary. The method returns the first matching
+    /// parameter found, if any.</param>
+    /// <returns>The first matching parameter from the dictionary if a key matches any value in the collection; otherwise, null.</returns>
+    private static Parameter? SearchParameters(this IDictionary<string, Parameter> parameters, IEnumerable<string> values)
+    {
+        if (!values.Any(parameters.ContainsKey))
+        {
+            return null;
+        }
+
+        foreach(var value in values)
+        {
+            if (parameters.TryGetValue(value, out var parameter))
+            {
+                return parameter;
+            }
+        }
+
+        return null;
+    }
+
     public static async Task<FieldResult> GetField<T>(
         this InjectableCommandOperationBase<T> operation,
         IManagedStream stream,
-        IEnumerable<string> arguments,
+        IDictionary<string, Parameter> arguments,
         int position,
         string prompt,
         CancellationToken cancellationToken,
@@ -21,33 +47,31 @@ public static class InjectableCommandOperationBaseExtensions
         params string[] fields)
         where T : IInjectableCommandOperation
     {
-        var fieldValue = position == Fields.IgnorePositionalParameter ? string.Empty : arguments.ElementAtOrDefault(wasLastFieldAParameter ? position + 1 : position);
-        bool hasValue;
+        
+        var field = 
+            position == Fields.IgnorePositionalParameter 
+            ? arguments.SearchParameters(fields)
+            : arguments.Values.ElementAtOrDefault(position);
+
+        bool hasValue = field is not null && !field.IsFlag;
         bool isParameter = false;
-        if (string.IsNullOrWhiteSpace(fieldValue) || fieldValue.StartsWith('-'))
+        if (hasValue && !string.IsNullOrEmpty(field!.Value))
         {
-            isParameter = !string.IsNullOrWhiteSpace(fieldValue = operation.Parameters?.TryGetRawValue(fields));
-            if (!isParameter && promptInput)
-            {
-                fieldValue = await stream.PromptAsync(prompt, cancellationToken);
-            }
-            
+            return new(true, isParameter, field.Value);
         }
 
-        hasValue = !string.IsNullOrWhiteSpace(fieldValue);
-
-        if (!hasValue && outputErrors)
+        if (outputErrors)
         {
             await stream.Error.WriteLineAsync($"{prompt} is not specified", cancellationToken);
         }
 
-        return new(hasValue, isParameter, fieldValue);
+        return new(false, isParameter, null);
     }
 
     public static async Task<string?> GetOptionalField<T>(
         this InjectableCommandOperationBase<T> operation,
         IManagedStream stream,
-        IEnumerable<string> arguments,
+        IDictionary<string, Parameter> arguments,
         CancellationToken cancellationToken,
         bool wasLastFieldAParameter = false,
         params string[] fields)
@@ -59,7 +83,7 @@ public static class InjectableCommandOperationBaseExtensions
 
     public static async Task<FieldResult<TLookup>> LookUpFieldAsync<T, TLookup>(this InjectableCommandOperationBase<T> operation,
         IManagedStream stream,
-        IEnumerable<string> arguments,
+        IDictionary<string, Parameter> arguments,
         Func<string, CancellationToken, Task<TLookup?>> lookupFactory,
         CancellationToken cancellationToken,
         int? position = null,
@@ -102,8 +126,8 @@ public static class InjectableCommandOperationBaseExtensions
 
     public static Task<FieldResult> GetRequiredField<T>(
         this InjectableCommandOperationBase<T> operation, 
-        IManagedStream stream, 
-        IEnumerable<string> arguments, 
+        IManagedStream stream,
+        IDictionary<string, Parameter> arguments,
         int position, 
         string prompt,
         CancellationToken cancellationToken,

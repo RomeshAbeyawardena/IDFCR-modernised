@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "settings get"
+      "commandLineArgs": "settings read --key Key"
     }
   }
 }

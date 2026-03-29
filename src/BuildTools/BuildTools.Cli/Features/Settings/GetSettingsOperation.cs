@@ -9,11 +9,12 @@ namespace BuildTools.Cli.Features.Settings;
 public class GetSettingsOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository) 
     : InjectableCommandOperationBase<GetSettingsOperation>(serviceProvider, SettingsRootOperation.Prefix, CommandName, typeof(SettingsRootOperation))
 {
-    public const string CommandName = "get";
+    public const string CommandName = "read";
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        var key = await this.GetOptionalField(managedStream, command, cancellationToken, false);
-        var type = await this.GetOptionalField(managedStream, command, cancellationToken);
+        var key = await this.GetOptionalField(managedStream, Parameters!, cancellationToken, true, "key");
+        var type = await this.GetOptionalField(managedStream, Parameters!, cancellationToken, true, "type");
+        
         if (string.IsNullOrWhiteSpace(key))
         {
             //generate paged list
@@ -42,6 +43,6 @@ public class GetSettingsOperation(IServiceProvider serviceProvider, IManagedStre
             return;
         }
 
-
+        await managedStream.Error.WriteLineAsync($"Unable to read value: {valueResult.Exception?.Message ?? "Unknown issue"}", cancellationToken);
     }
 }
