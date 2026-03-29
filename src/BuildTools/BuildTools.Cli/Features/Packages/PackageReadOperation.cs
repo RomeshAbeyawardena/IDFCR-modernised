@@ -36,6 +36,8 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
                         RowWidth = 20 }
                     );
             }
+
+            return;
         }
 
         var valueResult = await packageRepository.GetPackageAsync(name, @namespace, cancellationToken);
