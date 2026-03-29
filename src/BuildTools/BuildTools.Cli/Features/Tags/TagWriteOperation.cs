@@ -2,6 +2,7 @@
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
 using BuildTools.Infrastructure.Features.Tags;
+using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Tags;
@@ -26,7 +27,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
         var foundEntry = (await tagRepository.GetTagAsync(name!, cancellationToken)).GetResultOrDefault();
 
-        var result = await tagRepository.UpsertAsync(new Shared.Features.Tags.Tag
+        var result = await tagRepository.UpsertAsync(new Tag
         {
             Id = foundEntry?.Id,
             Name = foundEntry?.Name ?? name!,
@@ -46,8 +47,30 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        if(Parameters!.TryGetValue("mult-mode", out var multiMode))
+        if(Parameters!.TryGetValue("tags", out var tags) && !string.IsNullOrWhiteSpace(tags.Value))
         {
+            //a csv of tags tag1:Tag 1,tag2: Tag 2
+            var tagItems = tags.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            List<Tag> tagList = [];
+            foreach(var tagItem in tagItems)
+            {
+                if (!tagItem.Contains(':'))
+                {
+                    continue;
+                }
+
+                var delimited = tagItem.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                var name = delimited[0];
+                
+                if (delimited.Length < 0)
+                {
+                    tagList.Add(new Tag { 
+                        Name = name, 
+                        DisplayName = delimited[1] 
+                    });
+                }
+            }
 
             return;
         }
