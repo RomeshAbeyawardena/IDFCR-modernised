@@ -7,7 +7,7 @@ namespace IDFCR.Abstractions.Persistence;
 /// </summary>
 /// <typeparam name="T">The domain model type.</typeparam>
 /// <typeparam name="TKey">The identifier type.</typeparam>
-public interface IRepository<T, TKey>
+public interface IRepository<T, TKey> : IUnitOfWork
     where TKey : struct
 {
     /// <summary>
