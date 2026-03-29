@@ -4,7 +4,7 @@ namespace BuildTools.Cli.Extensions;
 
 public class TableField<T>
 {
-    public required Expression<Func<T, object>> Field { get; init; }
+    public required Expression<Func<T, object?>> Field { get; init; }
 
     public Func<object?, string?>? Format { get; init; }
     

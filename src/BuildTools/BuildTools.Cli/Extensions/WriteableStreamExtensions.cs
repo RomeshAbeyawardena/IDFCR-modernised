@@ -48,6 +48,11 @@ public static class WriteableStreamExtensions
         return writeableStream.WriteAsync(b => b.Append(string.Format(format, parameters)), cancellationToken);
     }
 
+    public static Task WriteLineAsync(this IIOWriteableStream writeableStream, string format, CancellationToken cancellationToken)
+    {
+        return writeableStream.WriteAsync(b => b.AppendLine(format), cancellationToken);
+    }
+
     public static Task WriteLineAsync(this IIOWriteableStream writeableStream, string format, CancellationToken cancellationToken,
         params object[] parameters)
     {

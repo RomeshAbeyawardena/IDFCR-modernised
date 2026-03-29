@@ -5,8 +5,8 @@ using BuildTools.Infrastructure.Features.Packages;
 
 namespace BuildTools.Cli.Features.Packages;
 
-[FeatureCommand(PackageRootOperation.Prefix,CommandName)]
-public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, 
+[FeatureCommand(PackageRootOperation.Prefix, CommandName)]
+public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream,
     IPackageRepository packageRepository)
     : InjectableCommandOperationBase<PackageReadOperation>(serviceProvider, PackageRootOperation.Prefix,
         CommandName, typeof(PackageRootOperation))
@@ -29,12 +29,22 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
 
             if (pagedResult.HasValue)
             {
+                if (outputType == "json")
+                {
+                    await managedStream.Out.WriteLineAsync(pagedResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
+                    return;
+                }
+
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageDto>(t), cancellationToken,
-                    new TableField<PackageDto> { Field = s => s.Namespace, Title = "Namespace", RowWidth = 20 },
-                    new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 20 },
-                    new TableField<PackageDto> { Field = s => s.Description ?? string.Empty, Title = "Description", 
-                        RowWidth = 20 }
-                    );
+                new TableField<PackageDto> { Field = s => s.Namespace, Title = "Namespace", RowWidth = 20 },
+                new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 20 },
+                new TableField<PackageDto>
+                {
+                    Field = s => s.Description,
+                    Title = "Description",
+                    RowWidth = 40
+                }
+                );
             }
 
             return;
@@ -42,9 +52,9 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
 
         var valueResult = await packageRepository.GetPackageAsync(name, @namespace, cancellationToken);
 
-        if(valueResult.HasValue)
+        if (valueResult.HasValue)
         {
-            if (outputType == "Powershell")
+            if (outputType == "json")
             {
                 await managedStream.Out.WriteLineAsync(
                     valueResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
