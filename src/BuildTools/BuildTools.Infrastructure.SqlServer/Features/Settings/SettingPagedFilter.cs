@@ -9,13 +9,13 @@ public class SettingPagedFilter : PagedFilterBase<GetPagedSettingsQuery, Setting
     protected override Expression<Func<SettingEntity, bool>> BuildPredicate(IQueryable<SettingEntity> queryable, GetPagedSettingsQuery request)
     {
         var query = base.StarterExpression;
-        if (!string.IsNullOrWhiteSpace(request.Name))
+        if (!string.IsNullOrWhiteSpace(request.Key))
         {
-            query = query.And(x => x.Key == request.Name);
+            query = query.And(x => x.Key == request.Key);
         }
-        else if (!string.IsNullOrWhiteSpace(request.NameContains))
+        else if (!string.IsNullOrWhiteSpace(request.KeyContains))
         {
-            query = query.And(x => x.Key.Contains(request.Name));
+            query = query.And(x => x.Key.Contains(request.Key));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Type))
