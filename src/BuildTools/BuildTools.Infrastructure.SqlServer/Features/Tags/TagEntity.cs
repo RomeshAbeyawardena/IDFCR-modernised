@@ -1,8 +1,6 @@
 ﻿using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Tags;
 
@@ -22,13 +20,5 @@ public class TagEntity : MapperBase<ITag>, ITag, IIdentifiable<Guid>
 
         Name = source.Name;
         DisplayName = source.DisplayName;
-    }
-}
-
-public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
-{
-    public void Configure(EntityTypeBuilder<TagEntity> builder)
-    {
-        
     }
 }
