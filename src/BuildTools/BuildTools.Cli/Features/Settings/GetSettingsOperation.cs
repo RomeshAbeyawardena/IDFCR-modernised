@@ -39,6 +39,9 @@ public class GetSettingsOperation(IServiceProvider serviceProvider, IManagedStre
         if (valueResult.HasValue)
         {
             await managedStream.Out.WriteLineAsync($"{key}: {valueResult.Result}", cancellationToken);
+            return;
         }
+
+
     }
 }
