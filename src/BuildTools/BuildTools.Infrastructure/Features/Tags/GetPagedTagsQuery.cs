@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Results;
 
-namespace BuildTools.Cli.Features.Tags;
+namespace BuildTools.Infrastructure.Features.Tags;
 
 public record GetPagedTagsQuery : PagedQuery
 {

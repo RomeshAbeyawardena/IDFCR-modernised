@@ -2,7 +2,7 @@
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 
-namespace BuildTools.Cli.Features.Tags;
+namespace BuildTools.Infrastructure.Features.Tags;
 
 public interface ITagRepository : IRepository<Tag, Guid>
 {
