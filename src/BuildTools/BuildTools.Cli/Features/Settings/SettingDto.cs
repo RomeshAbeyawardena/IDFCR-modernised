@@ -5,6 +5,7 @@ namespace BuildTools.Cli.Features.Settings;
 
 public class SettingDto : MapperBase<ISetting>, ISetting
 {
+    public object? Id { get; set; } = null!;
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
     /// <inheritdoc/>
@@ -16,6 +17,7 @@ public class SettingDto : MapperBase<ISetting>, ISetting
     /// <inheritdoc/>
     public override void Map(ISetting source)
     {
+        Id = source.Id;
         Type = source.Type;
         Key = source.Key;
         Value = source.Value;

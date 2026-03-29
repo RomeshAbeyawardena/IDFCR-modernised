@@ -7,6 +7,7 @@ namespace BuildTools.Shared.Features.Settings;
 /// </summary>
 public interface ISetting : IMapper<ISetting>
 {
+    object? Id { get; }
     /// <summary>
     /// Gets the logical category for the setting (for example, tool, subsystem, or feature area).
     /// </summary>

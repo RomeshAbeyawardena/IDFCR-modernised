@@ -6,6 +6,7 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
 public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
 {
+    object? ISetting.Id => Id;
     public Guid Id { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
@@ -18,6 +19,11 @@ public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
     /// <inheritdoc/>
     public override void Map(ISetting source)
     {
+        if (source.Id is not null && source.Id is Guid id)
+        {
+            Id = id;
+        }
+
         Type = source.Type;
         Key = source.Key;
         Value = source.Value;

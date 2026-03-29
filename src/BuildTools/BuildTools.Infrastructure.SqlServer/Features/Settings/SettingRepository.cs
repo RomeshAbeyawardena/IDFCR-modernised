@@ -11,18 +11,34 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory), ISettingRepository
 {
-    public async Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken)
+    public async Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken)
     {
-        var query = FilterFactory.Apply(DbSet, new GetPagedSettingsQuery { });
+        var query = FilterFactory.Apply(DbSet.AsNoTracking(), new GetPagedSettingsQuery
+        {
+            Key = key,
+            Type = type
+        });
 
         var result = await query.FirstOrDefaultAsync(cancellationToken);
 
         if (result is null)
         {
-            return UnitResult.NotFound<string>(key);
+            return UnitResult.NotFound<Setting>(key);
         }
 
-        return UnitResult.FromResult(result.Value);
+        return UnitResult.FromResult(base.Map(result));
+    }
+
+    public async Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken)
+    {
+        var settingResult = await GetSettingAsync(key, type, cancellationToken);
+        
+        if (settingResult.HasValue)
+        {
+            return UnitResult.FromResult(settingResult.Result.Value);
+        }
+
+        return UnitResult.Failed<string>(settingResult?.Exception ?? new InvalidOperationException("Exception unknown"));
     }
 
     protected override bool IsHandled(Exception exception)
