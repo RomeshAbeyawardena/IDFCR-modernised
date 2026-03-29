@@ -28,6 +28,12 @@ public class SettingsReadOperation(IServiceProvider serviceProvider, IManagedStr
 
             if (pagedResult.HasValue)
             {
+                if (outputType == "json")
+                {
+                    await managedStream.Out.WriteLineAsync(pagedResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
+                    return;
+                }
+
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<SettingDto>(t), cancellationToken, 
                     new TableField<SettingDto> { Field = s => s.Key, Title = "Setting Key", RowWidth = 20 },
                     new TableField<SettingDto> { Field = s => s.Value ?? "Not set", Title = "Value", RowWidth = 20 },
@@ -41,9 +47,11 @@ public class SettingsReadOperation(IServiceProvider serviceProvider, IManagedStr
 
         if (valueResult.HasValue)
         {
-            if (outputType == "Powershell")
+            if (outputType == "json")
             {
-                await managedStream.Out.WriteLineAsync(valueResult.Result, cancellationToken);
+                (string Key, string Value) value = new(key, valueResult.Result);
+
+                await managedStream.Out.WriteLineAsync(value.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
                 return;
             }
             await managedStream.Out.WriteLineAsync($"{key}: {valueResult.Result}", cancellationToken);
