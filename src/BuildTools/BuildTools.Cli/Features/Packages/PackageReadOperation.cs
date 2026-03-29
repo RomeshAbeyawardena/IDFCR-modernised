@@ -37,12 +37,12 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
 
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageDto>(t), cancellationToken,
                 new TableField<PackageDto> { Field = s => s.Namespace, Title = "Namespace", RowWidth = 20 },
-                new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 20 },
+                new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 40 },
                 new TableField<PackageDto>
                 {
                     Field = s => s.Description,
                     Title = "Description",
-                    RowWidth = 40
+                    RowWidth = 80
                 }
                 );
             }
