@@ -1,4 +1,6 @@
-﻿using IDFCR.Abstractions.Results;
+﻿namespace BuildTools.Infrastructure.Features.Settings;
+
+using IDFCR.Abstractions.Results;
 
 public record GetPagedSettingsQuery : PagedQuery
 {

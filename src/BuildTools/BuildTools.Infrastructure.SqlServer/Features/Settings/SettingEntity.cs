@@ -1,10 +1,12 @@
 ﻿using BuildTools.Shared.Features.Settings;
 using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Metadata;
 
-namespace BuildTools.Cli.Features.Settings;
+namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
-public class SettingDto : MapperBase<ISetting>, ISetting
+public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
 {
+    public Guid Id { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
     /// <inheritdoc/>

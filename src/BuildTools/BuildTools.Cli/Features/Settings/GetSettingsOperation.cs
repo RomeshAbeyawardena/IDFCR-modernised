@@ -1,7 +1,9 @@
 ﻿using BuildTools.Cli.Extensions;
-using BuildTools.Cli.Features.Settings;
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
+using BuildTools.Infrastructure.Features.Settings;
+
+namespace BuildTools.Cli.Features.Settings;
 
 [FeatureCommand(SettingsRootOperation.Prefix, CommandName)]
 public class GetSettingsOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ISettingRepository settingRepository) 

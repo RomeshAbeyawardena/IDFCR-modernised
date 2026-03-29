@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="BuildTools.Cli/BuildTools.Cli.csproj" />
   <Project Path="BuildTools.Infrastructure.SqlServer/BuildTools.Infrastructure.SqlServer.csproj" />
+  <Project Path="BuildTools.Infrastructure/BuildTools.Infrastructure.csproj" />
   <Project Path="BuildTools.Shared/BuildTools.Shared.csproj" />
 </Solution>

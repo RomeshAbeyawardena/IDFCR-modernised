@@ -14,6 +14,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
     where T : class, IMapper<TCommon>, TCommon
 {
+    protected IFilterFactory FilterFactory { get; } = filterFactory;
     protected DbSet<TDb> DbSet { get; } = db.Set<TDb>();
     protected override async Task<TKey> OnAddAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
     {
@@ -61,7 +62,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
 
     protected override async Task<(IEnumerable<TDb> data, int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
     {
-        var filteredResult = filterFactory.ApplyPaged(DbSet, request);
+        var filteredResult = FilterFactory.ApplyPaged(DbSet, request);
 
         var (query, totalCount) = filteredResult;
 

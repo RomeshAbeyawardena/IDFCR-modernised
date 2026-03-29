@@ -1,35 +1,29 @@
-﻿using BuildTools.Shared.Features.Settings;
+﻿using BuildTools.Infrastructure.Features.Settings;
+using BuildTools.Shared.Features.Settings;
 using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Interceptors;
-using IDFCR.Abstractions.Mapper;
-using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
-public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
-{
-    public Guid Id { get; set; }
-    /// <inheritdoc/>
-    public string Type { get; set; } = null!;
-    /// <inheritdoc/>
-    public string Key { get; set; } = null!;
-    /// <inheritdoc/>
-    public string? Value { get; set; } = null!;
-    /// <inheritdoc/>
-    public DateTime LastUpdatedTimestampUtc { get; set; }
-    /// <inheritdoc/>
-    public override void Map(ISetting source)
-    {
-        Type = source.Type;
-        Key = source.Key;
-        Value = source.Value;
-        LastUpdatedTimestampUtc = source.LastUpdatedTimestampUtc;
-    }
-}
 
 public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory), ISettingRepository
 {
+    public async Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken)
+    {
+        var query = FilterFactory.Apply(DbSet, new GetPagedSettingsQuery { });
+
+        var result = await query.FirstOrDefaultAsync(cancellationToken);
+
+        if (result is null)
+        {
+            return UnitResult.NotFound<string>(key);
+        }
+
+        return UnitResult.FromResult(result.Value);
+    }
+
     protected override bool IsHandled(Exception exception)
     {
         return true;

@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Mapper" Version="1.0.0.2" />
+    <PackageReference Include="IDFCR.Abstractions.Persistence" Version="1.0.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BuildTools.Shared\BuildTools.Shared.csproj" />
+  </ItemGroup>
 </Project>

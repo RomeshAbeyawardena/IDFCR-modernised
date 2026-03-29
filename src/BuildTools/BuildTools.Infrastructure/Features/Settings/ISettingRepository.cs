@@ -2,7 +2,7 @@
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 
-namespace BuildTools.Cli.Features.Settings;
+namespace BuildTools.Infrastructure.Features.Settings;
 
 public interface ISettingRepository : IRepository<Setting, Guid>
 {
