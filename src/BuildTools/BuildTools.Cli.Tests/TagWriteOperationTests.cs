@@ -8,7 +8,6 @@ using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Results;
 using IDFCR.TestUtilities;
 using Moq;
-using System.Linq;
 
 namespace BuildTools.Cli.Tests;
 

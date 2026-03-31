@@ -36,7 +36,7 @@ public static class UnitResult
     /// <returns>An object representing a successful unit result containing the specified action.</returns>
     public static IUnitResult Success(UnitAction action)
     {
-        return new DefaultUnitResult(Action: action);
+        return new DefaultUnitResult(Action: action, IsSuccess: true);
     }
 
     /// <summary>
@@ -44,9 +44,10 @@ public static class UnitResult
     /// </summary>
     /// <param name="exception">The exception that caused the failure. Cannot be null.</param>
     /// <param name="action">The action associated with the failed result.</param>
+    /// <param name="failureReason">The reason for the failure.</param>
     /// <returns>An <see cref="IUnitResult"/> representing a failed operation with the provided exception and action.</returns>
-    public static IUnitResult Failed(Exception exception, UnitAction action)
+    public static IUnitResult Failed(Exception exception, UnitAction action, FailureReason failureReason)
     {
-        return new DefaultUnitResult(exception, action);
+        return new DefaultUnitResult(exception, action, false, failureReason);
     }
 }
