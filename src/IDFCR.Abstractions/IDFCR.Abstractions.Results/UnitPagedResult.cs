@@ -17,7 +17,7 @@ public static class UnitPagedResult
     /// <param name="exception">The captured exception.</param>
     /// <param name="failureReason">The failure reason.</param>
     /// <returns>A paged unit result.</returns>
-    public static UnitPagedResult<TResult> FromResult<TResult>(
+    internal static UnitPagedResult<TResult> FromResult<TResult>(
         IEnumerable<TResult>? result,
         int totalRows,
         IPagedQuery pagedQuery,
@@ -41,7 +41,7 @@ public static class UnitPagedResult
 /// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="exception">The captured exception.</param>
 /// <param name="failureReason">The failure reason.</param>
-public sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
+internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
 {
     /// <summary>
     /// Gets the paging request used to produce this result.

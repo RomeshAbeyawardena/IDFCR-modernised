@@ -14,7 +14,9 @@ public class TagWriteOperationTests
     [SetUp]
     public void Setup()
     {
-        sut = new(serviceProviderMock.Object,);
+        sut = new(serviceProviderMock.Object,
+            managedStreamMock.Object,
+            );
     }
 
     [Test]
