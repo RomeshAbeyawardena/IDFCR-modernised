@@ -63,7 +63,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
                 var name = delimited[0];
                 
-                if (delimited.Length < 0)
+                if (delimited.Length == 2)
                 {
                     tagList.Add(new Tag { 
                         Name = name, 
@@ -78,7 +78,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
             if (existingTags is not null)
             {
-                tagsToAdd = tagList.Where(x => existingTags.Any(t => t != x));
+                tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
             }
 
             var addResult = await tagRepository.AddTagsAsync([.. tagsToAdd], cancellationToken);

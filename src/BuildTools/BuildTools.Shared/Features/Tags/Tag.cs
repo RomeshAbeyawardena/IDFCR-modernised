@@ -4,6 +4,23 @@ namespace BuildTools.Shared.Features.Tags;
 
 public class Tag : MapperBase<ITag>, ITag
 {
+    public static bool operator ==(Tag? tag, Tag? otherTag)
+    {
+        if (ReferenceEquals(tag, otherTag))
+        {
+            return true;
+        }
+
+        if (tag is null || otherTag is null)
+        {
+            return false;
+        }
+
+        return tag.Equals(otherTag);
+    }
+
+    public static bool operator !=(Tag? tag, Tag? otherTag) => !(tag == otherTag);
+
     public object? Id { get; set; }
     public string Name { get; set; } = null!;
     public string? DisplayName { get; set; }
@@ -19,14 +36,13 @@ public class Tag : MapperBase<ITag>, ITag
     /// Determines whether the current tag is equal to the specified tag, using a case-insensitive comparison for the
     /// tag name.
     /// </summary>
-    /// <remarks>The comparison ignores case differences in the tag name. If the current tag's Id is null,
-    /// only the name is compared.</remarks>
+    /// <remarks>The comparison ignores case differences in the tag name.</remarks>
     /// <param name="otherTag">The tag to compare with the current tag.</param>
     /// <returns>true if the tags are considered equal; otherwise, false.</returns>
-    public bool Equals(Tag otherTag)
+    public bool Equals(Tag? otherTag)
     {
-        return ((Id is null || Id == otherTag.Id)
-            && Name.Equals(otherTag.Name, StringComparison.OrdinalIgnoreCase));
+        return otherTag is not null
+            && Name.Equals(otherTag.Name, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -55,6 +71,6 @@ public class Tag : MapperBase<ITag>, ITag
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Name, DisplayName);
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Name);
     }
 }
