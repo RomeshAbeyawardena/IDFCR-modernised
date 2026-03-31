@@ -40,6 +40,8 @@ public class RepositoryTests
         _entityInterceptorFactory = _serviceProvider.GetRequiredService<IEntityInterceptorFactory>();
         _filterFactory = _serviceProvider.GetRequiredService<IFilterFactory>();
         _mockRepository = new(_entityInterceptorFactory, _filterFactory);
+
+        new DbCustomer();
     }
 
     [TearDown]

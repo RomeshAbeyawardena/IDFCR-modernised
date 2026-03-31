@@ -64,7 +64,7 @@ namespace IDFCR.Abstractions.Persistence
         /// </summary>
         protected virtual TDb? Map(T value)
         {
-            return value.Map<TDb>(value);
+            return value.Map<TDb>();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace IDFCR.Abstractions.Persistence
         /// </summary>
         protected virtual T? Map(TDb value)
         {
-            return value.Map<T>(value);
+            return value.Map<T>();
         }
 
         /// <summary>

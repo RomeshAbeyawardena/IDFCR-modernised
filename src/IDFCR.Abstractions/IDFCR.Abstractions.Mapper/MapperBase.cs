@@ -11,9 +11,17 @@ namespace IDFCR.Abstractions.Mapper;
 public abstract class MapperBase<TSource>() : IMapper<TSource>
 {
     /// <summary>
-    /// Gets the underlying data source associated with the current instance.
+    /// Gets the current instance cast to the specified source type.
     /// </summary>
-    protected abstract TSource Source { get; }
+    /// <remarks>Use this property to access the current object as the generic source type parameter. This is
+    /// useful in scenarios where the derived class needs to expose itself as the generic type.</remarks>
+    protected TSource Source
+    {
+        get
+        {
+            return (TSource)(object)this;
+        }
+    }
 
     /// <summary>
     /// Creates an instance of the specified mapper type and maps the provided source object using that mapper.
