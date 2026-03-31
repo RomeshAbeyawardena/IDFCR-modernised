@@ -17,8 +17,8 @@ namespace IDFCR.TestUtilities
     /// data store is not required. All data is stored in memory and is lost when the repository instance is disposed or
     /// goes out of scope. Thread safety is not guaranteed.</remarks>
     /// <typeparam name="TCommon">The common interface or base type shared by the entity types managed by the repository.</typeparam>
-    /// <typeparam name="TDb">The database entity type, which must implement IMapper<TCommon>, TCommon, and IIdentifiable<Guid>.</typeparam>
-    /// <typeparam name="T">The domain entity type, which must implement IMapper<TCommon> and TCommon.</typeparam>
+    /// <typeparam name="TDb">The database entity type, which must implement IMapper, TCommon, and </typeparam>
+    /// <typeparam name="T">The domain entity type, which must implement IMapper and TCommon.</typeparam>
     /// <param name="entityInterceptorFactory">The factory used to create entity interceptors for handling entity lifecycle events.</param>
     /// <param name="filterFactory">The factory used to apply filtering and paging to in-memory entity collections.</param>
     public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory)

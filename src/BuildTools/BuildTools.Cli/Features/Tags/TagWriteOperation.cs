@@ -45,52 +45,58 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
         await managedStream.Error.WriteLineAsync($"Unable to write tag: {result.Exception?.Message ?? "Unknown error"}", cancellationToken);
     }
 
-    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
+    internal async Task MultipleUpsert(string tags, CancellationToken cancellationToken)
+    {
+        //a csv of tags tag1:Tag 1,tag2:Tag 2
+        var tagItems = tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        List<Tag> tagList = [];
+        foreach (var tagItem in tagItems)
+        {
+            if (!tagItem.Contains(':'))
+            {
+                continue;
+            }
+
+            var delimited = tagItem.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var name = delimited[0];
+
+            if (delimited.Length == 2)
+            {
+                tagList.Add(new Tag
+                {
+                    Name = name,
+                    DisplayName = delimited[1]
+                });
+            }
+        }
+
+        var existingTags = (await tagRepository.GetExistingTagsAsync([.. tagList.Select(x => x.Name)], cancellationToken)).GetResultOrDefault();
+
+        var tagsToAdd = tagList.AsEnumerable();
+
+        if (existingTags is not null)
+        {
+            tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
+        }
+
+        var addResult = await tagRepository.AddTagsAsync([.. tagsToAdd], cancellationToken);
+
+        if (addResult.IsSuccess)
+        {
+            await tagRepository.SaveChangesAsync(cancellationToken);
+        }
+
+        return;
+    }
+
+    protected override Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
         if(Parameters!.TryGetValue("tags", out var tags) && !string.IsNullOrWhiteSpace(tags.Value))
         {
-            //a csv of tags tag1:Tag 1,tag2:Tag 2
-            var tagItems = tags.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            List<Tag> tagList = [];
-            foreach(var tagItem in tagItems)
-            {
-                if (!tagItem.Contains(':'))
-                {
-                    continue;
-                }
-
-                var delimited = tagItem.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-                var name = delimited[0];
-                
-                if (delimited.Length == 2)
-                {
-                    tagList.Add(new Tag { 
-                        Name = name, 
-                        DisplayName = delimited[1] 
-                    });
-                }
-            }
-
-            var existingTags = (await tagRepository.GetExistingTagsAsync([.. tagList.Select(x => x.Name)], cancellationToken)).GetResultOrDefault();
-
-            var tagsToAdd = tagList.AsEnumerable();
-
-            if (existingTags is not null)
-            {
-                tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
-            }
-
-            var addResult = await tagRepository.AddTagsAsync([.. tagsToAdd], cancellationToken);
-
-            if (addResult.IsSuccess)
-            {
-                await tagRepository.SaveChangesAsync(cancellationToken);
-            }
-
-            return;
+            return MultipleUpsert(tags.Value, cancellationToken);
         }
 
-        await SimpleUpsert(command, cancellationToken);
+        return SimpleUpsert(command, cancellationToken);
     }
 }

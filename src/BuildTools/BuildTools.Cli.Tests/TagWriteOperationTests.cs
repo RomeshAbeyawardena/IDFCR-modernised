@@ -8,25 +8,40 @@ using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Results;
 using IDFCR.TestUtilities;
 using Moq;
+using System.Linq;
 
 namespace BuildTools.Cli.Tests;
 
 public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory)
     : InternalMemoryMockRepository<ITag, TagEntity, Tag>(entityInterceptorFactory, filterFactory), ITagRepository
 {
-    public Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
+    public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
     {
-        
+        await Task.CompletedTask;
+        base.Entries.AddRange(tags.Select(x => x.Map<TagEntity>(x)));
+        return UnitResult.Success(UnitAction.Add);
     }
 
-    public Task<IUnitResultCollection<Tag>> GetExistingTagsAsync(IEnumerable<string> tags, CancellationToken cancellationToken)
+    public async Task<IUnitResultCollection<Tag>> GetExistingTagsAsync(IEnumerable<string> tags, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await Task.CompletedTask;
+        var foundTags = Entries.Where(x => tags.Contains(x.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(x => x.Map<Tag>(x));
+
+        return UnitResultCollection.FromResult(foundTags);
     }
 
-    public Task<IUnitResult<Tag>> GetTagAsync(string name, CancellationToken cancellationToken)
+    public async Task<IUnitResult<Tag>> GetTagAsync(string name, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await Task.CompletedTask;
+        var entry = Entries.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (entry is null)
+        {
+            return UnitResult.NotFound<Tag>(name);
+        }
+
+        return UnitResult.FromResult(entry.Map<Tag>(entry));
     }
 }
 
@@ -53,9 +68,9 @@ public class TagWriteOperationTests
     }
 
     [Test]
-    public void Test1()
+    public async Task Test1()
     {
-
-        Assert.Pass();
+        string tagsToInsert = "";
+        await sut.MultipleUpsert(tagsToInsert, CancellationToken.None);
     }
 }
