@@ -27,6 +27,12 @@ namespace IDFCR.TestUtilities
         where T : class, IMapper<TCommon>, TCommon
     {
         private readonly List<TDb> entries = [];
+
+        /// <summary>
+        /// Gets the collection of entries managed by the current instance.
+        /// </summary>
+        protected List<TDb> Entries => entries;
+
         /// <summary>
         /// Sets a value indicating whether the current operation has been marked as handled.
         /// </summary>
