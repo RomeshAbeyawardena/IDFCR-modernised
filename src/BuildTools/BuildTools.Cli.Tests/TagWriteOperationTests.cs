@@ -15,6 +15,7 @@ namespace BuildTools.Cli.Tests;
 public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory)
     : InternalMemoryMockRepository<ITag, TagEntity, Tag>(entityInterceptorFactory, filterFactory), ITagRepository
 {
+    internal List<TagEntity> Entities => base.Entries;
     public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
@@ -47,13 +48,14 @@ public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterce
 
 public class TagWriteOperationTests
 {
-    private TagWriteOperation sut;
+    private TagWriteOperation sut = null!;
 
-    private Mock<IServiceProvider> serviceProviderMock;
-    private Mock<IManagedStream> managedStreamMock;
-    private InternalMemoryTagRepository internalMemoryTagRepository;
-    private Mock<IEntityInterceptorFactory> entityInterceptorFactoryMock;
-    private Mock<IFilterFactory> filterFactoryMock;
+    private Mock<IServiceProvider> serviceProviderMock = null!;
+    private Mock<IManagedStream> managedStreamMock = null!;
+    private InternalMemoryTagRepository internalMemoryTagRepository = null!;
+    private Mock<IEntityInterceptorFactory> entityInterceptorFactoryMock = null!;
+    private Mock<IFilterFactory> filterFactoryMock = null!;
+
     [SetUp]
     public void Setup()
     {
@@ -62,15 +64,92 @@ public class TagWriteOperationTests
         entityInterceptorFactoryMock = new();
         filterFactoryMock = new();
         internalMemoryTagRepository = new(entityInterceptorFactoryMock.Object, filterFactoryMock.Object);
-        sut = new(serviceProviderMock.Object,
-            managedStreamMock.Object, 
-            internalMemoryTagRepository);
+        sut = new(serviceProviderMock.Object, managedStreamMock.Object, internalMemoryTagRepository);
     }
 
     [Test]
-    public async Task Test1()
+    public async Task MultipleUpsert_ShouldBeIdempotent_WhenCalledWithSameTags()
     {
-        string tagsToInsert = "";
+        // Arrange
+        const string tagsToInsert = "tag1:Tag 1,tag2:Tag 2,tag3:Tag 3,tag4:Tag 4";
+
+        // Act
         await sut.MultipleUpsert(tagsToInsert, CancellationToken.None);
+        await sut.MultipleUpsert(tagsToInsert, CancellationToken.None);
+
+        // Assert
+        Assert.That(internalMemoryTagRepository.Entities, Has.Count.EqualTo(4));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.Name),
+            Is.EquivalentTo(["tag1", "tag2", "tag3", "tag4"]));
+    }
+
+    [Test]
+    public async Task MultipleUpsert_ShouldNotInsertDuplicateTags_WhenNamesDifferOnlyByCase()
+    {
+        // Arrange
+        const string initialTags = "tag1:Tag 1,tag2:Tag 2";
+        const string secondImport = "TAG1:Updated Name,tag3:Tag 3";
+
+        // Act
+        await sut.MultipleUpsert(initialTags, CancellationToken.None);
+        await sut.MultipleUpsert(secondImport, CancellationToken.None);
+
+        // Assert
+        Assert.That(internalMemoryTagRepository.Entities, Has.Count.EqualTo(3));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.Name),
+            Is.EquivalentTo(["tag1", "tag2", "tag3"]));
+    }
+
+    [Test]
+    public async Task MultipleUpsert_ShouldIgnoreMalformedEntries()
+    {
+        // Arrange
+        const string tagsWithInvalidItems = "tag1:Tag 1,invalid-entry,tag2:Tag 2:extra,tag3:Tag 3";
+
+        // Act
+        await sut.MultipleUpsert(tagsWithInvalidItems, CancellationToken.None);
+
+        // Assert
+        Assert.That(internalMemoryTagRepository.Entities, Has.Count.EqualTo(2));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.Name),
+            Is.EquivalentTo(["tag1", "tag3"]));
+    }
+
+    [Test]
+    public async Task MultipleUpsert_ShouldTrimWhitespaceAroundDelimitedValues()
+    {
+        // Arrange
+        const string tagsToInsert = "  tag1 :  Tag 1  ,   tag2:   Tag 2   ";
+
+        // Act
+        await sut.MultipleUpsert(tagsToInsert, CancellationToken.None);
+
+        // Assert
+        Assert.That(internalMemoryTagRepository.Entities, Has.Count.EqualTo(2));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.Name),
+            Is.EquivalentTo(["tag1", "tag2"]));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.DisplayName),
+            Is.EquivalentTo(["Tag 1", "Tag 2"]));
+    }
+
+    [Test]
+    public async Task MultipleUpsert_ShouldIgnoreEmptyCsvSegments()
+    {
+        // Arrange
+        const string tagsToInsert = "tag1:Tag 1,, ,tag2:Tag 2,";
+
+        // Act
+        await sut.MultipleUpsert(tagsToInsert, CancellationToken.None);
+
+        // Assert
+        Assert.That(internalMemoryTagRepository.Entities, Has.Count.EqualTo(2));
+        Assert.That(
+            internalMemoryTagRepository.Entities.Select(x => x.Name),
+            Is.EquivalentTo(["tag1", "tag2"]));
     }
 }
