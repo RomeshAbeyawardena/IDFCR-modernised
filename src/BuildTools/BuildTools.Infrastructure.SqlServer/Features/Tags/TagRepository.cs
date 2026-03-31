@@ -24,7 +24,7 @@ public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFact
             .Where(x => tags.Contains(x.Name))
             .ToArrayAsync(cancellationToken);
 
-        return UnitResultCollection.FromResult(foundTags.Select(x => x.Map<Tag>(x)));
+        return UnitResultCollection.FromResult(foundTags.Select(x => x.Map<Tag>()));
     }
 
     public async Task<IUnitResult<Tag>> GetTagAsync(string name, CancellationToken cancellationToken)

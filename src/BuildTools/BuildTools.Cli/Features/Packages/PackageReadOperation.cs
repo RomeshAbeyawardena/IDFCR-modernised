@@ -35,7 +35,7 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
                     return;
                 }
 
-                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageDto>(t), cancellationToken,
+                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageDto>(), cancellationToken,
                 new TableField<PackageDto> { Field = s => s.Namespace, Title = "Namespace", RowWidth = 20 },
                 new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 40 },
                 new TableField<PackageDto>

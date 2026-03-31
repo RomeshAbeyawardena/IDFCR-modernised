@@ -18,7 +18,7 @@ public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterce
     public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        base.Entries.AddRange(tags.Select(x => x.Map<TagEntity>(x)));
+        base.Entries.AddRange(tags.Select(x => x.Map<TagEntity>()));
         return UnitResult.Success(UnitAction.Add);
     }
 
@@ -26,7 +26,7 @@ public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterce
     {
         await Task.CompletedTask;
         var foundTags = Entries.Where(x => tags.Contains(x.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(x => x.Map<Tag>(x));
+            .Select(x => x.Map<Tag>());
 
         return UnitResultCollection.FromResult(foundTags);
     }
@@ -41,7 +41,7 @@ public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterce
             return UnitResult.NotFound<Tag>(name);
         }
 
-        return UnitResult.FromResult(entry.Map<Tag>(entry));
+        return UnitResult.FromResult(entry.Map<Tag>());
     }
 }
 

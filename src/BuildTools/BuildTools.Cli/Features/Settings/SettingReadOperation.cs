@@ -34,7 +34,7 @@ public class SettingReadOperation(IServiceProvider serviceProvider, IManagedStre
                     return;
                 }
 
-                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<SettingDto>(t), cancellationToken, 
+                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<SettingDto>(), cancellationToken, 
                     new TableField<SettingDto> { Field = s => s.Key, Title = "Setting Key", RowWidth = 20 },
                     new TableField<SettingDto> { Field = s => s.Value ?? "Not set", Title = "Value", RowWidth = 20 },
                     new TableField<SettingDto> { Field = s => s.LastUpdated!, Title = "Last updated", RowWidth = 32 });
