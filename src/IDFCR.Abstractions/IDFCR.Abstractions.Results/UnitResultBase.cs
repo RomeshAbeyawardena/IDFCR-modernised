@@ -1,36 +1,8 @@
-using IDFCR.Abstractions.Results.Exceptions;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IDFCR.Abstractions.Results;
-
-/// <summary>
-/// Factory helpers for unit results.
-/// </summary>
-public static class UnitResult
-{
-    /// <summary>
-    /// Creates a failed result that represents a missing entity.
-    /// </summary>
-    public static IUnitResult<T> NotFound<T>(object id, Exception? innerException = null, FailureReason? failureReason = FailureReason.NotFound)
-        => Failed<T>(new EntityNotFoundException(typeof(T), id, innerException), UnitAction.None, failureReason);
-
-    /// <summary>
-    /// Creates a failed result.
-    /// </summary>
-    public static IUnitResult<T> Failed<T>(Exception exception, UnitAction action = UnitAction.None, FailureReason? FailureReason = null)
-        => new DefaultUnitResult<T>(default, action, false, exception, FailureReason);
-
-    /// <summary>
-    /// Creates a unit result from the supplied value.
-    /// </summary>
-    public static IUnitResult<T> FromResult<T>(T? result, UnitAction action = UnitAction.Get,
-        bool isSuccess = true, Exception? exception = null)
-    {
-        return new DefaultUnitResult<T>(result, action, isSuccess, exception);
-    }
-}
 
 /// <summary>
 /// Base type for unit results that carry metadata.

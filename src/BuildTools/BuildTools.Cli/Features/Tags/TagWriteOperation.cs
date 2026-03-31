@@ -49,7 +49,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
     {
         if(Parameters!.TryGetValue("tags", out var tags) && !string.IsNullOrWhiteSpace(tags.Value))
         {
-            //a csv of tags tag1:Tag 1,tag2: Tag 2
+            //a csv of tags tag1:Tag 1,tag2:Tag 2
             var tagItems = tags.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             List<Tag> tagList = [];
             foreach(var tagItem in tagItems)
@@ -70,6 +70,22 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
                         DisplayName = delimited[1] 
                     });
                 }
+            }
+
+            var existingTags = (await tagRepository.GetExistingTagsAsync([.. tagList.Select(x => x.Name)], cancellationToken)).GetResultOrDefault();
+
+            var tagsToAdd = tagList.AsEnumerable();
+
+            if (existingTags is not null)
+            {
+                tagsToAdd = tagList.Where(x => existingTags.Any(t => t != x));
+            }
+
+            var addResult = await tagRepository.AddTagsAsync([.. tagsToAdd], cancellationToken);
+
+            if (addResult.IsSuccess)
+            {
+                await tagRepository.SaveChangesAsync(cancellationToken);
             }
 
             return;

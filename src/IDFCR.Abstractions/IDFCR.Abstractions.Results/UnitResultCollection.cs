@@ -40,7 +40,7 @@ public static class UnitResultCollection
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
-public record UnitResultCollection<TResult>(IEnumerable<TResult>? Result = null, UnitAction Action = UnitAction.Get,
+internal record UnitResultCollection<TResult>(IEnumerable<TResult>? Result = null, UnitAction Action = UnitAction.Get,
     bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null)
         : UnitResultBase<IEnumerable<TResult>>(Result, Action, IsSuccess, Exception, FailureReason), IUnitResultCollection<TResult>
 {
