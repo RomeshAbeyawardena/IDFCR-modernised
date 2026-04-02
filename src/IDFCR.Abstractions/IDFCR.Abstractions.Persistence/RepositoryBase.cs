@@ -226,6 +226,7 @@ namespace IDFCR.Abstractions.Persistence
                 totalRows, request, UnitAction.Get);
         }
 
+        /// <inheritdoc />
         public abstract Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

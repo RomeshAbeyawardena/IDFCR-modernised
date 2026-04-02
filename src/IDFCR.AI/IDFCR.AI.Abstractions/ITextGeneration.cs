@@ -4,6 +4,6 @@ using System.Text;
 
 namespace IDFCR.AI.Abstractions;
 
-public interface ITextGeneration
+internal interface ITextGeneration
 {
 }
