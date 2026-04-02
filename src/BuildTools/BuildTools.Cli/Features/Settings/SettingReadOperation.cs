@@ -2,6 +2,7 @@
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
 using BuildTools.Infrastructure.Features.Settings;
+using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Settings;
 
@@ -16,15 +17,21 @@ public class SettingReadOperation(IServiceProvider serviceProvider, IManagedStre
         var type = await this.GetOptionalField(managedStream, command, cancellationToken, true, "type");
         var outputType = await this.GetOptionalField(managedStream, command, cancellationToken, true, "output-type");
 
+        var pagedQuery = await this.GetPagingFields(managedStream, command, cancellationToken);
+
         if (string.IsNullOrWhiteSpace(key))
         {
             //generate paged list
-            var pagedResult = await settingRepository.GetPagedAsync(new GetPagedSettingsQuery 
+            var pagedRequest = new GetPagedSettingsQuery
             {
                 PageSize = 20,
                 Key = key,
                 Type = type
-            }, cancellationToken);
+            };
+
+            pagedRequest.MapQuery(pagedQuery);
+
+            var pagedResult = await settingRepository.GetPagedAsync(pagedRequest, cancellationToken);
 
             if (pagedResult.HasValue)
             {

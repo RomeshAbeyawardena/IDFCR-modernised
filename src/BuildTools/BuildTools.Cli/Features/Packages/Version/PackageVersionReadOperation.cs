@@ -2,6 +2,7 @@ using BuildTools.Cli.Extensions;
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
 using BuildTools.Infrastructure.Features.Packages.Version;
+using IDFCR.Abstractions.Results.Extensions;
 using Microsoft.SqlServer.Server;
 
 namespace BuildTools.Cli.Features.Packages.Version;
@@ -18,14 +19,19 @@ public class PackageVersionReadOperation(IServiceProvider serviceProvider, IMana
         var packageNamespace = await this.GetOptionalField(managedStream, command, cancellationToken, false, "namespace");
         var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, false, "name");
         var outputType = await this.GetOptionalField(managedStream, command, cancellationToken, true, "output-type");
+        var pagedQuery = await this.GetPagingFields(managedStream, command, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(packageNamespace) || !string.IsNullOrWhiteSpace(packageName))
         {
-            var pagedResult = await packageVersionRepository.GetPagedAsync(new GetPackageVersionPagedRequest
+            var pagedRequest = new GetPackageVersionPagedRequest
             {
                 PackageName = packageName,
                 PackageVersion = packageNamespace
-            }, cancellationToken);
+            };
+
+            pagedRequest.MapQuery(pagedQuery);
+
+            var pagedResult = await packageVersionRepository.GetPagedAsync(pagedRequest, cancellationToken);
 
             if (pagedResult.HasValue)
             {
