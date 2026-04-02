@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Cli.Extensions
+﻿namespace IDFCR.Abstractions.Cli.Extensions.Extensions
 {
     public static class TypeExtensions
     {

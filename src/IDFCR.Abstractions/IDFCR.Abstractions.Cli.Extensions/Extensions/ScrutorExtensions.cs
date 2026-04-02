@@ -1,7 +1,6 @@
-﻿using IDFCR.Abstractions.Cli.Extensions;
-using Scrutor;
+﻿using Scrutor;
 
-namespace IDFCR.Abstractions.Cli.Extensions
+namespace IDFCR.Abstractions.Cli.Extensions.Extensions
 {
     public static class ScrutorExtensions
     {
