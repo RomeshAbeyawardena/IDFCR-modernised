@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using IDFCR.Abstractions.Cli.Dispatchers;
-using IDFCR.Abstractions.Cli.Extensions;
+﻿using IDFCR.Abstractions.Cli.Dispatchers;
 using IDFCR.Abstractions.Cli.Operations;
-namespace IDFCR.Abstractions.Cli.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+namespace IDFCR.Abstractions.Cli.Extensions.Extensions;
 
 internal static class ServiceCollectionExtensions
 {

@@ -1,5 +1,4 @@
 ﻿using IDFCR.Abstractions.Cli.StateManagement;
-using System.Text.RegularExpressions;
 
 namespace IDFCR.Abstractions.Cli.Operations;
 

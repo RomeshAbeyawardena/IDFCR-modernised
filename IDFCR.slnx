@@ -8,6 +8,7 @@
   <Folder Name="/src/IDFCR.Abstractions/">
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Builders/IDFCR.Abstractions.Builders.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli/IDFCR.Abstractions.Cli.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli.Extensions/IDFCR.Abstractions.Cli.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DependencyInjection/IDFCR.Abstractions.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Filters/IDFCR.Abstractions.Filters.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
