@@ -1,0 +1,42 @@
+﻿using System.Text.Json;
+
+namespace IDFCR.Abstractions.Cli.Extensions;
+
+public static class StringExtensions
+{
+    public static string Jsonify<T>(this T? value, JsonSerializerOptions options)
+    {
+        if(value is null)
+        {
+            return "{}";
+        }
+
+        return JsonSerializer.Serialize(value, options);
+    }
+    public static string? Limit(this string? value, int limit)
+    {
+        if (string.IsNullOrWhiteSpace(value) || limit == 0)
+        {
+            return value;
+        }
+
+        if (limit < 4)
+        {
+            return "...";
+        }
+
+        if (value.Length > limit)
+        {
+            return string.Concat(value.AsSpan(0, limit - 3), "..."); 
+        }
+
+        if (value.Length < limit)
+        {
+            var len = limit - value.Length;
+            var r = string.Concat(value, new string(' ', len));
+            return r;
+        }
+
+        return value;
+    }
+}
