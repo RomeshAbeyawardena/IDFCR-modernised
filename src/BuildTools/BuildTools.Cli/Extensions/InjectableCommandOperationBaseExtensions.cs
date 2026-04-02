@@ -1,6 +1,8 @@
 ﻿using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
 using IDFCR.Abstractions.Results;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace BuildTools.Cli.Extensions;
 
@@ -110,5 +112,31 @@ public static class InjectableCommandOperationBaseExtensions
         where T : IInjectableCommandOperation
     {
         return GetField(operation, stream, arguments, position, prompt, cancellationToken, wasLastFieldAParameter, true, true, fields);
+    }
+
+    public static async Task<PagedQuery> GetPagingFields<T>(this InjectableCommandOperationBase<T> operation, IManagedStream managedStream,
+        IEnumerable<string> arguments,
+        CancellationToken cancellationToken,
+        bool wasLastFieldAParameter = false,
+        string? overridePageIndexKey = null,
+        string? overridePageSizeKey = null)
+        where T : IInjectableCommandOperation
+    {
+        var pageIndex = await operation.GetOptionalField(managedStream, arguments, cancellationToken, wasLastFieldAParameter, overridePageIndexKey ?? "page-index");
+        var pageSize = await operation.GetOptionalField(managedStream, arguments, cancellationToken, wasLastFieldAParameter, overridePageIndexKey ?? "page-size");
+
+        var pagedQuery = new PagedQuery();
+
+        if (!string.IsNullOrWhiteSpace(pageIndex) && int.TryParse(pageIndex, out var index) && index > -1)
+        {
+            pagedQuery.PageIndex = index;
+        }
+
+        if (!string.IsNullOrWhiteSpace(pageSize) && int.TryParse(pageSize, out var size) && size > -1)
+        {
+            pagedQuery.PageSize = size > 20 ? 20 : size;
+        }
+
+        return pagedQuery;
     }
 }
