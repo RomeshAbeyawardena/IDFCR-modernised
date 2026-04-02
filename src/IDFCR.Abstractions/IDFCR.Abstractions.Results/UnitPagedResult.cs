@@ -34,13 +34,6 @@ public static class UnitPagedResult
 /// Represents a paged collection result.
 /// </summary>
 /// <typeparam name="TResult">The element type.</typeparam>
-/// <param name="result">The page payload.</param>
-/// <param name="totalRows">The total row count before paging.</param>
-/// <param name="pagedQuery">The paging request that produced the result.</param>
-/// <param name="action">The associated action.</param>
-/// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
-/// <param name="exception">The captured exception.</param>
-/// <param name="failureReason">The failure reason.</param>
 internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
 {
     /// <summary>
