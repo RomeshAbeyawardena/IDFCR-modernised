@@ -12,9 +12,9 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrate;
 /// <param name="serviceProvider">The service provider for dependency injection.</param>
 /// <param name="targetDatabaseConfiguration">The target database configuration.</param>
 /// <param name="managedStream">The managed stream for output.</param>
-[FeatureCommand(DatabaseRootMigrateCommand.Prefix, CommandName)]
-public class DatabaseMigrateListCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
-    : InjectableCommandOperationBase<DatabaseRootMigrateCommand>(serviceProvider, DatabaseRootMigrateCommand.Prefix, CommandName, typeof(DatabaseRootMigrateCommand))
+[FeatureCommand(DatabaseMigrationsRootCommand.Prefix, CommandName)]
+public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
+    : InjectableCommandOperationBase<DatabaseMigrationsRootCommand>(serviceProvider, DatabaseMigrationsRootCommand.Prefix, CommandName, typeof(DatabaseMigrationsRootCommand))
 {
     /// <summary>
     /// Defines the command name for the database migration list command in the CLI. This command name is used to identify the command when invoked in the CLI environment. By using a clear and descriptive command name, developers can ensure that users understand the purpose of the command and can easily execute it to list pending database migrations. The command name "list" indicates that this command is responsible for listing pending migrations within the CLI, allowing users to see which migrations are awaiting application to the database.

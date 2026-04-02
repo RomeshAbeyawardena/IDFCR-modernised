@@ -12,12 +12,21 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrate;
 /// <param name="serviceProvider">The service provider for dependency injection.</param>
 /// <param name="targetDatabaseConfiguration">The target database configuration.</param>
 /// <param name="managedStream">The managed stream for output.</param>
-[FeatureCommand(DatabaseRootMigrateCommand.Prefix, CommandName)]
-public class DatabaseMigrateApplyCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
-    : InjectableCommandOperationBase<DatabaseRootMigrateCommand>(serviceProvider, DatabaseRootMigrateCommand.Prefix, CommandName, typeof(DatabaseRootMigrateCommand))
+[FeatureCommand(DatabaseMigrationsRootCommand.Prefix, CommandName)]
+public class ApplyDatabaseMigrationsCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
+    : InjectableCommandOperationBase<DatabaseMigrationsRootCommand>(serviceProvider, DatabaseMigrationsRootCommand.Prefix, CommandName, typeof(DatabaseMigrationsRootCommand))
 {
+    /// <summary>
+    /// Defines the command name for applying pending database migrations. This constant is used to identify the command when it is invoked in the CLI. The command name is "apply", and it is a subcommand of the "database migrate" command group. When users execute the command "database migrate apply", this operation will be triggered to apply any pending migrations to the database.
+    /// </summary>
     public const string CommandName = "apply";
 
+    /// <summary>
+    /// Invoke the database migration command when the context is owned. This method is responsible for applying any pending migrations to the database. It retrieves the specified DbContext from the service provider, checks for pending migrations, and applies them to the database. The method also handles exceptions that may occur during the migration process and provides feedback to the user through the managed stream output.
+    /// </summary>
+    /// <param name="command">The command arguments.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
         if (Services.GetRequiredService(targetDatabaseConfiguration.DbContextType) is not DbContext context)
