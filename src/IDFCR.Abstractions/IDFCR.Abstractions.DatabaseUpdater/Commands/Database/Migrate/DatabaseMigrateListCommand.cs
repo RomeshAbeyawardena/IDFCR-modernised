@@ -14,7 +14,7 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrate;
 /// <param name="managedStream">The managed stream for output.</param>
 [FeatureCommand(DatabaseRootMigrateCommand.Prefix, CommandName)]
 public class DatabaseMigrateListCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
-    : InjectableCommandOperationBase<DatabaseRootMigrateCommand>(serviceProvider, DatabaseRootCommand.Prefix, CommandName, typeof(DatabaseRootMigrateCommand))
+    : InjectableCommandOperationBase<DatabaseRootMigrateCommand>(serviceProvider, DatabaseRootMigrateCommand.Prefix, CommandName, typeof(DatabaseRootMigrateCommand))
 {
     /// <summary>
     /// Defines the command name for the database migration list command in the CLI. This command name is used to identify the command when invoked in the CLI environment. By using a clear and descriptive command name, developers can ensure that users understand the purpose of the command and can easily execute it to list pending database migrations. The command name "list" indicates that this command is responsible for listing pending migrations within the CLI, allowing users to see which migrations are awaiting application to the database.
@@ -28,9 +28,6 @@ public class DatabaseMigrateListCommand(IServiceProvider serviceProvider, ITarge
     /// <param name="cancellationToken">The cancellation token.</param>
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        var isListRequest = Parameters!.TryGetValue("list", out var list) && list.IsFlag;
-        var isApplyRequest = Parameters!.TryGetValue("apply", out var apply) && apply.IsFlag;
-
         if (Services.GetRequiredService(targetDatabaseConfiguration.DbContextType) is not DbContext context)
         {
             await managedStream.Out.WriteLineAsync($"The specified DbContext type '{targetDatabaseConfiguration.DbContextType.FullName}' could not be resolved from the service provider. Please ensure that it is registered correctly.", cancellationToken);
@@ -47,21 +44,12 @@ public class DatabaseMigrateListCommand(IServiceProvider serviceProvider, ITarge
                 return;
             }
 
-            if (isListRequest)
+            await managedStream.Out.WriteLineAsync("Pending Migrations:", cancellationToken);
+            foreach (var migration in migrations)
             {
-                await managedStream.Out.WriteLineAsync("Pending Migrations:", cancellationToken);
-                foreach (var migration in migrations)
-                {
-                    await managedStream.Out.WriteLineAsync($"\t- {migration}", cancellationToken);
-                }
+                await managedStream.Out.WriteLineAsync($"\t- {migration}", cancellationToken);
             }
 
-            if (isApplyRequest)
-            {
-                await managedStream.Out.WriteLineAsync("Applying pending migrations...", cancellationToken);
-                await context.Database.MigrateAsync(cancellationToken);
-                await managedStream.Out.WriteLineAsync("Database migration completed successfully.", cancellationToken);
-            }
         }
         catch (Exception ex)
         {
