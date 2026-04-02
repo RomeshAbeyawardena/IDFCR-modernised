@@ -1,19 +1,17 @@
 ﻿using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrate;
+namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrations;
 
 /// <summary>
 /// Represents a command for listing pending database migrations in the CLI. This command is a subcommand of the DatabaseMigrateCommand and is responsible for retrieving and displaying any pending migrations that have not yet been applied to the database. It is designed to be injectable, allowing for dependency injection of services required for database migration operations. The command is identified by the name "list" and can be invoked using the command name "database migrate list" in the CLI.
 /// </summary>
 /// <param name="serviceProvider">The service provider for dependency injection.</param>
-/// <param name="targetDatabaseConfiguration">The target database configuration.</param>
+/// <param name="databaseFascade">The database fascade for managing database migrations.</param>
 /// <param name="managedStream">The managed stream for output.</param>
 [FeatureCommand(DatabaseMigrationsRootCommand.Prefix, CommandName)]
-public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, ITargetDatabaseConfiguration targetDatabaseConfiguration, IManagedStream managedStream)
+public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, IDatabaseFascade databaseFascade, IManagedStream managedStream)
     : InjectableCommandOperationBase<DatabaseMigrationsRootCommand>(serviceProvider, DatabaseMigrationsRootCommand.Prefix, CommandName, typeof(DatabaseMigrationsRootCommand))
 {
     /// <summary>
@@ -28,15 +26,9 @@ public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, ITa
     /// <param name="cancellationToken">The cancellation token.</param>
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        if (Services.GetRequiredService(targetDatabaseConfiguration.DbContextType) is not DbContext context)
-        {
-            await managedStream.Out.WriteLineAsync($"The specified DbContext type '{targetDatabaseConfiguration.DbContextType.FullName}' could not be resolved from the service provider. Please ensure that it is registered correctly.", cancellationToken);
-            return;
-        }
-
         try
         {
-            var migrations = await context.Database.GetPendingMigrationsAsync(cancellationToken);
+            var migrations = await databaseFascade.GetPendingMigrationsAsync(cancellationToken);
 
             if (!migrations.Any())
             {
