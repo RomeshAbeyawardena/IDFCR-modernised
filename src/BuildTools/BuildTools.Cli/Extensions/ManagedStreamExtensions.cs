@@ -4,6 +4,11 @@ using System.Text;
 
 namespace BuildTools.Cli.Extensions;
 
+public static class Formatters
+{
+
+}
+
 public static class ManagedStreamExtensions
 {
     public static async Task<string?> PromptAsync(this IManagedStream stream, string prompt, CancellationToken cancellationToken)
