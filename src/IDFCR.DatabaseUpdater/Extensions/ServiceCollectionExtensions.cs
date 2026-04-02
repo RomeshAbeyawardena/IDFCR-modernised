@@ -15,7 +15,6 @@ public static class ServiceCollectionExtensions
     /// Configures the database updater services by registering the specified target database configuration. This method ensures that the target database configuration is properly registered in the service collection, allowing the CLI to identify and use the correct DbContext type for database operations. It checks if the specified DbContext type is already registered in the service collection and throws an exception if it is not, ensuring that the necessary dependencies are in place for successful database operations.
     /// And it also registers the necessary command services related to the database updater by scanning the specified assemblies, ensuring that all relevant commands are available for execution in the CLI.
     /// </summary>
-    /// <typeparam name="TTargetDatabaseConfiguration">The type of the target database configuration to register.</typeparam>
     /// <param name="services">The service collection to configure.</param>
     /// <param name="configurationInstance">The instance of the target database configuration to register.</param>
     /// <param name="assemblies">The assemblies to scan for injectable command services related to the database updater.</param>
@@ -32,7 +31,7 @@ public static class ServiceCollectionExtensions
         assemblies = [.. assemblies.Append(typeof(DatabaseRootCommand).Assembly)];
 
         return services
-            .AddSingleton<ITargetDatabaseConfiguration>()
+            .AddSingleton(configurationInstance)
             .AddScoped<IDatabaseFascade, DefaultDatabaseFascade>()
             .AddInjectableCommandServices(assemblies);
     }

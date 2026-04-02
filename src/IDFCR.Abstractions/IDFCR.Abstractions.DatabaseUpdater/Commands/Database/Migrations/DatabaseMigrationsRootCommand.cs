@@ -6,8 +6,9 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Commands.Database.Migrations;
 /// Represents a command for migrating the database in the CLI. This command is a subcommand of the DatabaseRootCommand and is responsible for executing database migration operations. It is designed to be injectable, allowing for dependency injection of services required for database migration. The command is identified by the name "migrate" and can be invoked using the command name "database migrate" in the CLI.
 /// </summary>
 /// <param name="serviceProvider"></param>
+[FeatureCommand(DatabaseRootCommand.Prefix, CommandName)]
 public class DatabaseMigrationsRootCommand(IServiceProvider serviceProvider)
-    : InjectableCommandOperationRootBase<DatabaseMigrationsRootCommand>(serviceProvider, DatabaseRootCommand.Prefix, CommandName, typeof(DatabaseRootCommand))
+    : InjectableCommandOperationBase<DatabaseMigrationsRootCommand>(serviceProvider, DatabaseRootCommand.Prefix, CommandName, typeof(DatabaseRootCommand))
 {
     /// <summary>
     /// Defines the prefix for the database migration command in the CLI. This prefix is used to identify the command and its associated subcommands when invoked in the CLI environment. By using a consistent prefix, developers can ensure that all database migration-related commands are organized under a common namespace, making it easier for users to discover and execute database migration operations within the CLI. The prefix "database-migrate" indicates that this command is related to database migration operations and serves as the root for all subsequent database migration commands within the CLI.
