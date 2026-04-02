@@ -45,7 +45,7 @@ public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, IDa
         }
         catch (Exception ex)
         {
-            await managedStream.Out.WriteLineAsync($"An error occurred during database migration: {ex.Message}", cancellationToken);
+            await managedStream.Error.WriteLineAsync($"An error occurred during database migration: {ex.Message}", cancellationToken);
         }
     }
 }
