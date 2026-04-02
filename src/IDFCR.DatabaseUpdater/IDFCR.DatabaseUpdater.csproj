@@ -4,4 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Cli.Extensions\IDFCR.Abstractions.Cli.Extensions.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.DatabaseUpdater\IDFCR.Abstractions.DatabaseUpdater.csproj" />
+  </ItemGroup>
+
 </Project>
