@@ -9,6 +9,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Builders/IDFCR.Abstractions.Builders.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli/IDFCR.Abstractions.Cli.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli.Extensions/IDFCR.Abstractions.Cli.Extensions.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DatabaseUpdater/IDFCR.Abstractions.DatabaseUpdater.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DependencyInjection/IDFCR.Abstractions.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Filters/IDFCR.Abstractions.Filters.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
@@ -19,6 +20,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Abstractions/Tests/">
+	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DatabaseUpdater.Tests/IDFCR.Abstractions.DatabaseUpdater.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DependencyInjection.Tests/IDFCR.Abstractions.DependencyInjection.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Filters.Tests/IDFCR.Abstractions.Filters.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests/IDFCR.Abstractions.Interceptors.DependencyInjection.Tests.csproj" />
@@ -26,6 +28,9 @@
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Mapper.Tests/IDFCR.Abstractions.Mapper.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
     <Project Path="src/IDFCR.TestUtilities/IDFCR.TestUtilities.csproj" />
+  </Folder>
+  <Folder Name="/src/IDFCR.DatabaseUpdater/">
+	<Project Path="src/IDFCR.DatabaseUpdater/IDFCR.DatabaseUpdater.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.AI/">
     <Project Path="src/IDFCR.AI/IDFCR.AI.Abstractions/IDFCR.AI.Abstractions.csproj" />
