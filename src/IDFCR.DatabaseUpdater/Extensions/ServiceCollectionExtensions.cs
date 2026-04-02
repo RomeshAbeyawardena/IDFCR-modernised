@@ -21,8 +21,7 @@ public static class ServiceCollectionExtensions
     /// <param name="assemblies">The assemblies to scan for injectable command services related to the database updater.</param>
     /// <returns>The updated service collection.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the specified DbContext type is not registered in the service collection.</exception>
-    public static IServiceCollection ConfigureDatabaseUpdater<TTargetDatabaseConfiguration>(this IServiceCollection services, ITargetDatabaseConfiguration configurationInstance, params Assembly[] assemblies)
-        where TTargetDatabaseConfiguration : class, ITargetDatabaseConfiguration, new()
+    public static IServiceCollection ConfigureDatabaseUpdater(this IServiceCollection services, ITargetDatabaseConfiguration configurationInstance, params Assembly[] assemblies)
     {
         if (!services.Any(s => s.ServiceType == configurationInstance.DbContextType))
         {
