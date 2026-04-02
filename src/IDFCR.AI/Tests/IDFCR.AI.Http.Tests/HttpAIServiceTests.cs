@@ -82,7 +82,7 @@ public class HttpAIServiceTests
             Assert.That(capturedRequest.RequestUri, Is.EqualTo(new Uri("https://example.test/v1/chat/completions")));
             Assert.That(capturedRequest.Headers.Authorization?.Scheme, Is.EqualTo("Bearer"));
             Assert.That(capturedRequest.Headers.Authorization?.Parameter, Is.EqualTo("token"));
-            Assert.That(capturedRequest.Headers.GetValues("x-request-id"), Is.EqualTo(new[] { "abc123" }));
+            Assert.That(capturedRequest.Headers.GetValues("x-request-id"), Is.EqualTo(["abc123"]));
         });
     }
 

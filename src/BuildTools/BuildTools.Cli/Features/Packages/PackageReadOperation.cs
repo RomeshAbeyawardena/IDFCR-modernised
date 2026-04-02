@@ -2,6 +2,7 @@
 using BuildTools.Cli.ManagedStreams;
 using BuildTools.Cli.Operations;
 using BuildTools.Infrastructure.Features.Packages;
+using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Packages;
 
@@ -18,14 +19,19 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
         var name = await this.GetOptionalField(managedStream, command, cancellationToken, true, "name");
         var outputType = await this.GetOptionalField(managedStream, command, cancellationToken, true, "output-type");
 
+        var pagedQuery = await this.GetPagingFields(managedStream, command, cancellationToken);
+
         if (string.IsNullOrWhiteSpace(@namespace) || string.IsNullOrEmpty(name))
         {
-            var pagedResult = await packageRepository.GetPagedAsync(new GetPagedPackagesQuery
+            var pagedRequest = new GetPagedPackagesQuery
             {
-                PageSize = 20,
                 Name = name,
                 Namespace = @namespace
-            }, cancellationToken);
+            };
+
+            pagedRequest.MapQuery(pagedQuery);
+
+            var pagedResult = await packageRepository.GetPagedAsync(pagedRequest, cancellationToken);
 
             if (pagedResult.HasValue)
             {

@@ -1,4 +1,4 @@
-﻿namespace BuildTools.Shared.Features.Settings;
+﻿namespace BuildTools.Shared.Features.Packages.Version;
 
 /// <summary>
 /// Defines version and publication state for a specific package revision.
