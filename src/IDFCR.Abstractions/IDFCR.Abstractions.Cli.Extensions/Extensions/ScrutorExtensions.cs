@@ -1,6 +1,6 @@
 ﻿using Scrutor;
 
-namespace IDFCR.Abstractions.Cli.Extensions.Extensions;
+namespace IDFCR.Abstractions.Cli.Extensions;
 
 /// <summary>
 /// Defines a static class that provides extension methods for the Scrutor library, which is a popular assembly scanning and registration tool for dependency injection in .NET applications. The HasInterface extension method allows developers to filter types based on whether they implement a specific interface, while also providing the option to exclude certain types from the filter. By using this extension method, developers can easily configure their dependency injection registrations to include only types that implement a desired interface, while excluding any types that may not be relevant or appropriate for the registration process. This can help improve the organization and maintainability of dependency injection configurations within applications and systems that utilize Scrutor for assembly scanning and registration purposes.

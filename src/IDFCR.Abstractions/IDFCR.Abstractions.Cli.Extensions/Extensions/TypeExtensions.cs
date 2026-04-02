@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Cli.Extensions.Extensions;
+﻿namespace IDFCR.Abstractions.Cli.Extensions;
 
 /// <summary>
 /// Defines a static class that provides extension methods for the Type class in .NET. The HasInterface extension method allows developers to check if a given type implements a specific interface, while also providing the option to exclude certain types from the check. By using this extension method, developers can easily determine if a type implements a desired interface, while excluding any types that may not be relevant or appropriate for the check. This can help improve the organization and maintainability of code that involves type checking and interface implementation within applications and systems that utilize the Type class in .NET.

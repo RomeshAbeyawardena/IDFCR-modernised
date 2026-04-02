@@ -1,10 +1,10 @@
-﻿using BuildTools.Cli.Extensions;
-using BuildTools.Cli.ManagedStreams;
-using BuildTools.Infrastructure;
+﻿using BuildTools.Infrastructure;
 using BuildTools.Infrastructure.SqlServer.Extensions;
+using IDFCR.Abstractions.Cli.ManagedStreams;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using IDFCR.Abstractions.Cli.Extensions;
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
