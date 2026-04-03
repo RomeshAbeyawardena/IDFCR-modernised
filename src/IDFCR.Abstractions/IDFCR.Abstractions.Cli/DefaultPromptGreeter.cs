@@ -45,17 +45,17 @@ public sealed class DefaultPromptGreeter(IPromptGreeterOptions options) : IPromp
     }
 
     /// <summary>
-    /// Defines a method to generate a greeting prompt based on the current time of day and the provided options. This method takes the current time of day, an optional set of prompt greeter options, and an optional override prompt template. The method uses the options to determine the appropriate greeting based on the time of day and generates a greeting prompt accordingly. If an override prompt template is provided, it will be used instead of the default prompt template defined in the options. The generated greeting prompt can include dynamic values such as the current time and the time of day label, allowing for a personalized user experience in CLI applications that utilize this functionality.
+    /// Defines a method to generate a greeting prompt based on the current time of day and optional override options and prompt template. This method takes the current time of day, an optional set of prompt greeter options to customize the greeting, and an optional override prompt template to use instead of the default template. The method returns a generated greeting prompt that incorporates the current time of day and any provided override options or prompt template, allowing for a personalized and contextually relevant greeting in CLI applications. By using this method, developers can easily generate dynamic greeting prompts that enhance the user experience based on the time of day and provided configuration options.
     /// </summary>
     /// <param name="timeOfDay">The current time of day.</param>
-    /// <param name="options">An optional set of prompt greeter options to customize the greeting.</param>
+    /// <param name="overrideOptions">An optional set of prompt greeter options to customize the greeting.</param>
     /// <param name="overridePrompt">An optional override prompt template to use instead of the default template.</param>
     /// <returns>The generated greeting prompt.</returns>
     public string GenerateGreetingPrompt(DateTimeOffset timeOfDay, IPromptGreeterOptions? overrideOptions = null, string? overridePrompt = null)
     {
         overrideOptions ??= options ?? PromptGreeterOptions.WesternDefault;
 
-        return GenerateGreetingPrompt(overrideOptions.DefaultPromptTemplate ?? overridePrompt, timeOfDay, new Dictionary<string, string>
+        return GenerateGreetingPrompt(overridePrompt ?? overrideOptions.DefaultPromptTemplate, timeOfDay, new Dictionary<string, string>
         {
             { "CurrentTime", timeOfDay.ToLocalTime().ToString("HH:mm") },
             { "TimeOfDay", GetTimeOfDayLabel(timeOfDay) }
