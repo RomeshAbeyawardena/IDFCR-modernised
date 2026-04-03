@@ -45,7 +45,9 @@ internal class ListDatabaseMigrationsCommandTests
         //we provide the assembly name so we can provide the location of commands we want to extend into the CLI
         services.AddDbContext<MyTestDbContext>(options => options.UseInMemoryDatabase("TestDatabase"));
         services = services
-            .ConfigurePromptGreeterOptions(opt => opt.UseDefault(Cli.PromptGreeterDefaults.Western).Build())
+            .ConfigurePromptGreeterOptions(opt => opt.UseDefault(Cli.PromptGreeterDefaults.Western)
+                .Configure(defaultPromptTemplate: $"Migration Assistant v.1.0{Environment.NewLine}{{OriginalTemplate}}")
+                .Build())
             .ConfigureDatabaseUpdater(TargetDatabaseConfiguration.Create<MyTestDbContext>(), typeof(MyTestDbContext).Assembly);
         databaseFascade = new();
 
@@ -76,7 +78,7 @@ internal class ListDatabaseMigrationsCommandTests
 
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nNo pending migrations found. The database is already up to date.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nNo pending migrations found. The database is already up to date.\r\n"));
     }
 
     [Test]
@@ -86,7 +88,7 @@ internal class ListDatabaseMigrationsCommandTests
         databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(["Migration1", "Migration2"]);
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nPending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nPending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
     }
 
     [Test]
@@ -99,7 +101,7 @@ internal class ListDatabaseMigrationsCommandTests
         await host.Object.RunCommandsAsync(args);
 
         Assert.That(esw.ToString(), Does.Contain("An error occurred during database migration: DB unavailable"));
-        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\n"));
     }
 
     [Test]
@@ -117,7 +119,7 @@ internal class ListDatabaseMigrationsCommandTests
         var args = CommandLineParser.SplitCommandLine("database extension-feature");
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nExtension for database command executed successfully.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nExtension for database command executed successfully.\r\n"));
     }
 
 

@@ -57,6 +57,7 @@ internal sealed class DefaultPromptGreeter(IPromptGreeterOptions options) : IPro
 
         return GenerateGreetingPrompt(overridePrompt ?? overrideOptions.DefaultPromptTemplate, timeOfDay, new Dictionary<string, string>
         {
+            { "OriginalTemplate", overrideOptions.OriginalPromptTemplate ?? string.Empty },
             { "CurrentTime", timeOfDay.ToLocalTime().ToString("HH:mm") },
             { "TimeOfDay", GetTimeOfDayLabel(timeOfDay) }
         });

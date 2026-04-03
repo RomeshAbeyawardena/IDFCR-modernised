@@ -10,6 +10,10 @@
 public record PromptGreeterOptions(bool EnablePromptGreeting = true, TimeOnly? MorningStartTime = default, TimeOnly? AfternoonStartTime = default, TimeOnly? EveningStartTime = default) : IPromptGreeterOptions
 {
     /// <summary>
+    /// Gets the original prompt template. This property allows developers to specify a custom template for generating greeting prompts. The template can include placeholders that will be replaced with dynamic values, such as the current time or the time of day label (e.g., "morning", "afternoon", "evening"). By providing a customizable prompt template, developers can tailor the greeting messages to better suit the tone and style of their CLI applications, creating a more personalized user experience based on the time of day.
+    /// </summary>
+    public string? OriginalPromptTemplate { get; private set; }
+    /// <summary>
     /// Gets the default prompt template. This property allows developers to specify a custom template for generating greeting prompts. The template can include placeholders that will be replaced with dynamic values, such as the current time or the time of day label (e.g., "morning", "afternoon", "evening"). By providing a customizable prompt template, developers can tailor the greeting messages to better suit the tone and style of their CLI applications, creating a more personalized user experience based on the time of day.
     /// </summary>
     public string? DefaultPromptTemplate { get; init; }
@@ -30,7 +34,7 @@ public record PromptGreeterOptions(bool EnablePromptGreeting = true, TimeOnly? M
     /// </summary>
     public static readonly PromptGreeterOptions WesternDefault = new(true, new TimeOnly(00, 30), new TimeOnly(12, 00), new TimeOnly(17, 00))
     {
-        DefaultPromptTemplate= "Good {TimeOfDay}. The current time is {CurrentTime}.",
+        DefaultPromptTemplate = "Good {TimeOfDay}. The current time is {CurrentTime}.",
         MorningLabel = "morning",
         AfternoonLabel = "afternoon",
         EveningLabel = "evening"
@@ -48,7 +52,9 @@ public record PromptGreeterOptions(bool EnablePromptGreeting = true, TimeOnly? M
             return this;
         }
 
-       return this with {
+        return this with
+        {
+            OriginalPromptTemplate = DefaultPromptTemplate,
             DefaultPromptTemplate = string.IsNullOrWhiteSpace(options.DefaultPromptTemplate) ? DefaultPromptTemplate : options.DefaultPromptTemplate,
             MorningLabel = string.IsNullOrWhiteSpace(options.MorningLabel) ? MorningLabel : options.MorningLabel,
             AfternoonLabel = string.IsNullOrWhiteSpace(options.AfternoonLabel) ? AfternoonLabel : options.AfternoonLabel,

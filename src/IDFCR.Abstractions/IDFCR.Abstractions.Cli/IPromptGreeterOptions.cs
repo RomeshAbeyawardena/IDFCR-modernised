@@ -7,6 +7,10 @@
 public interface IPromptGreeterOptions
 {
     /// <summary>
+    /// Gets the original prompt template. This property allows developers to specify a custom template for generating greeting prompts. The template can include placeholders that will be replaced with dynamic values, such as the current time or the time of day label (e.g., "morning", "afternoon", "evening"). By providing a customizable prompt template, developers can tailor the greeting messages to better suit the tone and style of their CLI applications, creating a more personalized user experience based on the time of day.
+    /// </summary>
+    string? OriginalPromptTemplate { get; }
+    /// <summary>
     /// Combines the current options with another instance of <see cref="IPromptGreeterOptions"/>. This method allows for merging the settings from another options instance, enabling developers to easily integrate additional configurations or override existing ones. By calling this method, developers can ensure that the prompt greeter options are updated with the latest settings, providing a flexible way to manage and customize the behavior of the prompt greeter in CLI applications.
     /// </summary>
     /// <param name="options">The new options to combine with the current options.</param>

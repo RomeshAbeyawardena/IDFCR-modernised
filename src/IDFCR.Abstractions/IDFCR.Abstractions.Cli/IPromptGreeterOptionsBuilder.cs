@@ -25,7 +25,14 @@ public interface IPromptGreeterOptionsBuilder
     /// <param name="afternoonStartTime">The start time for the afternoon period.</param>
     /// <param name="eveningStartTime">The start time for the evening period.</param>
     /// <returns>The current instance of the IPromptGreeterOptionsBuilder for fluent configuration.</returns>
-    IPromptGreeterOptionsBuilder Configure(string defaultPromptTemplate, string morningLabel, string afternoonLabel, string eveningLabel, bool enablePromptGreeting, TimeOnly morningStartTime, TimeOnly afternoonStartTime, TimeOnly eveningStartTime);
+    IPromptGreeterOptionsBuilder Configure(bool enablePromptGreeting = true,
+        string? defaultPromptTemplate = null,
+        string? morningLabel = null,
+        string? afternoonLabel = null,
+        string? eveningLabel = null,
+        TimeOnly? morningStartTime = null,
+        TimeOnly? afternoonStartTime = null,
+        TimeOnly? eveningStartTime = null);
     /// <summary>
     /// Defines a method for configuring the prompt greeter options using predefined defaults. This method allows developers to specify a set of default configurations for the prompt greeter based on a predefined enumeration (PromptGreeterDefaults). By selecting a default configuration, developers can quickly set up the prompt greeter with commonly used settings that are appropriate for different cultural or regional contexts (e.g., Western). This approach provides a convenient way to apply standard configurations while still allowing for further customization if needed. Additionally, it supports future configuration and database integration by enabling the use of predefined defaults that can be easily extended or modified as necessary.
     /// </summary>
@@ -77,7 +84,14 @@ public class DefaultPromptGreeterOptionsBuilder : IPromptGreeterOptionsBuilder
     /// <param name="afternoonStartTime">The start time for the afternoon period.</param>
     /// <param name="eveningStartTime">The start time for the evening period.</param>
     /// <returns>The current instance of IPromptGreeterOptionsBuilder.</returns>
-    public IPromptGreeterOptionsBuilder Configure(string defaultPromptTemplate, string morningLabel, string afternoonLabel, string eveningLabel, bool enablePromptGreeting, TimeOnly morningStartTime, TimeOnly afternoonStartTime, TimeOnly eveningStartTime)
+    public IPromptGreeterOptionsBuilder Configure(bool enablePromptGreeting,
+        string? defaultPromptTemplate, 
+        string? morningLabel, 
+        string? afternoonLabel, 
+        string? eveningLabel,
+        TimeOnly? morningStartTime, 
+        TimeOnly? afternoonStartTime, 
+        TimeOnly? eveningStartTime)
     {
         return Configure(new PromptGreeterOptions
         {
