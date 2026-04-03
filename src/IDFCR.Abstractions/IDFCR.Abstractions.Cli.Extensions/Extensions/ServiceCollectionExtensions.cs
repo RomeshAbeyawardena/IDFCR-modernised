@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddBaseCommandServices(this IServiceCollection services)
     {
         return services
+            .AddSingleton<IPromptGreeter, DefaultPromptGreeter>()
             .AddSingleton<ICommandRouteDispatcher, DefaultCommandRouteDispatcher>();
     }
 
@@ -37,6 +38,18 @@ public static class ServiceCollectionExtensions
         var serviceKey = attribute.ToString();
         
         return serviceKey;
+    }
+
+    /// <summary>
+    /// Configures the options for the prompt greeter service by accepting a delegate that builds an instance of IPromptGreeterOptions using an IPromptGreeterOptionsBuilder. This method registers the configured options as a singleton service in the dependency injection container, allowing it to be injected into other services that depend on IPromptGreeterOptions. By calling this method, developers can easily customize the behavior of the prompt greeter service in their CLI applications by providing specific configurations for greeting messages and time-based greetings.
+    /// <para>You can start with a <see cref="IPromptGreeterOptionsBuilder.UseDefault(PromptGreeterDefaults)"/> as a starting point and customise the options further using the builder methods.</para>
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add the configured options to.</param>
+    /// <param name="buildConfig">A delegate that builds an instance of IPromptGreeterOptions using an IPromptGreeterOptionsBuilder.</param>
+    /// <returns>The IServiceCollection with the configured prompt greeter options added.</returns>
+    public static IServiceCollection ConfigurePromptGreeterOptions(this IServiceCollection services, Func<IPromptGreeterOptionsBuilder, IPromptGreeterOptions> buildConfig)
+    {
+        return services.AddSingleton(buildConfig(new DefaultPromptGreeterOptionsBuilder()));
     }
 
     /// <summary>

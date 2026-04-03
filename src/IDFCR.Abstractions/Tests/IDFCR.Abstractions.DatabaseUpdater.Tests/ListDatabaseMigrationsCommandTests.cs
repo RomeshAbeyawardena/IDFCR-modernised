@@ -40,7 +40,9 @@ internal class ListDatabaseMigrationsCommandTests
         services.AddSingleton(managedStream.Object);
         //we provide the assembly name so we can provide the location of commands we want to extend into the CLI
         services.AddDbContext<MyTestDbContext>(options => options.UseInMemoryDatabase("TestDatabase"));
-        services = services.ConfigureDatabaseUpdater(TargetDatabaseConfiguration.Create<MyTestDbContext>(), typeof(MyTestDbContext).Assembly);
+        services = services
+            .ConfigurePromptGreeterOptions(opt => opt.UseDefault(Cli.PromptGreeterDefaults.Western).Build())
+            .ConfigureDatabaseUpdater(TargetDatabaseConfiguration.Create<MyTestDbContext>(), typeof(MyTestDbContext).Assembly);
         databaseFascade = new();
 
         var existingFascadeDescriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IDatabaseFascade));
