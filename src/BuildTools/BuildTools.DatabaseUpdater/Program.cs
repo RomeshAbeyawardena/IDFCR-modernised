@@ -1,6 +1,8 @@
 ﻿using BuildTools.Infrastructure;
 using BuildTools.Infrastructure.SqlServer;
 using BuildTools.Infrastructure.SqlServer.Extensions;
+using IDFCR.Abstractions.Cli;
+using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.DatabaseUpdater.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -8,17 +10,25 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 
-using var _ = await HostExtensions
-    .ConfigureDatabaseUpdaterHost(TargetDatabaseConfiguration.Create<PackageManagerDbContext>(), args, ConfigureServices);
+using var _ = await IDFCR.DatabaseUpdater.Extensions.HostExtensions
+    .ConfigureDatabaseUpdaterHost(TargetDatabaseConfiguration.Create<PackageManagerDbContext>(), args, ConfigureHostConfiguration, ConfigureServices);
+
+static void ConfigureHostConfiguration(IConfigurationBuilder builder)
+{
+    builder.AddUserSecrets<Program>();
+}
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
-    context.Configuration.AddUserSecrets<Program>();
+    
     var dbSettings = context.Configuration.Get<DbSettings>();
 
     var currentAssembly = typeof(Program).Assembly;
     services
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
+        .ConfigurePromptGreeterOptions(opt => opt.UseDefault(PromptGreeterDefaults.Western)
+                .Configure(defaultPromptTemplate: $"Migration Assistant v.1.0{Environment.NewLine}{{OriginalTemplate}}")
+                .Build())
         .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"));
 }

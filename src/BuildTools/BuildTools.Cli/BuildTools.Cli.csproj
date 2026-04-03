@@ -8,8 +8,8 @@
     <UserSecretsId>0fa7bb76-8950-4fce-bf82-08d43a0776c4</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.1.5" />
-    <PackageReference Include="IDFCR.Abstractions.Results" Version="2.0.1.5" />
+    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.1.6" />
+    <PackageReference Include="IDFCR.Abstractions.Results" Version="2.0.1.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     <PackageReference Include="Scrutor" Version="7.0.0" />
   </ItemGroup>
