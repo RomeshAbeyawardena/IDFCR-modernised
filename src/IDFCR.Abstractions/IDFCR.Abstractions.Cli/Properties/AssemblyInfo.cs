@@ -2,3 +2,4 @@
 
 [assembly: InternalsVisibleTo("IDFCR.TestUtilities")]
 [assembly: InternalsVisibleTo("IDFCR.Abstractions.Cli.Extensions")]
+[assembly: InternalsVisibleTo("IDFCR.Abstractions.Cli.Tests")]

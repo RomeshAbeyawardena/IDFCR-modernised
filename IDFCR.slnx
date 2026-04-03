@@ -20,6 +20,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Abstractions/Tests/">
+	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Cli.Tests/IDFCR.Abstractions.Cli.Tests.csproj" />
 	<Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DatabaseUpdater.Tests/IDFCR.Abstractions.DatabaseUpdater.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.DependencyInjection.Tests/IDFCR.Abstractions.DependencyInjection.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Filters.Tests/IDFCR.Abstractions.Filters.Tests.csproj" />
