@@ -83,7 +83,7 @@ A runtime console tool that applies pending EF Core database migrations against 
 
 ### BuildTools
 
-A self-contained sub-solution (`BuildTools.slnx`) providing a CLI-driven build pipeline. It is separate from the main framework and oriented around packaging and infrastructure operations.
+A self-contained sub-solution (`BuildTools.slnx`) providing a CLI-driven build pipeline. Rather than using project references, BuildTools consumes the published IDFCR NuGet packages — `IDFCR.Abstractions.*`, `IDFCR.Persistence.EntityFrameworkCore.*`, `IDFCR.DatabaseUpdater`, and `IDFCR.TestUtilities` — treating the main framework as a versioned foundational dependency. This means the build tooling is always built against stable, released artefacts of the framework it helps package.
 
 #### `BuildTools.Shared`
 Common models and utilities shared across the other BuildTools projects. Keeps shared concerns out of any single build step.
