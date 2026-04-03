@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Filters.Extensions;
 using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
+using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +20,10 @@ public static class ServiceCollectionExtensions
         }
 
         return services
+            .AddRepositories(currentAssembly)
             .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionString))
             .AddInterceptors(currentAssembly)
-            .ScanFilters(currentAssembly)
-            .Scan(s => s.FromAssemblies(currentAssembly)
-                .AddClasses(c => c.WithAttribute<RegisteredRepositoryAttribute>())
-                .AsImplementedInterfaces()
-                .WithScopedLifetime());
+            .ScanFilters(currentAssembly);
         
     }
 }
