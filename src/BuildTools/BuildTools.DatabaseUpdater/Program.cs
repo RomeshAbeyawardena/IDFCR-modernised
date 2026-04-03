@@ -13,6 +13,7 @@ using var _ = await HostExtensions
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
+    context.Configuration.AddUserSecrets<Program>();
     var dbSettings = context.Configuration.Get<DbSettings>();
 
     var currentAssembly = typeof(Program).Assembly;
