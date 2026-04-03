@@ -55,9 +55,8 @@ internal class ListDatabaseMigrationsCommandTests
         {
             isDbContextFascadeRegistered = true;
             services.Remove(existingFascadeDescriptor);
-            var fascadeService = new ServiceDescriptor(typeof(IDatabaseFascade), databaseFascade.Object);
             
-            services.Add(fascadeService);
+            services.AddScoped(_ => databaseFascade.Object);
         }
 
         serviceProvider = services.BuildServiceProvider();
