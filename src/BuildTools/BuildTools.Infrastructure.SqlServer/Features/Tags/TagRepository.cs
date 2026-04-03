@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
+using IDFCR.Persistence.EntityFrameworkCore.Attributes;
 using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Tags;
