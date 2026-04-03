@@ -1,4 +1,6 @@
 # IDFCR-modernised
+## IDFCR: Intent-Driven Flow Composition Runtime
+
 
 A modern .NET framework providing abstraction layers, persistence infrastructure, AI integration, database tooling, and a CLI build tool — designed around clean separation of concerns and composable, interchangeable implementations.
 
