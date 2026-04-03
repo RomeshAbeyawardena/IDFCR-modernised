@@ -51,11 +51,11 @@ public sealed class DefaultPromptGreeter(IPromptGreeterOptions options) : IPromp
     /// <param name="options">An optional set of prompt greeter options to customize the greeting.</param>
     /// <param name="overridePrompt">An optional override prompt template to use instead of the default template.</param>
     /// <returns>The generated greeting prompt.</returns>
-    public string GenerateGreetingPrompt(DateTimeOffset timeOfDay, IPromptGreeterOptions? options = null, string? overridePrompt = null)
+    public string GenerateGreetingPrompt(DateTimeOffset timeOfDay, IPromptGreeterOptions? overrideOptions = null, string? overridePrompt = null)
     {
-        options ??= PromptGreeterOptions.WesternDefault;
+        overrideOptions ??= options ?? PromptGreeterOptions.WesternDefault;
 
-        return GenerateGreetingPrompt(options.DefaultPromptTemplate ?? overridePrompt, timeOfDay, new Dictionary<string, string>
+        return GenerateGreetingPrompt(overrideOptions.DefaultPromptTemplate ?? overridePrompt, timeOfDay, new Dictionary<string, string>
         {
             { "CurrentTime", timeOfDay.ToLocalTime().ToString("HH:mm") },
             { "TimeOfDay", GetTimeOfDayLabel(timeOfDay) }

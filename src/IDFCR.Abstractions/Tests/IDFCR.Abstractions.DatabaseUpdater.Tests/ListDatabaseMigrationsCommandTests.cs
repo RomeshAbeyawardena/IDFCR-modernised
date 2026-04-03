@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.TestUtilities;
+using Microsoft.Extensions.Time.Testing;
 
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
@@ -21,12 +22,13 @@ internal class ListDatabaseMigrationsCommandTests
     private StringWriter esw;
     private Mock<IManagedStream> managedStream; 
     private Mock<IDatabaseFascade> databaseFascade;
-
+    private FakeTimeProvider fakeTimeProvider;
     private bool isDbContextFascadeRegistered = false;
 
     [SetUp]
     public void Setup()
     {
+        
         host = new();
         sr = new(string.Empty);
         sw = new();
@@ -35,9 +37,11 @@ internal class ListDatabaseMigrationsCommandTests
         managedStream.SetupGet(m => m.In).Returns(new StringReadableStream(sr));
         managedStream.SetupGet(m => m.Out).Returns(new StringWriteableStream(sw));
         managedStream.SetupGet(m => m.Error).Returns(new StringWriteableStream(esw));
-
+        fakeTimeProvider = new(new DateTimeOffset(2026, 04, 03, 13, 30, 00, TimeSpan.Zero));
         IServiceCollection services = new ServiceCollection();
-        services.AddSingleton(managedStream.Object);
+        services
+            .AddSingleton<TimeProvider>(fakeTimeProvider)
+            .AddSingleton(managedStream.Object);
         //we provide the assembly name so we can provide the location of commands we want to extend into the CLI
         services.AddDbContext<MyTestDbContext>(options => options.UseInMemoryDatabase("TestDatabase"));
         services = services
@@ -73,7 +77,7 @@ internal class ListDatabaseMigrationsCommandTests
 
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("No pending migrations found. The database is already up to date.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nNo pending migrations found. The database is already up to date.\r\n"));
     }
 
     [Test]
@@ -83,7 +87,7 @@ internal class ListDatabaseMigrationsCommandTests
         databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(["Migration1", "Migration2"]);
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Pending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nPending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
     }
 
     [Test]
@@ -96,7 +100,7 @@ internal class ListDatabaseMigrationsCommandTests
         await host.Object.RunCommandsAsync(args);
 
         Assert.That(esw.ToString(), Does.Contain("An error occurred during database migration: DB unavailable"));
-        Assert.That(sw.ToString(), Is.Empty);
+        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\n"));
     }
 
     [Test]
@@ -114,7 +118,7 @@ internal class ListDatabaseMigrationsCommandTests
         var args = CommandLineParser.SplitCommandLine("database extension-feature");
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Extension for database command executed successfully.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo("Good afternoon. The current time is 14:30.\r\nExtension for database command executed successfully.\r\n"));
     }
 
 
