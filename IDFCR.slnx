@@ -42,4 +42,11 @@
     <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.Http.Tests/IDFCR.AI.Http.Tests.csproj" />
     <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.OpenAI.Tests/IDFCR.AI.OpenAI.Tests.csproj" />
   </Folder>
+  <Folder Name="/src/IDFCR.Persistence.EntityFramework/">
+	<Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore/IDFCR.Persistence.EntityFrameworkCore.csproj" />
+	<Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Extensions/IDFCR.Persistence.EntityFrameworkCore.Extensions.csproj" />
+  </Folder>
+  <Folder Name="/src/IDFCR.Persistence.EntityFramework/Tests/">
+	<Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Tests/IDFCR.Persistence.EntityFrameworkCore.Tests.csproj" />
+  </Folder>
 </Solution>
