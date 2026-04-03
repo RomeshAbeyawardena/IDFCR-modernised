@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
+  <Project Path="BuildTools.DatabaseUpdater/BuildTools.DatabaseUpdater.csproj" />
   <Project Path="BuildTools.Cli/BuildTools.Cli.csproj" />
   <Project Path="BuildTools.Infrastructure.SqlServer/BuildTools.Infrastructure.SqlServer.csproj" />
   <Project Path="BuildTools.Infrastructure/BuildTools.Infrastructure.csproj" />

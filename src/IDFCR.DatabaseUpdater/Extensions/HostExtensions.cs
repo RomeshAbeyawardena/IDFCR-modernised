@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.DatabaseUpdater;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace IDFCR.DatabaseUpdater.Extensions;
@@ -19,17 +20,24 @@ public static class HostExtensions
     /// <param name="configurationInstance">The target database configuration instance.</param>
     /// <param name="args">A collection of command-line arguments.</param>
     /// <param name="listOperations">A boolean indicating whether to list available operations.</param>
+    /// <param name="configureServices">An optional action to configure additional services in the host.</param>
     /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
     /// <param name="assembliesToScan">An array of assemblies to scan for database update operations.</param>
     /// <returns>An <see cref="IDisposable"/> representing the configured host.</returns>
     public static async Task<IDisposable> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance, 
-        IEnumerable<string> args, bool listOperations = false, CancellationToken? cancellationToken = null,
+        IEnumerable<string> args, bool listOperations = false, Action<IServiceCollection>? configureServices = null,
+        CancellationToken? cancellationToken = null,
         params System.Reflection.Assembly[] assembliesToScan)
     {
         var hostBuilder = new HostBuilder();
         hostBuilder.ConfigureServices((hostContext, services) => services
             .ConfigureDatabaseUpdater(configurationInstance, assembliesToScan));
         
+        if(configureServices is not null)
+        {
+            hostBuilder.ConfigureServices(configureServices);
+        }
+
         var host = hostBuilder.Build();
 
         await host.RunCommandsAsync(args, listOperations, cancellationToken.GetValueOrDefault(CancellationToken.None));
