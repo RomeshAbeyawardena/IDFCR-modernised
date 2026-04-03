@@ -8,43 +8,9 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.TestUtilities;
-using IDFCR.Abstractions.Cli.Operations;
-using IDFCR.Abstractions.DatabaseUpdater.Commands;
 
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
-
-internal class MyTestDbContext(DbContextOptions<MyTestDbContext> options) : DbContext(options);
-
-public class ExtendedCommandRoot(IServiceProvider serviceProvider) 
-    : InjectableCommandOperationRootBase<ExtendedCommandRoot>(serviceProvider, Prefix, CommandName, null)
-{
-    public const string Prefix = "extension";
-    public const string CommandName = "extension";
-}
-
-[FeatureCommand(ExtendedCommandRoot.Prefix, CommandName)]
-public class FeaturedExtendedCommand(IServiceProvider serviceProvider, IManagedStream managedStream) 
-    : InjectableCommandOperationBase<ExtendedCommandRoot>(serviceProvider, ExtendedCommandRoot.Prefix, CommandName, typeof(ExtendedCommandRoot))
-{
-    public const string CommandName = "feature";
-
-    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
-    {
-        await managedStream.Out.WriteLineAsync("Featured command executed successfully.", cancellationToken);
-    }
-}
-[FeatureCommand(DatabaseRootCommand.Prefix, CommandName)]
-public class ExtensionForDatabaseCommand(IServiceProvider service, IManagedStream managedStream)
-    : InjectableCommandOperationBase<ExtensionForDatabaseCommand>(service, DatabaseRootCommand.Prefix, CommandName, typeof(DatabaseRootCommand))
-{
-    public const string CommandName = "extension-feature";
-
-    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
-    {
-        await managedStream.Out.WriteLineAsync("Extension for database command executed successfully.", cancellationToken);
-    }
-}
 
 internal class ListDatabaseMigrationsCommandTests
 {
@@ -55,6 +21,9 @@ internal class ListDatabaseMigrationsCommandTests
     private StringWriter esw;
     private Mock<IManagedStream> managedStream; 
     private Mock<IDatabaseFascade> databaseFascade;
+
+    private bool isDbContextFascadeRegistered = false;
+
     [SetUp]
     public void Setup()
     {
@@ -78,6 +47,7 @@ internal class ListDatabaseMigrationsCommandTests
 
         if (existingFascadeDescriptor is not null)
         {
+            isDbContextFascadeRegistered = true;
             services.Remove(existingFascadeDescriptor);
             var fascadeService = new ServiceDescriptor(typeof(IDatabaseFascade), databaseFascade.Object);
             
@@ -86,6 +56,12 @@ internal class ListDatabaseMigrationsCommandTests
 
         serviceProvider = services.BuildServiceProvider();
         host.Setup(h => h.Services).Returns(serviceProvider);
+    }
+
+    [Test]
+    public void Ensure_database_fascade_is_registered()
+    {
+        Assert.That(isDbContextFascadeRegistered, Is.True);
     }
 
     [Test]
