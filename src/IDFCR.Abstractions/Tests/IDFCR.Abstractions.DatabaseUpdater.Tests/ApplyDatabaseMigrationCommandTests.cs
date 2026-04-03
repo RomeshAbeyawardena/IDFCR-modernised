@@ -8,15 +8,45 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.TestUtilities;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using IDFCR.Abstractions.Cli.Operations;
+using IDFCR.Abstractions.DatabaseUpdater.Commands;
+
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
 
 internal class MyTestDbContext(DbContextOptions<MyTestDbContext> options) : DbContext(options);
 
+public class ExtendedCommandRoot(IServiceProvider serviceProvider) 
+    : InjectableCommandOperationRootBase<ExtendedCommandRoot>(serviceProvider, Prefix, CommandName, null)
+{
+    public const string Prefix = "extension";
+    public const string CommandName = "extension";
+}
 
+[FeatureCommand(ExtendedCommandRoot.Prefix, CommandName)]
+public class FeaturedExtendedCommand(IServiceProvider serviceProvider, IManagedStream managedStream) 
+    : InjectableCommandOperationBase<ExtendedCommandRoot>(serviceProvider, ExtendedCommandRoot.Prefix, CommandName, typeof(ExtendedCommandRoot))
+{
+    public const string CommandName = "feature";
 
-internal class ApplyDatabaseMigrationCommandTests
+    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
+    {
+        await managedStream.Out.WriteLineAsync("Featured command executed successfully.", cancellationToken);
+    }
+}
+[FeatureCommand(DatabaseRootCommand.Prefix, CommandName)]
+public class ExtensionForDatabaseCommand(IServiceProvider service, IManagedStream managedStream)
+    : InjectableCommandOperationBase<ExtensionForDatabaseCommand>(service, DatabaseRootCommand.Prefix, CommandName, typeof(DatabaseRootCommand))
+{
+    public const string CommandName = "extension-feature";
+
+    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
+    {
+        await managedStream.Out.WriteLineAsync("Extension for database command executed successfully.", cancellationToken);
+    }
+}
+
+internal class ListDatabaseMigrationsCommandTests
 {
     private IServiceProvider serviceProvider;
     private Mock<IHost> host;
@@ -59,20 +89,56 @@ internal class ApplyDatabaseMigrationCommandTests
     }
 
     [Test]
-    public async Task Test()
+    public async Task Test_to_affirm_that_no_pending_migrations_are_found()
     {
         var args = CommandLineParser.SplitCommandLine("database migration list");
 
-        //don't worry - I know what I'm doing by passing null to the host!
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("No pending migrations found. The database is already up to date.\r\n"));
-
-        sw.GetStringBuilder().Clear();
-        await host.Object.RunCommandsAsync(args);
-        databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(["Migration1", "Migration2"]);
         Assert.That(sw.ToString(), Is.EqualTo("No pending migrations found. The database is already up to date.\r\n"));
     }
+
+    [Test]
+    public async Task Test_to_affirm_that_pending_migrations_are_found()
+    {
+        var args = CommandLineParser.SplitCommandLine("database migration list");
+        databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(["Migration1", "Migration2"]);
+        await host.Object.RunCommandsAsync(args);
+
+        Assert.That(sw.ToString(), Is.EqualTo("Pending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
+    }
+
+    [Test]
+    public async Task Test_to_affirm_that_an_error_is_written_on_failure()
+    {
+        databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>()))
+                       .ThrowsAsync(new InvalidOperationException("DB unavailable"));
+
+        var args = CommandLineParser.SplitCommandLine("database migration list");
+        await host.Object.RunCommandsAsync(args);
+
+        Assert.That(esw.ToString(), Does.Contain("An error occurred during database migration: DB unavailable"));
+        Assert.That(sw.ToString(), Is.Empty);
+    }
+
+    [Test]
+    public async Task Test_to_affirm_that_custom_commands_are_invoked()
+    {
+        var args = CommandLineParser.SplitCommandLine("extension feature");
+        await host.Object.RunCommandsAsync(args);
+
+        Assert.That(sw.ToString(), Is.EqualTo("Featured command executed successfully.\r\n"));
+    }
+
+    [Test]
+    public async Task Test_to_affirm_that_custom_commands_extending_existing_commands_are_invoked()
+    {
+        var args = CommandLineParser.SplitCommandLine("database extension-feature");
+        await host.Object.RunCommandsAsync(args);
+
+        Assert.That(sw.ToString(), Is.EqualTo("Extension for database command executed successfully.\r\n"));
+    }
+
 
     [TearDown]
     public void TearDown()
@@ -83,4 +149,8 @@ internal class ApplyDatabaseMigrationCommandTests
         }
     }
 }
+
+// In ConfigureDatabaseUpdater or AddInjectableCommandServices
+// after Scrutor scan — validate that every [FeatureCommand] key
+// matches its base class constructor prefix argument
 
