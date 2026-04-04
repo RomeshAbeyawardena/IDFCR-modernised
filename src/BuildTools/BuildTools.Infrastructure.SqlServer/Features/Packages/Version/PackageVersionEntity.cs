@@ -1,11 +1,16 @@
-using BuildTools.Shared.Features.Packages.Version;
+﻿using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Metadata;
 
-namespace BuildTools.Cli.Features.Packages.Version;
+namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 
-public class PackageVersionDto : MapperBase<IPackageVersion>, IPackageVersion
+public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion, IIdentifiable<Guid>
 {
-    public object PackageId { get; set; } = null!;
+    object IPackageVersion.PackageId => PackageId;
+    object? IPackageVersion.PackageVersionId => Id;
+    public Guid Id { get; set; }
+
+    public Guid PackageId { get; set; }
     public string VersionPrefix { get; set; } = null!;
     public int RevisionNumber { get; set; }
     public DateTime ReleaseDateTimestampUtc { get; set; }
@@ -13,13 +18,21 @@ public class PackageVersionDto : MapperBase<IPackageVersion>, IPackageVersion
     public bool PublishedToFeed { get; set; }
     public DateTime? LastErrorOnPublishAttemptTimestampUtc { get; set; }
     public DateTime? PublishedTimestampUtc { get; set; }
-    public string Version { get; set; } = null!;
-    public object? PackageVersionId { get; set; }
+
+    public virtual PackageEntity Package { get; set; } = null!;
 
     public override void Map(IPackageVersion source)
     {
-        PackageVersionId = source.PackageVersionId;
-        PackageId = source.PackageId;
+        if (source.PackageVersionId is not null && source.PackageVersionId is Guid id)
+        {
+            Id = id;
+        }
+
+        if (source.PackageId is not null && source.PackageId is Guid packageId)
+        {
+            PackageId = packageId;
+        }
+
         VersionPrefix = source.VersionPrefix;
         RevisionNumber = source.RevisionNumber;
         ReleaseDateTimestampUtc = source.ReleaseDateTimestampUtc;

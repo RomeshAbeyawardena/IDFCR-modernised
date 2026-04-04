@@ -9,6 +9,7 @@
 /// </remarks>
 public interface IPackageVersion
 {
+    object? PackageVersionId { get; }
     /// <summary>
     /// Gets the unique package identifier this version record belongs to.
     /// </summary>
