@@ -1,18 +1,8 @@
 ﻿using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
-
-public class PackageVersionEntityConfiguration : IEntityTypeConfiguration<PackageVersionEntity>
-{
-    public void Configure(EntityTypeBuilder<PackageVersionEntity> builder)
-    {
-        throw new NotImplementedException();
-    }
-}
 public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion, IIdentifiable<Guid>
 {
     object IPackageVersion.PackageId => PackageId;
@@ -22,11 +12,11 @@ public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion
     public Guid PackageId { get; set; }
     public string VersionPrefix { get; set; } = null!;
     public int RevisionNumber { get; set; }
-    public DateTime ReleaseDateTimestampUtc { get; set; }
+    public DateTimeOffset ReleaseDateTimestampUtc { get; set; }
     public string CommitId { get; set; } = null!;
     public bool PublishedToFeed { get; set; }
-    public DateTime? LastErrorOnPublishAttemptTimestampUtc { get; set; }
-    public DateTime? PublishedTimestampUtc { get; set; }
+    public DateTimeOffset? LastErrorOnPublishAttemptTimestampUtc { get; set; }
+    public DateTimeOffset? PublishedTimestampUtc { get; set; }
 
     public virtual PackageEntity Package { get; set; } = null!;
 
