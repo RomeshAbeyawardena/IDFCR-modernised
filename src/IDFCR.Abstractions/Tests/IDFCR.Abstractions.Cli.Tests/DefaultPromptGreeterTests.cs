@@ -1,4 +1,4 @@
-using IDFCR.Abstractions.Cli;
+using IDFCR.Abstractions.Cli.Prompts;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Cli.Tests;

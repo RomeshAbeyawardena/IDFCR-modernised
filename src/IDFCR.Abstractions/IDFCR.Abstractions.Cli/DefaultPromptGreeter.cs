@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Cli;
+﻿using IDFCR.Abstractions.Cli.Prompts;
+
+namespace IDFCR.Abstractions.Cli;
 
 /// <summary>
 /// Represents the default implementation of the <see cref="IPromptGreeter"/> interface, responsible for generating greeting prompts based on the time of day and provided options. This implementation utilizes the options defined in <see cref="IPromptGreeterOptions"/> to determine the appropriate greeting based on the current time and the specified configuration. The generated greeting prompts can include dynamic values such as the current time and the time of day label, allowing for a personalized user experience in CLI applications that utilize this functionality. By using this default implementation, developers can easily integrate dynamic greeting functionality into their CLI applications, creating a more engaging and personalized user experience without needing to implement custom logic for generating greetings based on time of day.

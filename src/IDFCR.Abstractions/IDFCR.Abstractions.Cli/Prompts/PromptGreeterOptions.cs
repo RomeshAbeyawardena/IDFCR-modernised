@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Cli;
+﻿namespace IDFCR.Abstractions.Cli.Prompts;
 
 /// <summary>
 /// Represents the options for the prompt greeter.

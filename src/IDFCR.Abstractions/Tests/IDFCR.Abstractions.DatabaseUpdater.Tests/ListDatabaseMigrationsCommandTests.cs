@@ -9,6 +9,7 @@ using Moq;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.TestUtilities;
 using Microsoft.Extensions.Time.Testing;
+using IDFCR.Abstractions.Cli.Prompts;
 
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
@@ -45,7 +46,7 @@ internal class ListDatabaseMigrationsCommandTests
         //we provide the assembly name so we can provide the location of commands we want to extend into the CLI
         services.AddDbContext<MyTestDbContext>(options => options.UseInMemoryDatabase("TestDatabase"));
         services = services
-            .ConfigurePromptGreeterOptions(opt => opt.UseDefault(Cli.PromptGreeterDefaults.Western)
+            .ConfigurePromptGreeterOptions(opt => opt.UseDefault(PromptGreeterDefaults.Western)
                 .Configure(defaultPromptTemplate: $"Migration Assistant v.1.0{Environment.NewLine}{{OriginalTemplate}}")
                 .Build())
             .ConfigureDatabaseUpdater(TargetDatabaseConfiguration.Create<MyTestDbContext>(), typeof(MyTestDbContext).Assembly);

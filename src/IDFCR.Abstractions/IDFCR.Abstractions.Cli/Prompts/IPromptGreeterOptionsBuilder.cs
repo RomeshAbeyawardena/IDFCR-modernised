@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Cli;
+﻿namespace IDFCR.Abstractions.Cli.Prompts;
 
 /// <summary>
 /// Represents a builder for configuring the options of the prompt greeter, which is responsible for generating greeting prompts based on the time of day. This interface defines methods that allow developers to configure the prompt greeter options using a generic type parameter, direct configuration values, or by using predefined defaults. By implementing this interface, developers can customize the behavior of the prompt greeter to provide appropriate greetings based on the current time, enhancing the user experience in CLI applications that utilize this functionality. The builder pattern allows for a fluent and flexible configuration of the prompt greeter options, making it easy to set up and customize as needed.

@@ -1,7 +1,7 @@
-﻿using IDFCR.Abstractions.Cli;
-using IDFCR.Abstractions.Cli.Extensions;
+﻿using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
+using IDFCR.Abstractions.Cli.Prompts;
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Commands;
 

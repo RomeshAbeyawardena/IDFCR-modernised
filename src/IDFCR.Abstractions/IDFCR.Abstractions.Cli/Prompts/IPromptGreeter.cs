@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Cli;
+﻿namespace IDFCR.Abstractions.Cli.Prompts;
 
 /// <summary>
 /// Represents a service responsible for generating greeting prompts based on the time of day and provided options. The <see cref="IPromptGreeter"/> interface defines methods for generating greeting prompts, allowing developers to create customized greetings that can be used in CLI applications. The implementation of this interface can utilize the options defined in <see cref="IPromptGreeterOptions"/> to determine the appropriate greeting based on the current time and the specified configuration, enhancing the user experience by providing contextually relevant greetings. By implementing this interface, developers can easily integrate dynamic greeting functionality into their CLI applications, creating a more engaging and personalized user experience.
