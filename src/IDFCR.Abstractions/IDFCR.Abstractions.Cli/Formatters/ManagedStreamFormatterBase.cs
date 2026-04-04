@@ -1,33 +1,7 @@
 ﻿using IDFCR.Abstractions.Cli.ManagedStreams;
 using System.Text;
-using System.Collections;
 
 namespace IDFCR.Abstractions.Cli.Formatters;
-
-public class ManagedStreamTableFormatter(IManagedStream managedStream) : ManagedStreamFormatterBase(managedStream)
-{
-    public Task FormatTableAsync<T>(IEnumerable<T> values, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-    public override Task FormatAsync<T>(T value, CancellationToken cancellationToken)
-    {
-        if(value is not IEnumerable)
-        {
-            throw new ArgumentException($"Value of type {typeof(T)} is not an IEnumerable and cannot be formatted as a table.");
-        }
-
-        var genericType = typeof(T).GetInterfaces().FirstOrDefault(x => x.IsGenericType) ?? throw new ArgumentException($"Value of type {typeof(T)} does not implement a generic IEnumerable interface and cannot be formatted as a table.");
-        var generic = genericType.GetGenericArguments().FirstOrDefault() ?? throw new ArgumentException($"Value of type {typeof(T)} does not implement a generic IEnumerable interface and cannot be formatted as a table.");
-        var method = typeof(ManagedStreamTableFormatter).GetMethod(nameof(FormatTableAsync)) ?? throw new ArgumentException($"FormatTableAsync method not found in {typeof(ManagedStreamTableFormatter)}.");
-
-        method = method.MakeGenericMethod(generic);
-
-        var result = method.Invoke(this, [value, cancellationToken]);
-
-        return result is Task task ? task : Task.CompletedTask;
-    }
-}
 
 /// <summary>
 /// Represents a base class for formatters that write formatted output to a managed stream. It provides common functionality for managing a StringBuilder to accumulate formatted output and defines methods for flushing the accumulated output to the appropriate stream (either error or output) based on the specified target. The class also implements the IFormatter interface, allowing derived classes to focus on implementing the specific formatting logic while handling the management of the output stream and disposal of resources.
