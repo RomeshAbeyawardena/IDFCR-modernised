@@ -16,16 +16,16 @@ public class SoftDeletionEntityInterceptor<TDatabaseOptions>(IOptions<DatabaseCo
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
         return options.Value.UseSoftDeletion
-            && context.Model is ISuppressable suppressable
-            && !suppressable.Suppressed;
+            && context.Model is ISuppressable suppressible
+            && !suppressible.Suppressed;
     }
 
     /// <inheritdoc />
     public override void Intercept(IEntityInterceptorContext context)
     {
-        if (context.Model is ISuppressable suppressable)
+        if (context.Model is ISuppressable suppressible)
         {
-            suppressable.Suppressed = true;
+            suppressible.Suppressed = true;
             WithContext<RepositoryInterceptorContext>(context, ctx => ctx.BypassOperation = true);
         }
     }
