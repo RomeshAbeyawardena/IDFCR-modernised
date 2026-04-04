@@ -1,5 +1,4 @@
-﻿using BuildTools.Cli.Features.Packages.Version;
-using BuildTools.Infrastructure.Features.Packages;
+﻿using BuildTools.Infrastructure.Features.Packages;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
@@ -7,11 +6,11 @@ using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Packages;
 
-[FeatureCommand(PackageVersionRootOperation.Prefix, CommandName)]
+[FeatureCommand(PackageRootOperation.Prefix, CommandName)]
 public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream,
     IPackageRepository packageRepository)
-    : InjectableCommandOperationBase<PackageReadOperation>(serviceProvider, PackageVersionRootOperation.Prefix,
-        CommandName, typeof(PackageVersionRootOperation))
+    : InjectableCommandOperationBase<PackageReadOperation>(serviceProvider, PackageRootOperation.Prefix,
+        CommandName, typeof(PackageRootOperation))
 {
     public const string CommandName = "read";
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
