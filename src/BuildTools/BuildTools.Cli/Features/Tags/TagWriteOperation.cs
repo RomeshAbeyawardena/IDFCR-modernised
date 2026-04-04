@@ -71,6 +71,8 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
             }
         }
 
+        tagList = [.. tagList.DistinctBy(x => x.Name)];
+
         var existingTags = (await tagRepository.GetExistingTagsAsync([.. tagList.Select(x => x.Name)], cancellationToken)).GetResultOrDefault();
 
         var tagsToAdd = tagList.AsEnumerable();
@@ -78,9 +80,23 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
         if (existingTags is not null)
         {
             tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
+
+            foreach(var tag in existingTags)
+            {
+                var foundTag = tagList.FirstOrDefault(t => t == tag);
+
+                if (foundTag is null || foundTag.DisplayName == tag.DisplayName)
+                {
+                    continue;
+                }
+
+                tag.DisplayName = foundTag.DisplayName;
+                await tagRepository.UpsertAsync(tag, cancellationToken);
+            }
         }
 
         var addResult = await tagRepository.AddTagsAsync([.. tagsToAdd], cancellationToken);
+
 
         if (addResult.IsSuccess)
         {
