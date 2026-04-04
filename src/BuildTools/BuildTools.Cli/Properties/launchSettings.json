@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "package version read"
+      "commandLineArgs": "package version read --namespace Foo"
     }
   }
 }

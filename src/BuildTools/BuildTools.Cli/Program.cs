@@ -23,4 +23,4 @@ using var host = new HostBuilder()
     .ConfigureHostConfiguration(s => s.AddUserSecrets<Program>())
     .Build();
 
-await host.RunCommandsAsync(args);
+await host.RunCommandsAsync(args, true);
