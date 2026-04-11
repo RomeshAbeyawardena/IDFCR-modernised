@@ -1,4 +1,5 @@
 using BuildTools.Infrastructure.Features.Packages;
+using BuildTools.Infrastructure.Features.Packages.Version;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
@@ -8,7 +9,7 @@ namespace BuildTools.Cli.Features.Packages.Version;
 
 //increments package version by adding a new version with a new revision number, and making it the latest version. If the package doesn't exist, it will be created with version 1.0.0
 [FeatureCommand(PackageVersionRootOperation.Prefix, CommandName)]
-public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IPackageRepository packageRepository)
+public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IPackageRepository packageRepository, IPackageVersionRepository packageVersionRepository, TimeProvider timeProvider)
     : InjectableCommandOperationBase<PackageVersionIncrementOperation>(serviceProvider, PackageVersionRootOperation.Prefix,
         CommandName, typeof(PackageVersionRootOperation))
 {
@@ -18,8 +19,8 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
     {
         var (hasNamespace, packageNamespace) = (await this.GetRequiredField(managedStream, command, 0, "Package namespace", cancellationToken, false, "namespace")).AsValueOrDefault(out var isParameter);
         var (hasVersionPrefix, packageVersionPrefix) = (await this.GetRequiredField(managedStream, command, 0, "Package version prefix", cancellationToken, isParameter, "version-prefix")).AsValueOrDefault(out isParameter);
-        var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, false, "package-name");
-
+        var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "package-name");
+        var commitId = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "commit-id");
         if ((!hasNamespace || string.IsNullOrWhiteSpace(packageName))
             && !hasVersionPrefix)
         {
@@ -41,7 +42,33 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
+
+        var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, cancellationToken);
+
+        var newRevisionNumber = 0;
+
+        if (latestPackageResult.HasValue)
+        {
+            newRevisionNumber = latestPackageResult.Result.RevisionNumber + 1;
+        }
+
+        var upsertResult = await packageVersionRepository.UpsertAsync(new Shared.Features.Packages.Version.PackageVersion
+        {
+            VersionPrefix = packageVersionPrefix,
+            RevisionNumber = newRevisionNumber,
+            ReleaseDateTimestampUtc = timeProvider.GetUtcNow(),
+            PackageId = packageResult.Result.Id!,
+            CommitId =  commitId ?? string.Empty
+        }, cancellationToken);
+
+        if (!upsertResult.IsSuccess)
+        {
+            await managedStream.Error.WriteLineAsync($"Unable to save package version: {upsertResult.Exception?.Message ?? "Unknown error"}", cancellationToken);
+            return;
+        }
+
+        await packageVersionRepository.SaveChangesAsync(cancellationToken);
         await managedStream.Out.WriteLineAsync($"adding: Package version: {packageNamespace}, Package name: {packageName}, {packageVersionPrefix}, {packageName}", cancellationToken);
-        
+
     }
 }
