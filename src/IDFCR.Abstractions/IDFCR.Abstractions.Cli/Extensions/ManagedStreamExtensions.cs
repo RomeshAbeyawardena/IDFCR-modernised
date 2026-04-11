@@ -151,7 +151,7 @@ public static class ManagedStreamExtensions
             }
 
             b.Append('-', (int)managedStream.Width);
-            b.AppendLine($"{results.TotalRows} found. Displaying {resultData.Length} items");
+            b.AppendLine($"{Environment.NewLine}{results.TotalRows} found. Displaying {resultData.Length} items");
         }, cancellationToken);
     }
 }
