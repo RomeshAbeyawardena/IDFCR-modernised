@@ -6,6 +6,10 @@
 public interface IManagedStreamTableFormatter
 {
     /// <summary>
+    /// Gets the context for the format renderer, which contains information about the custom style and rendering style to be used when formatting data for display. The context allows the formatter to determine how to format the data based on the specified rendering style (e.g., Custom, List, Table) and any custom styles defined in the context. This property is essential for the formatter to generate appropriate output based on the context and the structure of the data being formatted.
+    /// </summary>
+    IFormatRendererContext Context { get; }
+    /// <summary>
     /// Formats a collection of values as a table and accumulates the formatted output in the StringBuilder.
     /// </summary>
     /// <typeparam name="T"></typeparam>

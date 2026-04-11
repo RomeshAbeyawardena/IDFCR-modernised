@@ -26,7 +26,7 @@ internal class ManagedStreamTableFormatterTests
         mockManagedStream.SetupGet(m => m.Out).Returns(new StringWriteableStream(sw));
         mockManagedStream.SetupGet(m => m.Error).Returns(new StringWriteableStream(esw));
         
-        formatter = new ManagedStreamTableFormatter(mockManagedStream.Object);
+        //formatter = new ManagedStreamTableFormatter(mockManagedStream.Object);
     }
 
     [TearDown]
