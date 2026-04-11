@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Add-Migration.ps1" />
+  </Folder>
   <Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
   <Project Path="BuildTools.DatabaseUpdater/BuildTools.DatabaseUpdater.csproj" />
   <Project Path="BuildTools.Cli/BuildTools.Cli.csproj" />
