@@ -74,11 +74,14 @@ public static class ManagedStreamExtensions
     public static async Task DisplayPagedTable<T, TDestination>(this IManagedStream managedStream, IUnitPagedResult<T> results,
         Func<T, TDestination> map, CancellationToken cancellationToken, params TableField<TDestination>[] tableFields)
     {
+        var expression = MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile();
+
         Dictionary<string, int> stringColumnLengths = [];
 
         if (results.HasValue)
         {
-            var columnLengths = results.Result.SelectMany(MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile()).DistinctBy(x => x.Key);
+            
+            var columnLengths = results.Result.SelectMany(expression).DistinctBy(x => x.Key);
             stringColumnLengths = new(columnLengths);
         }
 
