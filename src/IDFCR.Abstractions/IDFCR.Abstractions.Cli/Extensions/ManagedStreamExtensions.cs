@@ -36,7 +36,7 @@ public static class ManagedStreamExtensions
     /// <returns>A string representing the formatted table row for the given model.</returns>
     private static string FormatPagedTableData<T>(T model, params TableField<T>[] tableFields)
     {
-        Func<object?, string?>? defaultFormat = x => x?.ToString();
+        Func<object?, string?>? defaultFormat = x => x?.ToString() ?? string.Empty;
         StringBuilder builder = new();
         foreach (var tableField in tableFields)
         {
@@ -54,9 +54,15 @@ public static class ManagedStreamExtensions
 
             var modelValue = tableField.Property.GetValue(model);
             var format = tableField.Format ?? defaultFormat;
-            formattedValue = format(modelValue).Limit(tableField.RowWidth ?? MinColumnWidth);
 
-            builder.Append($"{formattedValue}");
+            var raw = format(modelValue) ?? throw new InvalidOperationException(
+                    $"TableField formatter for '{tableField.Property.Name}' returned null. " +
+                    "Formatters must return a non-null string.");
+
+            formattedValue = raw.Limit(tableField.RowWidth ?? MinColumnWidth);
+
+
+            builder.Append(formattedValue);
         }
 
         return builder.ToString();
