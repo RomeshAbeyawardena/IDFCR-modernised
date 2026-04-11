@@ -14,17 +14,13 @@ namespace IDFCR.Abstractions.Results;
 public abstract record UnitResultBase(Exception? Exception = null, UnitAction Action = UnitAction.None,
     bool IsSuccess = false, FailureReason? FailureReason = null) : IUnitResult
 {
-    internal readonly ConcurrentDictionary<string, object?> _metaProperties = [];
+    private readonly ConcurrentDictionary<string, object?> _metaProperties = [];
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, object?> Meta => _metaProperties;
+
     /// <inheritdoc />
     public object? this[string key] { get => _metaProperties[key]; }
-
-    /// <inheritdoc />
-    public int Count => _metaProperties.Count;
-
-    /// <inheritdoc />
-    public IEnumerable<string> Keys => _metaProperties.Keys;
-    /// <inheritdoc />
-    public IEnumerable<object?> Values => _metaProperties.Values;
 
     /// <inheritdoc />
     public IUnitResult AddMeta(string key, object? value)
@@ -39,30 +35,6 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 
     /// <inheritdoc />
     public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
-
-    /// <inheritdoc />
-    public bool ContainsKey(string key)
-    {
-        return _metaProperties.ContainsKey(key);
-    }
-
-    /// <inheritdoc />
-    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
-    {
-        return _metaProperties.GetEnumerator();
-    }
-
-    /// <inheritdoc />
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out object? value)
-    {
-        return _metaProperties.TryGetValue(key, out value);
-    }
-
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
 }
 
 /// <summary>

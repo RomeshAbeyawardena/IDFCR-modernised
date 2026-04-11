@@ -17,7 +17,7 @@ public static class UnitPagedResult
     /// <param name="exception">The captured exception.</param>
     /// <param name="failureReason">The failure reason.</param>
     /// <returns>A paged unit result.</returns>
-    internal static UnitPagedResult<TResult> FromResult<TResult>(
+    public static IUnitPagedResult<TResult> FromResult<TResult>(
         IEnumerable<TResult>? result,
         int totalRows,
         IPagedQuery pagedQuery,

@@ -78,7 +78,7 @@ public static class ManagedStreamExtensions
 
         if (results.HasValue)
         {
-            var columnLengths = results.Result.SelectMany(MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile());
+            var columnLengths = results.Result.SelectMany(MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile()).DistinctBy(x => x.Key);
             stringColumnLengths = new(columnLengths);
         }
 

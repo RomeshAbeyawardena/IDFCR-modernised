@@ -36,13 +36,13 @@ public static class UnitResultExtensions
         if (unitResultCollection.Result is null)
         {
             var res = new DefaultUnitResult(unitResultCollection.Exception, unitResultCollection.Action, unitResultCollection.IsSuccess).AsCollection<TDestination>(default);
-            CloneMeta(unitResultCollection, res);
+            CloneMeta(unitResultCollection.Meta, res);
             return res;
         }
 
         var mapped = unitResultCollection.Result.Select(x => converter(x));
         var result = new UnitResultCollection<TDestination>(mapped, unitResultCollection.Action, unitResultCollection.IsSuccess, unitResultCollection.Exception);
-        CloneMeta(unitResultCollection, result);
+        CloneMeta(unitResultCollection.Meta, result);
         return result;
     }
 
@@ -54,12 +54,12 @@ public static class UnitResultExtensions
         if (unitResult.Result is null)
         {
             var res = new DefaultUnitResult(unitResult.Exception, unitResult.Action, unitResult.IsSuccess).As<TDestination>(default);
-            CloneMeta(unitResult, res);
+            CloneMeta(unitResult.Meta, res);
             return res;
         }
 
         var result = new DefaultUnitResult<TDestination>(converter(unitResult.Result), unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
-        CloneMeta(unitResult, result);
+        CloneMeta(unitResult.Meta, result);
         return result;
     }
 
@@ -70,7 +70,7 @@ public static class UnitResultExtensions
     {
         var convertedResults = unitResult.Result?.Select(converter).ToList() ?? [];
         var results = new UnitPagedResult<TDestination>(convertedResults, unitResult.TotalRows, unitResult.PagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
-        CloneMeta(unitResult, results);
+        CloneMeta(unitResult.Meta, results);
         return results;
     }
 

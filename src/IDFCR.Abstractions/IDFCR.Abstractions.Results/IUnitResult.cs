@@ -5,8 +5,12 @@ namespace IDFCR.Abstractions.Results;
 /// <summary>
 /// Represents the common shape of a unit result.
 /// </summary>
-public interface IUnitResult : IReadOnlyDictionary<string, object?>
+public interface IUnitResult
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    IReadOnlyDictionary<string, object?> Meta { get; }
     /// <summary>
     /// Gets the failure reason, when one is available.
     /// </summary>
