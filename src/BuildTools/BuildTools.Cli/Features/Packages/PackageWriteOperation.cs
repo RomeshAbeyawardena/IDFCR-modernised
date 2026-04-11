@@ -30,11 +30,20 @@ public class PackageWriteOperation(IServiceProvider serviceProvider, IManagedStr
 
         var foundEntry = (await packageRepository.GetPackageAsync(name, @namespace, cancellationToken)).GetResultOrDefault();
 
+        //ensure another package with the same namespace does not already exist
+        var foundEntryWithNamespace = (await packageRepository.GetPackageAsync(null, @namespace, cancellationToken)).GetResultOrDefault();
+
+        if (foundEntry is null && foundEntryWithNamespace is not null)
+        {
+            await managedStream.Error.WriteLineAsync($"Unable to write package: A namespace with '{@namespace}' already exists.", cancellationToken);
+            return;
+        }
+
         var result = await packageRepository.UpsertAsync(new Shared.Features.Packages.Package
         {
             Id = foundEntry?.Id,
-            Alias = alias,
-            Description = description,
+            Alias = alias ?? foundEntry?.Alias,
+            Description = description ?? foundEntry?.Description,
             Name = foundEntry?.Name ?? name!,
             Namespace = foundEntry?.Namespace ?? @namespace!
         }, cancellationToken);

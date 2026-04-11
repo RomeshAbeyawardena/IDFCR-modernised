@@ -2,6 +2,7 @@ using BuildTools.Infrastructure.Features.Packages;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
+using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Packages.Version;
 
@@ -32,9 +33,13 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
-        var package = await packageRepository.GetPackageAsync(packageName, packageNamespace, cancellationToken);
+        var packageResult = await packageRepository.GetPackageAsync(packageName, packageNamespace, cancellationToken);
 
-
+        if (!packageResult.HasValue)
+        {
+            await managedStream.Error.WriteLineAsync($"Unable to find package: {packageResult.Exception?.Message ?? "Unknown error"}", cancellationToken);
+            return;
+        }
 
         await managedStream.Out.WriteLineAsync($"adding: Package version: {packageNamespace}, Package name: {packageName}, {packageVersionPrefix}, {packageName}", cancellationToken);
         
