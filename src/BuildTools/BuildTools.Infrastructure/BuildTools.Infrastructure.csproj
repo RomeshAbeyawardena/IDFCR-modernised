@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Persistence" Version="2.0.2.7" />
+    <PackageReference Include="IDFCR.Abstractions.Persistence" Version="2.0.2.8" />
   </ItemGroup>
 
   <ItemGroup>

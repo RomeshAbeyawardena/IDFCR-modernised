@@ -108,7 +108,7 @@ public static class ManagedStreamExtensions
 
             if (visitor.HasProperty && stringColumnLengths.TryGetValue(visitor.Property.Name, out var columnLength))
             {
-                tableField.RowWidth = tableField.RowWidth.HasValue && tableField.RowWidth > columnLength ? columnLength : columnLength;
+                tableField.RowWidth = tableField.RowWidth.HasValue && tableField.RowWidth > columnLength ? tableField.RowWidth : columnLength;
             }
 
             var val = $"{tableField.Title.Limit(tableField.RowWidth.GetValueOrDefault(MinColumnWidth))}";

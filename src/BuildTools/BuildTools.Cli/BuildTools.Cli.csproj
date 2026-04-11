@@ -8,7 +8,7 @@
     <UserSecretsId>0fa7bb76-8950-4fce-bf82-08d43a0776c4</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.2.7" />
+    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.2.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup>
