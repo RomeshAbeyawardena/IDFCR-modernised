@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.Persistence;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Persistence.Tests;
 
@@ -26,7 +25,7 @@ sealed class SingleStringModel
 [TestFixture]
 internal class MaximumLengthStringExpressionBuilderTests
 {
-    private Func<PersonModel, Dictionary<string, int>> _compiled = null!;
+    private Func<PersonModel, IEnumerable<KeyValuePair<string, int>>> _compiled = null!;
 
     [SetUp]
     public void SetUp()
@@ -44,21 +43,20 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result["Name"],  Is.EqualTo("Alice".Length));
-            Assert.That(result["Email"], Is.EqualTo("alice@example.com".Length));
+            Assert.That(ValueOf(result, "Name"),  Is.EqualTo("Alice".Length));
+            Assert.That(ValueOf(result, "Email"), Is.EqualTo("alice@example.com".Length));
         }
     }
 
     [Test]
     public void BuildExpression_WithNullStringProperty_ReturnsZeroForNullProperty()
     {
-        var instance = new PersonModel { Name = null, Email = "test@test.com" };
-        var result   = _compiled(instance);
+        var result = _compiled(new PersonModel { Name = null, Email = "test@test.com" });
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result["Name"],  Is.EqualTo(0));
-            Assert.That(result["Email"], Is.EqualTo("test@test.com".Length));
+            Assert.That(ValueOf(result, "Name"),  Is.EqualTo(0));
+            Assert.That(ValueOf(result, "Email"), Is.EqualTo("test@test.com".Length));
         }
     }
 
@@ -69,8 +67,8 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result["Name"],  Is.EqualTo(0));
-            Assert.That(result["Email"], Is.EqualTo(0));
+            Assert.That(ValueOf(result, "Name"),  Is.EqualTo(0));
+            Assert.That(ValueOf(result, "Email"), Is.EqualTo(0));
         }
     }
 
@@ -81,14 +79,14 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result,                       Has.Count.EqualTo(2));
-            Assert.That(result.ContainsKey("Age"),    Is.False);
-            Assert.That(result.ContainsKey("Active"), Is.False);
+            Assert.That(result,                                      Has.Exactly(2).Items);
+            Assert.That(result.Any(kvp => kvp.Key == "Age"),    Is.False);
+            Assert.That(result.Any(kvp => kvp.Key == "Active"), Is.False);
         }
     }
 
     [Test]
-    public void BuildExpression_WithNoStringProperties_ReturnsEmptyDictionary()
+    public void BuildExpression_WithNoStringProperties_ReturnsEmptySequence()
     {
         var result = MaximumLengthStringExpressionBuilder<NoStringModel>
             .BuildExpression()
@@ -106,8 +104,8 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result,          Has.Count.EqualTo(1));
-            Assert.That(result["Title"], Is.EqualTo("Hello, World!".Length));
+            Assert.That(result,                      Has.Exactly(1).Items);
+            Assert.That(ValueOf(result, "Title"), Is.EqualTo("Hello, World!".Length));
         }
     }
 
@@ -116,14 +114,15 @@ internal class MaximumLengthStringExpressionBuilderTests
     {
         PersonModel[] rows =
         [
-            new() { Name = "Al",        Email = "al@example.com" },
-            new() { Name = "Bob",        Email = "b@ex.io" },
-            new() { Name = "Charlotte",  Email = "charlotte@longdomain.example.com" },
+            new() { Name = "Al",       Email = "al@example.com"                    },
+            new() { Name = "Bob",      Email = "b@ex.io"                           },
+            new() { Name = "Charlotte", Email = "charlotte@longdomain.example.com" },
         ];
 
         var maxLengths = rows
-            .Select(_compiled)
-            .Aggregate((a, b) => a.Keys.ToDictionary(k => k, k => Math.Max(a[k], b[k])));
+            .SelectMany(_compiled)
+            .GroupBy(kvp => kvp.Key)
+            .ToDictionary(g => g.Key, g => g.Max(kvp => kvp.Value));
 
         using (Assert.EnterMultipleScope())
         {
@@ -131,4 +130,7 @@ internal class MaximumLengthStringExpressionBuilderTests
             Assert.That(maxLengths["Email"], Is.EqualTo("charlotte@longdomain.example.com".Length));
         }
     }
+
+    private static int ValueOf(IEnumerable<KeyValuePair<string, int>> pairs, string key)
+        => pairs.Single(kvp => kvp.Key == key).Value;
 }
