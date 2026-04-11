@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "package write --namespace com.hsinet.idfcr --name IDFCR --description \" Intent Driven factories and context Repositories\""
+      "commandLineArgs": "package version add --namespace \"com.hsinet.idfcr\" --version-prefix \"1.0.0\" --commit-id \"ae84u293\""
     }
   }
 }

@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
 
         return services
             .AddRepositories(currentAssembly)
-            .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionString))
+            .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionString)
+            .EnableDetailedErrors())
             .AddInterceptors(currentAssembly)
             .ScanFilters(currentAssembly);
         
