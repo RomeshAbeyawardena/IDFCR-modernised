@@ -18,6 +18,7 @@ public class PackageVersion : MapperBase<IPackageVersion>, IPackageVersion
     {
         PackageVersionId = source.PackageVersionId;
         PackageId = source.PackageId;
+        Version = source.Version;
         VersionPrefix = source.VersionPrefix;
         RevisionNumber = source.RevisionNumber;
         ReleaseDateTimestampUtc = source.ReleaseDateTimestampUtc;

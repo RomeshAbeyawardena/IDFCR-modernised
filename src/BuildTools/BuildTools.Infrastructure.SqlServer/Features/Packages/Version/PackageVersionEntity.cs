@@ -7,8 +7,9 @@ public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion
 {
     object IPackageVersion.PackageId => PackageId;
     object? IPackageVersion.PackageVersionId => Id;
-    public Guid Id { get; set; }
 
+    string IPackageVersion.Version => $"{VersionPrefix}.{RevisionNumber}";
+    public Guid Id { get; set; }
     public Guid PackageId { get; set; }
     public string VersionPrefix { get; set; } = null!;
     public int RevisionNumber { get; set; }
@@ -31,7 +32,7 @@ public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion
         {
             PackageId = packageId;
         }
-
+        
         VersionPrefix = source.VersionPrefix;
         RevisionNumber = source.RevisionNumber;
         ReleaseDateTimestampUtc = source.ReleaseDateTimestampUtc;

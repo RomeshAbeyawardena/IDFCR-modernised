@@ -41,8 +41,7 @@ public class PackageVersionReadOperation(IServiceProvider serviceProvider, IMana
                 }
 
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageVersionDto>(), cancellationToken,
-                    new TableField<PackageVersionDto> { Field = pv => pv.VersionPrefix, Title = "Version prefix", RowWidth = 5 },
-                    new TableField<PackageVersionDto> { Field = pv => pv.RevisionNumber, Title = "Version revision", RowWidth = 20 },
+                    new TableField<PackageVersionDto> { Field = pv => pv.Version, Title = "Version", RowWidth = 5 },
                     new TableField<PackageVersionDto>
                     {
                         Field = pv => pv.ReleaseDateTimestampUtc,

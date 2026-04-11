@@ -18,6 +18,7 @@ public class PackageVersionDto : MapperBase<IPackageVersion>, IPackageVersion
 
     public override void Map(IPackageVersion source)
     {
+        Version = source.Version;
         PackageVersionId = source.PackageVersionId;
         PackageId = source.PackageId;
         VersionPrefix = source.VersionPrefix;
