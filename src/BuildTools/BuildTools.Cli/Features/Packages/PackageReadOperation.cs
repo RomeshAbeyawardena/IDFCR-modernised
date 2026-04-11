@@ -1,8 +1,9 @@
-﻿using BuildTools.Infrastructure.Features.Packages;
-using IDFCR.Abstractions.Cli.Extensions;
+﻿using Debug = BuildTools.Cli.Extensions;
+using BuildTools.Infrastructure.Features.Packages;
+using IDFCR.Abstractions.Results.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
-using IDFCR.Abstractions.Results.Extensions;
+using IDFCR.Abstractions.Cli.Extensions;
 
 namespace BuildTools.Cli.Features.Packages;
 
@@ -41,7 +42,7 @@ public class PackageReadOperation(IServiceProvider serviceProvider, IManagedStre
                     return;
                 }
 
-                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageDto>(), cancellationToken,
+                await Debug.ManagedStreamExtensions.DisplayPagedTable(managedStream, pagedResult, t => t.Map<PackageDto>(), cancellationToken,
                 new TableField<PackageDto> { Field = s => s.Namespace, Title = "Namespace", RowWidth = 20 },
                 new TableField<PackageDto> { Field = s => s.Name, Title = "Name", RowWidth = 40 },
                 new TableField<PackageDto>

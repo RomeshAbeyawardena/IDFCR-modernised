@@ -1,10 +1,10 @@
-﻿using IDFCR.Abstractions.Cli.ManagedStreams;
+﻿using IDFCR.Abstractions.Cli.Extensions;
+using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
-using System.Reflection;
 using System.Text;
 
-namespace IDFCR.Abstractions.Cli.Extensions;
+namespace BuildTools.Cli.Extensions;
 
 /// <summary>
 /// Defines extension methods for IManagedStream to facilitate common operations such as prompting for input and displaying paged results in a tabular format.
@@ -31,16 +31,18 @@ public static class ManagedStreamExtensions
     /// Defines a method to format a model's data into a tabular string representation based on specified table fields. It uses a FieldVisitor to access the properties of the model defined by the TableField instances, applies any provided formatting functions, and constructs a string with the formatted values separated by tabs and pipes for display in a paged table format. The method ensures that each column adheres to a minimum width for better readability.
     /// </summary>
     /// <typeparam name="T">The type of the model to format.</typeparam>
+    /// <param name="stringColumnLengths">A dictionary mapping property names to their corresponding column lengths.</param>
+    /// <param name="visitor">The FieldVisitor instance used to access the properties of the model.</param>
     /// <param name="model">The model instance to format.</param>
     /// <param name="tableFields">An array of TableField instances defining the columns and formatting for the table.</param>
     /// <returns>A string representing the formatted table row for the given model.</returns>
-    private static string FormatPagedTableData<T>(T model, params TableField<T>[] tableFields)
+    private static string FormatPagedTableData<T>(IReadOnlyDictionary<string, int> stringColumnLengths, FieldVisitor visitor, T model, params TableField<T>[] tableFields)
     {
-        Func<object?, string?>? defaultFormat = x => x?.ToString();
         StringBuilder builder = new();
+        Func<object?, string?>? defaultFormat = x => x?.ToString();
         foreach (var tableField in tableFields)
         {
-            if (!tableField.HasProperty)
+            if (!visitor.HasProperty)
             {
                 continue;
             }
@@ -50,11 +52,16 @@ public static class ManagedStreamExtensions
                 builder.Append("\t|\t");
             }
 
-            var formattedValue = string.Empty;
+            var columnLength = tableField.RowWidth.GetValueOrDefault(MinColumnWidth);
 
-            var modelValue = tableField.Property.GetValue(model);
+            if (visitor.HasProperty && stringColumnLengths.TryGetValue(visitor.Property.Name, out var _columnLength))
+            {
+                columnLength = _columnLength;
+            }
+
+            var modelValue = visitor.Property.GetValue(model);
             var format = tableField.Format ?? defaultFormat;
-            formattedValue = format(modelValue).Limit(tableField.RowWidth ?? MinColumnWidth);
+            var formattedValue = format(modelValue).Limit(columnLength);
 
             builder.Append($"{formattedValue}");
         }
@@ -77,7 +84,7 @@ public static class ManagedStreamExtensions
         Func<T, TDestination> map, CancellationToken cancellationToken, params TableField<TDestination>[] tableFields)
     {
         var expression = MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile();
-        
+
         Dictionary<string, int> stringColumnLengths = [];
 
         if (results.HasValue)
@@ -93,26 +100,26 @@ public static class ManagedStreamExtensions
         {
             visitor.Visit(tableField.Field);
 
-            tableField.Property = visitor.Property;
-
             if (builder.Length != 0)
             {
                 builder.Append("\t|\t");
             }
 
-            if (visitor.HasProperty && stringColumnLengths.TryGetValue(visitor.Property.Name, out var columnLength))
+            var columnLength = tableField.RowWidth.GetValueOrDefault(MinColumnWidth);
+
+            if (visitor.HasProperty && stringColumnLengths.TryGetValue(visitor.Property.Name, out var _columnLength))
             {
-                tableField.RowWidth = tableField.RowWidth.HasValue && tableField.RowWidth > columnLength ? columnLength : columnLength;
+                columnLength = _columnLength;
             }
 
-            var val = $"{tableField.Title.Limit(tableField.RowWidth.GetValueOrDefault(MinColumnWidth))}";
+            var val = $"{tableField.Title.Limit(columnLength)}";
             builder.Append(val);
         }
         builder.AppendLine();
         builder.Append('-', Convert.ToInt32(managedStream.Width));
 
         await managedStream.Out.WriteLineAsync(builder.ToString(), cancellationToken);
-        await DisplayPaged(managedStream, results, map, x => FormatPagedTableData(x, tableFields), cancellationToken);
+        await DisplayPaged(managedStream, results, map, x => FormatPagedTableData(stringColumnLengths, visitor, x, tableFields), cancellationToken);
     }
 
     /// <summary>

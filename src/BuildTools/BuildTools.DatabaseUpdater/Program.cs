@@ -4,6 +4,7 @@ using BuildTools.Infrastructure.SqlServer.Extensions;
 using IDFCR.Abstractions.Cli;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
+using IDFCR.Abstractions.Cli.Prompts;
 using IDFCR.DatabaseUpdater.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

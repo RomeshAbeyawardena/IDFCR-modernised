@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace IDFCR.Abstractions.Cli.Extensions;
 
@@ -26,5 +27,16 @@ public class TableField<T>
     /// <summary>
     /// Gets or sets the row width for display purposes. This is an optional property that can be used to specify the width of the column when rendering the table. If not provided, a default width can be used or the width can be determined automatically based on the content.
     /// </summary>
-    public int? RowWidth { get; init; }
+    public int? RowWidth { get; set; }
+
+    /// <summary>
+    /// Gets or sets the metadata information for a property.
+    /// </summary>
+    public PropertyInfo? Property { get; set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the TableField has a valid property associated with it. This is determined by checking if the Property property is not null. If the Property is null, it means that the field expression did not successfully resolve to a property, and therefore the TableField does not have a valid property to access for retrieving values.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.MemberNotNullWhen(true, nameof(Property))]
+    public bool HasProperty => Property is not null;
 }
