@@ -8,6 +8,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.5" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
       <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
     </ItemGroup>
 </Project>

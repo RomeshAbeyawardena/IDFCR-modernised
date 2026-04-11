@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Cli.ManagedStreams;
+using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using System.Text;
 
@@ -29,18 +30,16 @@ public static class ManagedStreamExtensions
     /// Defines a method to format a model's data into a tabular string representation based on specified table fields. It uses a FieldVisitor to access the properties of the model defined by the TableField instances, applies any provided formatting functions, and constructs a string with the formatted values separated by tabs and pipes for display in a paged table format. The method ensures that each column adheres to a minimum width for better readability.
     /// </summary>
     /// <typeparam name="T">The type of the model to format.</typeparam>
+    /// <param name="visitor">The FieldVisitor instance used to access the properties of the model.</param>
     /// <param name="model">The model instance to format.</param>
     /// <param name="tableFields">An array of TableField instances defining the columns and formatting for the table.</param>
     /// <returns>A string representing the formatted table row for the given model.</returns>
-    private static string FormatPagedTableData<T>(T model, params TableField<T>[] tableFields)
+    private static string FormatPagedTableData<T>(FieldVisitor visitor, T model, params TableField<T>[] tableFields)
     {
         StringBuilder builder = new();
         Func<object?, string?>? defaultFormat = x => x?.ToString();
-        FieldVisitor visitor = new ();
         foreach (var tableField in tableFields)
         {
-            visitor.Visit(tableField.Field);
-
             if (!visitor.HasProperty)
             {
                 continue;
@@ -75,22 +74,42 @@ public static class ManagedStreamExtensions
     public static async Task DisplayPagedTable<T, TDestination>(this IManagedStream managedStream, IUnitPagedResult<T> results,
         Func<T, TDestination> map, CancellationToken cancellationToken, params TableField<TDestination>[] tableFields)
     {
+        Dictionary<string, int> stringColumnLengths = [];
+
+        if (results.HasValue)
+        {
+            var columnLengths = results.Result.SelectMany(MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile());
+            stringColumnLengths = new(columnLengths);
+        }
+
+        FieldVisitor visitor = new();
+
         StringBuilder builder = new();
         await managedStream.Out.WriteLineAsync(new string('-', (int)managedStream.Width), cancellationToken);
         foreach (var tableField in tableFields)
         {
+            visitor.Visit(tableField.Field);
+
             if (builder.Length != 0)
             {
                 builder.Append("\t|\t");
             }
-            var val = $"{tableField.Title.Limit(tableField.RowWidth.GetValueOrDefault(MinColumnWidth))}";
+
+            var columnLength = tableField.RowWidth.GetValueOrDefault(MinColumnWidth);
+
+            if (visitor.HasProperty && stringColumnLengths.TryGetValue(visitor.Property.Name, out var _columnLength))
+            {
+                columnLength = _columnLength;
+            }
+
+            var val = $"{tableField.Title.Limit(columnLength)}";
             builder.Append(val);
         }
         builder.AppendLine();
         builder.Append('-', Convert.ToInt32(managedStream.Width));
 
         await managedStream.Out.WriteLineAsync(builder.ToString(), cancellationToken);
-        await DisplayPaged(managedStream, results, map, x => FormatPagedTableData(x, tableFields), cancellationToken);
+        await DisplayPaged(managedStream, results, map, x => FormatPagedTableData(visitor, x, tableFields), cancellationToken);
     }
 
     /// <summary>
