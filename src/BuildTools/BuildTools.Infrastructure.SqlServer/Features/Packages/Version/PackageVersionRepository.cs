@@ -21,6 +21,13 @@ public class PackageVersionRepository(PackageManagerDbContext db, IFilterFactory
                 .Where(x => x.PackageId == id)
                 .OrderByDescending(x => x.RevisionNumber) //latest revision number
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (result is null)
+            {
+                return UnitResult.NotFound<PackageVersion>(packageId);
+            }
+
+            return UnitResult.FromResult(Map(result));
         }
 
         return UnitResult.Failed<PackageVersion>(new InvalidOperationException("A package ID is required"));

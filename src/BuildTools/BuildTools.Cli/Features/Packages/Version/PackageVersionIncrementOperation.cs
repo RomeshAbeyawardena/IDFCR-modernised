@@ -18,9 +18,14 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
         var (hasNamespace, packageNamespace) = (await this.GetRequiredField(managedStream, command, 0, "Package namespace", cancellationToken, false, "namespace")).AsValueOrDefault(out var isParameter);
-        var (hasVersionPrefix, packageVersionPrefix) = (await this.GetRequiredField(managedStream, command, 0, "Package version prefix", cancellationToken, isParameter, "version-prefix")).AsValueOrDefault(out isParameter);
+        var (hasVersionPrefix, packageVersionPrefix) = (await this.GetRequiredField(managedStream, command, 1, "Package version prefix", cancellationToken, isParameter, "version-prefix")).AsValueOrDefault(out isParameter);
         var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "package-name");
         var commitId = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "commit-id");
+
+        var parameters = Parameters!;
+
+        var isExternalTool = parameters.TryGetValue("external-tool", out var parameter) && parameter.IsFlag;
+
         if ((!hasNamespace || string.IsNullOrWhiteSpace(packageName))
             && !hasVersionPrefix)
         {
@@ -68,7 +73,14 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         }
 
         await packageVersionRepository.SaveChangesAsync(cancellationToken);
-        await managedStream.Out.WriteLineAsync($"adding: Package version: {packageNamespace}, Package name: {packageName}, {packageVersionPrefix}, {packageName}", cancellationToken);
+
+        if (isExternalTool)
+        {
+            await managedStream.Out.WriteLineAsync($"{packageVersionPrefix}.{newRevisionNumber}", cancellationToken);
+            return;
+        }
+
+        await managedStream.Out.WriteLineAsync($"Added: Package version: {packageNamespace}, Package name: {packageName}, {packageVersionPrefix}.{newRevisionNumber}, {packageName}", cancellationToken);
 
     }
 }

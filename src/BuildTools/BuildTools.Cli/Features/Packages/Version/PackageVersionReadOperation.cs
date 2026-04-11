@@ -16,7 +16,7 @@ public class PackageVersionReadOperation(IServiceProvider serviceProvider, IMana
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
         var packageNamespace = await this.GetOptionalField(managedStream, command, cancellationToken, false, "namespace");
-        var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, false, "name");
+        var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, true, "name");
         var outputType = await this.GetOptionalField(managedStream, command, cancellationToken, true, "output-type");
         var pagedQuery = await this.GetPagingFields(managedStream, command, cancellationToken);
 
@@ -25,7 +25,7 @@ public class PackageVersionReadOperation(IServiceProvider serviceProvider, IMana
             var pagedRequest = new GetPackageVersionPagedRequest
             {
                 PackageName = packageName,
-                PackageVersion = packageNamespace
+                PackageNamespace = packageNamespace
             };
 
             pagedRequest.MapQuery(pagedQuery);
@@ -42,7 +42,7 @@ public class PackageVersionReadOperation(IServiceProvider serviceProvider, IMana
 
                 await managedStream.DisplayPagedTable(pagedResult, t => t.Map<PackageVersionDto>(), cancellationToken,
                     new TableField<PackageVersionDto> { Field = pv => pv.VersionPrefix, Title = "Version prefix", RowWidth = 5 },
-                    new TableField<PackageVersionDto> { Field = pv => pv.Version, Title = "Version", RowWidth = 20 },
+                    new TableField<PackageVersionDto> { Field = pv => pv.RevisionNumber, Title = "Version revision", RowWidth = 20 },
                     new TableField<PackageVersionDto>
                     {
                         Field = pv => pv.ReleaseDateTimestampUtc,

@@ -9,7 +9,7 @@ public class PackageVersionFilter : PagedFilterBase<GetPackageVersionPagedReques
     protected override Expression<Func<PackageVersionEntity, bool>> BuildPredicate(IQueryable<PackageVersionEntity> queryable, GetPackageVersionPagedRequest request)
     {
         var query = base.StarterExpression;
-        query.DefaultExpression = e => true;
+        query = query.DefaultExpression = e => true;
 
         if (!string.IsNullOrWhiteSpace(request.PackageVersion))
         {

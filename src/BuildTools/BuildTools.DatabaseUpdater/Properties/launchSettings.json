@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BuildTools.DatabaseUpdater": {
+      "commandName": "Project",
+      "commandLineArgs": "database list"
+    }
+  }
+}

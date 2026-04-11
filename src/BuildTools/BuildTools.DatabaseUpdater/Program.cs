@@ -1,7 +1,6 @@
 ﻿using BuildTools.Infrastructure;
 using BuildTools.Infrastructure.SqlServer;
 using BuildTools.Infrastructure.SqlServer.Extensions;
-using IDFCR.Abstractions.Cli;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Prompts;
@@ -15,6 +14,7 @@ var currentAssembly = typeof(Program).Assembly;
 
 using var _ = await IDFCR.DatabaseUpdater.Extensions.HostExtensions
     .ConfigureDatabaseUpdaterHost(TargetDatabaseConfiguration.Create<PackageManagerDbContext>(), args, ConfigureHostConfiguration, ConfigureServices, assembliesToScan: currentAssembly);
+
 
 static void ConfigureHostConfiguration(IConfigurationBuilder builder)
 {
