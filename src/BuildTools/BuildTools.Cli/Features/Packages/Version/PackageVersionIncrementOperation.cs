@@ -67,6 +67,8 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var result = packageResult.Result;
 
         var lockRetryOpts = lockRetryOptions.Value;
+
+        var maximumAttempts = lockRetryOpts.MaximumAttempts.GetValueOrDefault(MaximumAttempts);
         do
         {
             var versionLockStatus = await versionLockRepository.GetVersionLockAsync(result.Id!,
@@ -80,6 +82,11 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                 {
                     using (managedStream.BeginWarning())
                     {
+                        if(attempts > 1)
+                        {
+                            await managedStream.Error.WriteAsync("Attempt {0} of {1}: ", cancellationToken, attempts, maximumAttempts);
+                        }
+
                         await managedStream.Error.WriteLineAsync($"The package version is currently locked until {lockStatus.LockedUntilTimestampUtc} by {lockStatus.Reference}", cancellationToken);
                     }
                     await Task.Delay(lockRetryOpts.RetryTimeoutInMilliseconds.GetValueOrDefault(Timeout), cancellationToken);
@@ -91,7 +98,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                 }
             }
         }
-        while (attempts++ < lockRetryOpts.MaximumAttempts.GetValueOrDefault(MaximumAttempts));
+        while (attempts++ < maximumAttempts);
 
         if (isLocked)
         {
