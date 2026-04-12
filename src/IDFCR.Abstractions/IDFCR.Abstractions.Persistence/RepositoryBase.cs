@@ -7,11 +7,6 @@ using IDFCR.Abstractions.Results.Exceptions;
 
 namespace IDFCR.Abstractions.Persistence
 {
-    public interface IHasRowVersion
-    {
-        byte[] RowVersion { get; set; }
-    }
-
     /// <summary>
     /// Base class for repositories that map between a common abstraction, a database model, and a domain model.
     /// </summary>
