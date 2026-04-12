@@ -5,6 +5,7 @@ using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Results.Extensions;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Options;
 
 namespace BuildTools.Cli.Features.Packages.Version;
@@ -62,10 +63,13 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         bool isLocked = false;
         int attempts = 0;
         VersionLock? lockStatus = null;
+
+        var result = packageResult.Result;
+
         var lockRetryOpts = lockRetryOptions.Value;
         do
         {
-            var versionLockStatus = await versionLockRepository.GetVersionLockAsync(packageResult.Result.Id!,
+            var versionLockStatus = await versionLockRepository.GetVersionLockAsync(result.Id!,
                 packageVersionPrefix, cancellationToken);
 
             if (versionLockStatus.HasValue)
@@ -103,7 +107,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var utcNow = timeProvider.GetUtcNow();
         //prepare to lock the resource;
         var upsertLockResult = await versionLockRepository.SetVersionLockAsync(
-            packageResult.Result.Id!,
+            result.Id!,
             packageVersionPrefix, buildToolReference,
             utcNow, utcNow.AddMinutes(lockRetryOpts.LockTimeoutInMinutes.GetValueOrDefault(LockTimeoutInMinutes)),
             cancellationToken: cancellationToken);
@@ -132,7 +136,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             VersionPrefix = packageVersionPrefix,
             RevisionNumber = newRevisionNumber,
             ReleaseDateTimestampUtc = timeProvider.GetUtcNow(),
-            PackageId = packageResult.Result.Id!,
+            PackageId = result.Id!,
             CommitId =  commitId ?? string.Empty
         }, cancellationToken);
 
