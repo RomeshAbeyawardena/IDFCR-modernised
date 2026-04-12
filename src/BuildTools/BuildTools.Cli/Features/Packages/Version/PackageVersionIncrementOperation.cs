@@ -62,7 +62,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         do
         {
             var versionLockStatus = await versionLockRepository.GetVersionLockAsync(packageResult.Result.Id!,
-                packageVersionPrefix, buildToolReference, cancellationToken);
+                packageVersionPrefix, cancellationToken);
 
             if (versionLockStatus.HasValue)
             {

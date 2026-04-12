@@ -54,7 +54,7 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
     {
         if (packageId is not Guid _packageId)
         {
-            return UnitResult.Failed<VersionLock>(new InvalidOperationException("Package ID not specified or in the wrong format"));
+            return UnitResult.Failed<VersionLock>(new InvalidOperationException("Package ID not specified or in the wrong format"), FailureReason: FailureReason.ValidationError);
         }
 
         var result = await DbSet.AsNoTracking()
@@ -96,7 +96,7 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
             VersionPrefix = versionPrefix
         }, ct);
 
-        return UnitResult.FromResult<object>(result.Result);
+        return result.As<object>();
     }
 
     protected override bool IsHandled(Exception exception)
