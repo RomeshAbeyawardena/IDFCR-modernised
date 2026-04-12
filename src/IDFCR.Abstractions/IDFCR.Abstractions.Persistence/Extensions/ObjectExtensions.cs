@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace IDFCR.Abstractions.Persistence.Extensions;
 
 /// <summary>
-/// Object copy helpers for repository models.
+/// Defines extension methods for copying properties between objects of different types, with caching for performance optimization.
 /// </summary>
 public static class ObjectExtensions
 {
@@ -42,6 +42,11 @@ public static class ObjectExtensions
 
         foreach (var targetProp in targetType.GetProperties().Where(p => p.CanWrite))
         {
+            if (targetProp.IsDefined(typeof(IgnoreApplyAttribute), true))
+            {
+                continue;
+            }
+
             var sourceProp = sourceType.GetProperty(targetProp.Name);
             if (sourceProp != null && sourceProp.CanRead && sourceProp.PropertyType == targetProp.PropertyType)
             {
