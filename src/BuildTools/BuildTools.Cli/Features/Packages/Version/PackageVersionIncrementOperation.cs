@@ -1,5 +1,6 @@
 using BuildTools.Infrastructure.Features.Packages;
 using BuildTools.Infrastructure.Features.Packages.Version;
+using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
@@ -9,7 +10,11 @@ namespace BuildTools.Cli.Features.Packages.Version;
 
 //increments package version by adding a new version with a new revision number, and making it the latest version. If the package doesn't exist, it will be created with version 1.0.0
 [FeatureCommand(PackageVersionRootOperation.Prefix, CommandName)]
-public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IPackageRepository packageRepository, IPackageVersionRepository packageVersionRepository, TimeProvider timeProvider)
+public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, 
+    IVersionLockRepository versionLockRepository,
+    IPackageRepository packageRepository, 
+    IPackageVersionRepository packageVersionRepository, 
+    TimeProvider timeProvider)
     : InjectableCommandOperationBase<PackageVersionIncrementOperation>(serviceProvider, PackageVersionRootOperation.Prefix,
         CommandName, typeof(PackageVersionRootOperation))
 {
@@ -21,7 +26,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var (hasVersionPrefix, packageVersionPrefix) = (await this.GetRequiredField(managedStream, command, 1, "Package version prefix", cancellationToken, isParameter, "version-prefix")).AsValueOrDefault(out isParameter);
         var packageName = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "package-name");
         var commitId = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "commit-id");
-
+        var buildToolReference = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "build-ref");
         var parameters = Parameters!;
 
         var isExternalTool = parameters.TryGetValue("external-tool", out var parameter) && parameter.IsFlag;
@@ -47,6 +52,66 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
+        //TODO: Move into configuration
+        const int MaximumAttempts = 60;
+        const int Timeout = 1000;
+        const int LockTimeoutInMinutes = 5;
+        bool isLocked = false;
+        int attempts = 0;
+        VersionLock? lockStatus = null;
+        do
+        {
+            var versionLockStatus = await versionLockRepository.GetVersionLockAsync(packageResult.Result.Id!,
+                packageVersionPrefix, buildToolReference, cancellationToken);
+
+            if (versionLockStatus.HasValue)
+            {
+                lockStatus = versionLockStatus.Result;
+
+                if (isLocked = lockStatus.IsLocked(timeProvider))
+                {
+                    using (managedStream.BeginWarning())
+                    {
+                        await managedStream.Error.WriteLineAsync($"The package version is currently locked until {lockStatus.LockedUntilTimestampUtc} by {lockStatus.Reference}", cancellationToken);
+                    }
+                    await Task.Delay(Timeout, cancellationToken);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        while (attempts++ < MaximumAttempts);
+
+        if (isLocked)
+        {
+            using (managedStream.BeginError())
+            {
+                await managedStream.Error.WriteLineAsync(@$"The package version is still locked until {lockStatus?.LockedUntilTimestampUtc} by {lockStatus?.Reference}.
+                  Unable to acquire resource aborting after {(Timeout * MaximumAttempts)/1000} seconds", cancellationToken);
+            }
+
+            return;
+        }
+        
+        var utcNow = timeProvider.GetUtcNow();
+        //prepare to lock the resource;
+        var upsertLockResult = await versionLockRepository.SetVersionLockAsync(
+            packageResult.Result.Id!,
+            packageVersionPrefix, buildToolReference,
+            utcNow, utcNow.AddMinutes(LockTimeoutInMinutes),
+            cancellationToken: cancellationToken);
+
+        if (upsertLockResult.IsSuccess)
+        {
+            await versionLockRepository.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            throw upsertLockResult.Exception!;
+        }
 
         var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, cancellationToken);
 
@@ -57,7 +122,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             newRevisionNumber = latestPackageResult.Result.RevisionNumber + 1;
         }
 
-        var upsertResult = await packageVersionRepository.UpsertAsync(new Shared.Features.Packages.Version.PackageVersion
+        var upsertResult = await packageVersionRepository.UpsertAsync(new PackageVersion
         {
             VersionPrefix = packageVersionPrefix,
             RevisionNumber = newRevisionNumber,
@@ -72,6 +137,21 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
+        utcNow = timeProvider.GetUtcNow();
+        //prepare to unlock the resource;
+        upsertLockResult = await versionLockRepository.SetVersionLockAsync(
+            packageResult.Result.Id!,
+            packageVersionPrefix, buildToolReference,
+            lockReleasedTimestampUtc: utcNow,
+            revisionId: newRevisionNumber,
+            cancellationToken: cancellationToken);
+
+        if (!upsertLockResult.IsSuccess)
+        {
+            throw upsertLockResult.Exception!;
+        }
+
+        //this will save both tables as the same unit of work
         await packageVersionRepository.SaveChangesAsync(cancellationToken);
 
         if (isExternalTool)
