@@ -23,7 +23,8 @@ public class VersionLockEntityConfiguration : IEntityTypeConfiguration<VersionLo
         builder.HasOne<PackageEntity>()
             .WithMany()
             .HasForeignKey(e => e.PackageId)
-            .HasConstraintName("FK_VersionLock_Package");
+            .HasConstraintName("FK_VersionLock_Package")
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Property(e => e.Reference)
             .HasMaxLength(255)

@@ -59,6 +59,7 @@ public class PackageVersionEntityConfiguration : IEntityTypeConfiguration<Packag
         builder.HasOne(e => e.Package)
             .WithMany()
             .HasForeignKey(e => e.PackageId)
-            .HasConstraintName("FK_PackageVersion_Package");
+            .HasConstraintName("FK_PackageVersion_Package")
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
