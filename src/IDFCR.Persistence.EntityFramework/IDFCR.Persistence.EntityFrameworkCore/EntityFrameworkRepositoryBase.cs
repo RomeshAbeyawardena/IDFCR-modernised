@@ -135,6 +135,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         return entry.Id;
     }
 
+    /// <summary>
+    /// On update method that is called when an entity is being updated. This method checks if the database entity and the DTO both implement the IHasRowVersion interface. If they do, it sets the original value of the RowVersion property in the database entity to the value of the RowVersion property in the DTO. This is typically done to handle concurrency control when updating entities in a database, ensuring that the update operation is based on the correct version of the entity. By overriding this method, derived classes can implement specific logic for handling row versioning during updates while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    /// <param name="dbValue">The database entity being updated.</param>
+    /// <param name="dto">The DTO containing the updated values.</param>
     protected override void OnUpdate(TDb dbValue, T dto)
     {
         if (dbValue is IHasRowVersion dbRowVersion && dto is IHasRowVersion rowVersion)
