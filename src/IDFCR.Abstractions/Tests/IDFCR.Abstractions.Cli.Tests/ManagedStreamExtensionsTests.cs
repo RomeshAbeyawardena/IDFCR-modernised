@@ -108,7 +108,7 @@ internal class ManagedStreamExtensionsTests
         var expected =
             $"- alpha{Environment.NewLine}" +
             $"- beta{Environment.NewLine}" +
-            $"------------7 found. Displaying 2 items{Environment.NewLine}";
+            $"------------{Environment.NewLine}7 found. Displaying 2 items{Environment.NewLine}";
 
         Assert.That(output.ToString(), Is.EqualTo(expected));
     }
@@ -144,7 +144,7 @@ internal class ManagedStreamExtensionsTests
             $"------------{Environment.NewLine}" +
             $"MigrationA{Environment.NewLine}" +
             $"MigrationB{Environment.NewLine}" +
-            $"------------2 found. Displaying 2 items{Environment.NewLine}";
+            $"------------{Environment.NewLine}2 found. Displaying 2 items{Environment.NewLine}";
 
         Assert.That(output.ToString(), Is.EqualTo(expected));
     }

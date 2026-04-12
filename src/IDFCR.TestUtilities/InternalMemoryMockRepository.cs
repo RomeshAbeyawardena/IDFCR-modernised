@@ -169,5 +169,16 @@ namespace IDFCR.TestUtilities
             //No-op in an in-memory list
             return Task.FromResult(0);
         }
+
+        /// <summary>
+        /// On update is not implemented in this in-memory repository as the update logic is handled directly in the OnUpdateAsync method.
+        /// </summary>
+        /// <param name="db">The database entity being updated.</param>
+        /// <param name="dto">The DTO containing the updated values.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        protected override void OnUpdate(TDb db, T dto)
+        {
+            
+        }
     }
 }
