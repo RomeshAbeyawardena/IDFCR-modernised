@@ -11,7 +11,7 @@ public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock
     object? IVersionLock.PackageId => PackageId;
     object? IVersionLock.Id => Id;
 
-    public IEnumerable<byte> RowVersion { get; set; } = [];
+    public byte[] RowVersion { get; set; } = [];
     public Guid PackageId { get; set; }
     public string? Reference { get; set; } = null!;
     public string VersionPrefix { get; set; } = null!;
@@ -34,7 +34,7 @@ public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock
             PackageId = packageid;
         }
 
-        if (source.RowVersion is not null && source.RowVersion is IEnumerable<byte> rowVersion)
+        if (source.RowVersion is not null && source.RowVersion is byte[] rowVersion)
         {
             RowVersion = rowVersion;
         }

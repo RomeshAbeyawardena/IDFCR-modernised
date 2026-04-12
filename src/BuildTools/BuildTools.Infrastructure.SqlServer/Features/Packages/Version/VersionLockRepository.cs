@@ -48,6 +48,7 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
 
         var result = await UpsertAsync(new VersionLock
         {
+            RowVersion = existingResult.Result?.RowVersion,
             Id = existingResult.Result?.Id,
             LastRequestedTimestampUtc = utcNow,
             LockedFromTimestampUtc = lockedFromTimestampUtc ?? existingResult.Result?.LockedFromTimestampUtc,
