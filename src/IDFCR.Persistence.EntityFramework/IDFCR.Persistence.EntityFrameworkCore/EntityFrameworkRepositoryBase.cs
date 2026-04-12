@@ -135,6 +135,19 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         return entry.Id;
     }
 
+    protected override void OnUpdate(TDb dbValue, T dto)
+    {
+        if (dbValue is IHasRowVersion dbRowVersion && dto is IHasRowVersion rowVersion)
+        {
+            if (dbRowVersion.RowVersion is not null)
+            {
+                DbSet.Entry(dbValue)
+                    .Property("RowVersion")
+                    .OriginalValue = rowVersion.RowVersion;
+            }
+        }
+    }
+
     /// <summary>
     /// Saves the changes made to the entities in the database context asynchronously. This method overrides the base implementation to call the SaveChangesAsync method of the DbContext, passing the provided cancellation token. It returns the number of state entries written to the database as a result of the save operation. By overriding this method, derived classes can ensure that changes made to entities are properly persisted to the database while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>

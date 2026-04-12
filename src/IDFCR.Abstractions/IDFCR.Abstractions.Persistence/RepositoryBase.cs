@@ -7,6 +7,11 @@ using IDFCR.Abstractions.Results.Exceptions;
 
 namespace IDFCR.Abstractions.Persistence
 {
+    public interface IHasRowVersion
+    {
+        byte[] RowVersion { get; set; }
+    }
+
     /// <summary>
     /// Base class for repositories that map between a common abstraction, a database model, and a domain model.
     /// </summary>
@@ -155,6 +160,13 @@ namespace IDFCR.Abstractions.Persistence
             return WrapFindResult(ct => OnFindAsync(key, false, ct), key, cancellationToken);
         }
 
+        /// <summary>
+        /// On add hook for performing actions before or after the add operation. The raw entry is provided for reference but should not be modified.
+        /// </summary>
+        /// <param name="db">The database entity.</param>
+        /// <param name="dto">The data transfer object.</param>
+        protected abstract void OnUpdate(TDb db, T dto);
+
         /// <inheritdoc />
         public async Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
         {
@@ -188,6 +200,8 @@ namespace IDFCR.Abstractions.Persistence
                     {
                         return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                     }
+
+                    OnUpdate(foundEntry, entry);
 
                     foundEntry.Apply(dbValue);
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
