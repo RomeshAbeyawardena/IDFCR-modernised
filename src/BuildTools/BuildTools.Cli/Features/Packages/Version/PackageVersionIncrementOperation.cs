@@ -108,11 +108,12 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         {
             await versionLockRepository.SaveChangesAsync(cancellationToken);
         }
+#if DEBUG
         else
         {
             throw upsertLockResult.Exception!;
         }
-
+#endif
         var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, cancellationToken);
 
         var newRevisionNumber = 0;
@@ -145,12 +146,12 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             lockReleasedTimestampUtc: utcNow,
             revisionId: newRevisionNumber,
             cancellationToken: cancellationToken);
-
+#if DEBUG
         if (!upsertLockResult.IsSuccess)
         {
             throw upsertLockResult.Exception!;
         }
-
+#endif
         //this will save both tables as the same unit of work
         await packageVersionRepository.SaveChangesAsync(cancellationToken);
 

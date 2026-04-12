@@ -22,7 +22,7 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
 
         var result = await DbSet.AsNoTracking()
             .FirstOrDefaultAsync(x => x.PackageId == _packageId
-                && x.VersionPrefix == versionPrefix);
+                && x.VersionPrefix == versionPrefix, cancellationToken);
 
         if (result is null)
         {
@@ -50,8 +50,8 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
         {
             Id = existingResult.Result?.Id,
             LastRequestedTimestampUtc = utcNow,
-            LockedFromTimestampUtc = lockedFromTimestampUtc,
-            LockedUntilTimestampUtc = lockedUntilTimestampUtc,
+            LockedFromTimestampUtc = lockedFromTimestampUtc ?? existingResult.Result?.LockedFromTimestampUtc,
+            LockedUntilTimestampUtc = lockedUntilTimestampUtc ?? existingResult.Result?.LockedUntilTimestampUtc,
             LockReleasedTimestampUtc = lockReleasedTimestampUtc,
             PackageId = packageId,
             Reference = reference,
