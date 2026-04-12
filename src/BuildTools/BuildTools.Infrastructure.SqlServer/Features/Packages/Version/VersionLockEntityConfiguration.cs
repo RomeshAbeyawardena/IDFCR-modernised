@@ -56,5 +56,9 @@ public class VersionLockEntityConfiguration : IEntityTypeConfiguration<VersionLo
         builder.HasIndex(e => new { e.PackageId, e.VersionPrefix })
             .IsUnique()
             .HasDatabaseName("UQ_VersionLock_PackageId_VersionPrefix");
+
+        builder.Property<byte[]>("RowVersion")
+            .IsRowVersion()
+            .IsConcurrencyToken();
     }
 }

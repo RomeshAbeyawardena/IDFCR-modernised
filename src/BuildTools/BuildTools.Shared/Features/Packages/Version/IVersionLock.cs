@@ -4,6 +4,7 @@ namespace BuildTools.Shared.Features.Packages.Version;
 
 public interface IVersionLock : IMapper<IVersionLock>
 {
+    object? RowVersion { get; }
     object? Id { get; }
     object? PackageId { get; }
     string? Reference { get; }

@@ -7,8 +7,11 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock
     , IIdentifiable<Guid>
 {
+    object? IVersionLock.RowVersion => RowVersion;
     object? IVersionLock.PackageId => PackageId;
     object? IVersionLock.Id => Id;
+
+    public IEnumerable<byte> RowVersion { get; set; } = [];
     public Guid PackageId { get; set; }
     public string? Reference { get; set; } = null!;
     public string VersionPrefix { get; set; } = null!;
@@ -29,6 +32,11 @@ public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock
         if (source.PackageId is not null && source.PackageId is Guid packageid)
         {
             PackageId = packageid;
+        }
+
+        if (source.RowVersion is not null && source.RowVersion is IEnumerable<byte> rowVersion)
+        {
+            RowVersion = rowVersion;
         }
 
         Reference = source.Reference;

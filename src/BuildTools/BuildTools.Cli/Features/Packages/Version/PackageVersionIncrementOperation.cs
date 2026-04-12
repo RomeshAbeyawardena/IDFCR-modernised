@@ -82,12 +82,12 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                 {
                     using (managedStream.BeginWarning())
                     {
-                        if(attempts > 1)
+                        if(attempts > 0)
                         {
                             await managedStream.Error.WriteAsync("Attempt {0} of {1}: ", cancellationToken, attempts, maximumAttempts);
                         }
 
-                        await managedStream.Error.WriteLineAsync($"The package version is currently locked until {lockStatus.LockedUntilTimestampUtc} by {lockStatus.Reference}", cancellationToken);
+                        await managedStream.Error.WriteLineAsync($"The package version is currently locked until {lockStatus.LockedUntilTimestampUtc} by '{lockStatus.Reference ?? "Unknown"}'", cancellationToken);
                     }
                     await Task.Delay(lockRetryOpts.RetryTimeoutInMilliseconds.GetValueOrDefault(Timeout), cancellationToken);
                     continue;

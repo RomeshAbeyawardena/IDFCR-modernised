@@ -13,7 +13,7 @@ public class VersionLock : MapperBase<IVersionLock>, IVersionLock
     }
 
     public object? Id { get; set; }
-
+    public object? RowVersion { get; set; }
     public object? PackageId { get; set; }
     public string? Reference { get; set; } = null!;
     public string VersionPrefix { get; set; } = null!;
@@ -27,6 +27,7 @@ public class VersionLock : MapperBase<IVersionLock>, IVersionLock
     public override void Map(IVersionLock source)
     {
         Id = source.Id;
+        RowVersion = source.RowVersion;
         PackageId = source.PackageId;
         Reference = source.Reference;
         VersionPrefix = source.VersionPrefix;
