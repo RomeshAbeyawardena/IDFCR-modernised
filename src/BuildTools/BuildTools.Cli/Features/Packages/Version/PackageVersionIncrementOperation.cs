@@ -5,6 +5,7 @@ using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Results.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace BuildTools.Cli.Features.Packages.Version;
 
@@ -13,7 +14,8 @@ namespace BuildTools.Cli.Features.Packages.Version;
 public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, 
     IVersionLockRepository versionLockRepository,
     IPackageRepository packageRepository, 
-    IPackageVersionRepository packageVersionRepository, 
+    IOptions<LockRetryConfiguration> lockRetryOptions,
+    IPackageVersionRepository packageVersionRepository,
     TimeProvider timeProvider)
     : InjectableCommandOperationBase<PackageVersionIncrementOperation>(serviceProvider, PackageVersionRootOperation.Prefix,
         CommandName, typeof(PackageVersionRootOperation))
@@ -52,13 +54,15 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
-        //TODO: Move into configuration
+        
         const int MaximumAttempts = 60;
         const int Timeout = 1000;
         const int LockTimeoutInMinutes = 5;
+
         bool isLocked = false;
         int attempts = 0;
         VersionLock? lockStatus = null;
+        var lockRetryOpts = lockRetryOptions.Value;
         do
         {
             var versionLockStatus = await versionLockRepository.GetVersionLockAsync(packageResult.Result.Id!,
@@ -74,7 +78,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                     {
                         await managedStream.Error.WriteLineAsync($"The package version is currently locked until {lockStatus.LockedUntilTimestampUtc} by {lockStatus.Reference}", cancellationToken);
                     }
-                    await Task.Delay(Timeout, cancellationToken);
+                    await Task.Delay(lockRetryOpts.RetryTimeoutInMilliseconds.GetValueOrDefault(Timeout), cancellationToken);
                     continue;
                 }
                 else
@@ -83,7 +87,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                 }
             }
         }
-        while (attempts++ < MaximumAttempts);
+        while (attempts++ < lockRetryOpts.MaximumAttempts.GetValueOrDefault(MaximumAttempts));
 
         if (isLocked)
         {
@@ -101,7 +105,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var upsertLockResult = await versionLockRepository.SetVersionLockAsync(
             packageResult.Result.Id!,
             packageVersionPrefix, buildToolReference,
-            utcNow, utcNow.AddMinutes(LockTimeoutInMinutes),
+            utcNow, utcNow.AddMinutes(lockRetryOpts.LockTimeoutInMinutes.GetValueOrDefault(LockTimeoutInMinutes)),
             cancellationToken: cancellationToken);
 
         if (upsertLockResult.IsSuccess)
