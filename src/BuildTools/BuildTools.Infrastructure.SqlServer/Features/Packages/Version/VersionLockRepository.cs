@@ -75,11 +75,17 @@ public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory fi
 
         var utcNow = timeProvider.GetUtcNow();
 
-        var existingResult = (await GetVersionLockAsync(packageId, versionPrefix, ct)).Result;
+        var existingResult = (await GetVersionLockAsync(packageId, versionPrefix, ct));
+
+        if (!existingResult.IsSuccess && existingResult.FailureReason != FailureReason.NotFound)
+        {
+            return UnitResult.Failed<object>(existingResult.Exception
+                ?? new InvalidOperationException("Unknown error"));
+        }
 
         var result = await UpsertAsync(new VersionLock
         {
-            Id = existingResult?.Id,
+            Id = existingResult.Result?.Id,
             LastRequestedTimestampUtc = utcNow,
             LockedFromTimestampUtc = lockedFromTimestampUtc,
             LockedUntilTimestampUtc = lockedUntilTimestampUtc,
