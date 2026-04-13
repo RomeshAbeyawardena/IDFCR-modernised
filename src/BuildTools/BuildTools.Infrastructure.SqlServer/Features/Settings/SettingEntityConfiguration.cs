@@ -17,6 +17,9 @@ public class SettingEntityConfiguration : IEntityTypeConfiguration<SettingEntity
             .HasDefaultValueSql("NEWSEQUENTIALID()", "DF_SettingId")
             .IsRequired();
 
+        builder.Property(e => e.EnvironmentId)
+            .IsRequired(false);
+
         builder.Property(e => e.Type)
             .HasMaxLength(100)
             .IsRequired();
@@ -43,5 +46,11 @@ public class SettingEntityConfiguration : IEntityTypeConfiguration<SettingEntity
             .HasColumnType("DATETIMEOFFSET(7)")
             .HasDefaultValueSql("GETUTCDATE()", "DF_SystemConfig_Setting_LastUpdatedTimestampUtc")
             .IsRequired();
+
+        builder.HasOne(e => e.Environment)
+            .WithMany()
+            .HasForeignKey(e => e.EnvironmentId)
+            .HasConstraintName("FK_SystemConfig_Setting_Environment")
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
