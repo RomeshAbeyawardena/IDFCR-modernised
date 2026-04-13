@@ -6,5 +6,5 @@ namespace BuildTools.Infrastructure.Features.Packages.Version;
 
 public interface IPackageVersionRepository : IRepository<PackageVersion, Guid>
 {
-    Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, CancellationToken cancellationToken);
+    Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, string prefix, CancellationToken cancellationToken);
 }

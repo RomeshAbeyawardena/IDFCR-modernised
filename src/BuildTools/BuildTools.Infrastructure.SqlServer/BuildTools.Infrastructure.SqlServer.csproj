@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Interceptors.DependencyInjection" Version="2.0.2.8" />
-    <PackageReference Include="IDFCR.Persistence.EntityFrameworkCore.Extensions" Version="2.0.2.8" />
+    <PackageReference Include="IDFCR.Abstractions.Interceptors.DependencyInjection" Version="2.0.2.10" />
+    <PackageReference Include="IDFCR.Persistence.EntityFrameworkCore.Extensions" Version="2.0.2.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup>

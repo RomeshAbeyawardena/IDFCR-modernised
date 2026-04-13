@@ -129,7 +129,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             throw upsertLockResult.Exception!;
         }
 #endif
-        var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, cancellationToken);
+        var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, packageVersionPrefix, cancellationToken);
 
         var newRevisionNumber = 0;
 

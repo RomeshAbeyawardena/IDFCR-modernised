@@ -13,12 +13,12 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 public class PackageVersionRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, IPackageVersion, PackageVersionEntity, PackageVersion, Guid>(db, filterFactory, entityInterceptorFactory), IPackageVersionRepository
 {
-    public async Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, CancellationToken cancellationToken)
+    public async Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, string prefix, CancellationToken cancellationToken)
     {
         if(packageId is Guid id)
         {
             var result = await DbSet.AsNoTracking()
-                .Where(x => x.PackageId == id)
+                .Where(x => x.PackageId == id && x.VersionPrefix == prefix)
                 .OrderByDescending(x => x.RevisionNumber) //latest revision number
                 .FirstOrDefaultAsync(cancellationToken);
 
