@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Mapper;
+﻿using BuildTools.Shared.Features.Environments;
+using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 
 namespace BuildTools.Shared.Features.Settings;
@@ -9,6 +10,9 @@ namespace BuildTools.Shared.Features.Settings;
 public interface ISetting : IMapper<ISetting>, IAuditCreatedTimestamp, IAuditModifiedTimestamp
 {
     object? Id { get; }
+
+    object? EnvironmentId { get; }
+
     /// <summary>
     /// Gets the logical category for the setting (for example, tool, subsystem, or feature area).
     /// </summary>
@@ -24,4 +28,5 @@ public interface ISetting : IMapper<ISetting>, IAuditCreatedTimestamp, IAuditMod
     /// <summary>
     /// Gets the UTC timestamp of the most recent successful update to this setting.
     /// </summary>
+    IEnvironment? Environment { get; }
 }

@@ -1,4 +1,6 @@
-﻿using BuildTools.Shared.Features.Settings;
+﻿using BuildTools.Cli.Features.Environments;
+using BuildTools.Shared.Features.Environments;
+using BuildTools.Shared.Features.Settings;
 using IDFCR.Abstractions.Mapper;
 
 namespace BuildTools.Cli.Features.Settings;
@@ -6,6 +8,7 @@ namespace BuildTools.Cli.Features.Settings;
 public class SettingDto : MapperBase<ISetting>, ISetting
 {
     public object? Id { get; set; } = null!;
+    public object? EnvironmentId { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
     /// <inheritdoc/>
@@ -16,16 +19,20 @@ public class SettingDto : MapperBase<ISetting>, ISetting
     /// <inheritdoc/>
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
 
+    public IEnvironment? Environment { get; set; }
+
     public string LastUpdated => ModifiedTimestampUtc.GetValueOrDefault(CreatedTimestampUtc).ToLocalTime().ToString("dd MMM yyyy HH:mm") ?? "No data";
 
     /// <inheritdoc/>
     public override void Map(ISetting source)
     {
         Id = source.Id;
+        EnvironmentId = source.EnvironmentId;
         Type = source.Type;
         Key = source.Key;
         Value = source.Value;
         CreatedTimestampUtc = source.CreatedTimestampUtc;
         ModifiedTimestampUtc = source.ModifiedTimestampUtc;
+        Environment = source.Environment?.Map<EnvironmentDto>();
     }
 }
