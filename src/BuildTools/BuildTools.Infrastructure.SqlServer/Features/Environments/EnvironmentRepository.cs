@@ -15,9 +15,11 @@ public class EnvironmentRepository(PackageManagerDbContext db, IFilterFactory fi
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, IEnvironment, EnvironmentEntity, EnvironmentDto, Guid>(db, filterFactory, entityInterceptorFactory),
     IEnvironmentRepository
 {
-    public async Task<IUnitResult<EnvironmentDto>> GetEnvironmentAsync(IEnvironmentQuery query, CancellationToken cancellationToken)
+    public async Task<IUnitResult<EnvironmentDto>> GetEnvironmentAsync(IEnvironmentQuery request, CancellationToken cancellationToken)
     {
-        var foundResult = await DbSet.AsNoTracking().FirstOrDefaultAsync(new EnvironmentPagedFilter().BuildPredicate(query), cancellationToken);
+        var query = FilterFactory.Apply(DbSet.AsNoTracking(), request);
+
+        var foundResult = await query.FirstOrDefaultAsync(cancellationToken);
 
         if (foundResult is null)
         {
