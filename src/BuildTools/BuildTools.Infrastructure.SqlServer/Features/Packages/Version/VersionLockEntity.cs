@@ -1,16 +1,19 @@
 ﻿using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Persistence;
+using IDFCR.Abstractions.Persistence.Extensions;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 
-public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock
+public class VersionLockEntity : MapperBase<IVersionLock>, IVersionLock, IHasRowVersion
     , IIdentifiable<Guid>
 {
     object? IVersionLock.RowVersion => RowVersion;
     object? IVersionLock.PackageId => PackageId;
     object? IVersionLock.Id => Id;
 
+    [IgnoreApply]
     public byte[] RowVersion { get; set; } = [];
     public Guid PackageId { get; set; }
     public string? Reference { get; set; } = null!;
