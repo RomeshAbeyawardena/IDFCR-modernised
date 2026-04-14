@@ -1,4 +1,5 @@
-﻿using BuildTools.Infrastructure.Features.Tags;
+﻿using BuildTools.Cli.Common;
+using BuildTools.Infrastructure.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
@@ -7,54 +8,43 @@ namespace BuildTools.Cli.Features.Tags;
 
 [FeatureCommand(TagRootOperation.Prefix, CommandName)]
 public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ITagRepository tagRepository)
-    : InjectableCommandOperationBase<TagReadOperation>(serviceProvider, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
+    : ReadCommandOperationBase<TagReadOperation>(serviceProvider, managedStream, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
 {
     public const string CommandName = "read";
-    protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
-    {
-        var name = await this.GetOptionalField(managedStream, command, cancellationToken, false, "name");
-        var outputType = await this.GetOptionalField(managedStream, command, cancellationToken, true, "output-type");
 
-        if (string.IsNullOrWhiteSpace(name))
+    private string? _name;
+
+    protected override async Task AcquireFieldsAsync(IEnumerable<string> command, CancellationToken cancellationToken)
+    {
+        _name = await this.GetOptionalField(ManagedStream, command, cancellationToken, false, "name");
+    }
+
+    protected override async Task InvokeReadAsync(IEnumerable<string> command, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(_name))
         {
             var pagedResult = await tagRepository.GetPagedAsync(new GetPagedTagsQuery
             {
                 PageSize = 20,
-                Name = name
+                Name = _name
             }, cancellationToken);
 
             if (pagedResult.HasValue)
-            {
-                if (outputType == "json")
-                {
-                    await managedStream.Out.WriteLineAsync(pagedResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
-                    return;
-                }
-
-                await managedStream.DisplayPagedTable(pagedResult, t => t.Map<TagDto>(), cancellationToken,
+                await WritePagedResultAsync(pagedResult, t => t.Map<TagDto>(), cancellationToken,
                     new TableField<TagDto> { Field = t => t.Name, Title = "Tag name", RowWidth = 20 },
-                    new TableField<TagDto> { Field = t => t.DisplayName, Title = "Friendly name", RowWidth = 20 }
-                    );
-            }
+                    new TableField<TagDto> { Field = t => t.DisplayName, Title = "Friendly name", RowWidth = 20 });
             return;
         }
 
-        var valueResult = await tagRepository.GetTagAsync(name, cancellationToken);
+        var valueResult = await tagRepository.GetTagAsync(_name, cancellationToken);
 
         if (valueResult.HasValue)
         {
-            if (outputType == "json")
-            {
-                await managedStream.Out.WriteLineAsync(valueResult.Result.Jsonify(System.Text.Json.JsonSerializerOptions.Web), cancellationToken);
-                return;
-            }
-
-            await managedStream.Error.WriteLineAsync("Unsupported format: Please provide a valid output-type", cancellationToken);
-
+            if (IsJson) { await WriteJsonAsync(valueResult.Result, cancellationToken); return; }
+            await ManagedStream.Error.WriteLineAsync("Unsupported format: Please provide a valid output-type", cancellationToken);
             return;
         }
 
-        await managedStream.Error.WriteLineAsync($"Unable to read value: {valueResult.Exception?.Message ?? "Unknown issue"}", cancellationToken);
-
+        await ManagedStream.Error.WriteLineAsync($"Unable to read value: {valueResult.Exception?.Message ?? "Unknown issue"}", cancellationToken);
     }
 }
