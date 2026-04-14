@@ -1,10 +1,11 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="Add-Migration.ps1" />
+    <File Path="Readme.md" />
   </Folder>
   <Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
-  <Project Path="BuildTools.DatabaseUpdater/BuildTools.DatabaseUpdater.csproj" />
   <Project Path="BuildTools.Cli/BuildTools.Cli.csproj" />
+  <Project Path="BuildTools.DatabaseUpdater/BuildTools.DatabaseUpdater.csproj" />
   <Project Path="BuildTools.Infrastructure.SqlServer/BuildTools.Infrastructure.SqlServer.csproj" />
   <Project Path="BuildTools.Infrastructure/BuildTools.Infrastructure.csproj" />
   <Project Path="BuildTools.Shared/BuildTools.Shared.csproj" />
