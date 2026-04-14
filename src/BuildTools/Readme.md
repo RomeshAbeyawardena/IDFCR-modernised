@@ -75,7 +75,7 @@ Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<u
 >
 > You can set individual values from the terminal instead of editing the file directly:
 > ```
-> dotnet user-secrets set "Server" "localhost,1433"
+> dotnet user-secrets set "Server" "localhost,<port>"
 > dotnet user-secrets set "InitialCatalog" "BuildTools"
 > dotnet user-secrets set "DefaultConnectionStringName" "<connection-name>"
 > dotnet user-secrets set "UserId" "sa"
