@@ -63,7 +63,13 @@ Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<u
   "InitialCatalog":"<db-name>",
   "UserId":"sa",
   "Password":"<password>",
-  "DefaultConnectionStringName":"<connection-name>"
+  "DefaultConnectionStringName":"<connection-name>",
+  "ListOperations": true,
+  "LockRetryConfiguration": {
+    "MaximumAttempts": 10,
+    "RetryTimeoutInMilliseconds": 1000,
+    "LockTimeoutInMinutes": 3
+  }
 }
 ````````
 
@@ -79,5 +85,5 @@ Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<u
 > dotnet user-secrets set "InitialCatalog" "BuildTools"
 > dotnet user-secrets set "DefaultConnectionStringName" "<connection-name>"
 > dotnet user-secrets set "UserId" "sa"
-> dotnet user-secrets set "Password" "YourStrongP@ssword"
+> dotnet user-secrets set "Password" "<password>"
 > ```

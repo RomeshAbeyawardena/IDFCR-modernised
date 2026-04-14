@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IDFCR.Abstractions.Cli.Extensions;
 using BuildTools.Infrastructure.SqlServer.Extensions;
+using BuildTools.Cli;
+using Microsoft.Extensions.Options;
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
@@ -12,6 +14,8 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
 
     var currentAssembly = typeof(Program).Assembly;
     services
+        .Configure<ApplicationConfiguration>(context.Configuration)
+        .Configure<LockRetryConfiguration>(context.Configuration.GetSection(nameof(LockRetryConfiguration)))
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
         .AddInjectableCommandServices(currentAssembly)
@@ -23,4 +27,9 @@ using var host = new HostBuilder()
     .ConfigureHostConfiguration(s => s.AddUserSecrets<Program>())
     .Build();
 
-await host.RunCommandsAsync(args, true);
+var options = host.Services.GetRequiredService<IOptions<ApplicationConfiguration>>();
+
+
+var applicationConfiguration = options.Value;
+
+await host.RunCommandsAsync(args, applicationConfiguration.ListOperations);
