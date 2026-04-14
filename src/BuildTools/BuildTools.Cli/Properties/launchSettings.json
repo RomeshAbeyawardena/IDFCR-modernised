@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "package version add --namespace \"com.hsinet.idfcr\" --version-prefix \"1.0.0\" --commit-id \"ae84u293\" --external-tool"
+      "commandLineArgs": "env write --external-reference \"qa-env\" --name \"QA\" --display-name \"Quality assurance environment\""
     }
   }
 }
