@@ -14,13 +14,13 @@ public class PackageDto : MapperBase<IPackage>, IPackage
     public string Namespace { get; set; } = null!;
     /// <inheritdoc/>
     public string? Description { get; set; } = null!;
-    public object? Identifier { get; set; }
+    public object? Id { get; set; }
     public IEnumerable<ITag> Tags { get; set; } = [];
 
     /// <inheritdoc/>
     public override void Map(IPackage source)
     {
-        Identifier = source.Identifier;
+        Id = source.Id;
         Name = source.Name;
         Alias = source.Alias;
         Namespace = source.Namespace;
