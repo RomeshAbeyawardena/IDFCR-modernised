@@ -71,7 +71,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var maximumAttempts = lockRetryOpts.MaximumAttempts.GetValueOrDefault(MaximumAttempts);
         do
         {
-            var versionLockStatus = await versionLockRepository.GetVersionLockAsync(result.Id!,
+            var versionLockStatus = await versionLockRepository.GetVersionLockAsync(result.Identifier!,
                 packageVersionPrefix, cancellationToken);
 
             if (versionLockStatus.HasValue)
@@ -114,7 +114,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         var utcNow = timeProvider.GetUtcNow();
         //prepare to lock the resource;
         var upsertLockResult = await versionLockRepository.SetVersionLockAsync(
-            result.Id!,
+            result.Identifier!,
             packageVersionPrefix, buildToolReference,
             utcNow, utcNow.AddMinutes(lockRetryOpts.LockTimeoutInMinutes.GetValueOrDefault(LockTimeoutInMinutes)),
             cancellationToken: cancellationToken);
@@ -129,7 +129,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             throw upsertLockResult.Exception!;
         }
 #endif
-        var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Id, packageVersionPrefix, cancellationToken);
+        var latestPackageResult = await packageVersionRepository.GetLatestVersionAsync(packageResult.Result.Identifier, packageVersionPrefix, cancellationToken);
 
         var newRevisionNumber = 0;
 
@@ -143,7 +143,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             VersionPrefix = packageVersionPrefix,
             RevisionNumber = newRevisionNumber,
             ReleaseDateTimestampUtc = timeProvider.GetUtcNow(),
-            PackageId = result.Id!,
+            PackageId = result.Identifier!,
             CommitId =  commitId ?? string.Empty
         }, cancellationToken);
 
@@ -156,7 +156,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
         utcNow = timeProvider.GetUtcNow();
         //prepare to unlock the resource;
         upsertLockResult = await versionLockRepository.SetVersionLockAsync(
-            packageResult.Result.Id!,
+            packageResult.Result.Identifier!,
             packageVersionPrefix, buildToolReference,
             lockReleasedTimestampUtc: utcNow,
             revisionId: newRevisionNumber,

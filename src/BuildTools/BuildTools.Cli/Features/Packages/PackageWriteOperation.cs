@@ -41,7 +41,7 @@ public class PackageWriteOperation(IServiceProvider serviceProvider, IManagedStr
 
         var result = await packageRepository.UpsertAsync(new Shared.Features.Packages.Package
         {
-            Id = foundEntry?.Id,
+            Identifier = foundEntry?.Identifier,
             Alias = alias ?? foundEntry?.Alias,
             Description = description ?? foundEntry?.Description,
             Name = foundEntry?.Name ?? name!,

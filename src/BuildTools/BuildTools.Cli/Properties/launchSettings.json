@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTools.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "env write --external-reference \"qa-env\" --name \"QA\" --display-name \"Quality assurance environment\""
+      "commandLineArgs": "tag read"
     }
   }
 }
