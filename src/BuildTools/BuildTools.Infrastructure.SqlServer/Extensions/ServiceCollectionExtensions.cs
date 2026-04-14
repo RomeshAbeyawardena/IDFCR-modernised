@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         var currentAssembly = typeof(PackageManagerDbContext).Assembly;
 
-        if (!settings.ConnectionStrings.TryGetValue(settings.DefaultConnectionString
+        if (!settings.ConnectionStrings.TryGetValue(settings.DefaultConnectionStringName
             ?? throw new InvalidOperationException("Default connection string not specified")
             , out var connectionString))
         {
@@ -42,11 +42,6 @@ public static class ServiceCollectionExtensions
             connectionStringBuilder.Add("User Id", settings.UserId);
         }
 
-        if (!string.IsNullOrWhiteSpace(settings.UserId))
-        {
-            connectionStringBuilder.Add("User Id", settings.UserId);
-        }
-
         if (!string.IsNullOrWhiteSpace(settings.Password))
         {
             connectionStringBuilder.Add("Password", settings.Password);
@@ -55,7 +50,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddRepositories(currentAssembly)
             .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionStringBuilder.ToString())
-            .EnableDetailedErrors())
+            .EnableDetailedErrors(settings.EnableDetailedErrors))
             .AddInterceptors(currentAssembly)
             .ScanFilters(currentAssembly);
         

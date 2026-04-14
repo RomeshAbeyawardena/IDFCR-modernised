@@ -51,20 +51,33 @@ Initialise secrets for the project you want to run:
 dotnet user-secrets init
 ````````
 
-Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<user-secrets-id>\secrets.json`) with the following structure:
+Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<user-secrets-id>\secrets.json`) with the following structure or right clicking the project in Visual studio and clicking 'Manage User secrets'
 
 ````````
 {
   "ConnectionStrings": {
     "<connection-name>":"MultipleActiveResultsets=true;TrustServerCertificate=true"
   },
-  "Server:"localhost,<port>",
+  "EnableDetailedErrors": false,
+  "Server":"localhost,<port>",
   "InitialCatalog":"<db-name>",
-  "UserId:"sa",
-  "Password:"<password>",
-  "DefaultConnectionString":"<connection-name>"
+  "UserId":"sa",
+  "Password":"<password>",
+  "DefaultConnectionStringName":"<connection-name>"
 }
 ````````
 
-> To generate a different user, use `dotnet user-secrets set UserId --prompt`.
-> To generate a strong password, use `dotnet user-secrets set Password --prompt`.
+> `Server`, `InitialCatalog`, `UserId`, and `Password` are injected at runtime via `DbConnectionStringBuilder`,
+> keeping the base connection string to the minimum required for local SQL Server development instances
+> (`MultipleActiveResultSets=true;TrustServerCertificate=true`).
+>
+> `UserId` and `Password` are **optional** — omit them when using Windows Authentication.
+>
+> You can set individual values from the terminal instead of editing the file directly:
+> ```
+> dotnet user-secrets set "Server" "localhost,1433"
+> dotnet user-secrets set "InitialCatalog" "BuildTools"
+> dotnet user-secrets set "DefaultConnectionStringName" "<connection-name>"
+> dotnet user-secrets set "UserId" "sa"
+> dotnet user-secrets set "Password" "YourStrongP@ssword"
+> ```
