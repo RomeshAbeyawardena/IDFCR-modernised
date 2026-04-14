@@ -2,7 +2,7 @@ using BuildTools.Infrastructure.Features.Packages;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
-using IDFCR.Abstractions.Results.Extensions;
+using IDFCR.Abstractions.Results;
 
 namespace BuildTools.Cli.Features.Packages.Tags;
 
@@ -49,7 +49,19 @@ public class PackageTagWriteOperation(IServiceProvider serviceProvider, IManaged
                 return;
             }
 
-            await managedStream.DisplayPagedTable(result, t => t, cancellationToken,
+            IUnitPagedResult<TagUnassignmentResult>? unitPagedResult = null;
+            if (result.HasValue)
+            {
+                unitPagedResult = UnitPagedResult.FromResult(result.Result, result.Result.Count(), new PagedQuery());
+            }
+
+            if (unitPagedResult is null)
+            {
+                await managedStream.Error.WriteLineAsync($"Unable to display results: {result.Exception?.Message ?? "Unknown Error"}", cancellationToken);
+                return;
+            }
+
+            await managedStream.DisplayPagedTable(unitPagedResult, t => t, cancellationToken,
                 new TableField<TagUnassignmentResult> { Field = t => t.TagName, Title = "Tag", RowWidth = 20 },
                 new TableField<TagUnassignmentResult> { Field = t => t.AssignmentStatus, Title = "Status", RowWidth = 15 }
             );
@@ -72,7 +84,19 @@ public class PackageTagWriteOperation(IServiceProvider serviceProvider, IManaged
                 return;
             }
 
-            await managedStream.DisplayPagedTable(result, t => t, cancellationToken,
+            IUnitPagedResult<TagAssignmentResult>? unitPagedResult = null;
+            if (result.HasValue)
+            {
+                unitPagedResult = UnitPagedResult.FromResult(result.Result, result.Result.Count(), new PagedQuery());
+            }
+
+            if (unitPagedResult is null)
+            {
+                await managedStream.Error.WriteLineAsync($"Unable to display results: {result.Exception?.Message ?? "Unknown Error"}", cancellationToken);
+                return;
+            }
+
+            await managedStream.DisplayPagedTable(unitPagedResult, t => t, cancellationToken,
                 new TableField<TagAssignmentResult> { Field = t => t.TagName, Title = "Tag", RowWidth = 20 },
                 new TableField<TagAssignmentResult> { Field = t => t.AssignmentStatus, Title = "Status", RowWidth = 15 }
             );
