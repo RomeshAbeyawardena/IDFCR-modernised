@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Environments;
 
-public class EnvironmentPagedFilter : PagedFilterBase<GetPagedEnvironmentQuery, EnvironmentEntity>
+public class EnvironmentFilter : FilterBase<IEnvironmentQuery, EnvironmentEntity>
 {
-    internal Expression<Func<EnvironmentEntity, bool>> BuildPredicate(IEnvironmentQuery request)
+    public static Expression<Func<EnvironmentEntity, bool>> BuildPredicate(Expression<Func<EnvironmentEntity, bool>> predicate, IEnvironmentQuery request)
     {
-        var query = base.StarterExpression.DefaultExpression = e => true;
+        var query = predicate;
 
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
@@ -27,8 +27,18 @@ public class EnvironmentPagedFilter : PagedFilterBase<GetPagedEnvironmentQuery, 
 
         return query;
     }
+
+    public override IQueryable<EnvironmentEntity> Apply(IQueryable<EnvironmentEntity> queryable, IEnvironmentQuery request)
+    {
+        return queryable.Where(BuildPredicate(base.StarterExpression.DefaultExpression = e => true, request));
+    }
+}
+
+public class EnvironmentPagedFilter : PagedFilterBase<GetPagedEnvironmentQuery, EnvironmentEntity>
+{
+    
     protected override Expression<Func<EnvironmentEntity, bool>> BuildPredicate(IQueryable<EnvironmentEntity> queryable, GetPagedEnvironmentQuery request)
     {
-        return BuildPredicate(request);
+        return EnvironmentFilter.BuildPredicate(base.StarterExpression.DefaultExpression = e => true, request);
     }
 }
