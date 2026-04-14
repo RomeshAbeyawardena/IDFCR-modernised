@@ -5,7 +5,7 @@ using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
 using IDFCR.Persistence.EntityFrameworkCore.Attributes;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using EnvironmentDto = BuildTools.Shared.Features.Environments.Environment;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Environments;
@@ -27,6 +27,11 @@ public class EnvironmentRepository(PackageManagerDbContext db, IFilterFactory fi
         }
 
         return UnitResult.FromResult(Map(foundResult));
+    }
+
+    public async Task<bool> IsEnvironmentInUseAsync(Guid environmentId, CancellationToken cancellationToken)
+    {
+        return await DbSet.AnyAsync(x => x.Id == environmentId && x.Settings.Any(), cancellationToken);
     }
 
     protected override bool IsHandled(Exception exception)

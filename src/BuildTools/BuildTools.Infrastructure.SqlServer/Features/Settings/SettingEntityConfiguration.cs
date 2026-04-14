@@ -48,7 +48,7 @@ public class SettingEntityConfiguration : IEntityTypeConfiguration<SettingEntity
             .IsRequired();
 
         builder.HasOne(e => e.Environment)
-            .WithMany()
+            .WithMany(e => e.Settings)
             .HasForeignKey(e => e.EnvironmentId)
             .HasConstraintName("FK_SystemConfig_Setting_Environment")
             .OnDelete(DeleteBehavior.NoAction);

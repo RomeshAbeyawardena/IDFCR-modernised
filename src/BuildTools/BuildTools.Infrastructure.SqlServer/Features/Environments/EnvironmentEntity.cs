@@ -1,6 +1,8 @@
-﻿using BuildTools.Shared.Features.Environments;
+﻿using BuildTools.Infrastructure.SqlServer.Features.Settings;
+using BuildTools.Shared.Features.Environments;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
+
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Environments;
 
@@ -11,6 +13,8 @@ public class EnvironmentEntity : MapperBase<IEnvironment>, IEnvironment, IIdenti
     public string ExternalReference { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string? DisplayName { get; set; }
+
+    public ICollection<SettingEntity> Settings { get; set; } = [];
 
     public override void Map(IEnvironment source)
     {

@@ -38,6 +38,19 @@ public class EnvironmentDeleteOperation(IServiceProvider serviceProvider, IManag
             return;
         }
 
+        if (foundEntry.Id is not Guid id)
+        {
+            await managedStream.Error.WriteLineAsync("Unexpected condition: Entity is not in the correct state to be removed, operation aborted!", cancellationToken);
+            return;
+        }
+
+        var isInUse = await environmentRepository.IsEnvironmentInUseAsync(id, cancellationToken);
+        if (isInUse)
+        {
+            await managedStream.Error.WriteLineAsync($"Unable to delete environment: Environment '{externalReference} ({foundEntry.Name})' is currently in use by one or more settings.", cancellationToken);
+            return;
+        }
+
         var shouldForce = !string.IsNullOrWhiteSpace(force);
 
         if (!shouldForce)
@@ -54,13 +67,6 @@ public class EnvironmentDeleteOperation(IServiceProvider serviceProvider, IManag
                 return;
             }
         }
-
-        if (foundEntry.Id is not Guid id)
-        {
-            await managedStream.Error.WriteLineAsync("Unexpected condition: Entity is not in the correct state to be removed, operation aborted!", cancellationToken);
-            return;
-        }
-
 
         var result = await environmentRepository.DeleteAsync(id, cancellationToken);
         if (result.IsSuccess)
