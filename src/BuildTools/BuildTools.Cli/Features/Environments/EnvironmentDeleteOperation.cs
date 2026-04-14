@@ -16,8 +16,7 @@ public class EnvironmentDeleteOperation(IServiceProvider serviceProvider, IManag
 
     protected override async Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        var (hasExternalReference, externalReference) = (await this.GetRequiredField(managedStream, command, 0, "Environment external reference", cancellationToken, false, "external-reference")).AsValueOrDefault(out var isParameter);
-        var force = await this.GetOptionalField(managedStream, command, cancellationToken, isParameter, "force");
+        var (hasExternalReference, externalReference) = (await this.GetRequiredField(managedStream, command, 0, "Environment external reference", cancellationToken, false, "external-reference")).AsValueOrDefault(out _);
 
         var isValid = hasExternalReference;
 
@@ -51,14 +50,14 @@ public class EnvironmentDeleteOperation(IServiceProvider serviceProvider, IManag
             return;
         }
 
-        var shouldForce = !string.IsNullOrWhiteSpace(force);
+        var shouldForce = Parameters?.TryGetValue("force", out var isForce) == true && isForce.IsFlag;
 
         if (!shouldForce)
         {
             await managedStream.Error.WriteLineAsync("⚠️  This action cannot be undone. This will permanently delete the environment.", cancellationToken);
             await managedStream.Error.WriteLineAsync($"Environment: {externalReference} ({foundEntry.Name})", cancellationToken);
             await managedStream.Error.WriteLineAsync(string.Empty, cancellationToken);
-            
+
             var confirmation = await managedStream.In.ReadLineAsync(cancellationToken);
 
             if (confirmation?.Trim() != externalReference)
