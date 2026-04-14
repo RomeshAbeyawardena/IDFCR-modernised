@@ -26,6 +26,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     where T : class, IMapper<TCommon>, TCommon
 {
     /// <summary>
+    /// Gets the DbContext instance used for database operations. This property provides access to the underlying DbContext, allowing derived classes to perform various database operations such as querying, adding, updating, and deleting entities. By exposing this property, the repository base class enables derived classes to leverage the full capabilities of Entity Framework Core for data management while adhering to the repository pattern. This allows for efficient and flexible data access while maintaining a clean separation of concerns between the repository and the database context.
+    /// </summary>
+    protected TDbContext Db => db;
+
+    /// <summary>
     /// Gets the filter factory instance used for applying filters to queries. This property provides access to the filter factory, allowing derived classes to utilize it for filtering data when retrieving entities from the database. The filter factory is typically used in conjunction with the repository's querying methods to apply specific filtering criteria based on the requirements of the application. By exposing this property, the repository base class enables derived classes to easily access and utilize the filter factory for implementing custom filtering logic as needed.
     /// </summary>
     protected IFilterFactory FilterFactory { get; } = filterFactory;

@@ -29,6 +29,20 @@ public static class UnitResultExtensions
     }
 
     /// <summary>
+    /// Converts a unit result to a paged result using the supplied paged query. The total rows is set to the count of the result collection if available, otherwise 0.
+    /// </summary>
+    /// <typeparam name="T">The type of the result items.</typeparam>
+    /// <param name="unitResult">The unit result collection to convert.</param>
+    /// <param name="pagedQuery">The paged query information.</param>
+    /// <returns>A paged result containing the items from the unit result collection.</returns>
+    public static IUnitPagedResult<T> AsPaged<T>(this IUnitResultCollection<T> unitResult, IPagedQuery pagedQuery)
+    {
+        var pagedResult = new UnitPagedResult<T>(unitResult.Result, unitResult.Result?.Count() ?? 0, pagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
+        CloneMeta(unitResult.Meta, pagedResult);
+        return pagedResult;
+    }   
+
+    /// <summary>
     /// Converts a collection result using the supplied converter.
     /// </summary>
     public static IUnitResultCollection<TDestination> Convert<T, TDestination>(this IUnitResultCollection<T> unitResultCollection, Func<T, TDestination> converter)
