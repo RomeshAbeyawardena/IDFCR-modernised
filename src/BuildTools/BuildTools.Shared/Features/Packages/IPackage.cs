@@ -1,4 +1,6 @@
-﻿namespace BuildTools.Shared.Features.Packages;
+﻿using BuildTools.Shared.Features.Tags;
+
+namespace BuildTools.Shared.Features.Packages;
 
 /// <summary>
 /// Describes a package known to the build tooling package catalog.
@@ -26,4 +28,5 @@ public interface IPackage
     /// Gets optional human-readable package details shown in catalog or UI surfaces.
     /// </summary>
     string? Description { get; }
+    IEnumerable<ITag> Tags { get; }
 }

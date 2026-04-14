@@ -1,4 +1,5 @@
 ﻿using BuildTools.Shared.Features.Packages;
+using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mapper;
 
 namespace BuildTools.Cli.Features.Packages;
@@ -14,6 +15,7 @@ public class PackageDto : MapperBase<IPackage>, IPackage
     /// <inheritdoc/>
     public string? Description { get; set; } = null!;
     public object? Id { get; set; }
+    public IEnumerable<ITag> Tags { get; set; } = [];
 
     /// <inheritdoc/>
     public override void Map(IPackage source)
@@ -23,5 +25,6 @@ public class PackageDto : MapperBase<IPackage>, IPackage
         Alias = source.Alias;
         Namespace = source.Namespace;
         Description = source.Description;
+        Tags = source.Tags;
     }
 }
