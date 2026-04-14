@@ -87,3 +87,5 @@ Then populate the secrets file (typically at `%APPDATA%\Microsoft\UserSecrets\<u
 > dotnet user-secrets set "UserId" "sa"
 > dotnet user-secrets set "Password" "<password>"
 > ```
+
+`ListOperations` enables verbose logging of the operations the CLI engine traverses while resolving and executing commands.
