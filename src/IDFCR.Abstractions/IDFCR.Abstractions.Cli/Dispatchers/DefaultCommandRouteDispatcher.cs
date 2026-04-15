@@ -39,7 +39,7 @@ public sealed class DefaultCommandRouteDispatcher(IServiceProvider services) : I
     {
 #pragma warning disable CA2263 //extension methods aren't supported by MOQ
         var s = services.GetServices(typeof(IInjectableCommandOperationRoot))
-            .Select(x => x as IInjectableCommandOperationRoot)
+            .OfType<IInjectableCommandOperationRoot>()
             .ToArray();
 
         List<IInjectableCommandOperation> operations = [];
