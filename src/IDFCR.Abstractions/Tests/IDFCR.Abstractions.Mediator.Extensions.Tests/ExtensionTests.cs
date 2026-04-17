@@ -53,6 +53,17 @@ public class ExtensionTests
     [Test]
     public async Task Test()
     {
-        var result = await mediator.Send(new MyTestRequest());
+
+        IUnitResult? result = null;
+        
+        Assert.DoesNotThrowAsync(async () => result = await mediator.Send(new MyTestRequest()));
+
+        Assert.That(result, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Exception, Is.InstanceOf<NotImplementedException>());
+        }
+
     }
 }
