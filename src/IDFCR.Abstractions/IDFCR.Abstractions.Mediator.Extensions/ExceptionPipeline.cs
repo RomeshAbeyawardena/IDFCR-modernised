@@ -3,27 +3,12 @@ using MediatR.Pipeline;
 
 namespace IDFCR.Abstractions.Mediator.Extensions;
 
-public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TException>(IExceptionBehaviourManager exceptionBehaviourManager)
-    : IRequestExceptionHandler<TRequest, IUnitResult, TException>
-        where TRequest : IUnitResultRequest
-        where TException : Exception
-{
-    public async Task Handle(TRequest request, TException exception, RequestExceptionHandlerState<IUnitResult> state, CancellationToken cancellationToken)
-    {
-        var exceptionBehaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>()
-            ?? exceptionBehaviourManager.DefaultExceptionBehaviour
-            ?? ExceptionBehaviourManagerBuilder.Default;
-
-        state.SetHandled(UnitResult.Failed(exception, exceptionBehaviour.UnitAction, exceptionBehaviour.FailureReason));
-    }
-}
-
 /// <summary>
 /// Represents a default exception handling pipeline for MediatR requests that return unit results. This pipeline is designed to catch exceptions of a specified type and convert them into a standardized unit result format, which indicates the failure of the operation along with the appropriate action and failure reason. The behavior for handling exceptions can be customized by implementing the IExceptionBehaviourManager interface, allowing for flexible and consistent error handling across different types of exceptions.
 /// </summary>
-/// <typeparam name="TRequest"></typeparam>
-/// <typeparam name="TResponse"></typeparam>
-/// <typeparam name="TException"></typeparam>
+/// <typeparam name="TRequest">The type of the request being processed.</typeparam>
+/// <typeparam name="TResponse">The type of the response returned by the request.</typeparam>
+/// <typeparam name="TException">The type of exception to be handled by this pipeline.</typeparam>
 public sealed class DefaultExceptionPipeline<TRequest, TResponse, TException>(IExceptionBehaviourManager exceptionBehaviourManager)
     : IRequestExceptionHandler<TRequest, IUnitResult<TResponse>, TException>
         where TRequest : IUnitResultRequest<TResponse>
