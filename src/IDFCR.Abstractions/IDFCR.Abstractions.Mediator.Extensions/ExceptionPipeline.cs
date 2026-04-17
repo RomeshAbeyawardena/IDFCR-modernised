@@ -26,7 +26,7 @@ public sealed class DefaultExceptionPipeline<TRequest, TResponse, TException>(IE
     {
         var exceptionBehaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>() 
             ?? exceptionBehaviourManager.DefaultExceptionBehaviour
-            ?? new ExceptionBehaviour(UnitAction.None, FailureReason.Unknown);
+            ?? ExceptionBehaviourManagerBuilder.Default;
 
         state.SetHandled(UnitResult.Failed<TResponse>(exception, exceptionBehaviour.UnitAction, exceptionBehaviour.FailureReason));
     }

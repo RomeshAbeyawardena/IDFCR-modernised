@@ -6,10 +6,13 @@ namespace IDFCR.Abstractions.Mediator.Extensions;
 /// <inheritdoc/>
 public class ExceptionBehaviourManagerBuilder : IExceptionBehaviourManagerBuilder
 {
-    private ConcurrentDictionary<Type, ExceptionBehaviour> behaviourDictionary = [];
+    private readonly ConcurrentDictionary<Type, ExceptionBehaviour> behaviourDictionary = [];
     private ExceptionBehaviour? defaultExceptionBehaviour = Default;
 
-    private static readonly ExceptionBehaviour Default = new ExceptionBehaviour(UnitAction.None, FailureReason.Unknown);
+    /// <summary>
+    /// Defines the default exception behaviour to be used when no specific behaviour is set for an exception type.
+    /// </summary>
+    public static readonly ExceptionBehaviour Default = new (UnitAction.None, FailureReason.Unknown);
 
     /// <inheritdoc/>
     public IExceptionBehaviourManager Build()
