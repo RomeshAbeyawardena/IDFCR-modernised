@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Extensions;
@@ -36,7 +37,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services, Action<MediatRServiceConfiguration>? configuration, bool registerServicesFromAssemblies, params Assembly[] assemblies)
     {
         return services
-            
+            .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))
+            .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(DefaultExceptionPipeline<,,>))
             .AddMediatR(cfg =>
             {
                 configuration?.Invoke(cfg);
@@ -44,8 +46,6 @@ public static class ServiceCollectionExtensions
                 {
                     cfg.RegisterServicesFromAssemblies(assemblies);
                 }
-
-                //cfg.AddBehavior(typeof(DefaultExceptionPipeline<,,>));
             });
     }
 

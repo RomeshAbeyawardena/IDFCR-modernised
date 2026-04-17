@@ -31,6 +31,11 @@ public class ExtensionTests
     public void SetUp()
     {
         services = new ServiceCollection()
+            .AddLogging()
+            .ConfigureExceptionBehaviourManager(cfg =>
+            {
+
+            })
             .AddMediatorServicesAndPipelines(typeof(ExtensionTests).Assembly)
             .BuildServiceProvider();
         mediator = services.GetRequiredService<IMediator>();
@@ -46,8 +51,8 @@ public class ExtensionTests
     }
 
     [Test]
-    public void Test()
+    public async Task Test()
     {
-        var result = mediator.Send(new MyTestRequest());
+        var result = await mediator.Send(new MyTestRequest());
     }
 }
