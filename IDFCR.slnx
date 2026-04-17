@@ -15,6 +15,8 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors/IDFCR.Abstractions.Interceptors.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mapper/IDFCR.Abstractions.Mapper.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator/IDFCR.Abstractions.Mediator.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator.Extensions/IDFCR.Abstractions.Mediator.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
