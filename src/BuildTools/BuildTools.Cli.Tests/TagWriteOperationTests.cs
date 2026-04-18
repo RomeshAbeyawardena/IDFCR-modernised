@@ -3,11 +3,14 @@
 using BuildTools.Infrastructure.Features.Tags;
 using BuildTools.Infrastructure.SqlServer.Features.Tags;
 using BuildTools.Shared.Features.Tags;
+using ContractTagDto = BuildTools.Shared.Contracts.Features.Tags.TagDto;
+using BuildTools.Shared.Contracts.Features.Tags;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Results;
 using IDFCR.TestUtilities;
+using MediatR;
 using Moq;
 
 namespace BuildTools.Cli.Tests;
@@ -19,7 +22,16 @@ public class InternalMemoryTagRepository(IEntityInterceptorFactory entityInterce
     public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        base.Entries.AddRange(tags.Select(x => x.Map<TagEntity>()));
+        base.Entries.AddRange(tags.Select(x =>
+        {
+            var entity = x.Map<TagEntity>();
+            if (entity.Id == Guid.Empty)
+            {
+                entity.Id = Guid.NewGuid();
+            }
+
+            return entity;
+        }));
         return UnitResult.Success(UnitAction.Add);
     }
 
@@ -52,6 +64,7 @@ public class TagWriteOperationTests
 
     private Mock<IServiceProvider> serviceProviderMock = null!;
     private Mock<IManagedStream> managedStreamMock = null!;
+    private Mock<IMediator> mediatorMock = null!;
     private InternalMemoryTagRepository internalMemoryTagRepository = null!;
     private Mock<IEntityInterceptorFactory> entityInterceptorFactoryMock = null!;
     private Mock<IFilterFactory> filterFactoryMock = null!;
@@ -61,10 +74,42 @@ public class TagWriteOperationTests
     {
         serviceProviderMock = new();
         managedStreamMock = new();
+        mediatorMock = new();
         entityInterceptorFactoryMock = new();
         filterFactoryMock = new();
         internalMemoryTagRepository = new(entityInterceptorFactoryMock.Object, filterFactoryMock.Object);
-        sut = new(serviceProviderMock.Object, managedStreamMock.Object, internalMemoryTagRepository);
+
+        mediatorMock
+            .Setup(x => x.Send(It.IsAny<GetTagsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetTagsQuery query, CancellationToken _) =>
+                UnitResultCollection.FromResult(
+                    internalMemoryTagRepository.Entities
+                        .Where(x => query.Names.Contains(x.Name, StringComparer.OrdinalIgnoreCase))
+                        .Select(x => new ContractTagDto
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            DisplayName = x.DisplayName
+                        })));
+
+        mediatorMock
+            .Setup(x => x.Send(It.IsAny<GetTagQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetTagQuery query, CancellationToken _) =>
+            {
+                var entry = internalMemoryTagRepository.Entities
+                    .FirstOrDefault(x => query.Name is not null && x.Name.Equals(query.Name, StringComparison.OrdinalIgnoreCase));
+
+                return entry is null
+                    ? UnitResult.NotFound<ContractTagDto>(query.Name ?? string.Empty)
+                    : UnitResult.FromResult(new ContractTagDto
+                    {
+                        Id = entry.Id,
+                        Name = entry.Name,
+                        DisplayName = entry.DisplayName
+                    });
+            });
+
+        sut = new(serviceProviderMock.Object, managedStreamMock.Object, mediatorMock.Object, internalMemoryTagRepository);
     }
 
     [Test]

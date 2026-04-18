@@ -1,13 +1,15 @@
 using BuildTools.Infrastructure.Features.Tags;
+using BuildTools.Shared.Contracts.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Results.Extensions;
+using MediatR;
 
 namespace BuildTools.Cli.Features.Tags;
 
 [FeatureCommand(TagRootOperation.Prefix, CommandName)]
-public class TagDeleteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ITagRepository tagRepository)
+public class TagDeleteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IMediator mediator)
     : InjectableCommandOperationBase<TagDeleteOperation>(serviceProvider, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
 {
     public const string CommandName = "delete";
@@ -23,7 +25,7 @@ public class TagDeleteOperation(IServiceProvider serviceProvider, IManagedStream
             return;
         }
 
-        var foundEntry = (await tagRepository.GetTagAsync(name, cancellationToken)).GetResultOrDefault();
+        var foundEntry = (await mediator.Send(new GetTagQuery { Name = name }, cancellationToken)).GetResultOrDefault();
 
         if (foundEntry is null)
         {
@@ -54,10 +56,9 @@ public class TagDeleteOperation(IServiceProvider serviceProvider, IManagedStream
             }
         }
 
-        var result = await tagRepository.DeleteAsync(id, cancellationToken);
+        var result = await mediator.Send(new DeleteTagCommand { Name = name, CommitChanges = true }, cancellationToken);
         if (result.IsSuccess)
         {
-            await tagRepository.SaveChangesAsync(cancellationToken);
             await managedStream.Out.WriteLineAsync($"Tag '{foundEntry.Name}' successfully deleted.", cancellationToken);
             return;
         }
