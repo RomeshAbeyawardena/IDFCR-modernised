@@ -1,12 +1,12 @@
-﻿using BuildTools.Shared.Contracts.GRPC.Common;
-using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
+﻿using BuildTools.GRPC.Shared.Contracts.Common;
+using BuildTools.GRPC.Shared.Contracts.Feature.Tags;
 using TagsFeature = BuildTools.Shared.Contracts.Feature.Tags;
 using Grpc.Core;
 using MediatR;
 using System.Threading.Tasks;
 using System;
 
-namespace BuildTools.Application.GRPC;
+namespace BuildTools.GRPC.Application;
 
 public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagCommandService.UpsertTagCommandServiceBase
 {

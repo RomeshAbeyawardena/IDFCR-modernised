@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package buildtools.shared.contracts.grpc.common;
 
-option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Common";
+option csharp_namespace = "BuildTools.GRPC.Shared.Contracts.Common";
 
 enum UnitAction {
   UNIT_ACTION_NONE = 0;

@@ -12,6 +12,8 @@ public class UpsertTagCommandHandler(ITagRepository tagRepository) : IUnitResult
 {
     public async Task<IUnitResult<object>> Handle(UpsertTagCommand request, CancellationToken cancellationToken)
     {
-        return (await tagRepository.UpsertAsync(request.Tag.Map<Tag>(), cancellationToken)).As<object>();
+        var result = await tagRepository.UpsertAsync(request.Tag.Map<Tag>(), cancellationToken);
+
+        return result.As<object>();
     }
 }

@@ -21,4 +21,5 @@ public class TagDto : MapperBase<ITag>, ITag
 public record UpsertTagCommand : IUnitResultRequest<object>
 {
     public TagDto? Tag { get; init; }
+    public bool CommitChanges { get; init; }
 }

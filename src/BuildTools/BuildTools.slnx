@@ -5,9 +5,10 @@
   </Folder>
   <Folder Name="/Backend/">
 	<Project Path="Backend/BuildTools.Application/BuildTools.Application.csproj" />
-	<Project Path="Backend/BuildTools.Application.gRPC/BuildTools.Application.GRPC.csproj" />
+	<Project Path="Backend/BuildTools.gRPC.Application/BuildTools.GRPC.Application.csproj" />
+	<Project Path="Backend/BuildTools.gRPC.Shared.Contracts/BuildTools.GRPC.Shared.Contracts.csproj" />
 	<Project Path="Backend/BuildTools.Shared.Contracts/BuildTools.Shared.Contracts.csproj" />
-	<Project Path="Backend/BuildTools.Shared.Contracts.gRPC/BuildTools.Shared.Contracts.GRPC.csproj" />
+	
   </Folder>
   <Folder Name="/Tests/">
 	<Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />

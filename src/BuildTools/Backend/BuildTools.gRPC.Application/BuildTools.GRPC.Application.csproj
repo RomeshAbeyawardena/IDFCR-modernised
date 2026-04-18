@@ -8,7 +8,7 @@
     <PackageReference Include="MediatR" Version="14.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BuildTools.Shared.Contracts.gRPC\BuildTools.Shared.Contracts.GRPC.csproj" />
+    <ProjectReference Include="..\BuildTools.gRPC.Shared.Contracts\BuildTools.GRPC.Shared.Contracts.csproj" />
     <ProjectReference Include="..\BuildTools.Shared.Contracts\BuildTools.Shared.Contracts.csproj" />
   </ItemGroup>
 
