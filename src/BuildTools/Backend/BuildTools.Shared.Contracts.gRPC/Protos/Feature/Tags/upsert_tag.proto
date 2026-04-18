@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package buildtools.shared.contracts.grpc.feature.tags;
+
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Feature.Tags";
+
+import "Common/unit_result.proto";
+
+message TagDto {
+  // object? in C# is represented as string here for wire compatibility.
+  // Adjust to int64/uuid bytes if your Id has a fixed type.
+  string id = 1;
+  string name = 2;
+  string display_name = 3;
+}
+
+message UpsertTagCommand {
+  TagDto tag = 1;
+}
+
+service UpsertTagCommandService {
+  rpc UpsertTag(UpsertTagCommand) returns (buildtools.shared.contracts.grpc.common.UnitResult);
+}
