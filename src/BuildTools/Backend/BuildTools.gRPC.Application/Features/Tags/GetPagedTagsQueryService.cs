@@ -18,7 +18,7 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
             NameContains = request.NameContains,
             PageIndex = request.PageIndex,
             PageSize = request.PageSize
-        });
+        }, context.CancellationToken);
 
         var response = new GetPagedTagsQueryResult
         {
