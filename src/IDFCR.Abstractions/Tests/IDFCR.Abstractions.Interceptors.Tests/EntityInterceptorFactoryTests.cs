@@ -14,9 +14,9 @@ public class EntityInterceptorFactoryTests
     [SetUp]
     public void SetUp()
     {
-        _timeProvider = new(new DateTimeOffset(2025,03, 1, 10, 40, 0, TimeSpan.Zero));
+        _timeProvider = new(new DateTimeOffset(2025, 03, 1, 10, 40, 0, TimeSpan.Zero));
         _entityInterceptorList = [
-            new AuditCreatedTimestampEntityInterceptor(_timeProvider), 
+            new AuditCreatedTimestampEntityInterceptor(_timeProvider),
             new AuditModifiedTimestampEntityInterceptor(_timeProvider)];
         _entityInterceptorFactory = new(_entityInterceptorList);
     }

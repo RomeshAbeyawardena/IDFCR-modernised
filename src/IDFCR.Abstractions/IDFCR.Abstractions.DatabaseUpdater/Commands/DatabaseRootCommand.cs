@@ -12,7 +12,7 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Commands;
 /// <param name="timeProvider">The time provider for obtaining the current time.</param>
 /// <param name="managedStream">The managed stream for handling CLI input and output.</param>
 /// <param name="promptGreeter">The prompt greeter for generating greeting prompts.</param>
-public class DatabaseRootCommand(IServiceProvider serviceProvider, TimeProvider timeProvider, IManagedStream managedStream, IPromptGreeter promptGreeter) 
+public class DatabaseRootCommand(IServiceProvider serviceProvider, TimeProvider timeProvider, IManagedStream managedStream, IPromptGreeter promptGreeter)
     : InjectableCommandOperationRootBase<DatabaseRootCommand>(serviceProvider, Prefix, CommandName, null)
 {
     /// <summary>

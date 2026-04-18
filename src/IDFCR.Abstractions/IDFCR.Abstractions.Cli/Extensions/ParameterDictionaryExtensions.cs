@@ -55,7 +55,7 @@ public static class ParameterDictionaryExtensions
     /// <returns></returns>
     public static async Task<IUnitResult<T>> LookupAsync<T>(this IDictionary<string, Parameter> parameters,
         Func<string, CancellationToken, Task<IUnitResult<T>>> lookupAction,
-        CancellationToken cancellationToken, 
+        CancellationToken cancellationToken,
         params string[] keys)
     {
         var lookupParameterResult = parameters
@@ -83,7 +83,7 @@ public static class ParameterDictionaryExtensions
     {
         foreach (var key in keys)
         {
-            if(parameters.TryGetValue(key, out var parameter)
+            if (parameters.TryGetValue(key, out var parameter)
                 && !string.IsNullOrWhiteSpace(parameter.Value))
             {
                 return parameter.Value;
@@ -101,7 +101,7 @@ public static class ParameterDictionaryExtensions
     /// <returns>The integer value if found and successfully parsed; otherwise, null.</returns>
     public static int? GetIntOrDefault(this IDictionary<string, Parameter> parameters, params string[] keys)
     {
-        var rawValue  = TryGetRawValue(parameters, keys);
+        var rawValue = TryGetRawValue(parameters, keys);
         if (string.IsNullOrWhiteSpace(rawValue))
         {
             return null;
@@ -128,7 +128,7 @@ public static class ParameterDictionaryExtensions
     {
         int pageIndex = 0,
           pageSize = 20;
-        
+
         pageIndex = parameters.GetIntOrDefault("page-index", "i").GetValueOrDefault(pageIndex);
         pageSize = parameters.GetIntOrDefault("page-size", "s").GetValueOrDefault(pageSize);
 

@@ -29,13 +29,13 @@ public class ArgumentParameters(IEnumerable<string> arguments) : IArgumentParame
     /// </summary>
     /// <value>An enumerable collection of parameter key strings.</value>
     public IEnumerable<string> Keys => _dictionary.Keys;
-    
+
     /// <summary>
     /// Gets a collection containing the parameter values.
     /// </summary>
     /// <value>An enumerable collection of <see cref="Parameter"/> objects.</value>
     public IEnumerable<Parameter> Values => _dictionary.Values;
-    
+
     /// <summary>
     /// Gets the number of parameters contained in the collection.
     /// </summary>

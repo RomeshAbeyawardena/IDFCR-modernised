@@ -17,8 +17,8 @@ namespace IDFCR.Abstractions.Persistence
     /// <param name="entityInterceptorFactory">The interceptor factory used to resolve repository interceptors.</param>
     public abstract class RepositoryBase<TCommon, TDb, T, TKey>(IEntityInterceptorFactory entityInterceptorFactory) : IRepository<T, TKey>
         where TKey : struct
-        where TDb: class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
-        where T: class, IMapper<TCommon>, TCommon
+        where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
+        where T : class, IMapper<TCommon>, TCommon
     {
         private async Task<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
         {
@@ -47,7 +47,7 @@ namespace IDFCR.Abstractions.Persistence
 
             return UnitResult.FromResult(value, UnitAction.Get, success, caughtException);
         }
-        
+
         private async Task<RepositoryInterceptorContext> InvokeInterceptorsAsync(EntityContextBehaviorStage stage,
             EntityContextBehavior behavior,
             object model, CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ namespace IDFCR.Abstractions.Persistence
         /// <summary>
         /// Returns the data and total row count for a paged query.
         /// </summary>
-        protected abstract Task<(IEnumerable<TDb> data,int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+        protected abstract Task<(IEnumerable<TDb> data, int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
             where TRequest : IPagedQuery;
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace IDFCR.Abstractions.Persistence
 
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
-                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre, 
+                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Insert, dbValue, cancellationToken);
 
                     if (context.BypassOperation)
@@ -231,7 +231,7 @@ namespace IDFCR.Abstractions.Persistence
 
             var mappedData = data.Select(Map) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
-            return UnitPagedResult.FromResult<T>(mappedData!, 
+            return UnitPagedResult.FromResult<T>(mappedData!,
                 totalRows, request, UnitAction.Get);
         }
 

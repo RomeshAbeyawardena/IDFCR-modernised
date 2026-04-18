@@ -16,7 +16,7 @@ public static class StringExtensions
     /// <returns>A JSON string representation of the object.</returns>
     public static string Jsonify<T>(this T? value, JsonSerializerOptions options)
     {
-        if(value is null)
+        if (value is null)
         {
             return "{}";
         }
@@ -44,7 +44,7 @@ public static class StringExtensions
 
         if (value.Length > limit)
         {
-            return string.Concat(value.AsSpan(0, limit - 3), "..."); 
+            return string.Concat(value.AsSpan(0, limit - 3), "...");
         }
 
         if (value.Length < limit)

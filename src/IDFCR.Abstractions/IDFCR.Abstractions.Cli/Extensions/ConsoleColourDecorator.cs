@@ -26,8 +26,8 @@ public class ConsoleColourDecorator : IDisposable
             resetForegroundColour = Console.ForegroundColor;
             Console.ForegroundColor = foregroundColour.Value;
         }
-        
-        
+
+
     }
 
     /// <summary>

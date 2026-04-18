@@ -1,5 +1,4 @@
 ﻿using IDFCR.Abstractions.Results;
-using MediatR;
 
 namespace IDFCR.Abstractions.Mediator;
 

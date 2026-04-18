@@ -18,5 +18,5 @@ public class DatabaseMigrationsRootCommand(IServiceProvider serviceProvider)
     /// Defines the command name for the database migration command in the CLI. This command name is used to identify the command when invoked in the CLI environment. By using a clear and descriptive command name, developers can ensure that users understand the purpose of the command and can easily execute it to perform database migration operations. The command name "migrate" indicates that this command is responsible for executing database migrations within the CLI.
     /// </summary>
     public const string CommandName = "migration";
-    
+
 }

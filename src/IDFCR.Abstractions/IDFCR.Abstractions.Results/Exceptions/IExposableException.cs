@@ -11,7 +11,7 @@ public interface IExposableException
     /// Gets the message that describes the exception.
     /// </summary>
     string Message { get; }
-    
+
     /// <summary>
     /// Gets additional details about the exception, if available.
     /// </summary>

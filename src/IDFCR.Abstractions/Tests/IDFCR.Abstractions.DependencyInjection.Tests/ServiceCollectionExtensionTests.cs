@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
-using IDFCR.Abstractions.DependencyInjection.Extensions;
-using IDFCR.TestUtilities.Fakes;
+﻿using IDFCR.Abstractions.DependencyInjection.Extensions;
 using IDFCR.Abstractions.DependencyInjection.Tests.Assets;
+using IDFCR.TestUtilities.Fakes;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 
 namespace IDFCR.Abstractions.DependencyInjection.Tests;
 

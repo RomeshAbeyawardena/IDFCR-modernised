@@ -14,7 +14,7 @@ public interface IMapper<TSource>
     /// <returns>An instance of the target type T, or null if the mapping could not be performed.</returns>
     T? Map<T>(params object[] parameters)
         where T : class, IMapper<TSource>;
-    
+
     /// <summary>
     /// Maps the source object to an instance of the specified target type T, using the default constructor of the target type. This method allows for parameterless mapping scenarios where no additional parameters are needed to perform the mapping. The target type T must implement the <see cref="IMapper{TSource}"/> interface and have a parameterless constructor, ensuring that it can be mapped from the source type. By using this method, developers can create simple mapping logic that can handle basic mapping scenarios, improving the versatility and reusability of mapping operations within applications and systems that utilize this interface.
     /// </summary>

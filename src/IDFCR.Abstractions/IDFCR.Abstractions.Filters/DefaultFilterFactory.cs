@@ -24,7 +24,7 @@ internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterF
     public IQueryable<TDb> Apply<TDb, TRequest>(IQueryable<TDb> queryable, TRequest request)
     {
         IQueryable<TDb> query = queryable;
-        
+
         foreach (var filter in GetFilters<TRequest, TDb>())
         {
             if (filter.CanFilter(request))
@@ -55,7 +55,7 @@ internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterF
         }
 
         (query, totalEntries) = PagedFilter.ApplyPaging(query, request, customCount: customCount);
-        
+
         return (query, totalEntries);
     }
 }

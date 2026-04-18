@@ -62,9 +62,9 @@ public abstract class MapperBase<TSource>() : IMapper<TSource>
         return result;
     }
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="source"></param>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
     public abstract void Map(TSource source);
 }

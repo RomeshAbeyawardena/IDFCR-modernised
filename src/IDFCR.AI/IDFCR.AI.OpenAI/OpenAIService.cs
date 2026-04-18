@@ -1,8 +1,8 @@
-using System.Text.Json;
 using IDFCR.AI.Abstractions;
 using IDFCR.AI.OpenAI.Configurations;
 using IDFCR.AI.OpenAI.Exceptions;
 using IDFCR.AI.OpenAI.Models;
+using System.Text.Json;
 
 namespace IDFCR.AI.OpenAI;
 

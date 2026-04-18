@@ -8,7 +8,7 @@ internal class PagedCustomerFilter : PagedFilterBase<PagedCustomerRequest, DbCus
     protected override Expression<Func<DbCustomer, bool>> BuildPredicate(IQueryable<DbCustomer> queryable, PagedCustomerRequest request)
     {
         var expression = base.StarterExpression;
-        var innerExpression =  base.StarterExpression;
+        var innerExpression = base.StarterExpression;
 
         if (!string.IsNullOrWhiteSpace(request.NameContains))
         {

@@ -11,6 +11,7 @@ public sealed class KeyNotFoundException(string messsage, Exception? innerExcept
     /// Initialises a new instance of the KeyNotFoundException class with a specified key that was not found. If the key is null, empty, or consists only of whitespace characters, a default error message "Key not found" is used. Otherwise, the error message includes the specific key that was not found, providing more context for debugging and error handling purposes. By using this constructor, developers can easily create instances of KeyNotFoundException with informative messages when a key is missing from a collection or data structure within applications and systems that involve key-based data access.
     /// </summary>
     /// <param name="key">The key that was not found.</param>
-    public KeyNotFoundException(string? key = null) : this(string.IsNullOrWhiteSpace(key) 
-        ? "Key not found" : $"Key '{key}' not found", null) { }
+    public KeyNotFoundException(string? key = null) : this(string.IsNullOrWhiteSpace(key)
+        ? "Key not found" : $"Key '{key}' not found", null)
+    { }
 }

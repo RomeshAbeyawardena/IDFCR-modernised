@@ -16,5 +16,5 @@ public interface IIOReadableStream
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<string?> ReadLineAsync(CancellationToken cancellationToken);
-    
+
 }

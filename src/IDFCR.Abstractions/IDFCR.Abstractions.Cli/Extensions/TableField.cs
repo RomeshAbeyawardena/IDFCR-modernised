@@ -13,7 +13,7 @@ public class TableField<T>
     /// Gets or sets the expression to access the field value from an instance of type T. This is a required property that must be provided when creating an instance of TableField.
     /// </summary>
     public required Expression<Func<T, object?>> Field { get; init; }
-    
+
     /// <summary>
     /// Gets or sets the function to format the field value for display. This is an optional property.
     /// </summary>

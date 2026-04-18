@@ -4,17 +4,17 @@ namespace IDFCR.Abstractions.Persistence.Tests;
 
 sealed class PersonModel
 {
-    public string? Name   { get; set; }
-    public string? Email  { get; set; }
-    public int     Age    { get; set; }
-    public bool    Active { get; set; }
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public int Age { get; set; }
+    public bool Active { get; set; }
 }
 
 sealed class NoStringModel
 {
-    public int     Id    { get; set; }
+    public int Id { get; set; }
     public decimal Value { get; set; }
-    public bool    Flag  { get; set; }
+    public bool Flag { get; set; }
 }
 
 sealed class SingleStringModel
@@ -39,11 +39,11 @@ internal class MaximumLengthStringExpressionBuilderTests
     public void BuildExpression_WithPopulatedStringProperties_ReturnsRuntimeLengths()
     {
         var instance = new PersonModel { Name = "Alice", Email = "alice@example.com" };
-        var result   = _compiled(instance);
+        var result = _compiled(instance);
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(ValueOf(result, "Name"),  Is.EqualTo("Alice".Length));
+            Assert.That(ValueOf(result, "Name"), Is.EqualTo("Alice".Length));
             Assert.That(ValueOf(result, "Email"), Is.EqualTo("alice@example.com".Length));
         }
     }
@@ -55,7 +55,7 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(ValueOf(result, "Name"),  Is.EqualTo(0));
+            Assert.That(ValueOf(result, "Name"), Is.EqualTo(0));
             Assert.That(ValueOf(result, "Email"), Is.EqualTo("test@test.com".Length));
         }
     }
@@ -67,7 +67,7 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(ValueOf(result, "Name"),  Is.EqualTo(0));
+            Assert.That(ValueOf(result, "Name"), Is.EqualTo(0));
             Assert.That(ValueOf(result, "Email"), Is.EqualTo(0));
         }
     }
@@ -79,8 +79,8 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result,                                      Has.Exactly(2).Items);
-            Assert.That(result.Any(kvp => kvp.Key == "Age"),    Is.False);
+            Assert.That(result, Has.Exactly(2).Items);
+            Assert.That(result.Any(kvp => kvp.Key == "Age"), Is.False);
             Assert.That(result.Any(kvp => kvp.Key == "Active"), Is.False);
         }
     }
@@ -104,7 +104,7 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result,                      Has.Exactly(1).Items);
+            Assert.That(result, Has.Exactly(1).Items);
             Assert.That(ValueOf(result, "Title"), Is.EqualTo("Hello, World!".Length));
         }
     }
@@ -126,7 +126,7 @@ internal class MaximumLengthStringExpressionBuilderTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(maxLengths["Name"],  Is.EqualTo("Charlotte".Length));
+            Assert.That(maxLengths["Name"], Is.EqualTo("Charlotte".Length));
             Assert.That(maxLengths["Email"], Is.EqualTo("charlotte@longdomain.example.com".Length));
         }
     }

@@ -10,7 +10,7 @@ namespace IDFCR.Abstractions.Persistence.Interceptors;
 /// <typeparam name="TDatabaseOptions">Reserved generic type parameter preserved by the public signature.</typeparam>
 public class SoftDeletionEntityInterceptor<TDatabaseOptions>(IOptions<DatabaseConfiguration> options)
     : EntityInterceptorBase(EntityContextBehaviorStage.Pre, EntityContextBehavior.Delete, 0)
-    
+
 {
     /// <inheritdoc />
     public override bool ShouldIntercept(IEntityInterceptorContext context)

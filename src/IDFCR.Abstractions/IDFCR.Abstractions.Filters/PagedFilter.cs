@@ -18,7 +18,7 @@ public static class PagedFilter
     /// <param name="defaultSize">The page size to use when the request does not provide one.</param>
     /// <param name="customCount">An optional custom count function.</param>
     /// <returns>The paged query and total row count before paging.</returns>
-    public static (IQueryable<TDb> query, int totalEntries) ApplyPaging<TDb,TRequest>(IQueryable<TDb> query, TRequest request, int defaultSize = 500, Func<IQueryable<TDb>, int>? customCount = null)
+    public static (IQueryable<TDb> query, int totalEntries) ApplyPaging<TDb, TRequest>(IQueryable<TDb> query, TRequest request, int defaultSize = 500, Func<IQueryable<TDb>, int>? customCount = null)
         where TRequest : IPagedQuery
     {
         var totalEntries = customCount is null ? query.Count() : customCount(query);

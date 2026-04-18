@@ -67,9 +67,11 @@ public abstract class CommandOperationBase(string name, params string[] aliases)
     /// <summary>
     /// Gets or sets the state of the command operation. The State property is used to maintain shared state information across the command operation and its sub-operations. This state can be initialized during the Initialise method and can be accessed by derived classes when implementing the OnInvokeAsync method to manage stateful information related to the command execution. The State property can only be set once during initialization, and any subsequent attempts to set it will result in an InvalidOperationException being thrown, ensuring that the state remains consistent throughout the lifecycle of the command operation.
     /// </summary>
-    public CommandOperationState State { 
-        get => _state; 
-        set { 
+    public CommandOperationState State
+    {
+        get => _state;
+        set
+        {
             if (!_isInitialised)
             {
                 _state = value;
@@ -79,7 +81,7 @@ public abstract class CommandOperationBase(string name, params string[] aliases)
             {
                 throw new InvalidOperationException("Cannot set State after initialisation.");
             }
-        } 
+        }
     }
 
     /// <summary>

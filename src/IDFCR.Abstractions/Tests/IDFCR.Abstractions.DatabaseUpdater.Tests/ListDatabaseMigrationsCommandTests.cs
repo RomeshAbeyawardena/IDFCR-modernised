@@ -1,15 +1,15 @@
 ﻿using IDFCR.Abstractions.Cli.Extensions;
+using IDFCR.Abstractions.Cli.ManagedStreams;
+using IDFCR.Abstractions.Cli.Prompts;
 using IDFCR.DatabaseUpdater.Extensions;
+using IDFCR.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.CommandLine.Parsing;
-using NUnit.Framework;
 using Microsoft.Extensions.Hosting;
-using Moq;
-using IDFCR.Abstractions.Cli.ManagedStreams;
-using IDFCR.TestUtilities;
 using Microsoft.Extensions.Time.Testing;
-using IDFCR.Abstractions.Cli.Prompts;
+using Moq;
+using NUnit.Framework;
+using System.CommandLine.Parsing;
 
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
@@ -21,7 +21,7 @@ internal class ListDatabaseMigrationsCommandTests
     private StringReader sr;
     private StringWriter sw;
     private StringWriter esw;
-    private Mock<IManagedStream> managedStream; 
+    private Mock<IManagedStream> managedStream;
     private Mock<IDatabaseFascade> databaseFascade;
     private FakeTimeProvider fakeTimeProvider;
     private bool isDbContextFascadeRegistered = false;
@@ -29,7 +29,7 @@ internal class ListDatabaseMigrationsCommandTests
     [SetUp]
     public void Setup()
     {
-        
+
         host = new();
         sr = new(string.Empty);
         sw = new();
@@ -58,7 +58,7 @@ internal class ListDatabaseMigrationsCommandTests
         {
             isDbContextFascadeRegistered = true;
             services.Remove(existingFascadeDescriptor);
-            
+
             services.AddScoped(_ => databaseFascade.Object);
         }
 

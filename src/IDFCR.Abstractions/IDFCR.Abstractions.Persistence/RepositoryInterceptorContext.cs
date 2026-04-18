@@ -11,11 +11,11 @@ namespace IDFCR.Abstractions.Persistence
             EntityContextBehavior Behavior,
             object Model)
         {
-            return new RepositoryInterceptorContext 
-            { 
+            return new RepositoryInterceptorContext
+            {
                 Stage = Stage,
-                Behavior = Behavior, 
-                Model = Model 
+                Behavior = Behavior,
+                Model = Model
             };
         }
 

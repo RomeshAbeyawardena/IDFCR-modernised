@@ -178,7 +178,7 @@ namespace IDFCR.TestUtilities
         /// <exception cref="NotImplementedException"></exception>
         protected override void OnUpdate(TDb db, T dto)
         {
-            
+
         }
     }
 }

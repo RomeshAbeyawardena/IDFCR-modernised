@@ -12,7 +12,7 @@ public static class TypeExtensions
     /// <param name="type">The type to check.</param>
     /// <param name="excludedTypes">An array of types to exclude from the check.</param>
     /// <returns>True if the type implements the interface and is not excluded; otherwise, false.</returns>
-   public static bool HasInterface<TInterface>(this Type type, params Type[] excludedTypes)
+    public static bool HasInterface<TInterface>(this Type type, params Type[] excludedTypes)
     {
         return type.GetInterface(typeof(TInterface).Name) is not null
             && excludedTypes.All(x => x != type);

@@ -40,7 +40,7 @@ public static class UnitResultExtensions
         var pagedResult = new UnitPagedResult<T>(unitResult.Result, unitResult.Result?.Count() ?? 0, pagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
         CloneMeta(unitResult.Meta, pagedResult);
         return pagedResult;
-    }   
+    }
 
     /// <summary>
     /// Converts a collection result using the supplied converter.
@@ -95,7 +95,8 @@ public static class UnitResultExtensions
     where T : IMapper<TAbstraction>, TAbstraction, new()
     where TDestination : IMapper<TAbstraction>, TAbstraction, new()
     {
-        return unitResult.Convert(x => {
+        return unitResult.Convert(x =>
+        {
             var result = new TDestination();
             result.Map(x);
             return result;

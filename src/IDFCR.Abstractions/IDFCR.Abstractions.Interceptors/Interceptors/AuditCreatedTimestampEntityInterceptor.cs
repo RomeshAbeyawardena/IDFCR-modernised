@@ -6,7 +6,7 @@ namespace IDFCR.Abstractions.Interceptors.Interceptors;
 /// Represents an entity interceptor that automatically sets the CreatedTimestampUtc property of an entity that implements the IAuditCreatedTimestamp interface to the current UTC time when the entity is being inserted into the context. This interceptor is designed to be applied during the Pre stage of the Insert behavior, ensuring that the CreatedTimestampUtc property is populated with the correct timestamp before the entity is persisted to the data store. By using this interceptor, developers can ensure that all entities implementing IAuditCreatedTimestamp have their CreatedTimestampUtc property set consistently and accurately when they are created within applications and systems that utilize interception mechanisms for managing entity operations.
 /// </summary>
 /// <param name="timeProvider">The timeprovider instance</param>
-public sealed class AuditCreatedTimestampEntityInterceptor(TimeProvider timeProvider) 
+public sealed class AuditCreatedTimestampEntityInterceptor(TimeProvider timeProvider)
     : EntityInterceptorBase(EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert, 0)
 {
     /// <summary>
@@ -16,7 +16,7 @@ public sealed class AuditCreatedTimestampEntityInterceptor(TimeProvider timeProv
     /// <returns>True if the interceptor should be applied; otherwise, false.</returns>
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
-        return context.Model is IAuditCreatedTimestamp auditCreatedTimestamp 
+        return context.Model is IAuditCreatedTimestamp auditCreatedTimestamp
             && auditCreatedTimestamp.CreatedTimestampUtc == default;
     }
 

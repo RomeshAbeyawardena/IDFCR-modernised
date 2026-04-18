@@ -38,7 +38,7 @@ public class CommandRouteDispatcher(IHost host) : IDisposable
     /// <summary>
     /// Disposes of the resources used by the CommandRouteDispatcher. This method ensures that any active service scope is properly disposed of, releasing any resources associated with it. After disposing of the service scope, it suppresses finalization to optimize garbage collection.
     /// </summary>
-    public void Dispose() 
+    public void Dispose()
     {
         _serviceScope?.Dispose();
         GC.SuppressFinalize(this);

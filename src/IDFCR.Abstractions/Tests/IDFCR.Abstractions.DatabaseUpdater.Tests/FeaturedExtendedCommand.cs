@@ -6,7 +6,7 @@ using IDFCR.Abstractions.Cli.Operations;
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
 
 [FeatureCommand(ExtendedCommandRoot.Prefix, CommandName)]
-public class FeaturedExtendedCommand(IServiceProvider serviceProvider, IManagedStream managedStream) 
+public class FeaturedExtendedCommand(IServiceProvider serviceProvider, IManagedStream managedStream)
     : InjectableCommandOperationBase<ExtendedCommandRoot>(serviceProvider, ExtendedCommandRoot.Prefix, CommandName, typeof(ExtendedCommandRoot))
 {
     public const string CommandName = "feature";

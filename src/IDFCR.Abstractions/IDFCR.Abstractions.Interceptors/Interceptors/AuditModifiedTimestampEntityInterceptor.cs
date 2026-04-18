@@ -6,7 +6,7 @@ namespace IDFCR.Abstractions.Interceptors.Interceptors;
 /// Represents an entity interceptor that automatically sets the ModifiedTimestampUtc property of an entity that implements the IAuditModifiedTimestamp interface to the current UTC time when the entity is being updated in the context. This interceptor is designed to be applied during the Pre stage of the Update behavior, ensuring that the ModifiedTimestampUtc property is populated with the correct timestamp before the entity is persisted to the data store. By using this interceptor, developers can ensure that all entities implementing IAuditModifiedTimestamp have their ModifiedTimestampUtc property set consistently and accurately when they are updated within applications and systems that utilize interception mechanisms for managing entity operations.
 /// </summary>
 /// <param name="timeProvider">The timeprovider instance</param>
-public sealed class AuditModifiedTimestampEntityInterceptor(TimeProvider timeProvider) 
+public sealed class AuditModifiedTimestampEntityInterceptor(TimeProvider timeProvider)
     : EntityInterceptorBase(EntityContextBehaviorStage.Pre, EntityContextBehavior.Update, 0)
 {
     /// <summary>

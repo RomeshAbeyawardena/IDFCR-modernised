@@ -26,8 +26,8 @@ public static class HostExtensions
     /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
     /// <param name="assembliesToScan">An array of assemblies to scan for database update operations.</param>
     /// <returns>An <see cref="IDisposable"/> representing the configured host.</returns>
-    public static async Task<IDisposable> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance, 
-        IEnumerable<string> args,  Action<IConfigurationBuilder>? configurationHostConfiguration = null,
+    public static async Task<IDisposable> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance,
+        IEnumerable<string> args, Action<IConfigurationBuilder>? configurationHostConfiguration = null,
         Action<HostBuilderContext, IServiceCollection>? configureServices = null,
         bool listOperations = false, CancellationToken? cancellationToken = null,
         params System.Reflection.Assembly[] assembliesToScan)
@@ -38,7 +38,7 @@ public static class HostExtensions
         {
             hostBuilder.ConfigureHostConfiguration(configurationHostConfiguration);
         }
-        
+
         if (configureServices is not null)
         {
             hostBuilder.ConfigureServices(configureServices);
@@ -46,7 +46,7 @@ public static class HostExtensions
 
         hostBuilder.ConfigureServices((hostContext, services) => services
             .ConfigureDatabaseUpdater(configurationInstance, assembliesToScan));
-        
+
         var host = hostBuilder.Build();
 
         await host.RunCommandsAsync(args, listOperations, cancellationToken.GetValueOrDefault(CancellationToken.None));

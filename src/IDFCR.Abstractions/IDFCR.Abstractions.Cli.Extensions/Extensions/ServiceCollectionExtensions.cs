@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
             return null;
         }
         var serviceKey = attribute.ToString();
-        
+
         return serviceKey;
     }
 

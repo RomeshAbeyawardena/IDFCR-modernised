@@ -13,7 +13,7 @@ public static class PagedQueryExtensions
     /// <param name="sourceQuery">The source query to copy paging properties from.</param>
     public static void MapQuery<T>(this T query, IPagedQuery sourceQuery)
         where T : IPagedQuery
-       
+
     {
         query.PageSize = sourceQuery.PageSize;
         query.PageIndex = sourceQuery.PageIndex;

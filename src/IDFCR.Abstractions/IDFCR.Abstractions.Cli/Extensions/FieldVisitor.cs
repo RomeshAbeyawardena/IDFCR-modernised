@@ -43,7 +43,7 @@ public class FieldVisitor : ExpressionVisitor
     {
         Reset();
         Member = node.Member;
-        
+
         if (Member is PropertyInfo property)
         {
             Property = property;

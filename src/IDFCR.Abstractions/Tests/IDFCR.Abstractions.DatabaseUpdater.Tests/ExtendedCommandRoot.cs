@@ -3,7 +3,7 @@
 
 namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
 
-public class ExtendedCommandRoot(IServiceProvider serviceProvider) 
+public class ExtendedCommandRoot(IServiceProvider serviceProvider)
     : InjectableCommandOperationRootBase<ExtendedCommandRoot>(serviceProvider, Prefix, CommandName, null)
 {
     public const string Prefix = "extension";

@@ -12,7 +12,7 @@ public class ExceptionBehaviourManagerBuilder : IExceptionBehaviourManagerBuilde
     /// <summary>
     /// Defines the default exception behaviour to be used when no specific behaviour is set for an exception type.
     /// </summary>
-    public static readonly ExceptionBehaviour Default = new (UnitAction.None, FailureReason.Unknown);
+    public static readonly ExceptionBehaviour Default = new(UnitAction.None, FailureReason.Unknown);
 
     /// <inheritdoc/>
     public IExceptionBehaviourManager Build()

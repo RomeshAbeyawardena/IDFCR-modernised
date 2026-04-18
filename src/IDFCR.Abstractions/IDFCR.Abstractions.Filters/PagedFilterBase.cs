@@ -43,12 +43,12 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
     /// <param name="request">The request used to build the predicate.</param>
     /// <returns>The predicate to apply to the query.</returns>
     protected abstract Expression<Func<TDb, bool>> BuildPredicate(IQueryable<TDb> queryable, TRequest request);
-    
+
     /// <inheritdoc />
     public override IQueryable<TDb> Apply(IQueryable<TDb> queryable, TRequest request)
     {
         var (query, _) = Apply_protected(queryable, request);
-        
+
         return query;
     }
 

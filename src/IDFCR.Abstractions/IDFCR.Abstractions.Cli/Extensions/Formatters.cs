@@ -15,7 +15,7 @@ public static class Formatters
     {
         return rd => rd is null
                             ? defaultPlaceholder
-                            : rd is DateTimeOffset offset 
+                            : rd is DateTimeOffset offset
                             ? offset.DateTime.ToLocalTime().ToShortDateString()
                             : rd is DateTime date
                                 ? date.ToLocalTime().ToShortDateString()

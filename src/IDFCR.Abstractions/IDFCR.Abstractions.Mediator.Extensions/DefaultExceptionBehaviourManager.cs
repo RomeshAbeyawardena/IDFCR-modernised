@@ -1,6 +1,6 @@
 ﻿namespace IDFCR.Abstractions.Mediator.Extensions;
 
-internal sealed class DefaultExceptionBehaviourManager(IDictionary<Type, ExceptionBehaviour>? behaviourDictionary = null, 
+internal sealed class DefaultExceptionBehaviourManager(IDictionary<Type, ExceptionBehaviour>? behaviourDictionary = null,
     ExceptionBehaviour? defaultExceptionBehaviour = null) : IExceptionBehaviourManager
 {
     private Dictionary<Type, ExceptionBehaviour> _behaviourDictionary = behaviourDictionary is not null ? new(behaviourDictionary) : [];

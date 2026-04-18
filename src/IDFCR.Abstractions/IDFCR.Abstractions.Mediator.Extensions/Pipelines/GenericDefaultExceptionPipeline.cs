@@ -51,7 +51,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                 }
 
                 result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, exception, behaviour.FailureReason])!;
-                
+
                 state.SetHandled(result);
 
                 return Task.CompletedTask;

@@ -61,7 +61,7 @@ public abstract class InjectableCommandOperationBase<T>(IServiceProvider service
             operation.ListOperations = ListOperations;
         }
 
-        ICommandOperation[] ownedOperations = [..operations.Where(x => x.MemberOfType == currentType)];
+        ICommandOperation[] ownedOperations = [.. operations.Where(x => x.MemberOfType == currentType)];
 
         AddSupportedOperations(ownedOperations);
 
@@ -135,7 +135,7 @@ public abstract class InjectableCommandOperationBase<T>(IServiceProvider service
     protected InjectableCommandOperationBase(IServiceProvider serviceProvider, string prefix, string name, params string[] aliases)
         : this(serviceProvider, prefix, name, null, aliases)
     {
-        
+
     }
 
     /// <summary>
