@@ -1,19 +1,16 @@
 using BuildTools.GRPC.Application.Extensions;
-using BuildTools.Infrastructure;
 using BuildTools.Application.Extensions;
 
 using BuildTools.Infrastructure.SqlServer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var dbSettings = builder.Configuration.Get<DbSettings>();
-
 var services = builder.Services;
 services
     .AddGrpc();
 
 services.AddSingleton(TimeProvider.System)
-       .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
+       .AddRepositories(builder.Configuration)
        .AddMediatorServices(builder.Configuration);
 
 var app = builder.Build();

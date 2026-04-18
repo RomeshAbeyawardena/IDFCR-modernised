@@ -23,12 +23,12 @@ static void ConfigureHostConfiguration(IConfigurationBuilder builder)
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
-    var dbSettings = context.Configuration.Get<DbSettings>();
+    
     services
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
         .ConfigurePromptGreeterOptions(opt => opt.UseDefault(PromptGreeterDefaults.Western)
                 .Configure(defaultPromptTemplate: $"Build Tools - Migration Assistant v.1.0{Environment.NewLine}{{OriginalTemplate}}")
                 .Build())
-        .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"));
+        .AddRepositories(context.Configuration);
 }

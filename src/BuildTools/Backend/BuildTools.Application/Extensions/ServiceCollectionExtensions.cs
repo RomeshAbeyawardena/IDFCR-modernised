@@ -3,7 +3,6 @@ using IDFCR.Abstractions.Mediator.Extensions.Extensions;
 using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Reflection;
 

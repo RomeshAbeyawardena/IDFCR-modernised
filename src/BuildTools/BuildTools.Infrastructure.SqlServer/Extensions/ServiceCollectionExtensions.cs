@@ -2,16 +2,20 @@
 using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
+using System.Data.Entity;
 
 namespace BuildTools.Infrastructure.SqlServer.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRepositories(this IServiceCollection services, DbSettings settings)
+    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         var currentAssembly = typeof(PackageManagerDbContext).Assembly;
+
+        var settings = configuration.Get<DbSettings>() ?? throw new InvalidOperationException("Unable to bind settings");
 
         if (!settings.ConnectionStrings.TryGetValue(settings.DefaultConnectionStringName
             ?? throw new InvalidOperationException("Default connection string not specified")

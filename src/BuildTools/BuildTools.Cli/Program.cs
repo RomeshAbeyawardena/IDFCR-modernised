@@ -11,8 +11,6 @@ using Microsoft.Extensions.Options;
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
-    var dbSettings = context.Configuration.Get<DbSettings>();
-
     var currentAssembly = typeof(Program).Assembly;
     services
         .Configure<ApplicationConfiguration>(context.Configuration)
@@ -20,7 +18,7 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
         .AddInjectableCommandServices(currentAssembly)
-        .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
+        .AddRepositories(context.Configuration)
         .AddMediatorServices(context.Configuration);
 }
 
