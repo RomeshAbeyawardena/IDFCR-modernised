@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Mediator;
 using IDFCR.Abstractions.Mediator.Extensions;
+using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Results;
 using MediatR.Pipeline;
 using NUnit.Framework;

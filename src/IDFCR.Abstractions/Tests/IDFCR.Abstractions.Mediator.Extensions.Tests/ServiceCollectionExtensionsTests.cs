@@ -1,9 +1,9 @@
-using IDFCR.Abstractions.Mediator;
-using IDFCR.Abstractions.Mediator.Extensions;
 using IDFCR.Abstractions.Mediator.Extensions.Extensions;
+using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Tests;
@@ -21,6 +21,13 @@ public sealed class ServiceCollectionThrowingRequestHandler : IUnitResultRequest
 [TestFixture]
 public class ServiceCollectionExtensionsTests
 {
+    private Mock<IUnitOfWork> unitOfWorkMock;
+    [SetUp]
+    public void SetUp()
+    {
+        unitOfWorkMock = new();
+    }
+
     [Test]
     public void ConfigureExceptionBehaviourManager_registers_singleton_manager_with_configured_behaviour()
     {
@@ -49,6 +56,7 @@ public class ServiceCollectionExtensionsTests
 
         using var services = new ServiceCollection()
             .AddLogging()
+            .AddScoped((c) => unitOfWorkMock.Object)
             .ConfigureExceptionBehaviourManager(builder => builder.Set<InvalidOperationException>(expected))
             .AddMediatorServicesAndPipelines(typeof(ServiceCollectionExtensionsTests).Assembly)
             .BuildServiceProvider();

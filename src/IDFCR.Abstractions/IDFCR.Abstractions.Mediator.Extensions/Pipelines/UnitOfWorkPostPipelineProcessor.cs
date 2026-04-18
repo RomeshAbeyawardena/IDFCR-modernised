@@ -9,7 +9,7 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <typeparam name="TRequest">The type of request being processed.</typeparam>
 /// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
 /// <param name="unitOfWork">The unit of work instance used to commit changes.</param>
-public class PostProcessUnitOfWorkPipeline<TRequest, TResponse>(IUnitOfWork unitOfWork) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
+public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
     /// <summary>
