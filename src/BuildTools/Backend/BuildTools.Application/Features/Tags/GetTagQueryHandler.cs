@@ -1,5 +1,6 @@
 ﻿using BuildTools.Infrastructure.Features.Tags;
 using BuildTools.Shared.Contracts.Feature.Tags;
+using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mediator.Extensions;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
@@ -14,11 +15,6 @@ public class GetTagQueryHandler(ITagRepository tagRepository) : IUnitResultReque
     {
         var tagResult = await tagRepository.GetTagAsync(request.Name, cancellationToken);
 
-        if (!tagResult.HasValue)
-        {
-            return UnitResult.Failed<TagDto>(tagResult.Exception, tagResult.Action, tagResult.FailureReason);
-        }
-
-        return UnitResult.FromResult(tagResult.GetResultOrDefault().Map<TagDto>(), tagResult.Action, true, tagResult.Exception);
+        return tagResult.Convert(x => x.Map<TagDto>());
     }
 }

@@ -47,7 +47,7 @@ public static class UnitResultExtensions
     /// </summary>
     public static IUnitResultCollection<TDestination> Convert<T, TDestination>(this IUnitResultCollection<T> unitResultCollection, Func<T, TDestination> converter)
     {
-        if (unitResultCollection.Result is null)
+        if (!unitResultCollection.HasValue)
         {
             var res = new DefaultUnitResult(unitResultCollection.Exception, unitResultCollection.Action, unitResultCollection.IsSuccess).AsCollection<TDestination>(default);
             CloneMeta(unitResultCollection.Meta, res);

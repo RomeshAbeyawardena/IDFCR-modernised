@@ -15,11 +15,6 @@ public class GetTagsQueryHandler(ITagRepository tagRepository) : IUnitResultColl
     {
         var tagsResult = await tagRepository.GetExistingTagsAsync(request.Names, cancellationToken);
 
-        if (!tagsResult.HasValue)
-        {
-            return UnitResultCollection.Failed<TagDto>(tagsResult.Exception, tagsResult.Action);
-        }
-
-        return UnitResultCollection.FromResult(tagsResult.GetResultOrDefault().Select(x => x.Map<TagDto>()), tagsResult.Action, true);
+        return tagsResult.Convert(x => x.Map<TagDto>());
     }
 }
