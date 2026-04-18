@@ -3,7 +3,15 @@
     <File Path="Add-Migration.ps1" />
     <File Path="Readme.md" />
   </Folder>
-  <Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
+  <Folder Name="/Backend/">
+	<Project Path="Backend/BuildTools.Application/BuildTools.Application.csproj" />
+	<Project Path="Backend/BuildTools.Application.gRPC/BuildTools.Application.GRPC.csproj" />
+	<Project Path="Backend/BuildTools.Shared.Contracts/BuildTools.Shared.Contracts.csproj" />
+	<Project Path="Backend/BuildTools.Shared.Contracts.gRPC/BuildTools.Shared.Contracts.GRPC.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+	<Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
+  </Folder>
   <Project Path="BuildTools.Cli/BuildTools.Cli.csproj" />
   <Project Path="BuildTools.DatabaseUpdater/BuildTools.DatabaseUpdater.csproj" />
   <Project Path="BuildTools.Infrastructure.SqlServer/BuildTools.Infrastructure.SqlServer.csproj" />
