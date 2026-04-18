@@ -5,12 +5,13 @@ using Grpc.Core;
 using MediatR;
 using System.Threading.Tasks;
 using System;
+using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.GRPC.Application;
 
 public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagCommandService.UpsertTagCommandServiceBase
 {
-    public override async Task<UnitResult> UpsertTag(UpsertTagCommand request, ServerCallContext context)
+    public override async Task<UpsertTagCommandResult> UpsertTag(UpsertTagCommand request, ServerCallContext context)
     {
         var tag = new TagsFeature.TagDto
         {
@@ -31,12 +32,16 @@ public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagComma
             failureReason = FailureReason.Unknown;
         }
 
-        return new UnitResult()
+        return new UpsertTagCommandResult
         {
-            IsSuccess = result.IsSuccess,
-            Action = unitAction,
-            ErrorMessage = result.Exception?.Message,
-            FailureReason = failureReason
+            TagId = result.GetResultOrDefault()?.ToString(),
+            Result = new UnitResult()
+            {
+                IsSuccess = result.IsSuccess,
+                Action = unitAction,
+                ErrorMessage = result.Exception?.Message,
+                FailureReason = failureReason
+            }
         };
     }
 }

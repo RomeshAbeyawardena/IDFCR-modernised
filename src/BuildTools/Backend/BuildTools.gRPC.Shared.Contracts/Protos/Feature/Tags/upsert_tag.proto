@@ -18,6 +18,11 @@ message UpsertTagCommand {
   TagDto tag = 1;
 }
 
+message UpsertTagCommandResult {
+	buildtools.shared.contracts.grpc.common.UnitResult result = 1;
+	string tag_id = 2;
+}
+
 service UpsertTagCommandService {
-  rpc UpsertTag(UpsertTagCommand) returns (buildtools.shared.contracts.grpc.common.UnitResult);
+  rpc UpsertTag(UpsertTagCommand) returns (UpsertTagCommandResult);
 }
