@@ -1,11 +1,12 @@
-﻿using BuildTools.Infrastructure;
+﻿using BuildTools.Application.Extensions;
+using BuildTools.Cli;
+using BuildTools.Infrastructure;
+using BuildTools.Infrastructure.SqlServer.Extensions;
+using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using IDFCR.Abstractions.Cli.Extensions;
-using BuildTools.Infrastructure.SqlServer.Extensions;
-using BuildTools.Cli;
 using Microsoft.Extensions.Options;
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
@@ -19,7 +20,8 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
         .AddInjectableCommandServices(currentAssembly)
-        .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"));
+        .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
+        .AddMediatorServices();
 }
 
 using var host = new HostBuilder()

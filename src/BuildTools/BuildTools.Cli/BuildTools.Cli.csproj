@@ -8,11 +8,12 @@
     <UserSecretsId>0fa7bb76-8950-4fce-bf82-08d43a0776c4</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.3.1" />
+    <PackageReference Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.3.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.6" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Backend\BuildTools.Application\BuildTools.Application.csproj" />
     <ProjectReference Include="..\BuildTools.Infrastructure.SqlServer\BuildTools.Infrastructure.SqlServer.csproj" />
     <ProjectReference Include="..\BuildTools.Shared\BuildTools.Shared.csproj" />
   </ItemGroup>

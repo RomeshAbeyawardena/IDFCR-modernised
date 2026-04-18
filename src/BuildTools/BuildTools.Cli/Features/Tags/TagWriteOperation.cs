@@ -1,14 +1,15 @@
-﻿using BuildTools.Infrastructure.Features.Tags;
+﻿using BuildTools.Shared.Contracts.Feature.Tags;
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Results.Extensions;
+using MediatR;
 
 namespace BuildTools.Cli.Features.Tags;
 
 [FeatureCommand(TagRootOperation.Prefix, CommandName)]
-public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ITagRepository tagRepository)
+public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IMediator mediator)
     : InjectableCommandOperationBase<TagWriteOperation>(serviceProvider, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
 {
     public const string CommandName = "write";
@@ -25,18 +26,20 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
             return;
         }
 
-        var foundEntry = (await tagRepository.GetTagAsync(name!, cancellationToken)).GetResultOrDefault();
+        var foundEntry = (await mediator.Send(new GetTagQuery { Name = name }, cancellationToken)).GetResultOrDefault();
 
-        var result = await tagRepository.UpsertAsync(new Tag
-        {
-            Id = foundEntry?.Id,
-            Name = foundEntry?.Name ?? name!,
-            DisplayName = displayName
+        var result = await mediator.Send(new UpsertTagCommand 
+        { 
+            CommitChanges = true,
+            Tag = new Shared.Contracts.Feature.Tags.TagDto {
+                Id = foundEntry?.Id,
+                Name = foundEntry?.Name ?? name!,
+                DisplayName = displayName
+            } 
         }, cancellationToken);
 
         if (result.IsSuccess)
         {
-            await tagRepository.SaveChangesAsync(cancellationToken);
             var verb = foundEntry is null ? "added" : "updated";
             await managedStream.Out.WriteLineAsync($"Tag '{name}' successfully {verb}.", cancellationToken);
             return;
