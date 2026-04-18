@@ -1,7 +1,7 @@
 ﻿using IDFCR.Abstractions.Results;
 using MediatR.Pipeline;
 
-namespace IDFCR.Abstractions.Mediator.Extensions;
+namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
 /// <summary>
 /// Represents a generic default exception handling pipeline for MediatR requests that return unit results. This pipeline is designed to catch exceptions of a specified type and convert them into a standardized unit result format, which indicates the failure of the operation along with the appropriate action and failure reason. The behavior for handling exceptions can be customized by implementing the IExceptionBehaviourManager interface, allowing for flexible and consistent error handling across different types of exceptions.

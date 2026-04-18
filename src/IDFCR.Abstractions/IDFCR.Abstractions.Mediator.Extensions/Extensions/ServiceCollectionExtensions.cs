@@ -1,4 +1,5 @@
-﻿using MediatR.Pipeline;
+﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
+using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

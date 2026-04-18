@@ -20,7 +20,7 @@ public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagComma
             Id = request.Tag.Id
         };
 
-        var result = await mediator.Send(new TagsFeature.UpsertTagCommand { Tag = tag }, context.CancellationToken);
+        var result = await mediator.Send(new TagsFeature.UpsertTagCommand { Tag = tag, CommitChanges = true }, context.CancellationToken);
 
         if (!Enum.TryParse<UnitAction>(result.Action.ToString(), false, out var unitAction))
         {
@@ -34,7 +34,7 @@ public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagComma
 
         return new UpsertTagCommandResult
         {
-            TagId = result.GetResultOrDefault()?.ToString(),
+            TagId = result.GetResultOrDefault()?.ToString(), //is a guid
             Result = new UnitResult()
             {
                 IsSuccess = result.IsSuccess,

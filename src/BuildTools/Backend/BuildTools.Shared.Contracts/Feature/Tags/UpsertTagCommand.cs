@@ -18,8 +18,13 @@ public class TagDto : MapperBase<ITag>, ITag
     }
 }
 
-public record UpsertTagCommand : IUnitResultRequest<object>
+public record UpsertTagCommand : IUnitResultRequest<object>, IUnitOfWorkRequest
 {
     public TagDto? Tag { get; init; }
     public bool CommitChanges { get; init; }
+}
+
+public interface IUnitOfWorkRequest
+{
+    bool CommitChanges { get; }
 }
