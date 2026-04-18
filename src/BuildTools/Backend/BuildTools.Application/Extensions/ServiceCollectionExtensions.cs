@@ -1,7 +1,9 @@
 ﻿using IDFCR.Abstractions.Mediator.Extensions;
 using IDFCR.Abstractions.Mediator.Extensions.Extensions;
 using IDFCR.Abstractions.Results;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Reflection;
 
@@ -9,12 +11,18 @@ namespace BuildTools.Application.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddMediatorServices(this IServiceCollection services, params Assembly[] assemblies)
+    public static IServiceCollection AddMediatorServices(this IServiceCollection services, 
+        IConfiguration configuration, params Assembly[] assemblies)
     {
-        return services.ConfigureExceptionBehaviourManager(x => { x
+        var licenses = configuration.GetSection("Licenses").Get<LicenseConfiguration>();
+
+        return services
+            .ConfigureExceptionBehaviourManager(x => { x
             .Set<NullReferenceException>(new ExceptionBehaviour(UnitAction.Get, FailureReason.NotFound))
             .Set<InvalidCastException>(new ExceptionBehaviour(UnitAction.Conflict, FailureReason.Conflict));
         })
-        .AddMediatorServicesAndPipelines([.. assemblies, typeof(ServiceCollectionExtensions).Assembly]);
+        .AddMediatorServicesAndPipelines(cfg => {
+            cfg.LicenseKey = licenses?.LuckyPenny;
+        }, [.. assemblies, typeof(ServiceCollectionExtensions).Assembly]);
     }
 }

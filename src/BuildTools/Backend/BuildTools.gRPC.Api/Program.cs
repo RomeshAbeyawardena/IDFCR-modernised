@@ -14,7 +14,8 @@ services
 
 services.AddSingleton(TimeProvider.System)
        .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
-       .AddMediatorServices();
+       .AddMediatorServices(builder.Configuration);
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");

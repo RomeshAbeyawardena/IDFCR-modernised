@@ -21,7 +21,7 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
         .AddSingleton(ConsoleStream.Std)
         .AddInjectableCommandServices(currentAssembly)
         .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
-        .AddMediatorServices();
+        .AddMediatorServices(context.Configuration);
 }
 
 using var host = new HostBuilder()
