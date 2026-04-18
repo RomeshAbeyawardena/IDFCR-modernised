@@ -1,4 +1,5 @@
-﻿using BuildTools.Shared.Contracts.Feature.Tags;
+﻿using BuildTools.Infrastructure.Features.Tags;
+using BuildTools.Shared.Contracts.Feature.Tags;
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
@@ -9,7 +10,7 @@ using MediatR;
 namespace BuildTools.Cli.Features.Tags;
 
 [FeatureCommand(TagRootOperation.Prefix, CommandName)]
-public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IMediator mediator)
+public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IMediator mediator, ITagRepository tagRepository)
     : InjectableCommandOperationBase<TagWriteOperation>(serviceProvider, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
 {
     public const string CommandName = "write";
@@ -76,12 +77,14 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
         tagList = [.. tagList.DistinctBy(x => x.Name)];
 
-        var existingTags = (await tagRepository.GetExistingTagsAsync([.. tagList.Select(x => x.Name)], cancellationToken)).GetResultOrDefault();
+        var existingTagsDto = (await mediator.Send(new GetTagsQuery { Names = [..tagList.Select(x => x.Name)] }, cancellationToken)).GetResultOrDefault();
 
         var tagsToAdd = tagList.AsEnumerable();
 
-        if (existingTags is not null)
+        if (existingTagsDto is not null)
         {
+            var existingTags = existingTagsDto.Select(x => x.Map<Tag>());
+
             tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
 
             foreach(var tag in existingTags)
@@ -94,6 +97,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
                 }
 
                 tag.DisplayName = foundTag.DisplayName;
+                //this will be too expensive to be handled by a pipeline, especially if it has many tags and pathways
                 await tagRepository.UpsertAsync(tag, cancellationToken);
             }
         }

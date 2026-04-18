@@ -3,9 +3,13 @@ using IDFCR.Abstractions.Persistence;
 
 namespace BuildTools.Shared.Contracts.Feature.Tags;
 
-public record GetTagQuery : IUnitResultRequest<TagDto>
+public record GetTagsQuery : IUnitResultCollectionRequest<TagDto>
 {
     public IEnumerable<string> Names { get; set; } = [];
+}
+
+public record GetTagQuery : IUnitResultRequest<TagDto>
+{
     public string? Name { get; init; }
     public string? NameContains { get; init; }
 }
