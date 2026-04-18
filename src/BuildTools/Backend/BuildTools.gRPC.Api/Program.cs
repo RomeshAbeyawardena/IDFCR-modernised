@@ -46,11 +46,11 @@ app.MapGet("/", async(ctx) => {
     statusReport.AppendLine();
 
     var timeProvider = ctx.RequestServices.GetRequiredService<TimeProvider>();
-
-    var uptime = timeProvider.GetUtcNow().Subtract(startTime);
+    var timeNow = timeProvider.GetUtcNow();
+    var uptime = timeNow.Subtract(startTime);
 
     statusReport.AppendLine($"Server Uptime: {uptime:hh\\:mm\\:ss}");
-
+    statusReport.AppendLine($"Last updated: {timeNow: dd/MM/yyy HH:mm:ss}");
     await ctx.Response.WriteAsync(statusReport.ToString());
 
     ///return $"Build tools GRPC Server\r\nActive Services:\r\n\t- {string.Join("\r\n\t- ", serviceList)}\r\n";
