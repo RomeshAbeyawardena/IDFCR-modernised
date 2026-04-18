@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.Results;
-using MediatR.Pipeline;
+﻿using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -23,6 +22,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureExceptionBehaviourManager(this IServiceCollection services, Action<IExceptionBehaviourManagerBuilder> buildConfiguration)
     {
         var builder = new ExceptionBehaviourManagerBuilder();
+        buildConfiguration(builder);
         return services.AddSingleton(builder.Build());
     }
 
@@ -39,9 +39,6 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))
-            //.AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(DefaultExceptionPipeline<,,>))
-            //.AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(DefaultCollectionExceptionPipeline<,,>))
-            //.AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(DefaultPagedExceptionPipeline<,,>))
             .AddMediatR(cfg =>
             {
                 configuration?.Invoke(cfg);

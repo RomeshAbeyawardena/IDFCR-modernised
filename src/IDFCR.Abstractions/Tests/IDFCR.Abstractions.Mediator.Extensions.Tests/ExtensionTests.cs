@@ -1,226 +1,201 @@
 ﻿using IDFCR.Abstractions.Mediator;
-using IDFCR.Abstractions.Mediator.Extensions.Extensions;
+using IDFCR.Abstractions.Mediator.Extensions;
 using IDFCR.Abstractions.Results;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using MediatR.Pipeline;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Tests;
 
 public sealed record Customer(int Id, string Name);
 
-public sealed class SuccessfulRequest : IUnitResultRequest
+public sealed class UnitResultRequest : IUnitResultRequest
 {
 }
 
-public sealed class SuccessfulRequestHandler : IUnitResultRequestHandler<SuccessfulRequest>
-{
-    public Task<IUnitResult> Handle(SuccessfulRequest request, CancellationToken cancellationToken)
-        => Task.FromResult(UnitResult.Success(UnitAction.Get));
-}
-
-public sealed class ThrowingRequest : IUnitResultRequest
+public sealed class TypedUnitResultRequest : IUnitResultRequest<Customer>
 {
 }
 
-public sealed class ThrowingRequestHandler : IUnitResultRequestHandler<ThrowingRequest>
-{
-    public Task<IUnitResult> Handle(ThrowingRequest request, CancellationToken cancellationToken)
-        => throw new InvalidOperationException("Simulated failure");
-}
-
-public sealed class CustomerCollectionRequest : IUnitResultCollectionRequest<Customer>
+public sealed class CollectionUnitResultRequest : IUnitResultCollectionRequest<Customer>
 {
 }
 
-public sealed class CustomerCollectionRequestHandler : IRequestHandler<CustomerCollectionRequest, IUnitResultCollection<Customer>>
+public sealed record PagedUnitResultRequest() : PagedQuery(2, 1), IPagedUnitResultRequest<Customer>;
+
+public sealed class UnsupportedResponseRequest
 {
-    public Task<IUnitResultCollection<Customer>> Handle(CustomerCollectionRequest request, CancellationToken cancellationToken)
-        => Task.FromResult(UnitResultCollection.FromResult(
-            [
-                new Customer(1, "Ada"),
-                new Customer(2, "Grace")
-            ],
-            UnitAction.Get));
-}
-
-public sealed class FailingCustomerCollectionRequest : IUnitResultCollectionRequest<Customer>
-{
-}
-
-public sealed class FailingCustomerCollectionRequestHandler : IRequestHandler<FailingCustomerCollectionRequest, IUnitResultCollection<Customer>>
-{
-    public Task<IUnitResultCollection<Customer>> Handle(FailingCustomerCollectionRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            throw new InvalidOperationException("Simulated collection failure");
-        }
-        catch (Exception ex)
-        {
-            return Task.FromResult(UnitResultCollection.Failed<Customer>(ex));
-        }
-    }
-}
-
-public sealed record CustomerPagedRequest() : PagedQuery(2, 1), IPagedUnitResultRequest<Customer>;
-
-public sealed class CustomerPagedRequestHandler : IRequestHandler<CustomerPagedRequest, IUnitPagedResult<Customer>>
-{
-    public Task<IUnitPagedResult<Customer>> Handle(CustomerPagedRequest request, CancellationToken cancellationToken)
-        => Task.FromResult(UnitPagedResult.FromResult(
-            [
-                new Customer(3, "Linus"),
-                new Customer(4, "Margaret")
-            ],
-            totalRows: 5,
-            pagedQuery: request,
-            action: UnitAction.Get));
-}
-
-public sealed record FailingCustomerPagedRequest() : PagedQuery(2, 1), IPagedUnitResultRequest<Customer>;
-
-public sealed class FailingCustomerPagedRequestHandler : IRequestHandler<FailingCustomerPagedRequest, IUnitPagedResult<Customer>>
-{
-    public Task<IUnitPagedResult<Customer>> Handle(FailingCustomerPagedRequest request, CancellationToken cancellationToken)
-    {
-        throw new InvalidOperationException("Simulated paged failure");
-    }
 }
 
 [TestFixture]
 public class ExtensionTests
 {
     [Test]
-    public async Task AddMediatorServicesAndPipelines_dispatches_unit_result_requests()
+    public async Task GenericDefaultExceptionPipeline_handles_non_generic_unit_results_using_default_behaviour()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
-
-        var result = await mediator.Send(new SuccessfulRequest());
+        var exception = new InvalidOperationException("boom");
+        var state = await Execute<UnitResultRequest, IUnitResult>(new UnitResultRequest(), exception);
+        var response = state.Response;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.True);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.Get));
-            Assert.That(result.Exception, Is.Null);
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.IsSuccess, Is.False);
+            Assert.That(response.Action, Is.EqualTo(UnitAction.None));
+            Assert.That(response.FailureReason, Is.EqualTo(FailureReason.Unknown));
+            Assert.That(response.Exception, Is.SameAs(exception));
         }
     }
 
     [Test]
-    public async Task AddMediatorServicesAndPipelines_dispatches_unit_result_collection_requests()
+    public async Task GenericDefaultExceptionPipeline_uses_registered_exception_behaviour_instead_of_default_fallback()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
+        var exception = new InvalidOperationException("boom");
+        var defaultBehaviour = new ExceptionBehaviour(UnitAction.Delete, FailureReason.InternalError);
+        var registeredBehaviour = new ExceptionBehaviour(UnitAction.Update, FailureReason.Conflict);
 
-        var result = await mediator.Send(new CustomerCollectionRequest());
-        var customers = result.Result?.ToArray();
+        var state = await Execute<TypedUnitResultRequest, IUnitResult<Customer>>(
+            new TypedUnitResultRequest(),
+            exception,
+            registeredBehaviour: registeredBehaviour,
+            defaultBehaviour: defaultBehaviour);
+
+        var response = state.Response;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.True);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.Get));
-            Assert.That(customers, Has.Length.EqualTo(2));
-            Assert.That(customers?.Select(x => x.Name), Is.EqualTo(new[] { "Ada", "Grace" }));
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.Action, Is.EqualTo(UnitAction.Update));
+            Assert.That(response.FailureReason, Is.EqualTo(FailureReason.Conflict));
+            Assert.That(response.Action, Is.Not.EqualTo(defaultBehaviour.UnitAction));
+            Assert.That(response.FailureReason, Is.Not.EqualTo(defaultBehaviour.FailureReason));
+            Assert.That(response.Exception, Is.SameAs(exception));
         }
     }
 
     [Test]
-    public async Task AddMediatorServicesAndPipelines_returns_failed_unit_result_collection_with_embedded_exception()
+    public async Task GenericDefaultExceptionPipeline_handles_typed_unit_results_using_registered_exception_behaviour()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
+        var exception = new InvalidOperationException("boom");
+        var behaviour = new ExceptionBehaviour(UnitAction.Update, FailureReason.Conflict);
 
-        var result = await mediator.Send(new FailingCustomerCollectionRequest());
+        var state = await Execute<TypedUnitResultRequest, IUnitResult<Customer>>(
+            new TypedUnitResultRequest(),
+            exception,
+            registeredBehaviour: behaviour);
+
+        var response = state.Response;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.False);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.None));
-            Assert.That(result.Result, Is.Null);
-            Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
-            Assert.That(result.Exception?.Message, Is.EqualTo("Simulated collection failure"));
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.IsSuccess, Is.False);
+            Assert.That(response.Action, Is.EqualTo(UnitAction.Update));
+            Assert.That(response.FailureReason, Is.EqualTo(FailureReason.Conflict));
+            Assert.That(response.Exception, Is.SameAs(exception));
+            Assert.That(response.Result, Is.Null);
+            Assert.That(response.HasValue, Is.False);
         }
     }
 
     [Test]
-    public async Task AddMediatorServicesAndPipelines_dispatches_paged_unit_result_requests()
+    public async Task GenericDefaultExceptionPipeline_handles_collection_results_and_embeds_the_thrown_exception()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
+        var exception = new InvalidOperationException("boom");
+        var behaviour = new ExceptionBehaviour(UnitAction.Delete, FailureReason.InternalError);
 
-        var result = await mediator.Send(new CustomerPagedRequest());
-        var customers = result.Result?.ToArray();
+        var state = await Execute<CollectionUnitResultRequest, IUnitResultCollection<Customer>>(
+            new CollectionUnitResultRequest(),
+            exception,
+            registeredBehaviour: behaviour);
+
+        var response = state.Response;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.True);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.Get));
-            Assert.That(result.TotalRows, Is.EqualTo(5));
-            Assert.That(result.PagedQuery.PageSize, Is.EqualTo(2));
-            Assert.That(result.PagedQuery.PageIndex, Is.EqualTo(1));
-            Assert.That(result.Meta["totalRows"], Is.EqualTo(5));
-            Assert.That(result.Meta["totalPages"], Is.EqualTo(3));
-            Assert.That(customers, Has.Length.EqualTo(2));
-            Assert.That(customers?.Select(x => x.Name), Is.EqualTo(new[] { "Linus", "Margaret" }));
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.IsSuccess, Is.False);
+            Assert.That(response.Action, Is.EqualTo(UnitAction.Delete));
+            Assert.That(response.Exception, Is.SameAs(exception));
+            Assert.That(response.Result, Is.Null);
         }
     }
 
     [Test]
-    public async Task AddMediatorServicesAndPipelines_returns_failed_paged_unit_result_with_embedded_exception()
+    public async Task GenericDefaultExceptionPipeline_handles_paged_results_with_empty_payload_and_paging_metadata()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
+        var request = new PagedUnitResultRequest();
+        var exception = new InvalidOperationException("boom");
+        var behaviour = new ExceptionBehaviour(UnitAction.Conflict, FailureReason.Forbidden);
 
-        var result = await mediator.Send(new FailingCustomerPagedRequest());
-        var customers = result.Result?.ToArray();
+        var state = await Execute<PagedUnitResultRequest, IUnitPagedResult<Customer>>(
+            request,
+            exception,
+            registeredBehaviour: behaviour);
+
+        var response = state.Response;
+        var result = response?.Result?.ToArray();
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.False);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.None));
-            Assert.That(result.TotalRows, Is.EqualTo(0));
-            Assert.That(result.PagedQuery.PageSize, Is.EqualTo(2));
-            Assert.That(result.PagedQuery.PageIndex, Is.EqualTo(1));
-            Assert.That(result.Meta["totalRows"], Is.EqualTo(0));
-            Assert.That(result.Meta["totalPages"], Is.EqualTo(0));
-            Assert.That(customers, Is.Empty);
-            Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
-            Assert.That(result.Exception?.Message, Is.EqualTo("Simulated paged failure"));
-            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.Unknown));
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.IsSuccess, Is.False);
+            Assert.That(response.Action, Is.EqualTo(UnitAction.Conflict));
+            Assert.That(response.FailureReason, Is.EqualTo(FailureReason.Forbidden));
+            Assert.That(response.Exception, Is.SameAs(exception));
+            Assert.That(response.TotalRows, Is.EqualTo(0));
+            Assert.That(response.PagedQuery, Is.SameAs(request));
+            Assert.That(response.PagedQuery.PageSize, Is.EqualTo(2));
+            Assert.That(response.PagedQuery.PageIndex, Is.EqualTo(1));
+            Assert.That(result, Is.Empty);
+            Assert.That(response.Meta["pageSize"], Is.EqualTo(2));
+            Assert.That(response.Meta["pageIndex"], Is.EqualTo(1));
+            Assert.That(response.Meta["totalRows"], Is.EqualTo(0));
+            Assert.That(response.Meta["totalPages"], Is.EqualTo(0));
         }
     }
 
     [Test]
-    public async Task AddMediatorServicesAndPipelines_converts_unit_result_request_exceptions_to_failed_results()
+    public async Task GenericDefaultExceptionPipeline_does_not_handle_unsupported_response_types()
     {
-        using var services = CreateServiceProvider();
-        var mediator = services.GetRequiredService<IMediator>();
-
-        var result = await mediator.Send(new ThrowingRequest());
+        var exception = new InvalidOperationException("boom");
+        var state = await Execute<UnsupportedResponseRequest, string>(new UnsupportedResponseRequest(), exception);
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.IsSuccess, Is.False);
-            Assert.That(result.Action, Is.EqualTo(UnitAction.None));
-            Assert.That(result.FailureReason, Is.EqualTo(FailureReason.Unknown));
-            Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
-            Assert.That(result.Exception?.Message, Is.EqualTo("Simulated failure"));
+            Assert.That(state.Handled, Is.False);
+            Assert.That(state.Response, Is.Null);
         }
     }
 
-    private static ServiceProvider CreateServiceProvider()
+    private static async Task<RequestExceptionHandlerState<TResponse>> Execute<TRequest, TResponse>(
+        TRequest request,
+        InvalidOperationException exception,
+        ExceptionBehaviour? registeredBehaviour = null,
+        ExceptionBehaviour? defaultBehaviour = null)
+        where TRequest : notnull
     {
-        return new ServiceCollection()
-            .AddLogging()
-            .ConfigureExceptionBehaviourManager(_ => { })
-            .AddMediatorServicesAndPipelines(typeof(ExtensionTests).Assembly)
-            .BuildServiceProvider();
+        var builder = new ExceptionBehaviourManagerBuilder();
+
+        if (defaultBehaviour is not null)
+        {
+            builder.SetDefault(defaultBehaviour);
+        }
+
+        if (registeredBehaviour is not null)
+        {
+            builder.Set<InvalidOperationException>(registeredBehaviour);
+        }
+
+        var pipeline = new GenericDefaultExceptionPipeline<TRequest, TResponse, InvalidOperationException>(builder.Build());
+        var state = new RequestExceptionHandlerState<TResponse>();
+
+        await pipeline.Handle(request, exception, state, CancellationToken.None);
+
+        return state;
     }
 }
