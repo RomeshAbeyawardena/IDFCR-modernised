@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package buildtools.shared.contracts.grpc.feature.tags;
+
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Feature.Tags";
+
+import "Common/unit_result.proto";
+import "Feature/Tags/upsert_tag.proto"; // reuses TagDto
+
+message GetPagedTagsQuery {
+  int32 page_size = 1;
+  int32 page_index = 2;
+  string name = 3;
+  string name_contains = 4;
+}
+
+message GetPagedTagsQueryResult {
+  buildtools.shared.contracts.grpc.common.UnitResult result = 1;
+  repeated TagDto tags = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+  int32 page_size = 5;
+  int32 page_index = 6;
+}
+
+service GetPagedTagsQueryService {
+  rpc GetPagedTags(GetPagedTagsQuery) returns (GetPagedTagsQueryResult);
+}
