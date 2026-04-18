@@ -5,10 +5,16 @@ using MediatR;
 using System.Threading.Tasks;
 using BuildTools.GRPC.Application.Extensions;
 using BuildTools.GRPC.Shared.Contracts.Common;
+using System;
 
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class RegisteredServiceAttribute : Attribute { }
+
+
+[RegisteredService]
 public class DefaultDeleteTagService(IMediator mediator) : DeleteTagCommandService.DeleteTagCommandServiceBase
 {
     public override async Task<UnitResult> DeleteTag(DeleteTagCommand request, ServerCallContext context)

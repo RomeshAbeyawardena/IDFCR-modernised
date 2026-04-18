@@ -9,6 +9,7 @@ using BuildTools.GRPC.Application.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
+[RegisteredService]
 public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagCommandService.UpsertTagCommandServiceBase
 {
     public override async Task<UpsertTagCommandResult> UpsertTag(UpsertTagCommand request, ServerCallContext context)

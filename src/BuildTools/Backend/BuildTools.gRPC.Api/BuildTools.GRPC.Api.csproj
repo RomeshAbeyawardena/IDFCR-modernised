@@ -8,4 +8,9 @@
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildTools.Infrastructure.SqlServer\BuildTools.Infrastructure.SqlServer.csproj" />
+    <ProjectReference Include="..\BuildTools.Application\BuildTools.Application.csproj" />
+    <ProjectReference Include="..\BuildTools.gRPC.Application\BuildTools.GRPC.Application.csproj" />
+  </ItemGroup>
 </Project>

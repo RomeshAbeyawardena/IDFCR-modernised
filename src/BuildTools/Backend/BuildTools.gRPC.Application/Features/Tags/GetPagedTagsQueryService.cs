@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
+[RegisteredService]
 public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQueryService.GetPagedTagsQueryServiceBase
 {
     public override async Task<GetPagedTagsQueryResult> GetPagedTags(GetPagedTagsQuery request, ServerCallContext context)
