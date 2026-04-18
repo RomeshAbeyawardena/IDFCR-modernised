@@ -3,11 +3,12 @@ using BuildTools.Infrastructure.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
+using MediatR;
 
 namespace BuildTools.Cli.Features.Tags;
 
 [FeatureCommand(TagRootOperation.Prefix, CommandName)]
-public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, ITagRepository tagRepository)
+public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream managedStream, IMediator mediator)
     : ReadCommandOperationBase<TagReadOperation>(serviceProvider, managedStream, TagRootOperation.Prefix, CommandName, typeof(TagRootOperation))
 {
     public const string CommandName = "read";

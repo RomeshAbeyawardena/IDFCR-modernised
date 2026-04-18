@@ -1,5 +1,5 @@
 ﻿using BuildTools.Infrastructure.Features.Tags;
-using BuildTools.Shared.Contracts.Feature.Tags;
+using BuildTools.Shared.Contracts.Features.Tags;
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mediator.Extensions;
 using IDFCR.Abstractions.Results;

@@ -1,7 +1,7 @@
 ﻿using IDFCR.Abstractions.Mediator;
 using IDFCR.Abstractions.Persistence;
 
-namespace BuildTools.Shared.Contracts.Feature.Tags;
+namespace BuildTools.Shared.Contracts.Features.Tags;
 
 public record UpsertTagCommand : IUnitResultRequest<object>, IUnitOfWorkRequest
 {

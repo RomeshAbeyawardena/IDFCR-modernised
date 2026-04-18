@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Mediator;
 
-namespace BuildTools.Shared.Contracts.Feature.Tags;
+namespace BuildTools.Shared.Contracts.Features.Tags;
 
 public record GetTagQuery : IUnitResultRequest<TagDto>
 {

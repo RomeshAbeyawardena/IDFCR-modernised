@@ -1,7 +1,7 @@
 ﻿using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mapper;
 
-namespace BuildTools.Shared.Contracts.Feature.Tags;
+namespace BuildTools.Shared.Contracts.Features.Tags;
 
 public class TagDto : MapperBase<ITag>, ITag
 {
