@@ -1,5 +1,4 @@
 using IDFCR.AI.Abstractions;
-using IDFCR.AI.Http;
 using IDFCR.AI.Http.Configurations;
 using Moq;
 using Moq.Protected;

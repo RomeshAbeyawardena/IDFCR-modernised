@@ -1,7 +1,6 @@
 ﻿using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
-using System.Reflection;
 using System.Text;
 
 namespace IDFCR.Abstractions.Cli.Extensions;
