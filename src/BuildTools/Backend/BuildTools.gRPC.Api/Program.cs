@@ -1,8 +1,20 @@
 using BuildTools.GRPC.Application.Extensions;
-using Grpc.Core;
+using BuildTools.Infrastructure;
+using BuildTools.Application.Extensions;
+
+using BuildTools.Infrastructure.SqlServer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddGrpc();
+
+var dbSettings = builder.Configuration.Get<DbSettings>();
+
+var services = builder.Services;
+services
+    .AddGrpc();
+
+services.AddSingleton(TimeProvider.System)
+       .AddRepositories(dbSettings ?? throw new InvalidOperationException("Unable to bind settings"))
+       .AddMediatorServices();
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
