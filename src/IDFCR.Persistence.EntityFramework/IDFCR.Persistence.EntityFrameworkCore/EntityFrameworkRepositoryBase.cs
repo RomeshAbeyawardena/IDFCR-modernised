@@ -48,8 +48,9 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <returns>The key of the newly added entity.</returns>
     protected override async Task<TKey> OnAddAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
     {
-        await DbSet.AddAsync(entry, cancellationToken);
-        return entry.Id;
+        var trackedEntry = await DbSet.AddAsync(entry, cancellationToken);
+        //return entry.Id;
+        return trackedEntry.Property(x => x.Id).CurrentValue;
     }
 
     /// <summary>

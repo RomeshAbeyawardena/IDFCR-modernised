@@ -28,6 +28,6 @@ enum FailureReason {
 message UnitResult {
   bool is_success = 1;
   UnitAction action = 2;
-  FailureReason failure_reason = 3;
+  optional FailureReason failure_reason = 3;
   string error_message = 4;
 }

@@ -22,7 +22,7 @@ public static class UnitResultExtensions
         {
             IsSuccess = result.IsSuccess,
             Action = unitAction,
-            ErrorMessage = result.Exception?.Message,
+            ErrorMessage = result.Exception?.Message ?? string.Empty,
             FailureReason = failureReason
         };
     }

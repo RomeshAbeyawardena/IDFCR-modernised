@@ -14,6 +14,7 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
 
         builder.Property(e => e.Id)
             .HasColumnName("TagId")
+            .ValueGeneratedOnAdd()
             .HasDefaultValueSql("NEWSEQUENTIALID()", "DF_Tag_TagId")
             .IsRequired();
 
