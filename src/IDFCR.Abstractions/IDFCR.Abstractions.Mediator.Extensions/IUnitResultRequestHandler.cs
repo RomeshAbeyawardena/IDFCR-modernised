@@ -21,3 +21,26 @@ public interface IUnitResultRequestHandler<TRequest, TResponse> : IRequestHandle
     where TRequest : IUnitResultRequest<TResponse>
 {
 }
+
+
+/// <summary>
+/// Represents a request handler for requests that return collections of unit results. This interface extends the MediatR IRequestHandler interface, allowing you to handle requests that indicate the success or failure of an operation along with a collection of associated data. By implementing this interface, you can create handlers that process specific types of requests and return standardized unit results with collections of values, which can be useful for scenarios where you want to indicate the outcome of an operation while also providing multiple relevant data items. The generic version of this interface provides flexibility in how you structure your request handlers based on the needs of your application, allowing you to work with different types of data collections while maintaining a consistent approach to handling unit results.
+/// </summary>
+/// <typeparam name="TRequest">The type of request being handled.</typeparam>
+/// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
+public interface IUnitResultCollectionRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, IUnitResultCollection<TResponse>>
+    where TRequest : IUnitResultCollectionRequest<TResponse>
+{
+
+}
+
+/// <summary>
+/// Represents a request handler for requests that return paged collections of unit results. This interface extends the MediatR IRequestHandler interface, allowing you to handle requests that indicate the success or failure of an operation along with a paged collection of associated data. By implementing this interface, you can create handlers that process specific types of requests and return standardized unit results with paged collections of values, which can be useful for scenarios where you want to indicate the outcome of an operation while also providing multiple relevant data items in a paged format. The generic version of this interface provides flexibility in how you structure your request handlers based on the needs of your application, allowing you to work with different types of paged data collections while maintaining a consistent approach to handling unit results.
+/// </summary>
+/// <typeparam name="TRequest">The type of request being handled.</typeparam>
+/// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
+public interface IUnitPagedResultCollectionRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, IUnitPagedResult<TResponse>>
+    where TRequest : IUnitPagedResultRequest<TResponse>
+{
+
+}

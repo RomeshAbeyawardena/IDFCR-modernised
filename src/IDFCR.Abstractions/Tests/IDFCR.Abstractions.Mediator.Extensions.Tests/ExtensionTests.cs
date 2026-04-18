@@ -19,7 +19,7 @@ public sealed class CollectionUnitResultRequest : IUnitResultCollectionRequest<C
 {
 }
 
-public sealed record PagedUnitResultRequest() : PagedQuery(2, 1), IPagedUnitResultRequest<Customer>;
+public sealed record PagedUnitResultRequest() : PagedQuery(2, 1), IUnitPagedResultRequest<Customer>;
 
 public sealed class UnsupportedResponseRequest
 {
