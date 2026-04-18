@@ -1,5 +1,5 @@
 ﻿using BuildTools.Infrastructure.Features.Tags;
-using BuildTools.Shared.Contracts.Feature.Tags;
+using BuildTools.Shared.Contracts.Features.Tags;
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
@@ -32,7 +32,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
         var result = await mediator.Send(new UpsertTagCommand 
         { 
             CommitChanges = true,
-            Tag = new Shared.Contracts.Feature.Tags.TagDto {
+            Tag = new Shared.Contracts.Features.Tags.TagDto {
                 Id = foundEntry?.Id,
                 Name = foundEntry?.Name ?? name!,
                 DisplayName = displayName

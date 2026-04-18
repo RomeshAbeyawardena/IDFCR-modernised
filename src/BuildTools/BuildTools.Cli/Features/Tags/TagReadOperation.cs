@@ -1,5 +1,4 @@
 ﻿using BuildTools.Cli.Common;
-using BuildTools.Infrastructure.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
@@ -24,7 +23,7 @@ public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream m
     {
         if (string.IsNullOrWhiteSpace(_name))
         {
-            var pagedResult = await tagRepository.GetPagedAsync(new GetPagedTagsQuery
+            var pagedResult = await mediator.Send(new Shared.Contracts.Features.Tags.GetPagedTagsQuery
             {
                 PageSize = 20,
                 Name = _name
@@ -37,7 +36,7 @@ public class TagReadOperation(IServiceProvider serviceProvider, IManagedStream m
             return;
         }
 
-        var valueResult = await tagRepository.GetTagAsync(_name, cancellationToken);
+        var valueResult = await mediator.Send(new Shared.Contracts.Features.Tags.GetTagQuery { Name = _name }, cancellationToken);
 
         if (valueResult.HasValue)
         {
