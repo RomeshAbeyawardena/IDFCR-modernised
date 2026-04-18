@@ -96,30 +96,3 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
         return Task.CompletedTask;
     }
 }
-
-//public sealed class DefaultPagedExceptionPipeline<TRequest, TValue, TException>
-//    : IRequestExceptionHandler<TRequest, IUnitPagedResult<TValue>, TException>
-//    where TRequest : IPagedUnitResultRequest<TValue>
-//    where TException : Exception
-//{
-//    public async Task Handle(
-//        TRequest request,
-//        TException exception,
-//        RequestExceptionHandlerState<IUnitPagedResult<TValue>> state,
-//        CancellationToken cancellationToken)
-//    {
-//        var behaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>()
-//            ?? exceptionBehaviourManager.DefaultExceptionBehaviour
-//            ?? ExceptionBehaviourManagerBuilder.Default;
-
-//        state.SetHandled(
-//            UnitPagedResult.FromResult<TValue>(
-//                [],
-//                0,
-//                request,
-//                behaviour.UnitAction,
-//                false,
-//                exception,
-//                behaviour.FailureReason));
-//    }
-//}
