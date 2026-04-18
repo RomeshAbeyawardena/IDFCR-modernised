@@ -3,6 +3,7 @@ using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
+
 public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion, IIdentifiable<Guid>
 {
     object IPackageVersion.PackageId => PackageId;
@@ -32,7 +33,7 @@ public class PackageVersionEntity : MapperBase<IPackageVersion>, IPackageVersion
         {
             PackageId = packageId;
         }
-        
+
         VersionPrefix = source.VersionPrefix;
         RevisionNumber = source.RevisionNumber;
         ReleaseDateTimestampUtc = source.ReleaseDateTimestampUtc;

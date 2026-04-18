@@ -26,7 +26,7 @@ public interface IPackageVersion
     /// 
     /// </summary>
     string Version { get; }
-    
+
     /// <summary>
     /// Gets the UTC timestamp when this package revision was released.
     /// </summary>

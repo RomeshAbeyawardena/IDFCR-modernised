@@ -58,7 +58,7 @@ public class Tag : MapperBase<ITag>, ITag
     {
         if (obj is Tag tag)
         {
-           return Equals(tag);
+            return Equals(tag);
         }
 
         if (obj is string tagName)

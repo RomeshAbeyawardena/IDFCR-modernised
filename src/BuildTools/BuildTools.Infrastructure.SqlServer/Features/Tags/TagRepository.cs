@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Tags;
 
 [RegisteredRepository]
-public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
+public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ITag, TagEntity, Tag, Guid>(db, filterFactory, entityInterceptorFactory), ITagRepository
 {
     public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)

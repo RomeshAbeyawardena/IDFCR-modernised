@@ -20,7 +20,7 @@ public class PackageVersionFilter : PagedFilterBase<GetPackageVersionPagedReques
         {
             query = query.And(e => e.Package.Name == request.PackageName);
         }
-        else if(!string.IsNullOrWhiteSpace(request.PackageNameContains))
+        else if (!string.IsNullOrWhiteSpace(request.PackageNameContains))
         {
             query = query.And(e => e.Package.Name.Contains(request.PackageNameContains));
         }

@@ -1,11 +1,11 @@
-﻿using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
-using Contracts = BuildTools.Shared.Contracts.Features.Tags;
+﻿using BuildTools.GRPC.Application.Extensions;
+using BuildTools.GRPC.Shared.Contracts.Common;
+using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
 using Grpc.Core;
 using MediatR;
-using System.Threading.Tasks;
-using BuildTools.GRPC.Application.Extensions;
-using BuildTools.GRPC.Shared.Contracts.Common;
 using System;
+using System.Threading.Tasks;
+using Contracts = BuildTools.Shared.Contracts.Features.Tags;
 
 
 namespace BuildTools.GRPC.Application.Features.Tags;

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer;
 
-public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> options) 
+public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> options)
     : DbContext(options), IUnitOfWork
 {
     public DbSet<EnvironmentEntity> Environments { get; set; }

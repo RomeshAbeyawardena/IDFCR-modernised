@@ -1,7 +1,7 @@
-using IDFCR.Abstractions.Cli.Operations;
 using BuildTools.Infrastructure.Features.Environments;
-using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Extensions;
+using IDFCR.Abstractions.Cli.ManagedStreams;
+using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Results.Extensions;
 
 namespace BuildTools.Cli.Features.Environments;

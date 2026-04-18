@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
 [RegisteredRepository]
-public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory) 
+public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
     : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory), ISettingRepository
 {
     protected override Task<Guid> OnAddAsync(SettingEntity entry, Setting rawEntry, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ public class SettingRepository(PackageManagerDbContext db, IFilterFactory filter
     public async Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken)
     {
         var settingResult = await GetSettingAsync(key, type, cancellationToken);
-        
+
         if (settingResult.HasValue)
         {
             return UnitResult.FromResult(settingResult.Result.Value);

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
-using System.Data.Entity;
 
 namespace BuildTools.Infrastructure.SqlServer.Extensions;
 
@@ -57,6 +56,6 @@ public static class ServiceCollectionExtensions
             .EnableDetailedErrors(settings.EnableDetailedErrors))
             .AddInterceptors(currentAssembly)
             .ScanFilters(currentAssembly);
-        
+
     }
 }

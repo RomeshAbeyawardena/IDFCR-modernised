@@ -4,17 +4,15 @@ using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
-using IDFCR.Abstractions.Results.Extensions;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Options;
 
 namespace BuildTools.Cli.Features.Packages.Version;
 
 //increments package version by adding a new version with a new revision number, and making it the latest version. If the package doesn't exist, it will be created with version 1.0.0
 [FeatureCommand(PackageVersionRootOperation.Prefix, CommandName)]
-public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream, 
+public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, IManagedStream managedStream,
     IVersionLockRepository versionLockRepository,
-    IPackageRepository packageRepository, 
+    IPackageRepository packageRepository,
     IOptions<LockRetryConfiguration> lockRetryOptions,
     IPackageVersionRepository packageVersionRepository,
     TimeProvider timeProvider)
@@ -55,7 +53,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             return;
         }
 
-        
+
         const int MaximumAttempts = 60;
         const int Timeout = 1000;
         const int LockTimeoutInMinutes = 5;
@@ -82,7 +80,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
                 {
                     using (managedStream.BeginWarning())
                     {
-                        if(attempts > 0)
+                        if (attempts > 0)
                         {
                             await managedStream.Error.WriteAsync("Attempt {0} of {1}: ", cancellationToken, attempts, maximumAttempts);
                         }
@@ -105,12 +103,12 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             using (managedStream.BeginError())
             {
                 await managedStream.Error.WriteLineAsync(@$"The package version is still locked until {lockStatus?.LockedUntilTimestampUtc} by {lockStatus?.Reference}.
-                  Unable to acquire resource aborting after {(Timeout * MaximumAttempts)/1000} seconds", cancellationToken);
+                  Unable to acquire resource aborting after {(Timeout * MaximumAttempts) / 1000} seconds", cancellationToken);
             }
 
             return;
         }
-        
+
         var utcNow = timeProvider.GetUtcNow();
         //prepare to lock the resource;
         var upsertLockResult = await versionLockRepository.SetVersionLockAsync(
@@ -144,7 +142,7 @@ public class PackageVersionIncrementOperation(IServiceProvider serviceProvider, 
             RevisionNumber = newRevisionNumber,
             ReleaseDateTimestampUtc = timeProvider.GetUtcNow(),
             PackageId = result.Id!,
-            CommitId =  commitId ?? string.Empty
+            CommitId = commitId ?? string.Empty
         }, cancellationToken);
 
         if (!upsertResult.IsSuccess)

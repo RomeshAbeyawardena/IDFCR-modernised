@@ -9,7 +9,7 @@ public class SettingPagedFilter : PagedFilterBase<GetPagedSettingsQuery, Setting
     protected override Expression<Func<SettingEntity, bool>> BuildPredicate(IQueryable<SettingEntity> queryable, GetPagedSettingsQuery request)
     {
         var query = base.StarterExpression;
-        
+
         query.DefaultExpression = x => true;
         if (!string.IsNullOrWhiteSpace(request.Key))
         {

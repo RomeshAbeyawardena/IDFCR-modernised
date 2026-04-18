@@ -1,10 +1,10 @@
-﻿using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
-using Contracts = BuildTools.Shared.Contracts.Features.Tags;
+﻿using BuildTools.GRPC.Application.Extensions;
+using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
 using Grpc.Core;
 using MediatR;
-using System.Threading.Tasks;
-using BuildTools.GRPC.Application.Extensions;
 using System.Linq;
+using System.Threading.Tasks;
+using Contracts = BuildTools.Shared.Contracts.Features.Tags;
 
 
 namespace BuildTools.GRPC.Application.Features.Tags;
@@ -14,7 +14,8 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
 {
     public override async Task<GetPagedTagsQueryResult> GetPagedTags(GetPagedTagsQuery request, ServerCallContext context)
     {
-        var result = await mediator.Send(new Contracts.GetPagedTagsQuery {
+        var result = await mediator.Send(new Contracts.GetPagedTagsQuery
+        {
             Name = request.Name,
             NameContains = request.NameContains,
             PageIndex = request.PageIndex,

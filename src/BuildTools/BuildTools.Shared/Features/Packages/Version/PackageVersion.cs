@@ -24,7 +24,7 @@ public class PackageVersion : MapperBase<IPackageVersion>, IPackageVersion
         ReleaseDateTimestampUtc = source.ReleaseDateTimestampUtc;
         CommitId = source.CommitId;
         PublishedToFeed = source.PublishedToFeed;
-        LastErrorOnPublishAttemptTimestampUtc = 
+        LastErrorOnPublishAttemptTimestampUtc =
             source.LastErrorOnPublishAttemptTimestampUtc;
         PublishedTimestampUtc = source.PublishedTimestampUtc;
     }

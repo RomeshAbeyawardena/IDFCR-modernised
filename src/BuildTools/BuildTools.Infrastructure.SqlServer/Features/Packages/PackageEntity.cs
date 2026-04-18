@@ -2,7 +2,6 @@
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages;
 

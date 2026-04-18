@@ -1,6 +1,6 @@
 ﻿using BuildTools.GRPC.Shared.Contracts.Common;
-using Contracts = IDFCR.Abstractions.Results;
 using System;
+using Contracts = IDFCR.Abstractions.Results;
 
 namespace BuildTools.GRPC.Application.Extensions;
 

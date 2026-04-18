@@ -14,7 +14,7 @@ public static class GrpcServices
            .GetTypes()
            .Where(t => t.IsClass && !t.IsAbstract &&
                        t.GetCustomAttribute<RegisteredServiceAttribute>() is not null);
-        
+
         return serviceTypes;
     }
 }

@@ -1,6 +1,5 @@
-using BuildTools.GRPC.Application.Extensions;
 using BuildTools.Application.Extensions;
-
+using BuildTools.GRPC.Application.Extensions;
 using BuildTools.Infrastructure.SqlServer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +23,7 @@ foreach (var type in GrpcServices.Fetch())
         .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService)))
         ?.MakeGenericMethod(type);
 
-    method?.Invoke(null, [ app ]);
+    method?.Invoke(null, [app]);
 }
 
 app.Run();

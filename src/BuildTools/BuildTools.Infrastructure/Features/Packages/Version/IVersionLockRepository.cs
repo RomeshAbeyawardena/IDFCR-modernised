@@ -6,7 +6,7 @@ namespace BuildTools.Infrastructure.Features.Packages.Version;
 
 public interface IVersionLockRepository : IRepository<VersionLock, Guid>
 {
-    Task<IUnitResult<VersionLock>> GetVersionLockAsync(object packageId, 
+    Task<IUnitResult<VersionLock>> GetVersionLockAsync(object packageId,
         string versionPrefix,
         CancellationToken cancellationToken);
 

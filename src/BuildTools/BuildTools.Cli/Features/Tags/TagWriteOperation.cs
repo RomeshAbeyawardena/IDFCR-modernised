@@ -29,14 +29,15 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
         var foundEntry = (await mediator.Send(new GetTagQuery { Name = name }, cancellationToken)).GetResultOrDefault();
 
-        var result = await mediator.Send(new UpsertTagCommand 
-        { 
+        var result = await mediator.Send(new UpsertTagCommand
+        {
             CommitChanges = true,
-            Tag = new Shared.Contracts.Features.Tags.TagDto {
+            Tag = new Shared.Contracts.Features.Tags.TagDto
+            {
                 Id = foundEntry?.Id,
                 Name = foundEntry?.Name ?? name!,
                 DisplayName = displayName
-            } 
+            }
         }, cancellationToken);
 
         if (result.IsSuccess)
@@ -77,7 +78,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
         tagList = [.. tagList.DistinctBy(x => x.Name)];
 
-        var existingTagsDto = (await mediator.Send(new GetTagsQuery { Names = [..tagList.Select(x => x.Name)] }, cancellationToken)).GetResultOrDefault();
+        var existingTagsDto = (await mediator.Send(new GetTagsQuery { Names = [.. tagList.Select(x => x.Name)] }, cancellationToken)).GetResultOrDefault();
 
         var tagsToAdd = tagList.AsEnumerable();
 
@@ -87,7 +88,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
             tagsToAdd = tagList.Where(x => !existingTags.Any(t => t == x));
 
-            foreach(var tag in existingTags)
+            foreach (var tag in existingTags)
             {
                 var foundTag = tagList.FirstOrDefault(t => t == tag);
 
@@ -115,7 +116,7 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
 
     protected override Task InvokeWhenContextIsOwned(IEnumerable<string> command, CancellationToken cancellationToken)
     {
-        if(Parameters!.TryGetValue("tags", out var tags) && !string.IsNullOrWhiteSpace(tags.Value))
+        if (Parameters!.TryGetValue("tags", out var tags) && !string.IsNullOrWhiteSpace(tags.Value))
         {
             return MultipleUpsert(tags.Value, cancellationToken);
         }

@@ -36,7 +36,7 @@ public class EnvironmentFilter : FilterBase<IEnvironmentQuery, EnvironmentEntity
 
 public class EnvironmentPagedFilter : PagedFilterBase<GetPagedEnvironmentQuery, EnvironmentEntity>
 {
-    
+
     protected override Expression<Func<EnvironmentEntity, bool>> BuildPredicate(IQueryable<EnvironmentEntity> queryable, GetPagedEnvironmentQuery request)
     {
         return EnvironmentFilter.BuildPredicate(base.StarterExpression.DefaultExpression = e => true, request);

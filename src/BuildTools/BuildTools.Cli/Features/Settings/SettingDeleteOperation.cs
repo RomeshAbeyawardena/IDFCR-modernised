@@ -69,4 +69,4 @@ public class SettingDeleteOperation(IServiceProvider serviceProvider, IManagedSt
 
         await managedStream.Error.WriteLineAsync($"Unable to delete setting: {result.Exception?.Message ?? "Unknown error"}", cancellationToken);
     }
-}   
+}

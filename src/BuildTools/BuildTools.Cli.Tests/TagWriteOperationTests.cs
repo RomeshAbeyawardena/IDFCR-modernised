@@ -1,10 +1,8 @@
 ﻿using BuildTools.Cli.Features.Tags;
-
 using BuildTools.Infrastructure.Features.Tags;
 using BuildTools.Infrastructure.SqlServer.Features.Tags;
-using BuildTools.Shared.Features.Tags;
-using ContractTagDto = BuildTools.Shared.Contracts.Features.Tags.TagDto;
 using BuildTools.Shared.Contracts.Features.Tags;
+using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Interceptors;
@@ -12,6 +10,7 @@ using IDFCR.Abstractions.Results;
 using IDFCR.TestUtilities;
 using MediatR;
 using Moq;
+using ContractTagDto = BuildTools.Shared.Contracts.Features.Tags.TagDto;
 
 namespace BuildTools.Cli.Tests;
 

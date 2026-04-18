@@ -12,6 +12,6 @@ public record ApplicationConfiguration(bool ListOperations)
 {
     public ApplicationConfiguration() : this(false)
     {
-        
+
     }
 }

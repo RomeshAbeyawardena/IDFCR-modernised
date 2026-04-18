@@ -13,7 +13,8 @@ public class GetPagedTagsQueryHandler(ITagRepository tagRepository) : IUnitPaged
 {
     public async Task<IUnitPagedResult<TagDto>> Handle(Contracts.GetPagedTagsQuery request, CancellationToken cancellationToken)
     {
-        var result = await tagRepository.GetPagedAsync(new Infrastructure.Features.Tags.GetPagedTagsQuery {
+        var result = await tagRepository.GetPagedAsync(new Infrastructure.Features.Tags.GetPagedTagsQuery
+        {
             Name = request.Name,
             NameContains = request.NameContains,
             PageIndex = request.PageIndex,

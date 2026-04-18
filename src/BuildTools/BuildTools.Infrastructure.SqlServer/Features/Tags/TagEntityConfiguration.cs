@@ -19,7 +19,7 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
             .IsRequired();
 
         builder.Property(e => e.Name)
-            .HasMaxLength(50)   
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.HasAlternateKey(e => e.Name)

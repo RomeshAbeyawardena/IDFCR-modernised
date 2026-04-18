@@ -15,7 +15,7 @@ public class PackageVersionRepository(PackageManagerDbContext db, IFilterFactory
 {
     public async Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, string prefix, CancellationToken cancellationToken)
     {
-        if(packageId is Guid id)
+        if (packageId is Guid id)
         {
             var result = await DbSet.AsNoTracking()
                 .Where(x => x.PackageId == id && x.VersionPrefix == prefix)

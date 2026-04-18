@@ -1,5 +1,4 @@
-﻿using BuildTools.Infrastructure;
-using BuildTools.Infrastructure.SqlServer;
+﻿using BuildTools.Infrastructure.SqlServer;
 using BuildTools.Infrastructure.SqlServer.Extensions;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
@@ -23,7 +22,7 @@ static void ConfigureHostConfiguration(IConfigurationBuilder builder)
 
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
-    
+
     services
         .AddSingleton(TimeProvider.System)
         .AddSingleton(ConsoleStream.Std)
