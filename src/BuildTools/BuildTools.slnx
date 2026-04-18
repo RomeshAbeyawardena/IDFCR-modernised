@@ -8,8 +8,10 @@
 	<Project Path="Backend/BuildTools.gRPC.Application/BuildTools.GRPC.Application.csproj" />
 	<Project Path="Backend/BuildTools.gRPC.Shared.Contracts/BuildTools.GRPC.Shared.Contracts.csproj" />
 	<Project Path="Backend/BuildTools.Shared.Contracts/BuildTools.Shared.Contracts.csproj" />
-	
   </Folder>
+  <Folder Name="/Web/">
+	<Project Path="Backend/BuildTools.gRPC.Api/BuildTools.GRPC.Api.csproj" />
+	</Folder>
   <Folder Name="/Tests/">
 	<Project Path="BuildTools.Cli.Tests/BuildTools.Cli.Tests.csproj" />
   </Folder>
