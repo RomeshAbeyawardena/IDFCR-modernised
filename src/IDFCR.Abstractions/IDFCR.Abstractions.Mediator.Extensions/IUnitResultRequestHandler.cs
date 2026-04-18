@@ -7,3 +7,8 @@ public interface IUnitResultRequestHandler<TRequest> : IRequestHandler<TRequest,
     where TRequest : IUnitResultRequest
 {
 }
+
+public interface IUnitResultRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, IUnitResult<TResponse>>
+    where TRequest : IUnitResultRequest<TResponse>
+{
+}

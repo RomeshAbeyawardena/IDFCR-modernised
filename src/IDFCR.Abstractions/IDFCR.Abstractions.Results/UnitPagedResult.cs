@@ -36,6 +36,11 @@ public static class UnitPagedResult
 /// <typeparam name="TResult">The element type.</typeparam>
 internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
 {
+    public static explicit operator UnitPagedResult<TResult>(DefaultUnitResult result)
+    {
+        return new UnitPagedResult<TResult>([], 0, null!, result.Action, result.IsSuccess, result.Exception, result.FailureReason);
+    }
+
     /// <summary>
     /// Gets the paging request used to produce this result.
     /// </summary>

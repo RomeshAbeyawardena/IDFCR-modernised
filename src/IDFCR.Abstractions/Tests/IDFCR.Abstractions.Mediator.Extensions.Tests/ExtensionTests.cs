@@ -99,13 +99,13 @@ public class ExtensionTests
 
         var result = await mediator.Send(new SuccessfulRequest());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Action, Is.EqualTo(UnitAction.Get));
             Assert.That(result.Exception, Is.Null);
-        });
+        }
     }
 
     [Test]
@@ -117,14 +117,14 @@ public class ExtensionTests
         var result = await mediator.Send(new CustomerCollectionRequest());
         var customers = result.Result?.ToArray();
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Action, Is.EqualTo(UnitAction.Get));
             Assert.That(customers, Has.Length.EqualTo(2));
             Assert.That(customers?.Select(x => x.Name), Is.EqualTo(new[] { "Ada", "Grace" }));
-        });
+        }
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class ExtensionTests
 
         var result = await mediator.Send(new FailingCustomerCollectionRequest());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.False);
@@ -143,7 +143,7 @@ public class ExtensionTests
             Assert.That(result.Result, Is.Null);
             Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
             Assert.That(result.Exception?.Message, Is.EqualTo("Simulated collection failure"));
-        });
+        }
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class ExtensionTests
         var result = await mediator.Send(new CustomerPagedRequest());
         var customers = result.Result?.ToArray();
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.True);
@@ -167,7 +167,7 @@ public class ExtensionTests
             Assert.That(result.Meta["totalPages"], Is.EqualTo(3));
             Assert.That(customers, Has.Length.EqualTo(2));
             Assert.That(customers?.Select(x => x.Name), Is.EqualTo(new[] { "Linus", "Margaret" }));
-        });
+        }
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class ExtensionTests
         var result = await mediator.Send(new FailingCustomerPagedRequest());
         var customers = result.Result?.ToArray();
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.False);
@@ -193,7 +193,7 @@ public class ExtensionTests
             Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
             Assert.That(result.Exception?.Message, Is.EqualTo("Simulated paged failure"));
             Assert.That(result.FailureReason, Is.EqualTo(FailureReason.Unknown));
-        });
+        }
     }
 
     [Test]
@@ -204,7 +204,7 @@ public class ExtensionTests
 
         var result = await mediator.Send(new ThrowingRequest());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.Not.Null);
             Assert.That(result.IsSuccess, Is.False);
@@ -212,7 +212,7 @@ public class ExtensionTests
             Assert.That(result.FailureReason, Is.EqualTo(FailureReason.Unknown));
             Assert.That(result.Exception, Is.TypeOf<InvalidOperationException>());
             Assert.That(result.Exception?.Message, Is.EqualTo("Simulated failure"));
-        });
+        }
     }
 
     private static ServiceProvider CreateServiceProvider()

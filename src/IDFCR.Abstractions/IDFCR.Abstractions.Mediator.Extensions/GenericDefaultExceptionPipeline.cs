@@ -10,25 +10,116 @@ namespace IDFCR.Abstractions.Mediator.Extensions;
 /// <typeparam name="TResponse">The type of the response returned by the request.</typeparam>
 /// <typeparam name="TException">The type of exception to be handled by this pipeline.</typeparam>
 /// <param name="exceptionBehaviourManager">The exception behaviour manager used to determine how exceptions should be handled.</param>
-public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TException>(IExceptionBehaviourManager exceptionBehaviourManager)
-    : IRequestExceptionHandler<TRequest, IUnitResult, TException>
-        where TRequest : IUnitResultRequest
-        where TException : Exception
+public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TException>(
+    IExceptionBehaviourManager exceptionBehaviourManager)
+    : IRequestExceptionHandler<TRequest, TResponse, TException>
+    where TRequest : notnull
+    where TException : Exception
 {
-    /// <summary>
-    /// Handles exceptions of type TException that occur during the processing of a MediatR request. When an exception is caught, this method retrieves the appropriate exception behavior from the IExceptionBehaviourManager and sets the handled result in the state to indicate the failure of the operation, along with the specified action and failure reason. This allows for a consistent and standardized way to handle exceptions and communicate failure information back to the caller.
-    /// </summary>
-    /// <param name="request">The request being processed when the exception occurred.</param>
-    /// <param name="exception">The exception that was thrown during request processing.</param>
-    /// <param name="state">The state object used to set the handled result.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task Handle(TRequest request, TException exception, RequestExceptionHandlerState<IUnitResult> state, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public Task Handle(
+        TRequest request,
+        TException exception,
+        RequestExceptionHandlerState<TResponse> state,
+        CancellationToken cancellationToken)
     {
-        var exceptionBehaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>()
+        var behaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>()
             ?? exceptionBehaviourManager.DefaultExceptionBehaviour
             ?? ExceptionBehaviourManagerBuilder.Default;
 
-        state.SetHandled(UnitResult.Failed(exception, exceptionBehaviour.UnitAction, exceptionBehaviour.FailureReason));
+        var responseType = typeof(TResponse);
+
+        var genericTypes = responseType.GetGenericArguments();
+
+        TResponse? result = default;
+        if (genericTypes.Length == 1)
+        {
+
+            var emptyMethodInfo = typeof(Enumerable).GetMethod(nameof(Enumerable.Empty))?.MakeGenericMethod(genericTypes);
+            var emptyArray = emptyMethodInfo?.Invoke(null, []);
+
+            if (responseType.IsAssignableTo(typeof(IUnitPagedResult<>).MakeGenericType(genericTypes)))
+            {
+                var methodInfo = typeof(UnitPagedResult).GetMethod(nameof(UnitPagedResult.FromResult))?
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+
+                IPagedQuery? pagedQuery = null;
+
+                if (request is IPagedQuery paged)
+                {
+                    pagedQuery = paged;
+                }
+
+                result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, exception, behaviour.FailureReason])!;
+                
+                state.SetHandled(result);
+
+                return Task.CompletedTask;
+            }
+            else if (responseType.IsAssignableTo(typeof(IUnitResultCollection<>).MakeGenericType(genericTypes)))
+            {
+                var methodInfo = typeof(UnitResultCollection).GetMethod(nameof(UnitResultCollection.Failed))?
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+
+                result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction])!;
+
+                state.SetHandled(result);
+
+                return Task.CompletedTask;
+            }
+            else if (responseType.IsAssignableTo(typeof(IUnitResult<>).MakeGenericType(genericTypes)))
+            {
+                var methodInfo = typeof(UnitResult).GetMethods()
+                    .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))?
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+
+                result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction, behaviour.FailureReason])!;
+
+                state.SetHandled(result);
+
+                return Task.CompletedTask;
+            }
+        }
+        else if (responseType.IsAssignableTo(typeof(IUnitResult)))
+        {
+            var methodInfo = typeof(UnitResult).GetMethods()
+                    .FirstOrDefault(x => !x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))
+                    ?? throw new InvalidOperationException($"Unable to find generic method");
+
+            result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction, behaviour.FailureReason])!;
+
+            state.SetHandled(result);
+
+            return Task.CompletedTask;
+        }
+
+        return Task.CompletedTask;
     }
 }
+
+//public sealed class DefaultPagedExceptionPipeline<TRequest, TValue, TException>
+//    : IRequestExceptionHandler<TRequest, IUnitPagedResult<TValue>, TException>
+//    where TRequest : IPagedUnitResultRequest<TValue>
+//    where TException : Exception
+//{
+//    public async Task Handle(
+//        TRequest request,
+//        TException exception,
+//        RequestExceptionHandlerState<IUnitPagedResult<TValue>> state,
+//        CancellationToken cancellationToken)
+//    {
+//        var behaviour = exceptionBehaviourManager.GetExceptionBehaviour<TException>()
+//            ?? exceptionBehaviourManager.DefaultExceptionBehaviour
+//            ?? ExceptionBehaviourManagerBuilder.Default;
+
+//        state.SetHandled(
+//            UnitPagedResult.FromResult<TValue>(
+//                [],
+//                0,
+//                request,
+//                behaviour.UnitAction,
+//                false,
+//                exception,
+//                behaviour.FailureReason));
+//    }
+//}
