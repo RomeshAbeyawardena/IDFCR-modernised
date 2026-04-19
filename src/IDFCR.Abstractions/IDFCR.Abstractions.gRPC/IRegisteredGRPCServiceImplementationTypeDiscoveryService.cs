@@ -31,7 +31,7 @@ public interface IRegisteredGRPCServiceImplementationTypeDiscoveryService
     /// <summary>
     /// Gets cached discovered types from the most recent discovery operation.
     /// </summary>
-    IEnumerable<Type> DiscoveredTypes { get; }
+    IReadOnlyList<Type> DiscoveredTypes { get; }
 
     /// <summary>
     /// Scans the provided assemblies and returns types that satisfy the discovery rules.
@@ -43,5 +43,5 @@ public interface IRegisteredGRPCServiceImplementationTypeDiscoveryService
     /// </param>
     /// <param name="assemblies">Assemblies to scan.</param>
     /// <returns>Types eligible for gRPC registration.</returns>
-    IEnumerable<Type> DiscoverTypes(IConfiguration configuration, params Assembly[] assemblies);
+    IReadOnlyList<Type> DiscoverTypes(IConfiguration configuration, params Assembly[] assemblies);
 }

@@ -4,15 +4,16 @@ using System.Reflection;
 namespace IDFCR.Abstractions.GRPC;
 
 /// <inheritdoc />
-public class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegisteredGRPCServiceImplementationTypeDiscoveryService
+public sealed class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegisteredGRPCServiceImplementationTypeDiscoveryService
 {
+    private Type[] _discoveredTypes = [];
     /// <inheritdoc />
-    public IEnumerable<Type> DiscoveredTypes { get; private set; } = [];
+    public IReadOnlyList<Type> DiscoveredTypes => _discoveredTypes;
 
     /// <inheritdoc />
-    public IEnumerable<Type> DiscoverTypes(IConfiguration configuration, params Assembly[] assemblies)
+    public IReadOnlyList<Type> DiscoverTypes(IConfiguration configuration, params Assembly[] assemblies)
     {
-        if (DiscoveredTypes.Any())
+        if (_discoveredTypes.Length > 0)
         {
             return DiscoveredTypes;
         }
@@ -46,7 +47,7 @@ public class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegister
               return false;
             });
 
-        DiscoveredTypes = [.. serviceTypes];
+        _discoveredTypes = [.. serviceTypes];
 
         return DiscoveredTypes;
     }
@@ -54,6 +55,6 @@ public class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegister
     /// <inheritdoc />
     public void FlushCache()
     {
-        DiscoveredTypes = [];
+        _discoveredTypes = [];
     }
 }
