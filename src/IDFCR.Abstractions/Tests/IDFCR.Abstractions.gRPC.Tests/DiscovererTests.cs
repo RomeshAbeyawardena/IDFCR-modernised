@@ -87,6 +87,36 @@ internal class DiscovererTests
     }
 
     [Test]
+    public void DiscoverTypes_OnSubsequentCall_ReturnsCachedResult()
+    {
+        var firstCall = RegisteredGRPCServices
+            .DiscoverTypes(configuration.Object, typeof(DiscovererTests).Assembly);
+
+        var secondCall = RegisteredGRPCServices
+            .DiscoverTypes(configuration.Object, typeof(DiscovererTests).Assembly);
+
+        Assert.That(secondCall, Is.EquivalentTo(firstCall));
+        // Configuration should only have been accessed during the first call
+        configuration.Verify(x => x.GetSection(It.IsAny<string>()), Times.AtMostOnce);
+    }
+
+    [Test]
+    public void DiscoverTypes_AfterFlushCache_RediscoversTypes()
+    {
+        var beforeFlush = RegisteredGRPCServices
+            .DiscoverTypes(configuration.Object, typeof(DiscovererTests).Assembly);
+
+        RegisteredGRPCServices.FlushCache();
+
+        Assert.That(RegisteredGRPCServices.DiscoveredTypes, Is.Empty);
+
+        var afterFlush = RegisteredGRPCServices
+            .DiscoverTypes(configuration.Object, typeof(DiscovererTests).Assembly);
+
+        Assert.That(afterFlush, Is.EquivalentTo(beforeFlush));
+    }
+
+    [Test]
     public void DiscoverTypes_WhenConfigurationKeyIsTrue_IncludesConfigurationDependentService()
     {
         SetupConfigurationKey("true");

@@ -48,7 +48,7 @@ public class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegister
 
         DiscoveredTypes = [.. serviceTypes];
 
-        return serviceTypes;
+        return DiscoveredTypes;
     }
 
     /// <inheritdoc />
