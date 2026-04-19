@@ -11,6 +11,11 @@ public static class RegisteredGRPCServices
     private static readonly Lazy<IRegisteredGRPCServiceImplementationTypeDiscoveryService> registeredGRPCServiceImplementationTypeDiscoveryService = 
         new(new RegisteredGRPCServiceImplementationTypeDiscoveryService());
 
+    public static void FlushCache()
+    {
+        registeredGRPCServiceImplementationTypeDiscoveryService.Value.FlushCache();
+    }
+
     /// <summary>
     /// Gets a cache of the types that have been discovered by the DiscoverTypes method. This property can be used to avoid redundant discovery of types if the same assemblies are searched multiple times. The DiscoverTypes method should update this property with the newly discovered types each time it is called.
     /// <para>Will be empty if <see cref="DiscoverTypes(IConfiguration, Assembly[])"/> or <see cref="DiscoverTypes(IConfiguration, bool, Assembly[])"/> has not been called yet.</para>
