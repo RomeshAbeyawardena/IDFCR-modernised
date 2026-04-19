@@ -27,7 +27,6 @@
     <Content Remove="contentFiles\**\*.*" />
   </ItemGroup>
   <ItemGroup>
-
     <Protobuf Include="Protos\Common\**\*.proto" GrpcServices="Both" CopyToOutput="Never" />
     <ProtoToPack Include="contentFiles\**\*.*" Pack="true" PackagePath="contentFiles/%(RecursiveDir)" />
   </ItemGroup>
