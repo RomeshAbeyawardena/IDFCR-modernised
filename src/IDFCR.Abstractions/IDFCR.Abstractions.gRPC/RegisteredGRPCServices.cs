@@ -12,6 +12,12 @@ public static class RegisteredGRPCServices
         new(new RegisteredGRPCServiceImplementationTypeDiscoveryService());
 
     /// <summary>
+    /// Gets a cache of the types that have been discovered by the DiscoverTypes method. This property can be used to avoid redundant discovery of types if the same assemblies are searched multiple times. The DiscoverTypes method should update this property with the newly discovered types each time it is called.
+    /// <para>Will be empty if <see cref="DiscoverTypes(IConfiguration, Assembly[])"/> or <see cref="DiscoverTypes(IConfiguration, bool, Assembly[])"/> has not been called yet.</para>
+    /// </summary>
+    public static IEnumerable<Type> DiscoveredTypes => registeredGRPCServiceImplementationTypeDiscoveryService.Value.DiscoveredTypes;
+
+    /// <summary>
     /// Discovers types that are decorated with the RegisteredGRPCServiceImplementationAttribute in the specified assemblies. The method returns an enumerable of types that are decorated with the RegisteredGRPCServiceImplementationAttribute and meet the criteria specified by the attribute's parameters. The configuration parameter can be used to evaluate the EnabledValueConfigurationKey for each type if necessary. This method uses a lazy singleton instance of the RegisteredGRPCServiceImplementationTypeDiscoveryService to perform the discovery of types, so it will cache the results of the discovery and return the cached results on subsequent calls with the same assemblies, unless the FlushCache method is called to clear the cache. This allows for efficient discovery of types without redundant reflection operations on subsequent calls with the same assemblies. If you need to force a fresh discovery of types, you can call the DiscoverTypes method with flashCache set to true, which will flush the cache before performing the discovery.
     /// </summary>
     /// <param name="configuration">The application's configuration, which can be used to evaluate the EnabledValueConfigurationKey for each type if necessary.</param>
