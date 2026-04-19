@@ -10,8 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.6" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.Mapper" Version="2.0.3.5" />
-    <PackageReference Include="IDFCR.Abstractions.Metadata" Version="2.0.3.5" />
+    <PackageReference Include="IDFCR.Abstractions.Mapper" Version="2.0.4.1" />
+    <PackageReference Include="IDFCR.Abstractions.Metadata" Version="2.0.4.1" />
   </ItemGroup>
 
 </Project>

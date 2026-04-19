@@ -4,6 +4,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <MyFiles Include="$(ProjectDir)\Protos\Common\**\*.proto" />
+  </ItemGroup>
+  
+  <Target Name="CopyCustomFiles" AfterTargets="Build">
+    <Copy
+      SourceFiles="@(MyFiles)"
+      DestinationFolder="$(ProjectDir)\buildTransitive\Protos\Common" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.34.1" />
     <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />
@@ -13,10 +24,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Protos\Common\**\*.proto" PackagePath="contentFiles/any/any/Common/" GrpcServices="Both" CopyToOutput="Never" />
-  </ItemGroup>
-  <ItemGroup>
-    <Protobuf Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Common\**\*.proto" />
+    <Protobuf Include="Protos\Common\**\*.proto" 
+              GrpcServices="Both" 
+              CopyToOutput="Never" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
