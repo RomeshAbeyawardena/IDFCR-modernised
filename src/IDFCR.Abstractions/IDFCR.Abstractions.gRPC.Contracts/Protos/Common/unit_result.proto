@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package buildtools.shared.contracts.grpc.common;
+package idfc.abstractions.grpc.contracts.common;
 
-option csharp_namespace = "BuildTools.GRPC.Shared.Contracts.Common";
+option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common";
 
 enum UnitAction {
   UNIT_ACTION_NONE = 0;

@@ -8,6 +8,19 @@ namespace IDFCR.Abstractions.Results;
 public static class UnitResult
 {
     /// <summary>
+    /// Creates a unit result with the specified success status, exception, action, and failure reason.
+    /// </summary>
+    /// <param name="isSuccess">Indicates whether the operation was successful.</param>
+    /// <param name="exception">The exception associated with the result, if any.</param>
+    /// <param name="action">The action associated with the result.</param>
+    /// <param name="failureReason">The reason for the failure, if any.</param>
+    /// <returns>An <see cref="IUnitResult"/> representing the result of the operation.</returns>
+    public static IUnitResult Create(bool isSuccess, Exception? exception = null, UnitAction action = UnitAction.None, FailureReason? failureReason = null)
+    {
+        return new DefaultUnitResult(exception, action, isSuccess, failureReason);
+    }
+
+    /// <summary>
     /// Creates a failed result that represents a missing entity.
     /// </summary>
     public static IUnitResult<T> NotFound<T>(object id, Exception? innerException = null, FailureReason? failureReason = FailureReason.NotFound)
