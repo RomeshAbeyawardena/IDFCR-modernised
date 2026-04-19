@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace IDFCR.Abstractions.GRPC;
 
-/// <inheritdoc />
+/// <inheritdoc cref="IRegisteredGRPCServiceImplementationTypeDiscoveryService" />
 public sealed class RegisteredGRPCServiceImplementationTypeDiscoveryService : IRegisteredGRPCServiceImplementationTypeDiscoveryService
 {
     private Type[] _discoveredTypes = [];
