@@ -10,9 +10,8 @@
   </ItemGroup>
   
   <Target Name="CopyCustomFiles" AfterTargets="Build">
-    <Copy
-      SourceFiles="@(MyFiles)"
-      DestinationFolder="$(ProjectDir)\buildTransitive\Protos\Common" />
+    <Message Text="Copying .proto files to $(ProjectDir)contentFiles\any\any\Protos\Common..." Importance="high" />
+    <Copy SourceFiles="@(MyFiles)" DestinationFolder="$(ProjectDir)contentFiles\any\any\Protos\Common" />
   </Target>
 
   <ItemGroup>
@@ -24,9 +23,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Protos\Common\**\*.proto" 
-              GrpcServices="Both" 
-              CopyToOutput="Never" />
+    <None Remove="contentFiles\**\*.*" />
+    <Content Remove="contentFiles\**\*.*" />
+  </ItemGroup>
+  <ItemGroup>
+
+    <Protobuf Include="Protos\Common\**\*.proto" GrpcServices="Both" CopyToOutput="Never" />
+    <ProtoToPack Include="contentFiles\**\*.*" Pack="true" PackagePath="contentFiles/%(RecursiveDir)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
