@@ -8,7 +8,4 @@
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC.Generated\IDFCR.Abstractions.GRPC.Generated.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
  </Project>

@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package buildtools.shared.contracts.grpc.feature.tags;
 
-option csharp_namespace = "BuildTools.GRPC.Shared.Contracts.Feature.Tags";
+option csharp_namespace = "BuildTools.GRPC.Shared.Contracts.Features.Tags";
 
-import "Common/unit_result.proto";
+import "unit_result.proto";
 
 message TagDto {
   // object? in C# is represented as string here for wire compatibility.

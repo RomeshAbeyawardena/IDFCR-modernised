@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package buildtools.shared.contracts.grpc.feature.tags;
 
-option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Feature.Tags";
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.Tags";
 
-import "idfcr/common/unit_result.proto";
+import "unit_result.proto";
 
 message DeleteTagCommand {
   string name = 1;

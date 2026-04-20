@@ -1,36 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseProjectReferences Condition="'$(UseProjectReferences)' == ''">true</UseProjectReferences>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.34.1" />
     <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />
     <PackageReference Include="Grpc.Tools" Version="2.80.0" PrivateAssets="All" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(UseProjectReferences)' == 'true'">
     <ProjectReference Include="..\IDFCR.Abstractions.GRPC.Contracts\IDFCR.Abstractions.GRPC.Contracts.csproj" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(UseProjectReferences)' != 'true'">
-    <PackageReference Include="IDFCR.Abstractions.GRPC.Contracts"
-                      Version="2.0.4.5"
-                      GeneratePathProperty="true" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.Contracts" Version="2.0.4.8" GeneratePathProperty="true" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(UseProjectReferences)' == 'true'">
-    <Protobuf Include="..\IDFCR.Abstractions.GRPC.Contracts\Protos\**\*.proto"
-              GrpcServices="Client" />
+    <Protobuf Include="..\IDFCR.Abstractions.GRPC.Contracts\Protos\**\*.proto" GrpcServices="Client" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(UseProjectReferences)' != 'true'">
-    <Protobuf Include="$(PkgIDFCR_Abstractions_GRPC_Contracts)\contentFiles\any\any\idfcr\**\*.proto"
-              GrpcServices="Client" />
+    <Protobuf Include="$(PkgIDFCR_Abstractions_GRPC_Contracts)\contentFiles\any\any\idfcr\**\*.proto" GrpcServices="Client" />
   </ItemGroup>
-  
 </Project>

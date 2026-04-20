@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package buildtools.shared.contracts.grpc.feature.tags;
 
-option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Feature.Tags";
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.Tags";
 
 import "Common/unit_result.proto";
-import "Feature/Tags/upsert_tag.proto"; // reuses TagDto
+import "Features/Tags/upsert_tag.proto"; // reuses TagDto
 
 message GetPagedTagsQuery {
   int32 page_size = 1;
