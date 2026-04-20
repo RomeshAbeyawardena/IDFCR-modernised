@@ -1,18 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <MyFiles Include="$(ProjectDir)\Protos\Common\**\*.proto" />
-  </ItemGroup>
-  
-  <Target Name="CopyCustomFiles" AfterTargets="Build">
-    <Message Text="Copying .proto files to $(ProjectDir)contentFiles\any\any\Protos\Common..." Importance="high" />
-    <Copy SourceFiles="@(MyFiles)" DestinationFolder="$(ProjectDir)contentFiles\any\any\Protos\Common" />
-  </Target>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.34.1" />
@@ -22,15 +14,19 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
-    <None Remove="contentFiles\**\*.*" />
-    <Content Remove="contentFiles\**\*.*" />
+    <Protobuf Include="Protos\Common\**\*.proto" GrpcServices="Both" />
   </ItemGroup>
+
   <ItemGroup>
-    <Protobuf Include="Protos\Common\**\*.proto" GrpcServices="Both" CopyToOutput="Never" />
-    <ProtoToPack Include="contentFiles\**\*.*" Pack="true" PackagePath="contentFiles/%(RecursiveDir)" />
+    <None Include="Protos\Common\**\*.proto"
+          Pack="true"
+          PackagePath="contentFiles/any/any/Protos/Common/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
-  </ItemGroup>
+  </ItemGroup> 
+
 </Project>

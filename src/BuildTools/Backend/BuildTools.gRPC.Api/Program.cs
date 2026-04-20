@@ -1,6 +1,9 @@
 using BuildTools.Application.Extensions;
-using BuildTools.GRPC.Application.Extensions;
+using BuildTools.GRPC.Api;
+using BuildTools.GRPC.Application;
 using BuildTools.Infrastructure.SqlServer.Extensions;
+using IDFCR.Abstractions.gRPC.Extensions;
+using IDFCR.Abstractions.GRPC;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,33 +16,23 @@ services.AddSingleton(TimeProvider.System)
        .AddRepositories(builder.Configuration)
        .AddMediatorServices(builder.Configuration);
 
-var app = builder.Build();
+using var app = builder.Build();
 
+app.DiscoverGRPCServices(builder.Configuration, typeof(ServiceMarker).Assembly);
 
-
-var method = typeof(GrpcEndpointRouteBuilderExtensions)
-        .GetMethods()
-        .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService)));
-
-List<string> serviceList = [];
-
-foreach (var type in GrpcServices.Fetch())
-{
-    var genericMethod = method?.MakeGenericMethod(type);
-    genericMethod?.Invoke(null, [app]);
-    serviceList.Add(type.Name);
-}
+IReadOnlyList<string> serviceList = [.. RegisteredGRPCServices.DiscoveredTypes.Select(x => x.Name)];
 
 var startTime = app.Services.GetRequiredService<TimeProvider>().GetUtcNow();
-string? cachedReportData = null;
-
-using SemaphoreSlim semaphoreSlim = new(0, 1);
+using CachedStringService cachedStringService = new ();
 
 const int UpdateIntervalInSeconds = 10;
 app.MapGet("/", async(ctx) => {
     ctx.Response.Headers.Append("Refresh", $"{UpdateIntervalInSeconds}");
     StringBuilder statusReport = new();
-    if (string.IsNullOrEmpty(cachedReportData))
+
+    var value = await cachedStringService.GetCachedValueAsync();
+
+    if (string.IsNullOrEmpty(value))
     {
         var newLine = Environment.NewLine;
         statusReport.AppendLine($"Build Tools gRPC Server{newLine}{newLine}");
@@ -55,13 +48,11 @@ app.MapGet("/", async(ctx) => {
 
         statusReport.AppendLine();
 
-        cachedReportData = statusReport.ToString();
+        await cachedStringService.SetCachedValueAsync(statusReport.ToString());
     }
     else
     {
-        await semaphoreSlim.WaitAsync();
-        statusReport.Append(cachedReportData);
-        semaphoreSlim.Release();
+        statusReport.Append(value);
     }
 
     var timeProvider = ctx.RequestServices.GetRequiredService<TimeProvider>();

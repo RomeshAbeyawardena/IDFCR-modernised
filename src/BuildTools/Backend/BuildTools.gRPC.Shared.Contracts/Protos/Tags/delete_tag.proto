@@ -12,5 +12,5 @@ message DeleteTagCommand {
 }
 
 service DeleteTagCommandService {
-  rpc DeleteTag(DeleteTagCommand) returns (buildtools.shared.contracts.grpc.common.UnitResult);
+  rpc DeleteTag(DeleteTagCommand) returns (idfc.abstractions.grpc.contracts.common.UnitResult);
 }

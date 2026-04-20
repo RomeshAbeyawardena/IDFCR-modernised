@@ -1,12 +1,11 @@
-﻿using BuildTools.GRPC.Application.Extensions;
-using BuildTools.GRPC.Shared.Contracts.Common;
-using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
+﻿using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
 using Grpc.Core;
+using IDFCR.Abstractions.GRPC.Contracts.Common;
 using MediatR;
 using System;
 using System.Threading.Tasks;
 using Contracts = BuildTools.Shared.Contracts.Features.Tags;
-
+using IDFCR.Abstractions.GRPC.Contracts.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
@@ -25,6 +24,6 @@ public class DefaultDeleteTagService(IMediator mediator) : DeleteTagCommandServi
             CommitChanges = true
         }, context.CancellationToken);
 
-        return result.Map();
+        return UnitResultExtensions.From(result);
     }
 }

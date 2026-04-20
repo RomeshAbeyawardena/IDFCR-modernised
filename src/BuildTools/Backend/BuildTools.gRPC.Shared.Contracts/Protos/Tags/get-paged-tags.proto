@@ -15,7 +15,7 @@ message GetPagedTagsQuery {
 }
 
 message GetPagedTagsQueryResult {
-  buildtools.shared.contracts.grpc.common.UnitResult result = 1;
+  idfc.abstractions.grpc.contracts.common.UnitResult result = 1;
   repeated TagDto tags = 2;
   int32 total_rows = 3;
   int32 total_pages = 4;

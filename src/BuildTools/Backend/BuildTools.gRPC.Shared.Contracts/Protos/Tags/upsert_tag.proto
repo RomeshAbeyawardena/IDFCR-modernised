@@ -19,7 +19,7 @@ message UpsertTagCommand {
 }
 
 message UpsertTagCommandResult {
-	buildtools.shared.contracts.grpc.common.UnitResult result = 1;
+	idfc.abstractions.grpc.contracts.common.UnitResult result = 1;
 	string tag_id = 2;
 }
 

@@ -1,7 +1,0 @@
-<Project>
-  <ItemGroup>
-    <Protobuf Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Protos\Common\**\*.proto"
-              Link="Common/%(Filename)%(Extension)"
-              GrpcServices="Both" />
-  </ItemGroup>
-</Project>
