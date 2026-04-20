@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package idfc.abstractions.grpc.contracts.common;
+package idfcr.abstractions.grpc.contracts.common;
 
 option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common";
 

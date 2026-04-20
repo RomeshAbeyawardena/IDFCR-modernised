@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <IDFCR_Proto_ImportDir>$(MSBuildThisFileDirectory)..\contentFiles\any\any\protos</IDFCR_Proto_ImportDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Protobuf_AdditionalImportDirs Include="$(IDFCR_Proto_ImportDir)" />
+  </ItemGroup>
+</Project>
