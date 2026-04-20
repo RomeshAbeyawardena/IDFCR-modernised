@@ -8,8 +8,9 @@
 
   <ItemGroup>
     <None Include="Protos\**\*.proto" Pack="true" PackagePath="contentFiles\any\any\protos\" />
-    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.props"
-       Pack="true"
-       PackagePath="buildTransitive\" />
+
+    <!-- transitive PackageReference -->
+    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.props" Pack="true" PackagePath="buildTransitive\" />
+    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 </Project>

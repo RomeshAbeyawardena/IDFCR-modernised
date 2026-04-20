@@ -22,7 +22,7 @@
           BeforeTargets="BeforeBuild"
           Condition="Exists('$(IDFCR_ProtoSourceRoot)')">
 
-    <Message Importance="Low"
+    <Message Importance="High"
              Text="Copying IDFCR proto files to $(IDFCR_ProtoTargetRoot)" />
 
     <MakeDir Directories="$(IDFCR_ProtoTargetRoot)" />

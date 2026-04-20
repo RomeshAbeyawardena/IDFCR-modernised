@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <IDFCR_ProtoSourceRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\protos\</IDFCR_ProtoSourceRoot>
+    <IDFCR_ProtoTargetRoot>$(MSBuildProjectDirectory)\Protos\Shared\</IDFCR_ProtoTargetRoot>
+  </PropertyGroup>
+
+  <Target Name="IDFCR_CopyProtos"
+          AfterTargets="Restore;Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(IDFCR_ProtoSourceRoot)')">
+    <ItemGroup>
+      <IDFCR_ProtoFiles Include="$(IDFCR_ProtoSourceRoot)**\*.proto" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(IDFCR_ProtoTargetRoot)" />
+    <Copy SourceFiles="@(IDFCR_ProtoFiles)"
+          DestinationFiles="@(IDFCR_ProtoFiles->'$(IDFCR_ProtoTargetRoot)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>
