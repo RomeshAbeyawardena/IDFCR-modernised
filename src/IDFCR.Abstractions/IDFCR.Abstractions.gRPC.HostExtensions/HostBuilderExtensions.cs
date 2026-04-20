@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
-namespace IDFCR.Abstractions.gRPC.Extensions;
+namespace IDFCR.Abstractions.GRPC.HostExtensions;
 
 /// <summary>
 /// Defines a static class that provides extension methods for the WebApplication class to discover and register gRPC services that are decorated with the RegisteredGRPCServiceImplementationAttribute. The DiscoverGRPCServices method takes an array of assemblies to search for types and returns the WebApplication instance for chaining. The method uses the RegisteredGRPCServices class to discover the types that are decorated with the RegisteredGRPCServiceImplementationAttribute and meet the criteria specified by the attribute's parameters, and then uses reflection to invoke the MapGrpcService method for each discovered type to register it as a gRPC service in the application's request pipeline. This allows for automatic registration of gRPC service implementations based on the presence of the RegisteredGRPCServiceImplementationAttribute on their classes, without needing to directly reference the MapGrpcService method or manually register each service implementation in the application's request pipeline.
