@@ -1,19 +1,22 @@
-<Project>
-  <PropertyGroup>
-    <IDFCR_ProtoSourceRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\protos\</IDFCR_ProtoSourceRoot>
-    <IDFCR_ProtoTargetRoot>$(MSBuildProjectDirectory)\Protos\Shared\</IDFCR_ProtoTargetRoot>
-  </PropertyGroup>
-
-  <Target Name="IDFCR_CopyProtos"
-          AfterTargets="Restore;Build"
-          Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(IDFCR_ProtoSourceRoot)')">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopyProtosToProject" BeforeTargets="PrepareForBuild;BeforeBuild">
     <ItemGroup>
-      <IDFCR_ProtoFiles Include="$(IDFCR_ProtoSourceRoot)**\*.proto" />
+      <NuGetSourceFiles Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Proto\Shared\idfcr-shared\**\*" />
+
+      <P2PSourceFiles Include="$(MSBuildThisFileDirectory)Proto\Shared\idfcr-shared\**\*" />
+
+      <AllSourceFiles Condition="'@(NuGetSourceFiles)' != ''" Include="@(NuGetSourceFiles)" />
+      <AllSourceFiles Condition="'@(NuGetSourceFiles)' == ''" Include="@(P2PSourceFiles)" />
     </ItemGroup>
 
-    <MakeDir Directories="$(IDFCR_ProtoTargetRoot)" />
-    <Copy SourceFiles="@(IDFCR_ProtoFiles)"
-          DestinationFiles="@(IDFCR_ProtoFiles->'$(IDFCR_ProtoTargetRoot)%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
+    <MakeDir Directories="$(ProjectDir)Proto\Shared\idfcr-shared" Condition="!Exists('$(ProjectDir)Proto\Shared\idfcr-shared')" />
+
+    <Copy
+      SourceFiles="@(AllSourceFiles)"
+      DestinationFolder="$(ProjectDir)Proto\Shared\idfcr-shared\%(RecursiveDir)"
+      SkipUnchangedFiles="true"
+      OverwriteReadOnlyFiles="true" />
+
+    <Message Text="[Idfcr] Synced protos to $(ProjectDir)Proto\Shared\idfcr-shared" Importance="high" />
   </Target>
 </Project>

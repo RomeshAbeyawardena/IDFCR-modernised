@@ -1,16 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <IncludeContentInPack>true</IncludeContentInPack>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Protos\**\*.proto" Pack="true" PackagePath="contentFiles\any\any\protos\" />
+    <Content Include="Proto\Shared\idfcr-shared\**\*" Pack="true" PackagePath="contentFiles\any\any\Proto\Shared\idfcr-shared\">
+      <PackageCopyToOutput>false</PackageCopyToOutput>
+      <BuildAction>None</BuildAction>
+    </Content>
 
-    <!-- transitive PackageReference -->
-    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.props" Pack="true" PackagePath="buildTransitive\" />
-    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.targets" Pack="true" PackagePath="buildTransitive\" />
+    <None Include="buildTransitive\IDFCR.Abstractions.GRPC.Contracts.targets" Pack="true" PackagePath="build\$(PackageId).targets" />
   </ItemGroup>
 </Project>

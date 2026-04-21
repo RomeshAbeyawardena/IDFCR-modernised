@@ -10,7 +10,6 @@
     <PackageReference Include="Grpc.Tools" Version="2.80.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Protos\**\*.proto" GrpcServices="Both" />
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC.Contracts\IDFCR.Abstractions.GRPC.Contracts.csproj" />
   </ItemGroup>
 </Project>
