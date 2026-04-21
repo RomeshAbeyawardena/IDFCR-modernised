@@ -124,7 +124,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
 
         var (query, totalCount) = filteredResult;
 
-        return (await query.ToArrayAsync(cancellationToken), totalCount);
+        return (await OrderBy(request, query).ToArrayAsync(cancellationToken), totalCount);
     }
 
     /// <summary>
@@ -167,5 +167,16 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
         return db.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Defines a method for ordering a queryable collection of entities based on a request object. This method takes a request object and a queryable collection of database entities as parameters. It applies ordering to the query based on the provided request and returns the ordered queryable collection. The default implementation orders the query by the Id property of the entities, but derived classes can override this method to provide specific ordering logic based on the requirements of the application. By utilizing this method, developers can ensure that the retrieved data is ordered according to the desired criteria while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    /// <param name="request">The request containing any parameters for ordering.</param>
+    /// <param name="query">The query to order.</param>
+    /// <returns>The ordered query.</returns>
+    protected virtual IQueryable<TDb> OrderBy<TRequest>(TRequest request, IQueryable<TDb> query)
+    {
+        return query.OrderBy(x => x.Id);
     }
 }
