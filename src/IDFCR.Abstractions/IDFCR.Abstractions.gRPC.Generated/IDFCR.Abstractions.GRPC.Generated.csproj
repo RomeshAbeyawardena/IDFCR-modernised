@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC.Contracts\IDFCR.Abstractions.GRPC.Contracts.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Protobuf Include="Protos\**\*.proto" GrpcServices="Both" />
-  </ItemGroup>
+
+  <Import Project="..\IDFCR.Abstractions.gRPC.Contracts\buildTransitive\IDFCR.Abstractions.GRPC.Contracts.targets" Condition="Exists('..\IDFCR.Abstractions.gRPC.Contracts\buildTransitive\IDFCR.Abstractions.GRPC.Contracts.targets')" />
 </Project>

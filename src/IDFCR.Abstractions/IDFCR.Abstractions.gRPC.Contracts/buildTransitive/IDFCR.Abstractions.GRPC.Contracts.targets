@@ -1,7 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="CopyProtosToProject" BeforeTargets="PrepareForBuild;BeforeBuild">
     <ItemGroup>
-      <NuGetSourceFiles Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Proto\Shared\idfcr-shared\**\*" />
+      <NuGetSourceFiles Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Protos\Shared\idfcr-shared\**\*" />
 
       <P2PSourceFiles Include="$(MSBuildThisFileDirectory)Proto\Shared\idfcr-shared\**\*" />
 
@@ -9,14 +9,14 @@
       <AllSourceFiles Condition="'@(NuGetSourceFiles)' == ''" Include="@(P2PSourceFiles)" />
     </ItemGroup>
 
-    <MakeDir Directories="$(ProjectDir)Proto\Shared\idfcr-shared" Condition="!Exists('$(ProjectDir)Proto\Shared\idfcr-shared')" />
+    <MakeDir Directories="$(ProjectDir)Protos\Shared\idfcr-shared" Condition="!Exists('$(ProjectDir)Protos\Shared\idfcr-shared')" />
 
     <Copy
       SourceFiles="@(AllSourceFiles)"
-      DestinationFolder="$(ProjectDir)Proto\Shared\idfcr-shared\%(RecursiveDir)"
+      DestinationFolder="$(ProjectDir)Protos\%(RecursiveDir)"
       SkipUnchangedFiles="true"
       OverwriteReadOnlyFiles="true" />
 
-    <Message Text="[Idfcr] Synced protos to $(ProjectDir)Proto\Shared\idfcr-shared" Importance="high" />
+    <Message Text="[Idfcr] Synced protos to $(ProjectDir)Protos\Shared\idfcr-shared" Importance="high" />
   </Target>
 </Project>
