@@ -1,5 +1,6 @@
 ﻿using BuildTools.Shared.Contracts.GRPC.Features.Tags;
 using Grpc.Core;
+using IDFCR.Abstractions.GRPC;
 using MediatR;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
-[RegisteredService]
+[RegisteredGRPCServiceImplementation(true)]
 public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQueryService.GetPagedTagsQueryServiceBase
 {
     public override async Task<GetPagedTagsQueryResult> GetPagedTags(GetPagedTagsQuery request, ServerCallContext context)

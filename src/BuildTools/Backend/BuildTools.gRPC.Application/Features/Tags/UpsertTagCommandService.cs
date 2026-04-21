@@ -1,14 +1,15 @@
 ﻿using BuildTools.GRPC.Shared.Contracts.Features.Tags;
 using Grpc.Core;
-using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
+using IDFCR.Abstractions.GRPC;
 using IDFCR.Abstractions.Results.Extensions;
 using MediatR;
 using System.Threading.Tasks;
 using Contracts = BuildTools.Shared.Contracts.Features.Tags;
+using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
-[RegisteredService]
+[RegisteredGRPCServiceImplementation(true)]
 public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagCommandService.UpsertTagCommandServiceBase
 {
     public override async Task<UpsertTagCommandResult> UpsertTag(UpsertTagCommand request, ServerCallContext context)

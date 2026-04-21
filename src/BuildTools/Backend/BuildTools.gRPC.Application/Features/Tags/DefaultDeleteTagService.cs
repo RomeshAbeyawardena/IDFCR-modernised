@@ -6,14 +6,11 @@ using Contracts = BuildTools.Shared.Contracts.Features.Tags;
 using BuildTools.Shared.Contracts.GRPC.Features.Tags;
 using IDFCR.Abstractions.GRPC.Contracts.Common.V1;
 using IDFCR.Abstractions.GRPC.Extensions;
+using IDFCR.Abstractions.GRPC;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
-[AttributeUsage(AttributeTargets.Class)]
-public sealed class RegisteredServiceAttribute : Attribute { }
-
-
-[RegisteredService]
+[RegisteredGRPCServiceImplementation(true)]
 public class DefaultDeleteTagService(IMediator mediator) : DeleteTagCommandService.DeleteTagCommandServiceBase
 {
     public override async Task<UnitResult> DeleteTag(DeleteTagCommand request, ServerCallContext context)
