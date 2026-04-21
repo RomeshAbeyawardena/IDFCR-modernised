@@ -1,11 +1,10 @@
-﻿using BuildTools.GRPC.Application.Extensions;
-using BuildTools.Shared.Contracts.GRPC.Feature.Tags;
+﻿using BuildTools.Shared.Contracts.GRPC.Features.Tags;
 using Grpc.Core;
 using MediatR;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts = BuildTools.Shared.Contracts.Features.Tags;
-
+using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.Tags;
 
@@ -24,12 +23,17 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
 
         var response = new GetPagedTagsQueryResult
         {
-            Result = result.Map(),
+            Result = GRPCUnitResultExtensions.UnitResultExtensions.From(result),
         };
 
         if (result.HasValue)
         {
-            response.Tags.AddRange(result.Result.Select(x => x.Map()));
+            response.Tags.AddRange(result.Result.Select(x => new Shared.Contracts.Features.Tags.TagDto
+            {
+                DisplayName = x.DisplayName,
+                Id = x.Id?.ToString(),
+                Name = x.Name,
+            }));
         }
 
         return response;

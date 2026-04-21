@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <InformationalVersion>2.0.4.11</InformationalVersion>
-    <FileVersion>2.0.4.11</FileVersion>
-    <PackageVersion>2.0.4.11</PackageVersion>
-    <Version>2.0.4.11</Version>
+    <InformationalVersion>2.0.4.12</InformationalVersion>
+    <FileVersion>2.0.4.12</FileVersion>
+    <PackageVersion>2.0.4.12</PackageVersion>
+    <Version>2.0.4.12</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

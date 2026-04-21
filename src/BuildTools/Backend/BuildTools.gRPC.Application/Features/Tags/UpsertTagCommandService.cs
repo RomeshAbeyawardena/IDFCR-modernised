@@ -1,6 +1,6 @@
-﻿using BuildTools.GRPC.Application.Extensions;
-using BuildTools.GRPC.Shared.Contracts.Feature.Tags;
+﻿using BuildTools.GRPC.Shared.Contracts.Features.Tags;
 using Grpc.Core;
+using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
 using IDFCR.Abstractions.Results.Extensions;
 using MediatR;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagComma
         return new UpsertTagCommandResult
         {
             TagId = result.GetResultOrDefault()?.ToString(), //is a guid
-            Result = result.Map()
+            Result = GRPCUnitResultExtensions.UnitResultExtensions.From(result)
         };
     }
 }

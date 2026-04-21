@@ -1,4 +1,4 @@
-﻿using BuildTools.GRPC.Shared.Contracts.Feature.Tags;
+﻿using BuildTools.GRPC.Shared.Contracts.Features.Tags;
 using Contracts = BuildTools.Shared.Contracts.Features.Tags;
 namespace BuildTools.GRPC.Application.Features.Tags;
 
