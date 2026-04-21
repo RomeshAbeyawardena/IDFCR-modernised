@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package idfcr.abstractions.grpc.contracts.common;
 
-option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common";
+option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common.v1";
 
 enum UnitAction {
   UNIT_ACTION_NONE = 0;

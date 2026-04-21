@@ -12,4 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC.Contracts\IDFCR.Abstractions.GRPC.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="Protos\**\*.proto" GrpcServices="Both" />
+  </ItemGroup>
 </Project>

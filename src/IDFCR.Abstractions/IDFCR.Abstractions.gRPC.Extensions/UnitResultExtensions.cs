@@ -1,5 +1,5 @@
 ﻿using IDFCR.Abstractions.Results;
-
+using V1Common = IDFCR.Abstractions.GRPC.Contracts.Common.V1;
 namespace IDFCR.Abstractions.gRPC.Extensions;
 
 /// <summary>
@@ -12,18 +12,18 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="unitResult"></param>
     /// <returns></returns>
-    public static GRPC.Contracts.Common.UnitResult From(IUnitResult unitResult)
+    public static V1Common.UnitResult From(IUnitResult unitResult)
     {
-        var result = new GRPC.Contracts.Common.UnitResult
+        var result = new V1Common.UnitResult
         {
-            Action = Enum.Parse<GRPC.Contracts.Common.UnitAction>(unitResult.Action.ToString()),
+            Action = Enum.Parse<V1Common.UnitAction>(unitResult.Action.ToString()),
             IsSuccess = unitResult.IsSuccess,
             ErrorMessage = unitResult?.Exception?.Message ?? ""
         };
 
         if (unitResult!.FailureReason.HasValue)
         {
-            result.FailureReason = Enum.Parse<GRPC.Contracts.Common.FailureReason>(unitResult.FailureReason.Value.ToString());
+            result.FailureReason = Enum.Parse<V1Common.FailureReason>(unitResult.FailureReason.Value.ToString());
         }
 
         return result;
@@ -34,7 +34,7 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="unitResult">The common UnitResult to convert.</param>
     /// <returns>An IUnitResult representing the converted unit result.</returns>
-    public static IUnitResult From(this GRPC.Contracts.Common.UnitResult unitResult)
+    public static IUnitResult From(this V1Common.UnitResult unitResult)
     {
         return UnitResult.Create(unitResult.IsSuccess, new Exception(unitResult.ErrorMessage), 
             Enum.Parse<UnitAction>(unitResult.Action.ToString()));
