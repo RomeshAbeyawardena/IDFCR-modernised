@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Metadata.Extensions;
 using System.Text;
+using System.Text.Json;
 
 namespace IDFCR.Abstractions.Metadata;
 
@@ -8,9 +9,21 @@ namespace IDFCR.Abstractions.Metadata;
 /// </summary>
 public abstract record StructuredOrderedRequestBase : IStructuredOrderedRequest
 {
+    private IEnumerable<ISort> _fields = [];
+
+    /// <summary>
+    /// Sets the collection of <see cref="ISort"/> objects that represent the sorting specifications for the request. This property is used internally to populate the <see cref="Fields"/> property and should not be exposed publicly, as it is intended for use within the implementation of the <see cref="ParseFields"/> method to convert JSON-based sorting specifications into a structured format that can be easily processed by query handlers or services throughout the application.
+    /// </summary>
+    protected IEnumerable<ISort> SortedFields { set => _fields = value; }
 
     /// <inheritdoc />
-    public IEnumerable<ISort> Fields { get; init; } = [];
+    public IEnumerable<ISort> Fields { get => _fields; init => _fields = value; }
+
+    /// <inheritdoc />
+    public void ParseFields(string json)
+    {
+        SortedFields = JsonSerializer.Deserialize<IEnumerable<DefaultSort>>(json) ?? [];
+    }
 
     /// <inheritdoc />
     public IOrderedRequest ToOrderedRequest(OrderDirection? defaultOrderDirection)
