@@ -2,8 +2,8 @@ using BuildTools.Application.Extensions;
 using BuildTools.GRPC.Api;
 using BuildTools.GRPC.Application;
 using BuildTools.Infrastructure.SqlServer.Extensions;
-using IDFCR.Abstractions.gRPC.Extensions;
 using IDFCR.Abstractions.GRPC;
+using IDFCR.Abstractions.GRPC.HostExtensions;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
