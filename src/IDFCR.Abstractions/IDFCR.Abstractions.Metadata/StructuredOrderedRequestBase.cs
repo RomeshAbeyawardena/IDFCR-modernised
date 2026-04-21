@@ -16,9 +16,14 @@ public abstract record StructuredOrderedRequestBase : IStructuredOrderedRequest
     public IOrderedRequest ToOrderedRequest(OrderDirection? defaultOrderDirection)
     {
         StringBuilder orderByStringBuilder = new();
+        string delimiter = string.Empty;
         foreach(var field in Fields)
         {
-            orderByStringBuilder.Append($",{field.Field} {field.Direction.ToDirectionString()}");
+            orderByStringBuilder.Append($"{delimiter}{field.Field} {field.Direction.ToDirectionString()}");
+            if (string.IsNullOrEmpty(delimiter))
+            {
+                delimiter = ", ";
+            }
         }
 
         return new DefaultOrderedRequest { 
