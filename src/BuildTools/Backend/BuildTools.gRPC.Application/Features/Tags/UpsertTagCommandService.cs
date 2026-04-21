@@ -16,12 +16,6 @@ public class DefaultUpsertTagCommandService(IMediator mediator) : UpsertTagComma
     {
         var tag = request.Tag.Map();
 
-        var foundResult = await mediator.Send(new Contracts.GetTagQuery { Name = tag.Name }, context.CancellationToken);
-
-        var foundEntity = foundResult.GetResultOrDefault();
-
-        tag.Id = foundEntity?.Id;
-
         var result = await mediator.Send(new Contracts.UpsertTagCommand { Tag = tag, CommitChanges = true }, context.CancellationToken);
 
         return new UpsertTagCommandResult

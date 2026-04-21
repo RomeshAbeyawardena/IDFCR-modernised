@@ -4,6 +4,7 @@ using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
+using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
 using MediatR;
 
@@ -27,22 +28,21 @@ public class TagWriteOperation(IServiceProvider serviceProvider, IManagedStream 
             return;
         }
 
-        var foundEntry = (await mediator.Send(new GetTagQuery { Name = name }, cancellationToken)).GetResultOrDefault();
-
         var result = await mediator.Send(new UpsertTagCommand
         {
             CommitChanges = true,
             Tag = new Shared.Contracts.Features.Tags.TagDto
             {
-                Id = foundEntry?.Id,
-                Name = foundEntry?.Name ?? name!,
+                Name = name!,
                 DisplayName = displayName
             }
         }, cancellationToken);
 
         if (result.IsSuccess)
         {
-            var verb = foundEntry is null ? "added" : "updated";
+            var verb = result.Action == UnitAction.Add 
+                ? "added" : result.Action == UnitAction.Update 
+                    ? "updated" : "unknown";
             await managedStream.Out.WriteLineAsync($"Tag '{name}' successfully {verb}.", cancellationToken);
             return;
         }
