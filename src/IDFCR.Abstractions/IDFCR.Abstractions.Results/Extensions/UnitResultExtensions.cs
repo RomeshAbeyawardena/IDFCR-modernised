@@ -7,6 +7,54 @@ namespace IDFCR.Abstractions.Results.Extensions;
 /// </summary>
 public static class UnitResultExtensions
 {
+    /// <summary>
+    /// Gets a value from the result metadata by key and attempts to parse it as an integer. Returns null if the key is not found or if the value cannot be parsed as an integer.
+    /// </summary>
+    /// <param name="result">The unit result containing the metadata.</param>
+    /// <param name="key">The key of the metadata value to retrieve.</param>
+    /// <returns>The integer value if found and successfully parsed; otherwise, null.</returns>
+    public static int? GetValue(IUnitResult result, string key)
+    {
+        int? value = null;
+        if (result.Meta.TryGetValue(key, out var val)
+            && int.TryParse(value?.ToString(), out int _value))
+        {
+            value = _value;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// Gets the total rows value from the result metadata. Returns null if the key is not found or if the value cannot be parsed as an integer.
+    /// </summary>
+    /// <param name="result">The unit result containing the metadata.</param>
+    /// <returns>The total rows value if found and successfully parsed; otherwise, null.</returns>
+    public static int? GetTotalPages(IUnitResult result)
+    {
+        return GetValue(result, "totalPages");
+    }
+
+    /// <summary>
+    /// Gets the page index value from the result metadata. Returns null if the key is not found or if the value cannot be parsed as an integer.
+    /// </summary>
+    /// <param name="result">The unit result containing the metadata.</param>
+    /// <returns>The page index value if found and successfully parsed; otherwise, null.</returns>
+    public static int? GetPageIndex(IUnitResult result)
+    {
+        return GetValue(result, "pageIndex");
+    }
+
+    /// <summary>
+    /// Gets the page size value from the result metadata. Returns null if the key is not found or if the value cannot be parsed as an integer.
+    /// </summary>
+    /// <param name="result">The unit result containing the metadata.</param>
+    /// <returns>The page size value if found and successfully parsed; otherwise, null.</returns>
+    public static int? GetPageSize(IUnitResult result)
+    {
+        return GetValue(result, "pageSize");
+    }
+
     private static void CloneMeta<TDestination>(IReadOnlyDictionary<string, object?> data, IUnitResult<TDestination> target)
     {
         foreach (var (key, value) in data)

@@ -22,8 +22,19 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
             PageSize = request.PageSize
         }, context.CancellationToken);
 
+        var totalPages = -1;
+        if (result.Meta.TryGetValue("totalPages", out var _totalPages)
+            && int.TryParse(_totalPages?.ToString(), out int pages))
+        {
+            totalPages = pages;
+        }
+
         var response = new GetPagedTagsQueryResult
         {
+            TotalRows = result.TotalRows,
+            PageIndex = request.PageIndex,
+            PageSize = request.PageSize,
+            TotalPages = totalPages,
             Result = GRPCUnitResultExtensions.UnitResultExtensions.From(result),
         };
 
