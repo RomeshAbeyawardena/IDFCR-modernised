@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Proto\Shared\idfcr-shared\**\*" Pack="true" PackagePath="contentFiles\any\any\Proto\Shared\idfcr-shared\">
+    <Content Include="Protos\**\*" Pack="true" PackagePath="contentFiles\any\any\Protos">
       <PackageCopyToOutput>false</PackageCopyToOutput>
       <BuildAction>None</BuildAction>
     </Content>

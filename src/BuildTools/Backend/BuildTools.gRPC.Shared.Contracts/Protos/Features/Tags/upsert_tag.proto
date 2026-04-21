@@ -4,7 +4,7 @@ package buildtools.shared.contracts.grpc.feature.tags;
 
 option csharp_namespace = "BuildTools.GRPC.Shared.Contracts.Features.Tags";
 
-import "unit_result.proto";
+import "Shared/idfcr-shared/v1/unit_result.proto";
 
 message TagDto {
   // object? in C# is represented as string here for wire compatibility.
@@ -19,7 +19,7 @@ message UpsertTagCommand {
 }
 
 message UpsertTagCommandResult {
-	idfc.abstractions.grpc.contracts.common.UnitResult result = 1;
+	idfcr.abstractions.grpc.contracts.common.UnitResult result = 1;
 	string tag_id = 2;
 }
 

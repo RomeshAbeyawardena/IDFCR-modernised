@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.GRPC.Contracts" Version="2.0.4.8" GeneratePathProperty="true" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.Contracts" Version="2.0.4.11" />
     <PackageReference Include="Google.Protobuf" Version="3.34.1" />
     <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />
     <PackageReference Include="Grpc.Tools" Version="2.80.0">
@@ -16,8 +16,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Protobuf Include="$(PkgIDFCR_Abstractions_GRPC_Contracts)/contentFiles/any/any/Protos/Common/*.proto" />
-    <Protobuf Include="Protos\Features\**\*.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\**\*.proto" ProtoRoot="Protos" GrpcServices="Both" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Results;
 using V1Common = IDFCR.Abstractions.GRPC.Contracts.Common.V1;
-namespace IDFCR.Abstractions.gRPC.Extensions;
+namespace IDFCR.Abstractions.GRPC.Extensions;
 
 /// <summary>
 /// Defines extension methods for converting between gRPC contract types and common types related to unit results.

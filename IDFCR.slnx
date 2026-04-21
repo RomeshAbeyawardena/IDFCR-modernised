@@ -15,7 +15,7 @@
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC/IDFCR.Abstractions.GRPC.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.Contracts/IDFCR.Abstractions.GRPC.Contracts.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.Generated/IDFCR.Abstractions.GRPC.Generated.csproj" />
-	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.Extensions/IDFCR.Abstractions.gRPC.Extensions.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.Extensions/IDFCR.Abstractions.GRPC.Extensions.csproj" />
 	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.HostExtensions/IDFCR.Abstractions.GRPC.HostExtensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors/IDFCR.Abstractions.Interceptors.csproj" />

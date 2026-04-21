@@ -4,7 +4,7 @@ package buildtools.shared.contracts.grpc.feature.tags;
 
 option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.Tags";
 
-import "unit_result.proto";
+import "Shared/idfcr-shared/v1/unit_result.proto";
 
 message DeleteTagCommand {
   string name = 1;
