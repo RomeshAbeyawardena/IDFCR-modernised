@@ -1,22 +1,22 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="CopyProtosToProject" BeforeTargets="PrepareForBuild;BeforeBuild">
     <ItemGroup>
-      <NuGetSourceFiles Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\Protos\Shared\idfcr-shared\**\*" />
-
-      <P2PSourceFiles Include="$(MSBuildThisFileDirectory)Proto\Shared\idfcr-shared\**\*" />
-
-      <AllSourceFiles Condition="'@(NuGetSourceFiles)' != ''" Include="@(NuGetSourceFiles)" />
-      <AllSourceFiles Condition="'@(NuGetSourceFiles)' == ''" Include="@(P2PSourceFiles)" />
+      <SourceProtoFiles Include="$(MSBuildThisFileDirectory)..\**\idfcr-shared\v1\*.proto" Condition="Exists('$(MSBuildThisFileDirectory)..\')" />
+      <SourceProtoFiles Include="$(MSBuildThisFileDirectory)**\idfcr-shared\v1\*.proto" Condition="'@(SourceProtoFiles)' == ''" />
     </ItemGroup>
 
-    <MakeDir Directories="$(ProjectDir)Protos\Shared\idfcr-shared" Condition="!Exists('$(ProjectDir)Protos\Shared\idfcr-shared')" />
+    <PropertyGroup>
+      <V1Target>$(ProjectDir)Protos\Shared\idfcr-shared\v1\</V1Target>
+    </PropertyGroup>
+
+    <Message Text="[Idfcr] Copying @(SourceProtoFiles->Count()) files to $(V1Target)" Importance="high" />
+
+    <MakeDir Directories="$(V1Target)" Condition="!Exists('$(V1Target)')" />
 
     <Copy
-      SourceFiles="@(AllSourceFiles)"
-      DestinationFolder="$(ProjectDir)Protos\%(RecursiveDir)"
+      SourceFiles="@(SourceProtoFiles)"
+      DestinationFolder="$(V1Target)"
       SkipUnchangedFiles="true"
       OverwriteReadOnlyFiles="true" />
-
-    <Message Text="[Idfcr] Synced protos to $(ProjectDir)Protos\Shared\idfcr-shared" Importance="high" />
   </Target>
 </Project>
