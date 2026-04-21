@@ -17,6 +17,7 @@ public static class OrderDirectionExtensions
         {
             OrderDirection.Ascending => "asc",
             OrderDirection.Descending => "desc",
+            OrderDirection.None => string.Empty,
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
