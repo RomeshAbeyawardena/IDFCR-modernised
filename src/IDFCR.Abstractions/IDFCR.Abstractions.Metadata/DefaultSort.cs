@@ -6,7 +6,7 @@
 public record DefaultSort : ISort
 {
     /// <inheritdoc />
-    public string Field { get; } = null!;
+    public string Field { get; init; } = null!;
     /// <inheritdoc />
-    public int Order { get; } = 0;
+    public int Order { get; init; } = 0;
 }

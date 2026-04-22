@@ -22,7 +22,7 @@ public abstract record StructuredOrderedRequestBase : IStructuredOrderedRequest
     /// <inheritdoc />
     public void ParseFields(string json)
     {
-        SortedFields = JsonSerializer.Deserialize<IEnumerable<DefaultSort>>(json) ?? [];
+        SortedFields = JsonSerializer.Deserialize<IEnumerable<DefaultSort>>(json, JsonSerializerOptions.Web) ?? [];
     }
 
     /// <inheritdoc />
