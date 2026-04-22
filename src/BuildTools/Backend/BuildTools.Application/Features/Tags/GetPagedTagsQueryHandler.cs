@@ -15,6 +15,7 @@ public class GetPagedTagsQueryHandler(ITagRepository tagRepository) : IUnitPaged
     {
         var result = await tagRepository.GetPagedAsync(new Infrastructure.Features.Tags.GetPagedTagsQuery
         {
+            Fields = request.SortFields,
             Name = request.Name,
             NameContains = request.NameContains,
             PageIndex = request.PageIndex,

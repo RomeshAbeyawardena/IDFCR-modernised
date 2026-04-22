@@ -2,7 +2,7 @@
 
 namespace BuildTools.Infrastructure.Features.Tags;
 
-public record GetPagedTagsQuery : PagedQuery
+public record GetPagedTagsQuery : PagedSortedQuery
 {
     public string? Name { get; init; }
     public string? NameContains { get; init; }
