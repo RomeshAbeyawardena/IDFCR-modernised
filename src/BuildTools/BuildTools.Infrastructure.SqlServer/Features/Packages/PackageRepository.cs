@@ -56,9 +56,9 @@ public class PackageRepository(PackageManagerDbContext db, IFilterFactory filter
         }
 
         var foundTags = tagIds.Any()
-            ? db.Tags.Where(x => tagIds.Contains(x.Id))
+            ? Db.Tags.Where(x => tagIds.Contains(x.Id))
             : tags is not null
-                ? db.Tags.Where(x => tags.Contains(x.Name))
+                ? Db.Tags.Where(x => tags.Contains(x.Name))
                 : null;
 
         if (foundTags is null)
@@ -120,9 +120,9 @@ public class PackageRepository(PackageManagerDbContext db, IFilterFactory filter
         }
 
         var foundTags = tagIds.Any()
-            ? db.Tags.Where(x => tagIds.Contains(x.Id))
+            ? Db.Tags.Where(x => tagIds.Contains(x.Id))
             : tags is not null
-                ? db.Tags.Where(x => tags.Contains(x.Name))
+                ? Db.Tags.Where(x => tags.Contains(x.Name))
                 : null;
 
         if (foundTags is null)
