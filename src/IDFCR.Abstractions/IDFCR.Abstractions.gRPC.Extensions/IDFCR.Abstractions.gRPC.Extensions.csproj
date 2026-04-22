@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC.Generated\IDFCR.Abstractions.GRPC.Generated.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>
  </Project>

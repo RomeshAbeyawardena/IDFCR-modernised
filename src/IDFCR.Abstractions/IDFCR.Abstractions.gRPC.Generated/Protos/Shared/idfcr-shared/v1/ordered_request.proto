@@ -12,6 +12,6 @@ enum OrderDirection {
 
 message SortOrder {
 	string field_name = 1;
-	int32 order_direction = 2;
+	int32 order = 2;
 	OrderDirection direction = 3;
 }
