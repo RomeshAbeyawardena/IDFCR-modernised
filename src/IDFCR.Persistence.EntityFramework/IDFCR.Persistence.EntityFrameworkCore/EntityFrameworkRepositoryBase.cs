@@ -3,6 +3,7 @@ using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
+using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
@@ -177,6 +178,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <returns>The ordered query.</returns>
     protected virtual IQueryable<TDb> OrderBy<TRequest>(TRequest request, IQueryable<TDb> query)
     {
+        if (request is IOrderedRequest orderedRequest && !string.IsNullOrEmpty(orderedRequest.OrderBy))
+        {
+            return query.ApplyOrdering(orderedRequest.OrderBy);
+        }
+
         return query.OrderBy(x => x.Id);
     }
 }
