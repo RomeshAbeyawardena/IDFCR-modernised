@@ -1,6 +1,7 @@
 ﻿using BuildTools.Shared.Contracts.GRPC.Features.Tags;
 using Grpc.Core;
 using IDFCR.Abstractions.GRPC;
+using IDFCR.Abstractions.GRPC.Extensions;
 using MediatR;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,12 +15,15 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
 {
     public override async Task<GetPagedTagsQueryResult> GetPagedTags(GetPagedTagsQuery request, ServerCallContext context)
     {
+        var sortFields = request.OrderedFields.Select(x => x.From());
+
         var result = await mediator.Send(new Contracts.GetPagedTagsQuery
         {
             Name = request.Name,
             NameContains = request.NameContains,
             PageIndex = request.PageIndex,
-            PageSize = request.PageSize
+            PageSize = request.PageSize,
+            SortFields = sortFields
         }, context.CancellationToken);
 
         var totalPages = -1;

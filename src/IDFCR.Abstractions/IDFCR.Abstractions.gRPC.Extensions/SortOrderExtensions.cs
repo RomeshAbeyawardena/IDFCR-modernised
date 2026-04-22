@@ -12,7 +12,7 @@ public static class SortOrderExtensions
     /// </summary>
     /// <param name="sort">The common ISort to convert.</param>
     /// <returns>A <see cref="V1Common.SortOrder"/> representing the converted sort order.</returns>
-    public static V1Common.SortOrder From(ISort sort)
+    public static V1Common.SortOrder From(this ISort sort)
     {
         V1Common.SortOrder result = new()
         {
@@ -29,7 +29,7 @@ public static class SortOrderExtensions
     /// </summary>
     /// <param name="sort">The gRPC contract SortOrder to convert.</param>
     /// <returns>An <see cref="ISort"/> representing the converted sort order.</returns>
-    public static ISort From(V1Common.SortOrder sort)
+    public static ISort From(this V1Common.SortOrder sort)
     {
         DefaultSort sortOrder = new()
         {

@@ -12,7 +12,7 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="unitResult"></param>
     /// <returns></returns>
-    public static V1Common.UnitResult From(IUnitResult unitResult)
+    public static V1Common.UnitResult From(this IUnitResult unitResult)
     {
         var result = new V1Common.UnitResult
         {

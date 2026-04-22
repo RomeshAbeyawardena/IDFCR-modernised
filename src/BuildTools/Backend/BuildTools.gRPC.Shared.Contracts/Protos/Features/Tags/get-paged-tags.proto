@@ -5,13 +5,15 @@ package buildtools.shared.contracts.grpc.feature.tags;
 option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.Tags";
 
 import "Shared/idfcr-shared/v1/unit_result.proto";
+import "Shared/idfcr-shared/v1/ordered_request.proto";
 import "Features/Tags/upsert_tag.proto"; // reuses TagDto
 
 message GetPagedTagsQuery {
-  int32 page_size = 1;
-  int32 page_index = 2;
-  string name = 3;
-  string name_contains = 4;
+  repeated idfcr.abstractions.grpc.contracts.common.SortOrder ordered_fields = 1;
+  int32 page_size = 2;
+  int32 page_index = 3;
+  string name = 4;
+  string name_contains = 5;
 }
 
 message GetPagedTagsQueryResult {
