@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.Builders\IDFCR.Abstractions.Builders.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Mapper\IDFCR.Abstractions.Mapper.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
   </ItemGroup>
 </Project>
