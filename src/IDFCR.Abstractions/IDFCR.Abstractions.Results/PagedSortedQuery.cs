@@ -5,8 +5,10 @@ namespace IDFCR.Abstractions.Results;
 /// <summary>
 /// Represents a composition of a paged query and a sorted query, allowing for both pagination and sorting specifications to be included in a single request. This record combines the properties and functionality of both the <see cref="PagedQuery"/> and the <see cref="StructuredOrderedRequestBase"/> classes, enabling developers to easily create requests that require both pagination and sorting capabilities by inheriting from this composite record. The <see cref="PagedSortedQuery"/> class provides a convenient way to encapsulate all necessary information for handling paged and sorted queries in a unified manner, simplifying the process of creating and managing complex query requests throughout the application.
 /// </summary>
-public record PagedSortedQuery : StructuredOrderedRequestBase, IPagedQuery
+public record PagedSortedQuery : StructuredOrderedRequestBase, IPagedQuery, IOrderedRequest
 {
+    string? IOrderedRequest.OrderBy => ToOrderedRequest(DefaultOrderDirection).OrderBy;
+
     private readonly PagedQuery pagedQuery;
 
     /// <summary>
@@ -34,6 +36,9 @@ public record PagedSortedQuery : StructuredOrderedRequestBase, IPagedQuery
 
     /// <inheritdoc />
     public int? PageIndex { get => pagedQuery.PageIndex; set => pagedQuery.PageIndex = value; }
+
+    /// <inheritdoc />
+    public OrderDirection? DefaultOrderDirection { get; init; }
 
     /// <inheritdoc />
     public void Map(IPagedQuery source)
