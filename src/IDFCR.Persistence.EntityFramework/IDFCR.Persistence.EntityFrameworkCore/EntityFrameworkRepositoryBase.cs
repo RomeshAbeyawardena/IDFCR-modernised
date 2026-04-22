@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
+using IDFCR.Abstractions.Metadata.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
@@ -171,7 +172,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     }
 
     /// <summary>
-    /// Defines a method for ordering a queryable collection of entities based on a request object. This method takes a request object and a queryable collection of database entities as parameters. It applies ordering to the query based on the provided request and returns the ordered queryable collection. The default implementation orders the query by the Id property of the entities, but derived classes can override this method to provide specific ordering logic based on the requirements of the application. By utilizing this method, developers can ensure that the retrieved data is ordered according to the desired criteria while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// Defines a method for ordering a query based on the provided request. This method checks if the request implements the IOrderedRequest interface and if it contains a valid OrderBy property. If both conditions are met, it applies the specified ordering to the query using the ApplyOrdering extension method. If the request does not implement IOrderedRequest or does not contain a valid OrderBy property, it defaults to ordering the query by the Id property of the entities. This method is designed to be overridden by derived classes to provide specific implementation details for ordering queries based on different types of requests while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>
     /// <param name="request">The request containing any parameters for ordering.</param>
     /// <param name="query">The query to order.</param>
@@ -180,7 +181,8 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     {
         if (request is IOrderedRequest orderedRequest && !string.IsNullOrEmpty(orderedRequest.OrderBy))
         {
-            return query.ApplyOrdering(orderedRequest.OrderBy);
+            return query.ApplyOrdering(orderedRequest.OrderBy, 
+                orderedRequest.DefaultOrderDirection?.ToDirectionString());
         }
 
         return query.OrderBy(x => x.Id);

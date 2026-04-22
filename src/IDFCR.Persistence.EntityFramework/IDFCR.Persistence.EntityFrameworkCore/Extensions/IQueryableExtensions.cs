@@ -13,11 +13,22 @@ public static class IQueryableExtensions
     /// <typeparam name="T">The type of the elements in the <see cref="IQueryable{T}"/>.</typeparam>
     /// <param name="source">The <see cref="IQueryable{T}"/> to apply the ordering to.</param>
     /// <param name="orderBy">A comma-separated string specifying the properties to order by and their respective directions (e.g., "Name desc, Age").</param>
+    /// <param name="defaultSortDirection">A string specifying the default sort direction ("asc" or "desc") to use when no direction is provided for a property.</param>
     /// <returns>A new <see cref="IQueryable{T}"/> with the applied ordering.</returns>
-    public static IQueryable<T> ApplyOrdering<T>(this IQueryable<T> source, string orderBy)
+    public static IQueryable<T> ApplyOrdering<T>(this IQueryable<T> source, string orderBy, string? defaultSortDirection = null)
     {
         if (string.IsNullOrWhiteSpace(orderBy))
+        {
             return source;
+        }
+
+        if (string.IsNullOrWhiteSpace(defaultSortDirection))
+        {
+            defaultSortDirection = "asc";
+        }
+
+        // Sanitize the default once
+        bool defaultIsDescending = defaultSortDirection.Equals("desc", StringComparison.OrdinalIgnoreCase);
 
         var sortExpressions = orderBy.Split(',', StringSplitOptions.RemoveEmptyEntries);
         var currentExpression = source.Expression;
@@ -26,19 +37,19 @@ public static class IQueryableExtensions
         {
             var parts = sortExpressions[i].Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var propertyPath = parts[0];
-            var isDescending = parts.Length > 1 &&
-                               parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase);
+
+            // Logic: If a direction was provided, use it. Otherwise, use the default parameter.
+            bool isDescending = parts.Length > 1
+                ? parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase)
+                : defaultIsDescending;
 
             var parameter = Expression.Parameter(typeof(T), "x");
 
-            // Efficiently drill down into nested properties (e.g., "Customer.Address.City")
-            // Since you validate upstream, we assume propertyPath is safe.
             var propertyAccess = propertyPath.Split('.')
                 .Aggregate((Expression)parameter, Expression.PropertyOrField);
 
             var lambda = Expression.Lambda(propertyAccess, parameter);
 
-            // Select method via nameof for compile-time safety
             var methodName = i == 0
                 ? (isDescending ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy))
                 : (isDescending ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy));
