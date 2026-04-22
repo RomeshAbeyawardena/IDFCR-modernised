@@ -39,7 +39,7 @@ public class DefaultPagedTagsQueryService(IMediator mediator) : GetPagedTagsQuer
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
             TotalPages = totalPages,
-            Result = GRPCUnitResultExtensions.UnitResultExtensions.From(result),
+            Result = result.From(),
         };
 
         if (result.HasValue)
