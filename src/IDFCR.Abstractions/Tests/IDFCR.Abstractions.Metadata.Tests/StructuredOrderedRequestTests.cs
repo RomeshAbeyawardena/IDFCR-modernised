@@ -4,6 +4,14 @@ namespace IDFCR.Abstractions.Metadata.Tests;
 
 public record MyStructuredOrderedRequest : StructuredOrderedRequestBase { }
 
+public record MyRestrictedOrderedRequest : StructuredOrderedRequestBase
+{
+    public MyRestrictedOrderedRequest()
+    {
+        SupportedFields.AddRange(["environment", "deployedBy"]);
+    }
+}
+
 [TestFixture]
 public class StructuredOrderedRequestTests
 {
@@ -63,5 +71,45 @@ public class StructuredOrderedRequestTests
         var ordered = request.ToOrderedRequest(null);
 
         Assert.That(ordered.OrderBy, Is.EqualTo("environment asc, version desc, deployedBy asc"));
+    }
+
+    [Test]
+    public void ParseFields_WithSupportedFields_ShouldSucceed_WhenAllFieldsAreAllowed()
+    {
+        const string json = """
+            [
+              { "field": "environment", "order": 1 },
+              { "field": "deployedBy", "order": -1 }
+            ]
+            """;
+
+        var request = new MyRestrictedOrderedRequest();
+
+        Assert.DoesNotThrow(() => request.ParseFields(json));
+        Assert.That(request.Fields.Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public void ParseFields_WithSupportedFields_ShouldThrowFieldValidationException_WhenUnsupportedFieldIsRequested()
+    {
+        // "version" is not in MyRestrictedOrderedRequest's SupportedFields
+        var request = new MyRestrictedOrderedRequest();
+
+        Assert.Throws<FieldValidationException>(() => request.ParseFields(SampleJson));
+    }
+
+    [Test]
+    public void ParseFields_WithSupportedFields_ShouldBeCaseInsensitive()
+    {
+        const string json = """
+            [
+              { "field": "ENVIRONMENT", "order": 1 },
+              { "field": "DeployedBy", "order": -1 }
+            ]
+            """;
+
+        var request = new MyRestrictedOrderedRequest();
+
+        Assert.DoesNotThrow(() => request.ParseFields(json));
     }
 }

@@ -10,14 +10,40 @@ namespace IDFCR.Abstractions.Metadata;
 public abstract record StructuredOrderedRequestBase : IStructuredOrderedRequest
 {
     private IEnumerable<ISort> _fields = [];
+    private readonly List<string> _supportedFields = [];
+
+    /// <summary>
+    /// Gets the list of supported fields for sorting. This property is used internally to validate the fields specified in the request and should not be modified directly. Derived classes can add supported fields to this list to enable sorting on specific properties.
+    /// </summary>
+    protected List<string> SupportedFields => _supportedFields;
+
+    /// <summary>
+    /// Validates the collection of <see cref="ISort"/> objects against the list of supported fields. This method checks if all fields specified in the sorting specifications are included in the list of supported fields. If the list of supported fields is empty, it is assumed that all fields are valid. This validation ensures that only valid and supported fields are used for sorting, preventing potential errors or issues when processing the sorting specifications in query handlers or services.
+    /// </summary>
+    /// <param name="fields">The collection of fields to validate.</param>
+    /// <returns>True if all fields are valid and supported; otherwise, false.</returns>
+    protected virtual bool ValidateFields(IEnumerable<ISort> fields)
+    {
+        return _supportedFields.Count == 0 || fields.All(f => _supportedFields.Contains(f.Field, StringComparer.InvariantCultureIgnoreCase));
+    }
 
     /// <summary>
     /// Sets the collection of <see cref="ISort"/> objects that represent the sorting specifications for the request. This property is used internally to populate the <see cref="Fields"/> property and should not be exposed publicly, as it is intended for use within the implementation of the <see cref="ParseFields"/> method to convert JSON-based sorting specifications into a structured format that can be easily processed by query handlers or services throughout the application.
     /// </summary>
-    protected IEnumerable<ISort> SortedFields { set => _fields = value; }
+    protected IEnumerable<ISort> SortedFields { 
+        set 
+        {
+            if (!ValidateFields(value))
+            {
+                throw new FieldValidationException("One or several requested fields are not supported.");
+            }
+
+            _fields = value;
+        }
+    }
 
     /// <inheritdoc />
-    public IEnumerable<ISort> Fields { get => _fields; init => _fields = value; }
+    public IEnumerable<ISort> Fields { get => _fields; init => SortedFields = value; }
 
     /// <inheritdoc />
     public void ParseFields(string json)
