@@ -85,4 +85,22 @@ public class OrderedTesting
         // Assert
         Assert.That(orderedList.Select(x => x.Name), Is.EqualTo(["Cherry", "Plum"]));
     }
+
+    [TestCase("OrderIndx desc")]  // misspelled
+    public void ApplyOrdering_Should_Be_NoOp_When_OrderField_Is_Invalid(string orderBy)
+    {
+        // Arrange
+        List<Fruit> list =
+        [
+            new Fruit { OrderIndex = 2, Name = "Cherry" },
+            new Fruit { OrderIndex = 1, Name = "Plum" }
+        ];
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => list.AsQueryable().ApplyOrdering(orderBy));
+
+        // Assert
+        Assert.That(exception, Is.Not.Null);
+        Assert.That(exception!.Message, Does.Contain("is not a member of type"));
+    }
 }
