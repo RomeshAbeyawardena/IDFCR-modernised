@@ -10,6 +10,8 @@ public interface ISaferExceptionProviderBuilder
     /// </summary>
     /// <typeparam name="TException">The type of the exception.</typeparam>
     /// <param name="saferMessage">The safer message to associate with the exception type.</param>
+    /// <param name="statusCode">The status code to associate with the exception type.</param>
+    /// <param name="failureReason">The failure reason to associate with the exception type.</param>
     /// <returns>The builder instance for chaining.</returns>
     ISaferExceptionProviderBuilder AddOrUpdate<TException>(string saferMessage, int? statusCode, FailureReason? failureReason)
         where TException : Exception;

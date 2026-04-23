@@ -2,7 +2,7 @@
 
 internal class DefaultSaferExceptionProviderBuilder : ISaferExceptionProviderBuilder
 {
-    private Dictionary<Type, Func<Exception, SaferException>> saferExceptionTypes = [];
+    private readonly Dictionary<Type, Func<Exception, SaferException>> saferExceptionTypes = [];
     public ISaferExceptionProviderBuilder AddOrUpdate<TException>(string saferMessage, int? statusCode, FailureReason? failureReason) where TException : Exception
     {
         var exceptionType = typeof(TException);
