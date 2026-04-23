@@ -6,6 +6,15 @@
 public interface ISaferExceptionProviderBuilder
 {
     /// <summary>
+    /// Adds default safer exception implementations for common exception types. This method can be used to quickly set up a provider with predefined safer messages for frequently encountered exceptions, such as <see cref="ArgumentNullException"/>, <see cref="InvalidOperationException"/>, and others. By calling this method, the provider will be configured to return safer messages for these common exception types without the need for manual configuration of each type. This can help improve the security and user-friendliness of error messages in applications that utilize the provider.
+    /// <para>
+    /// Ensure you run this first before adding or updating specific exception types, as it will set up a baseline of safer exception implementations that can be further customized using the <see cref="AddOrUpdate{TException}(string, int?, FailureReason?)"/> method.
+    /// Otherwise your custom configurations may be overwritten by the defaults if you call this method after adding or updating specific exception types.
+    /// </para>
+    /// </summary>
+    /// <returns>The builder instance for chaining.</returns>
+    ISaferExceptionProviderBuilder AddDefaults();
+    /// <summary>
     /// Adds or updates a safer exception implementation for the specified exception type. This method can be used to configure the provider to return a specific safer message for a given exception type. If an implementation for the specified exception type already exists, it will be updated with the new safer message; otherwise, a new implementation will be added to the provider.
     /// </summary>
     /// <typeparam name="TException">The type of the exception.</typeparam>
