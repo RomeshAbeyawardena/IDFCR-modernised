@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace IDFCR.Abstractions.Results;
 
 /// <summary>
 /// Represents a provider for safer exceptions, which can be used to create exceptions that are more secure and less likely to expose sensitive information. This interface can be implemented by classes that provide functionality for creating safer exceptions, such as by sanitizing exception messages or by providing additional context for exceptions.
@@ -12,7 +14,7 @@ public interface ISaferExceptionProvider
     /// <param name="exception">The exception instance for which to get a safer implementation.</param>
     /// <param name="saferException">The safer exception instance, if available.</param>
     /// <returns>True if a safer exception implementation is available; otherwise, false.</returns>
-    bool TryGetImplementation<TException>(TException exception, out SaferException? saferException)
+    bool TryGetImplementation<TException>(TException exception, [MaybeNullWhen(false)] out SaferException? saferException)
         where TException : Exception;
 
     /// <summary>
@@ -22,6 +24,6 @@ public interface ISaferExceptionProvider
     /// <param name="exception">The exception instance for which to get a safer implementation.</param>
     /// <param name="saferException">The safer exception instance, if available.</param>
     /// <returns>True if a safer exception instance is available; otherwise, false.</returns>
-    bool TryGet<TException>(TException exception, out ISaferException? saferException)
+    bool TryGet<TException>(TException exception, [MaybeNullWhen(false)] out ISaferException? saferException)
         where TException : Exception;
 }

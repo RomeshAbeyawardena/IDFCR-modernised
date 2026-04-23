@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Results;
 using MediatR.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
@@ -10,8 +11,9 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <typeparam name="TResponse">The type of the response returned by the request.</typeparam>
 /// <typeparam name="TException">The type of exception to be handled by this pipeline.</typeparam>
 /// <param name="exceptionBehaviourManager">The exception behaviour manager used to determine how exceptions should be handled.</param>
+/// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
 public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TException>(
-    IExceptionBehaviourManager exceptionBehaviourManager)
+    IExceptionBehaviourManager exceptionBehaviourManager, IServiceProvider serviceProvider)
     : IRequestExceptionHandler<TRequest, TResponse, TException>
     where TRequest : notnull
     where TException : Exception
@@ -30,6 +32,15 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
         var responseType = typeof(TResponse);
 
         var genericTypes = responseType.GetGenericArguments();
+
+        var saferExceptionProvider = serviceProvider.GetService<ISaferExceptionProvider>(); // we don't care if this is registered, if it isn't it will just expose the raw exceptions
+        Exception finalException = exception; //will be either the converted to a safer exception OR just expose the raw exception
+        ISaferException? _saferException = null;
+        if (saferExceptionProvider is not null && saferExceptionProvider.TryGetImplementation(exception, out var saferException))
+        {
+            finalException = (Exception?)saferException ?? exception;
+            _saferException = saferException;
+        }
 
         TResponse? result = default;
         if (genericTypes.Length == 1)
@@ -50,7 +61,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                     pagedQuery = paged;
                 }
 
-                result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, exception, behaviour.FailureReason])!;
+                result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, finalException, _saferException?.FailureReason ?? behaviour.FailureReason])!;
 
                 state.SetHandled(result);
 
@@ -61,7 +72,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                 var methodInfo = typeof(UnitResultCollection).GetMethod(nameof(UnitResultCollection.Failed))?
                     .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
 
-                result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction])!;
+                result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction])!;
 
                 state.SetHandled(result);
 
@@ -73,7 +84,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                     .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))?
                     .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
 
-                result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction, behaviour.FailureReason])!;
+                result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason])!;
 
                 state.SetHandled(result);
 
@@ -86,7 +97,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                     .FirstOrDefault(x => !x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))
                     ?? throw new InvalidOperationException($"Unable to find generic method");
 
-            result = (TResponse)methodInfo.Invoke(null, [exception, behaviour.UnitAction, behaviour.FailureReason])!;
+            result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason])!;
 
             state.SetHandled(result);
 
