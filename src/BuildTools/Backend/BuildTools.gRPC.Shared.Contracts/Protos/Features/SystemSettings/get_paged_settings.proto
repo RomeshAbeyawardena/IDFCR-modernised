@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package buildtools.shared.contracts.grpc.feature.systemsettings;
+
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.SystemSettings";
+
+import "Shared/idfcr-shared/v1/unit_result.proto";
+import "Shared/idfcr-shared/v1/ordered_request.proto";
+
+message GetPagedSettingsQuery {
+  repeated idfcr.abstractions.grpc.contracts.common.SortOrder ordered_fields = 1;
+  int32 page_size = 2;
+  int32 page_index = 3;
+}
