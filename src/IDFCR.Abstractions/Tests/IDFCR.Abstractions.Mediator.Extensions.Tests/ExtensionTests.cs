@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Results;
 using MediatR.Pipeline;
+using Moq;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Tests;
@@ -171,7 +172,15 @@ public class ExtensionTests
         }
     }
 
-    private static async Task<RequestExceptionHandlerState<TResponse>> Execute<TRequest, TResponse>(
+    private Mock<IServiceProvider> serviceProviderMock;
+
+    [SetUp]
+    public void SetUp()
+    {
+        serviceProviderMock = new();
+    }
+
+    private async Task<RequestExceptionHandlerState<TResponse>> Execute<TRequest, TResponse>(
         TRequest request,
         InvalidOperationException exception,
         ExceptionBehaviour? registeredBehaviour = null,
@@ -190,7 +199,12 @@ public class ExtensionTests
             builder.Set<InvalidOperationException>(registeredBehaviour);
         }
 
-        var pipeline = new GenericDefaultExceptionPipeline<TRequest, TResponse, InvalidOperationException>(builder.Build());
+        DefaultSaferExceptionProviderBuilder saferExceptionbuilder = new();
+
+        serviceProviderMock.Setup(x => x.GetService(typeof(ISaferExceptionProvider)))
+            .Returns(saferExceptionbuilder.Build());
+
+        var pipeline = new GenericDefaultExceptionPipeline<TRequest, TResponse, InvalidOperationException>(builder.Build(), serviceProviderMock.Object);
         var state = new RequestExceptionHandlerState<TResponse>();
 
         await pipeline.Handle(request, exception, state, CancellationToken.None);

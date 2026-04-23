@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions.Mediator.Extensions\IDFCR.Abstractions.Mediator.Extensions.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>
 </Project>
