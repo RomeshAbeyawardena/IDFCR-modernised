@@ -43,5 +43,15 @@ public enum FailureReason
     /// <summary>
     /// An internal error occurred.
     /// </summary>
-    InternalError = 6
+    InternalError = 6,
+
+    /// <summary>
+    /// An external dependency error
+    /// </summary>
+    ExternalDependencyError = 7,
+
+    /// <summary>
+    /// An authorisation error
+    /// </summary>
+    AuthorizationError = 8
 }
