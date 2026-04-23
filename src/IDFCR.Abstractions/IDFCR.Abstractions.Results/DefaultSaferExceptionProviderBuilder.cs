@@ -23,11 +23,6 @@ internal class DefaultSaferExceptionProviderBuilder : ISaferExceptionProviderBui
             .AddOrUpdate<HttpRequestException>("An external service request failed", 502, FailureReason.ExternalDependencyError)
             .AddOrUpdate<WebException>("An external service communication error occurred", 502, FailureReason.ExternalDependencyError)
 
-            //// Database / Persistence
-            //.AddOrUpdate<SqlException>("A database operation failed", 500, FailureReason.InternalError)
-            //.AddOrUpdate<DbUpdateException>("A data persistence error occurred", 500, FailureReason.InternalError)
-            //.AddOrUpdate<DbUpdateConcurrencyException>("The resource was modified by another process", 409, FailureReason.Conflict)
-
             // File system
             .AddOrUpdate<FileNotFoundException>("A required file could not be found", 500, FailureReason.InternalError)
             .AddOrUpdate<DirectoryNotFoundException>("A required directory could not be found", 500, FailureReason.InternalError)
