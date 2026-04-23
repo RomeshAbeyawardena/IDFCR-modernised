@@ -29,6 +29,17 @@ public sealed class UnsupportedResponseRequest
 [TestFixture]
 public class ExtensionTests
 {
+
+    private Mock<IServiceProvider> serviceProviderMock;
+    DefaultSaferExceptionProviderBuilder saferExceptionbuilder;
+
+    [SetUp]
+    public void SetUp()
+    {
+        serviceProviderMock = new();
+        saferExceptionbuilder = new();
+    }
+
     [Test]
     public async Task GenericDefaultExceptionPipeline_handles_non_generic_unit_results_using_default_behaviour()
     {
@@ -125,6 +136,56 @@ public class ExtensionTests
     }
 
     [Test]
+    public async Task GenericDefaultExceptionPipeline_uses_safer_exception_from_provider_when_mapping_exists()
+    {
+        var exception = new InvalidOperationException("boom");
+        var behaviour = new ExceptionBehaviour(UnitAction.Update, FailureReason.Conflict);
+
+        var state = await Execute<TypedUnitResultRequest, IUnitResult<Customer>>(
+            new TypedUnitResultRequest(),
+            exception,
+            registeredBehaviour: behaviour,
+            saferExceptionProviderSetup: x => x.AddDefaults());
+
+        var response = state.Response;
+        var saferException = response?.Exception as SaferException;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(saferException, Is.Not.Null);
+            Assert.That(saferException!.Message, Is.EqualTo("The operation could not be completed"));
+            Assert.That(saferException.InnerException, Is.SameAs(exception));
+            Assert.That(response!.FailureReason, Is.EqualTo(FailureReason.InternalError));
+            Assert.That(response.Action, Is.EqualTo(UnitAction.Update));
+        }
+    }
+
+    [Test]
+    public async Task GenericDefaultExceptionPipeline_keeps_raw_exception_when_provider_has_no_mapping()
+    {
+        var exception = new InvalidOperationException("boom");
+        var behaviour = new ExceptionBehaviour(UnitAction.Update, FailureReason.Conflict);
+
+        var state = await Execute<TypedUnitResultRequest, IUnitResult<Customer>>(
+            new TypedUnitResultRequest(),
+            exception,
+            registeredBehaviour: behaviour,
+            saferExceptionProviderSetup: x => x.AddOrUpdate<NullReferenceException>("sanitised", 500, FailureReason.InternalError));
+
+        var response = state.Response;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response!.Exception, Is.SameAs(exception));
+            Assert.That(response.FailureReason, Is.EqualTo(FailureReason.Conflict));
+        }
+    }
+
+    [Test]
     public async Task GenericDefaultExceptionPipeline_handles_paged_results_with_empty_payload_and_paging_metadata()
     {
         var request = new PagedUnitResultRequest();
@@ -172,19 +233,47 @@ public class ExtensionTests
         }
     }
 
-    private Mock<IServiceProvider> serviceProviderMock;
-
-    [SetUp]
-    public void SetUp()
+    [Test]
+    public async Task GenericDefaultExceptionPipeline_consumes_custom_safer_exception_registered_with_builder()
     {
-        serviceProviderMock = new();
+        var exception = new InvalidOperationException("sensitive failure details");
+        var behaviour = new ExceptionBehaviour(UnitAction.Update, FailureReason.Conflict);
+        const string safeMessage = "A safe error message";
+
+        var state = await Execute<TypedUnitResultRequest, IUnitResult<Customer>>(
+            new TypedUnitResultRequest(),
+            exception,
+            registeredBehaviour: behaviour,
+            saferExceptionProviderSetup: x => x.AddOrUpdate<InvalidOperationException>(safeMessage, 418, FailureReason.Forbidden));
+
+        var response = state.Response;
+        var saferException = response?.Exception as SaferException;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(state.Handled, Is.True);
+            Assert.That(response, Is.Not.Null);
+
+            Assert.That(saferException, Is.Not.Null);
+            Assert.That(saferException!.Message, Is.EqualTo(safeMessage));
+            Assert.That(saferException.InnerException, Is.SameAs(exception));
+            Assert.That(saferException.StatusCode, Is.EqualTo(418));
+            Assert.That(saferException.FailureReason, Is.EqualTo(FailureReason.Forbidden));
+
+            // proves pipeline consumed safer exception metadata over registered behaviour default
+            Assert.That(response!.FailureReason, Is.EqualTo(FailureReason.Forbidden));
+            Assert.That(response.Action, Is.EqualTo(UnitAction.Update));
+
+            serviceProviderMock.Verify(x => x.GetService(typeof(ISaferExceptionProvider)), Times.AtLeastOnce);
+        }
     }
 
     private async Task<RequestExceptionHandlerState<TResponse>> Execute<TRequest, TResponse>(
         TRequest request,
         InvalidOperationException exception,
         ExceptionBehaviour? registeredBehaviour = null,
-        ExceptionBehaviour? defaultBehaviour = null)
+        ExceptionBehaviour? defaultBehaviour = null,
+        Action<DefaultSaferExceptionProviderBuilder>? saferExceptionProviderSetup = null)
         where TRequest : notnull
     {
         var builder = new ExceptionBehaviourManagerBuilder();
@@ -199,7 +288,7 @@ public class ExtensionTests
             builder.Set<InvalidOperationException>(registeredBehaviour);
         }
 
-        DefaultSaferExceptionProviderBuilder saferExceptionbuilder = new();
+        saferExceptionProviderSetup?.Invoke(saferExceptionbuilder);
 
         serviceProviderMock.Setup(x => x.GetService(typeof(ISaferExceptionProvider)))
             .Returns(saferExceptionbuilder.Build());
