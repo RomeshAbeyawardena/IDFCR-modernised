@@ -34,9 +34,5 @@ public interface IEntityInterceptor
     /// <param name="context">The entity interceptor context.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
-    {
-        Intercept(context);
-        return Task.CompletedTask;
-    }
+    Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken);
 }

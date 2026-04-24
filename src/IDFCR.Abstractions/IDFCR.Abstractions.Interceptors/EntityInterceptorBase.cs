@@ -53,6 +53,18 @@ public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, En
     /// <summary>
     /// Executes against the given entity interceptor context. This method must be implemented by derived classes to provide the specific logic for handling the interception of the entity operation based on the context. The context contains information about the stage and behavior of the entity operation, as well as any relevant data or state that may be needed for the interception logic. By implementing this method, developers can define custom behavior for their interceptors that will be executed when the CanIntercept method returns true for a given context within applications and systems that utilize interception mechanisms.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">The entity interceptor context</param>
     public abstract void Intercept(IEntityInterceptorContext context);
+
+    /// <summary>
+    /// Executes asynchronously against the given entity interceptor context. This method can be overridden by derived classes to provide asynchronous logic for handling the interception of the entity operation based on the context. By default, this method calls the synchronous Intercept method and returns a completed task. Developers can implement custom asynchronous behavior in their derived interceptor implementations if needed, allowing for more flexible and efficient handling of entity operations within applications and systems that utilize interception mechanisms.
+    /// </summary>
+    /// <param name="context">The entity interceptor context.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public virtual Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
+    {
+        Intercept(context);
+        return Task.CompletedTask;
+    }
 }
