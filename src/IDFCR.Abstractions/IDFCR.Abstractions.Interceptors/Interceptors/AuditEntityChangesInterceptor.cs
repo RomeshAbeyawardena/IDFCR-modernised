@@ -45,7 +45,7 @@ public class AuditEntityChangesInterceptor(IAuditProcessorProvider provider)
              context.Model is IAuditable auditable
              && !string.IsNullOrWhiteSpace(auditable.AuditEntityName))
         {
-            await provider.AuditChangesAsync(auditable.AuditEntityName, oldModel, context.Model, CancellationToken.None);
+            await provider.AuditChangesAsync(auditable.AuditEntityName, oldModel, context.Model, cancellationToken);
         }
     }
 }
