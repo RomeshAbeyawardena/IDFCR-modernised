@@ -12,7 +12,12 @@ public interface IDtoWithAutoMapping : IMapper<IDtoWithAutoMapping>
     bool IsValue { get; }
 }
 
-public class DtoWithAutoMapping : MapperBase<IDtoWithAutoMapping>, IDtoWithAutoMapping
+/// <summary>
+/// Opts into automatic mapping by inheriting <see cref="AutoMapperBase{TSource}"/>.
+/// The protected SingularMap is only reachable through this deliberate inheritance — 
+/// external callers cannot invoke it directly.
+/// </summary>
+public class DtoWithAutoMapping : AutoMapperBase<IDtoWithAutoMapping>, IDtoWithAutoMapping
 {
     public string Name { get; set; } = null!;
     public int A { get; set; }
@@ -22,10 +27,14 @@ public class DtoWithAutoMapping : MapperBase<IDtoWithAutoMapping>, IDtoWithAutoM
 
     public override void Map(IDtoWithAutoMapping source)
     {
-        this.SingularMap(source);
+        SingularMap(source);
     }
 }
 
+/// <summary>
+/// Intentionally does NOT inherit <see cref="AutoMapperBase{TSource}"/> — 
+/// proves manual mapping remains the baseline and that the auto path is an explicit opt-in.
+/// </summary>
 internal class DtoWithAutoMappingManualClone : MapperBase<IDtoWithAutoMapping>, IDtoWithAutoMapping
 {
     public string Name { get; set; } = null!;
@@ -57,14 +66,15 @@ internal class AutoTests
     };
 
     /// <summary>
-    /// Proves that SingularMap produces the same result as a manual one-to-one clone.
+    /// Proves AutoMapperBase.SingularMap produces an identical result to a hand-written clone,
+    /// validating the opt-in auto-mapping path against the manual baseline.
     /// </summary>
     [Test]
     public void SingularMap_ProducesSameResultAsManualClone()
     {
         var source = CreateSource();
 
-        var autoMapped = source.Map<DtoWithAutoMapping>();
+        var autoMapped   = source.Map<DtoWithAutoMapping>();
         var manualMapped = source.Map<DtoWithAutoMappingManualClone>();
 
         Assert.Multiple(() =>
@@ -78,7 +88,7 @@ internal class AutoTests
     }
 
     /// <summary>
-    /// Proves that SingularMap copies each property individually to expected values.
+    /// Proves that every property is copied to its exact expected value via AutoMapperBase.SingularMap.
     /// </summary>
     [Test]
     public void SingularMap_CopiesAllProperties_ToExpectedValues()
@@ -89,22 +99,26 @@ internal class AutoTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(autoMapped.Name,    Is.EqualTo("Test"),     "Name mismatch");
-            Assert.That(autoMapped.A,       Is.EqualTo(4),          "A mismatch");
-            Assert.That(autoMapped.B,       Is.EqualTo(2.2m),       "B mismatch");
-            Assert.That(autoMapped.C,       Is.EqualTo(2.4293F),    "C mismatch");
-            Assert.That(autoMapped.IsValue, Is.True,                "IsValue mismatch");
+            Assert.That(autoMapped.Name,    Is.EqualTo("Test"),  "Name mismatch");
+            Assert.That(autoMapped.A,       Is.EqualTo(4),       "A mismatch");
+            Assert.That(autoMapped.B,       Is.EqualTo(2.2m),    "B mismatch");
+            Assert.That(autoMapped.C,       Is.EqualTo(2.4293F), "C mismatch");
+            Assert.That(autoMapped.IsValue, Is.True,             "IsValue mismatch");
         });
     }
 
     /// <summary>
-    /// Proves that SingularMap does not throw when source is null (guard clause).
+    /// Proves the boundary holds: a type that does not inherit AutoMapperBase
+    /// has no access to SingularMap — the opt-in gate is enforced at the type level.
+    /// This is a compile-time guarantee; the test documents the architectural intent.
     /// </summary>
     [Test]
-    public void SingularMap_DoesNotThrow_WhenSourceIsNull()
+    public void ManualClone_DoesNotInheritAutoMapperBase_EnforcingOptInBoundary()
     {
-        var target = new DtoWithAutoMapping();
-
-        Assert.DoesNotThrow(() => target.SingularMap<IDtoWithAutoMapping, DtoWithAutoMapping>(null!));
+        Assert.That(
+            typeof(DtoWithAutoMappingManualClone).IsSubclassOf(typeof(AutoMapperBase<IDtoWithAutoMapping>)),
+            Is.False,
+            "DtoWithAutoMappingManualClone must NOT inherit AutoMapperBase — " +
+            "SingularMap access should remain an explicit opt-in via inheritance only.");
     }
 }
