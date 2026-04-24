@@ -11,17 +11,17 @@ namespace IDFCR.Abstractions.Interceptors.Tests;
 internal class TestEntity : IAuditable
 {
     string IAuditable.AuditEntityName => nameof(TestEntity);
-    public string Name { get; set; }
-    public string DisplayName { get; set; }
-    public string UnitName { get; set; }
-    public string DepartmentName { get; set; }
+    public required string Name { get; set; }
+    public string? DisplayName { get; set; }
+    public string? UnitName { get; set; }
+    public string? DepartmentName { get; set; }
 }
 
 internal class TestEntityAudit
 {
-    public string OldValue { get; set; }
-    public string NewValue { get; set; }
-    public string ChangeDescription { get; set; }
+    public string? OldValue { get; set; }
+    public string? NewValue { get; set; }
+    public string? ChangeDescription { get; set; }
 }
 
 internal class TestEntityAuditProcessor(ICollection<TestEntityAudit> testEntityAuditEntries) : AuditProcessorBase<TestEntity, TestEntityAudit>(nameof(TestEntity))
@@ -77,13 +77,13 @@ internal class EntityChangedInterceptorTests
     }
 
     [Test]
-    public async Task Test()
+    public async Task AuditEntityChangesInterceptor_CapturesChangesAsync()
     {
         TestEntity oldSubject = new()
         {
             Name = "Test",
             DepartmentName = "Test department",
-            DisplayName = "Testy",
+            DisplayName = "Test entity",
             UnitName = "Test Unit"
         };
 
@@ -94,13 +94,27 @@ internal class EntityChangedInterceptorTests
             DisplayName = "Testy",
             UnitName = "Another test unit"
         };
+        
         var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Post, EntityContextBehavior.Update, subject);
         context.Dictionary.Add(AuditEntityChangesInterceptor.OldDataKey, oldSubject);
+        
         var interceptors = await _entityInterceptorFactory
             .GetEntityInterceptorsAsync(context, CancellationToken.None);
 
         await _entityInterceptorFactory.InvokeAsync(interceptors, context, CancellationToken.None);
 
-        var m = _testEntityAuditEntries;
+        // Verify audit entry was created
+        Assert.That(_testEntityAuditEntries, Has.Count.EqualTo(1));
+        
+        var auditEntry = _testEntityAuditEntries[0];
+        
+        // Verify old and new values are captured
+        Assert.That(auditEntry.OldValue, Is.Not.Null.And.Not.Empty);
+        Assert.That(auditEntry.NewValue, Is.Not.Null.And.Not.Empty);
+        
+        // Verify change descriptions include the changed fields
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("Unit name changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("Department name changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("Display name changed"));
     }
 }
