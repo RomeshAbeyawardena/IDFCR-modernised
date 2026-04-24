@@ -50,14 +50,14 @@ namespace IDFCR.Abstractions.Persistence
 
         private async Task<RepositoryInterceptorContext> InvokeInterceptorsAsync(EntityContextBehaviorStage stage,
             EntityContextBehavior behavior,
-            object model, object? newModel, CancellationToken cancellationToken)
+            object model, object? oldModel, CancellationToken cancellationToken)
         {
             var context = RepositoryInterceptorContext.Create(stage, behavior, model);
 
-            if (newModel is not null)
+            if (oldModel is not null)
             {
                 context = RepositoryInterceptorContext.Create(stage, behavior, model, 
-                    b => b.AddOrUpdate("new-model", newModel));
+                    b => b.AddOrUpdate("old-model", oldModel));
             }
 
             var interceptors = await entityInterceptorFactory.GetEntityInterceptorsAsync(context, cancellationToken);
@@ -209,7 +209,7 @@ namespace IDFCR.Abstractions.Persistence
 
                     foundEntry.Apply(dbValue);
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Update, clonedEntity, foundEntry, cancellationToken);
+                        EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
 
                     if (context.BypassOperation)
                     {
@@ -218,7 +218,7 @@ namespace IDFCR.Abstractions.Persistence
                     }
                     var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Update, clonedEntity, foundEntry, cancellationToken);
+                        EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Update);
                 }
