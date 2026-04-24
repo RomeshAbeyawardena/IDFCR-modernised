@@ -6,9 +6,36 @@ option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.SystemSetti
 
 import "Shared/idfcr-shared/v1/unit_result.proto";
 import "Shared/idfcr-shared/v1/ordered_request.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetPagedSettingsQuery {
   repeated idfcr.abstractions.grpc.contracts.common.SortOrder ordered_fields = 1;
-  int32 page_size = 2;
-  int32 page_index = 3;
+  string environment = 2;
+  string key = 3;
+  string key_contains = 4;
+  string type = 5;
+  int32 page_size = 6;
+  int32 page_index = 7;
+}
+
+message SettingDto {
+  string id = 1;
+  string environment = 2;
+  string key = 3;
+  string value = 4;
+  string type = 5;
+  google.protobuf.Timestamp modified = 6;
+}
+
+message GetPagedSettingsQueryResult {
+  idfcr.abstractions.grpc.contracts.common.UnitResult result = 1;
+  repeated SettingDto settings = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+  int32 page_size = 5;
+  int32 page_index = 6;
+}
+
+service GetPagedSettingsQueryService {
+	rpc GetPagedSettings(GetPagedSettingsQuery) returns (GetPagedSettingsQueryResult);
 }

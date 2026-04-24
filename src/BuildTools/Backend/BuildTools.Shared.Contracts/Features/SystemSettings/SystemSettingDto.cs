@@ -8,6 +8,7 @@ public class SystemSettingDto : MapperBase<ISetting>, ISetting
 {
     public object? Id { get; set; } = null!;
     public object? EnvironmentId { get; set; }
+    public string? EnvironmentName { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
     /// <inheritdoc/>

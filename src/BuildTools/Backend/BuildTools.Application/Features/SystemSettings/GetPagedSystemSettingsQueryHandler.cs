@@ -17,6 +17,7 @@ public class GetPagedSystemSettingsQueryHandler(ISettingRepository settingReposi
         var result = await settingRepository.GetPagedAsync(new GetPagedSettingsQuery
         {
             Fields = request.SortFields,
+            Environment = request.Environment,
             Key = request.Key,
             KeyContains = request.KeyContains,
             Type = request.Type,

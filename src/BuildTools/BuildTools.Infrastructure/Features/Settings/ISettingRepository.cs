@@ -6,6 +6,8 @@ namespace BuildTools.Infrastructure.Features.Settings;
 
 public interface ISettingRepository : IRepository<Setting, Guid>
 {
+    Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, string? environment, CancellationToken cancellationToken);
+
     Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken);
     Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken);
 }

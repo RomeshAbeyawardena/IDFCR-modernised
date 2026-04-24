@@ -1,12 +1,14 @@
 <Solution>
+  <Folder Name="/Backend/GRPC/">
+    <Project Path="Backend/BuildTools.gRPC.Application/BuildTools.GRPC.Application.csproj" />
+    <Project Path="Backend/BuildTools.gRPC.Shared.Contracts/BuildTools.GRPC.Shared.Contracts.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Add-Migration.ps1" />
     <File Path="Readme.md" />
   </Folder>
   <Folder Name="/Backend/">
 	<Project Path="Backend/BuildTools.Application/BuildTools.Application.csproj" />
-	<Project Path="Backend/BuildTools.gRPC.Application/BuildTools.GRPC.Application.csproj" />
-	<Project Path="Backend/BuildTools.gRPC.Shared.Contracts/BuildTools.GRPC.Shared.Contracts.csproj" />
 	<Project Path="Backend/BuildTools.Shared.Contracts/BuildTools.Shared.Contracts.csproj" />
   </Folder>
   <Folder Name="/Web/">
