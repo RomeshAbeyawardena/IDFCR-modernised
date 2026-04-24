@@ -15,11 +15,11 @@ public abstract class AuditProcessorBase<TEntity, TAuditEntity>(string entityNam
     /// <inheritdoc />
     public string EntityName => entityName;
     /// <inheritdoc />
-    public async Task<IUnitResult> AuditChangesAsync(object oldValue, object newValue)
+    public async Task<IUnitResult> AuditChangesAsync(object oldValue, object newValue, CancellationToken cancellationToken)
     {
         if (oldValue is TEntity old && newValue is TEntity @new)
         {
-            return await AuditChangesAsync(old, @new);
+            return await AuditChangesAsync(old, @new, cancellationToken);
         }
 
         return UnitResult.Failed(new InvalidCastException($"Unable to cast {oldValue.GetType()} to {typeof(TEntity)}"), UnitAction.None, FailureReason.ValidationError);

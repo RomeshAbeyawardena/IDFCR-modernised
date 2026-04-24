@@ -21,7 +21,7 @@ public class ServiceCollectionExtensionTests
     {
         services.AddInterceptors();
 
-        Assert.That(services, Has.Count.EqualTo(4));
+        Assert.That(services, Has.Count.EqualTo(5));
 
         var factoryService = services.FirstOrDefault(x => x.ImplementationType == typeof(DefaultEntityInterceptorFactory));
         Assert.That(factoryService, Is.Not.Null);

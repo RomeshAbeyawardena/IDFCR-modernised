@@ -17,3 +17,17 @@ public interface IAuditProcessorProvider
     /// <returns>A task representing the asynchronous operation, containing the result of the audit.</returns>
     Task<IUnitResult> AuditChangesAsync(string entityName, object oldValue, object newValue, CancellationToken cancellation);
 }
+
+internal class DefaultAuditProcessorProvider(IEnumerable<IAuditProcessor> auditProcessors) : IAuditProcessorProvider
+{
+    public async Task<IUnitResult> AuditChangesAsync(string entityName, object oldValue, object newValue, CancellationToken cancellationToken)
+    {
+        IAuditProcessor[] processors = [.. auditProcessors.Where(x => x.EntityName == entityName)];
+        if (processors.Length > 1)
+        {
+            return UnitResult.Failed(new InvalidOperationException($"Multiple {nameof(IAuditProcessor)}'s found for '{entityName}'"), UnitAction.Get, FailureReason.Conflict);
+        }
+
+        return await processors[0].AuditChangesAsync(oldValue, newValue, cancellationToken);
+    }
+}

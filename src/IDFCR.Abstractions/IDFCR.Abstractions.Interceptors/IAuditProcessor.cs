@@ -34,6 +34,7 @@ public interface IAuditProcessor
     /// </summary>
     /// <param name="oldValue">The previous state of the entity.</param>
     /// <param name="newValue">The current state of the entity.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation, containing the result of the audit.</returns>
-    Task<IUnitResult> AuditChangesAsync(object oldValue, object newValue);
+    Task<IUnitResult> AuditChangesAsync(object oldValue, object newValue, CancellationToken cancellationToken);
 }
