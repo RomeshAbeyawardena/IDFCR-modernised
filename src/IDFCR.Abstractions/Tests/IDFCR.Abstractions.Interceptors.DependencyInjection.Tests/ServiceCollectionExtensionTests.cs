@@ -49,5 +49,14 @@ public class ServiceCollectionExtensionTests
             Assert.That(auditModifiedService.ImplementationType, Is.EqualTo(typeof(AuditModifiedTimestampEntityInterceptor)));
             Assert.That(auditModifiedService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
         }
+
+        var auditChangesService = services.FirstOrDefault(x => x.ImplementationType == typeof(AuditEntityChangesInterceptor));
+        Assert.That(auditChangesService, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(auditChangesService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
+            Assert.That(auditChangesService.ImplementationType, Is.EqualTo(typeof(AuditEntityChangesInterceptor)));
+            Assert.That(auditChangesService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+        }
     }
 }
