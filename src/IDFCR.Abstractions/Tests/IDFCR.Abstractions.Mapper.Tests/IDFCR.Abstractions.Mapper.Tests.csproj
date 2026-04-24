@@ -17,6 +17,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IDFCR.Abstractions.Mapper\IDFCR.Abstractions.Mapper.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Mapper.Extensions\IDFCR.Abstractions.Mapper.Extensions.csproj" />
   </ItemGroup>
 </Project>

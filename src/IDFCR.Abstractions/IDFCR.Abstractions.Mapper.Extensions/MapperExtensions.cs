@@ -1,5 +1,6 @@
 ﻿using FastMember;
 using System.Collections.Concurrent;
+using System.Xml.Linq;
 
 namespace IDFCR.Abstractions.Mapper.Extensions;
 /// <summary>
@@ -18,22 +19,28 @@ public static class MapperExtensions
     /// <typeparam name="TSource">The type of the source and target objects. This type must implement the <see cref="IMapper{TSource}"/> interface.</typeparam>
     /// <param name="target">The target object to which values will be copied.</param>
     /// <param name="source">The source object from which values will be copied.</param>
-    public static void SingularMap<TSource>(this TSource target, TSource source)
-        where TSource : IMapper<TSource>
+    public static void SingularMap<TSource, TDestination>(this TDestination target, TSource source)
     {
         if (source == null || target == null)
         {
             return;
         }
 
-        var type = typeof(TSource);
-        var accessor = TypeAccessor.Create(typeof(TSource));
-        
+        var type = source.GetType();
+        var sourceAccessor = TypeAccessor.Create(type);
+        var sourceTypeNames = _mappableMemberCache.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
+
+        var destinationType = target.GetType();
+
+        var destinationAccessor = TypeAccessor.Create(destinationType);
+        var destinationTypeNames = _mappableMemberCache.GetOrAdd(destinationType, (t) => [.. destinationAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
+
         var destinationObjectAccessor = ObjectAccessor.Create(target);
         var sourceObjectAccessor = ObjectAccessor.Create(source);
-        foreach (var name in _mappableMemberCache.GetOrAdd(type, (t) => [.. accessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]))
+
+        foreach (var name in destinationTypeNames.Where(x => sourceTypeNames.Contains(x)))
         {
-            accessor[target, name] = accessor[source, name];
+            destinationAccessor[target, name] = sourceAccessor[source, name];
         }
     }
 }
