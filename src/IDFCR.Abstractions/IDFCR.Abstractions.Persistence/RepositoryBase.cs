@@ -1,4 +1,5 @@
 using IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence.Extensions;
@@ -57,7 +58,7 @@ namespace IDFCR.Abstractions.Persistence
             if (oldModel is not null)
             {
                 context = RepositoryInterceptorContext.Create(stage, behavior, model, 
-                    b => b.AddOrUpdate("old-model", oldModel));
+                    b => b.AddOrUpdate(AuditEntityChangesInterceptor.OldDataKey, oldModel));
             }
 
             var interceptors = await entityInterceptorFactory.GetEntityInterceptorsAsync(context, cancellationToken);
