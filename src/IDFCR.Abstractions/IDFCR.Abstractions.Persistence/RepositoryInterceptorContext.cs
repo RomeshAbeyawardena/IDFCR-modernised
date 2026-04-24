@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Interceptors;
+﻿using IDFCR.Abstractions.Builders;
+using IDFCR.Abstractions.Interceptors;
 
 namespace IDFCR.Abstractions.Persistence
 {
@@ -9,19 +10,25 @@ namespace IDFCR.Abstractions.Persistence
 
         public static RepositoryInterceptorContext Create(EntityContextBehaviorStage Stage,
             EntityContextBehavior Behavior,
-            object Model)
+            object Model, Action<IDictionaryBuilder<string, object>>? configureData = null)
         {
+            var dataDictionary = new DictionaryBuilder<string, object>();
+
+            configureData?.Invoke(dataDictionary);
+
             return new RepositoryInterceptorContext
             {
                 Stage = Stage,
                 Behavior = Behavior,
-                Model = Model
+                Model = Model,
+                Data = dataDictionary.Build().AsReadOnly()
             };
         }
 
         public EntityContextBehaviorStage Stage { get; init; }
         public EntityContextBehavior Behavior { get; init; }
         public object? Model { get; init; }
+        public IReadOnlyDictionary<string, object> Data { get; init; } = new Dictionary<string, object>();
         /// <summary>
         /// Indicates that the underlying persistence operation (e.g. Add, Update, Delete)
         /// should be skipped by the repository where supported.

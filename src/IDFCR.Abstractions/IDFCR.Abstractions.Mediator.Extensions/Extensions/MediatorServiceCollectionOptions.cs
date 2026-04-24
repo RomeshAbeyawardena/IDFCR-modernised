@@ -13,4 +13,9 @@ public record MediatorServiceCollectionOptions
     /// Gets or sets a value indicating whether to use the UnitOfWorkPostPipelineProcessor in the MediatR pipeline. If set to true, the UnitOfWorkPostPipelineProcessor will be added as an open request post-processor, allowing it to handle unit of work operations after request processing. If set to false, the UnitOfWorkPostPipelineProcessor will not be included in the pipeline, and you will need to handle unit of work operations manually if needed. The default value is true, which means that the UnitOfWorkPostPipelineProcessor will be used by default.
     /// </summary>
     public bool UseUnitOfWorkPostPipelineProcessor { get; init; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to use the AuditEntityPostPipelineProcessor in the MediatR pipeline. If set to true, the AuditEntityPostPipelineProcessor will be added as an open request post-processor, allowing it to handle auditing of entities after request processing. If set to false, the AuditEntityPostPipelineProcessor will not be included in the pipeline, and you will need to handle entity auditing manually if needed. The default value is false, which means that the AuditEntityPostPipelineProcessor will not be used by default.
+    /// </summary>
+    public bool UseAuditEntityPostPipelineProcessor { get; init; } = false;
 }

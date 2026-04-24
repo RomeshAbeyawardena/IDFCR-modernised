@@ -50,9 +50,16 @@ namespace IDFCR.Abstractions.Persistence
 
         private async Task<RepositoryInterceptorContext> InvokeInterceptorsAsync(EntityContextBehaviorStage stage,
             EntityContextBehavior behavior,
-            object model, CancellationToken cancellationToken)
+            object model, object? newModel, CancellationToken cancellationToken)
         {
             var context = RepositoryInterceptorContext.Create(stage, behavior, model);
+
+            if (newModel is not null)
+            {
+                context = RepositoryInterceptorContext.Create(stage, behavior, model, 
+                    b => b.AddOrUpdate("new-model", newModel));
+            }
+
             var interceptors = await entityInterceptorFactory.GetEntityInterceptorsAsync(context, cancellationToken);
             await entityInterceptorFactory.InvokeAsync(interceptors, context, cancellationToken);
 
@@ -122,7 +129,7 @@ namespace IDFCR.Abstractions.Persistence
                 }
 
                 var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Delete, dbValue, cancellationToken);
+                        EntityContextBehavior.Delete, dbValue, null, cancellationToken);
 
                 if (context.BypassOperation)
                 {
@@ -133,7 +140,7 @@ namespace IDFCR.Abstractions.Persistence
                 success = await OnDeleteAsync(key, cancellationToken);
 
                 await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Delete, dbValue, cancellationToken);
+                        EntityContextBehavior.Delete, dbValue, null, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -172,7 +179,7 @@ namespace IDFCR.Abstractions.Persistence
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Insert, dbValue, cancellationToken);
+                        EntityContextBehavior.Insert, dbValue, null, cancellationToken);
 
                     if (context.BypassOperation)
                     {
@@ -183,24 +190,26 @@ namespace IDFCR.Abstractions.Persistence
                     var id = await OnAddAsync(dbValue, entry, cancellationToken);
 
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Insert, dbValue, cancellationToken);
+                        EntityContextBehavior.Insert, dbValue, null, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Add);
                 }
                 else
                 {
                     var foundEntry = await OnFindAsync(dbValue.Id, true, cancellationToken);
-
+                    
                     if (foundEntry is null)
                     {
                         return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                     }
 
+                    var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+
                     OnUpdate(foundEntry, entry);
 
                     foundEntry.Apply(dbValue);
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Update, foundEntry, cancellationToken);
+                        EntityContextBehavior.Update, clonedEntity, foundEntry, cancellationToken);
 
                     if (context.BypassOperation)
                     {
@@ -209,7 +218,7 @@ namespace IDFCR.Abstractions.Persistence
                     }
                     var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Update, foundEntry, cancellationToken);
+                        EntityContextBehavior.Update, clonedEntity, foundEntry, cancellationToken);
 
                     return UnitResult.FromResult(id, UnitAction.Update);
                 }

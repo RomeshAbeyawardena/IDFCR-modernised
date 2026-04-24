@@ -17,4 +17,9 @@ public interface IEntityInterceptorContext
     /// Gets an optional model associated with the entity operation being intercepted. This property can be used to provide additional context or data related to the entity operation, which may be needed for the interception logic. The model can contain any relevant information or state that may be useful for the interceptor to make decisions or perform actions based on the specific details of the entity operation. By including this property, developers can enhance the flexibility and functionality of their interceptors by allowing them to access additional context when handling entity operations within applications and systems that utilize interception mechanisms.
     /// </summary>
     object? Model { get; }
+
+    /// <summary>
+    /// Gets a read-only dictionary containing additional data or context that may be relevant to the entity operation being intercepted. This property allows developers to provide extra information or state that may be needed for the interception logic, which can be accessed by the interceptors when handling the entity operation. The data in this dictionary can be used to store any relevant details or context that may assist the interceptor in making decisions or performing actions based on the specific circumstances of the entity operation. By including this property, developers can further enhance the flexibility and functionality of their interceptors by allowing them to access a wide range of additional context when managing entity operations within applications and systems that utilize interception mechanisms.
+    /// </summary>
+    IReadOnlyDictionary<string, object> Data { get; }
 }
