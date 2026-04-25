@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package buildtools.shared.contracts.grpc.feature.systemsettings;
+
+option csharp_namespace = "BuildTools.Shared.Contracts.GRPC.Features.SystemSettings";
+
+import "Features/SystemSettings/get_paged_settings.proto";
+import "Shared/idfcr-shared/v1/unit_result.proto";
+
+message UpsertSettingCommand {
+	buildtools.shared.contracts.grpc.feature.systemsettings.SettingDto setting = 1;
+}
+
+message UpsertSettingCommandResult {
+	idfcr.abstractions.grpc.contracts.common.UnitResult result = 1;
+	string setting_id = 2;
+}
+
+service UpsertSettingCommandService {
+	rpc UpsertSetting(UpsertSettingCommand) returns (UpsertSettingCommandResult);
+}
