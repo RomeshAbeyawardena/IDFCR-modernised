@@ -3,14 +3,16 @@ using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Extensions;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings.Processors;
 
-public class SettingAuditProcessor(PackageManagerDbContext context, IEnvironmentRepository environmentRepository) : AuditProcessorBase<SettingEntity, SettingAuditEntity>(nameof(SettingEntity))
+public class SettingAuditProcessor(IServiceProvider serviceProvider) : AuditProcessorBase<SettingEntity, SettingAuditEntity>(nameof(SettingEntity))
 {
     private async Task<object?> LookupAsync(string key, object value, CancellationToken cancellationToken)
     {
+        var environmentRepository = serviceProvider.GetRequiredService<IEnvironmentRepository>();
         if (key == "Environment" && value is Guid id)
         {
             var environment = (await environmentRepository.FindAsync(id, cancellationToken)).GetResultOrDefault();
@@ -26,6 +28,9 @@ public class SettingAuditProcessor(PackageManagerDbContext context, IEnvironment
 
     public override async Task<IUnitResult> AuditChangesAsync(SettingEntity oldValue, SettingEntity newValue, CancellationToken cancellationToken)
     {
+        using var scope = serviceProvider.CreateScope();
+            
+        var context = scope.ServiceProvider.GetRequiredService<PackageManagerDbContext>();
         var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
         context.SettingAudits.Add(new SettingAuditEntity
         {
