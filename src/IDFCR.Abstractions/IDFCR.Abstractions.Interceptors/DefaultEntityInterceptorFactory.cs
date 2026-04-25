@@ -3,6 +3,8 @@
 //from DI or whatever 
 internal class DefaultEntityInterceptorFactory(IEnumerable<IEntityInterceptor> interceptors) : IEntityInterceptorFactory
 {
+    public IDictionary<Type, object> SharedContextObjects { get; } = new Dictionary<Type, object>();
+
     public async ValueTask<IEnumerable<IEntityInterceptor>> GetEntityInterceptorsAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
         var interceptorList = new List<IEntityInterceptor>();
@@ -10,6 +12,7 @@ internal class DefaultEntityInterceptorFactory(IEnumerable<IEntityInterceptor> i
         {
             if (await interceptor.CanInterceptAsync(context, cancellationToken))
             {
+                interceptor.Context = this;
                 interceptorList.Add(interceptor);
             }
         }

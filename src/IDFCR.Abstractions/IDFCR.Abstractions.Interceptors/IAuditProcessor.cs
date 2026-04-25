@@ -26,6 +26,10 @@ public interface IAuditProcessor<TEntity, TAuditEntity> : IAuditProcessor
 public interface IAuditProcessor
 {
     /// <summary>
+    /// Gets or sets the audit processor provider associated with this audit processor. The provider is responsible for managing the execution of the audit processor and providing necessary context or dependencies for auditing operations. By accessing the provider, developers can ensure that their audit processors are properly integrated into the auditing framework and can leverage any shared resources or services provided by the provider when performing audit operations within applications and systems that utilize auditing mechanisms for tracking entity modifications.
+    /// </summary>
+    IAuditProcessorProvider? Provider { get; set; }
+    /// <summary>
     /// Gets the name of the entity being audited. This property is used to identify the type of entity for which the audit processor is responsible. The entity name can be used in audit records or logs to indicate which type of entity was modified, providing context for the changes being tracked. By defining this property, developers can ensure that their audit processors are associated with specific entity types, allowing for more organized and meaningful audit records within applications and systems that utilize auditing mechanisms for tracking entity modifications.
     /// </summary>
     string EntityName { get; }

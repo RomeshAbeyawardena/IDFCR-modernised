@@ -6,6 +6,10 @@ namespace IDFCR.Abstractions.Interceptors;
 public interface IEntityInterceptor
 {
     /// <summary>
+    /// Gets the entity interceptor context factory associated with this interceptor. The context factory is responsible for creating instances of the entity interceptor context, which provides information about the stage and behavior of the entity operation being intercepted. By accessing the context factory, developers can obtain the necessary context information to determine how the interceptor should be applied and to execute the appropriate logic based on the specific conditions of the entity operation within applications and systems that utilize interception mechanisms.
+    /// </summary>
+    IEntityInterceptorFactory? Context { get; set; }
+    /// <summary>
     /// Gets an optional index to control the execution order of multiple interceptors. This property can be used to specify the order in which interceptors should be executed when multiple interceptors are applicable to the same stage and behavior of an entity context. Interceptors with lower OrderIndex values will be executed before those with higher values. If OrderIndex is null, the execution order of the interceptor will be determined by the order in which they are registered or discovered within the application or system that utilizes interception mechanisms. By defining this property, developers can ensure that their interceptors are executed in a specific sequence when necessary, allowing for more precise control over the interception logic and its effects on entity operations.
     /// </summary>
     int? OrderIndex { get; }

@@ -150,6 +150,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <param name="dto">The DTO containing the updated values.</param>
     protected override void OnUpdate(TDb dbValue, T dto)
     {
+        if (!base.EntityInterceptorFactory.SharedContextObjects.ContainsKey(typeof(TDbContext)))
+        {
+            EntityInterceptorFactory.SharedContextObjects.Add(typeof(TDbContext), Db);
+        }
+
         if (dbValue is IHasRowVersion dbRowVersion && dto is IHasRowVersion rowVersion)
         {
             if (dbRowVersion.RowVersion is not null)

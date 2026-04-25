@@ -21,6 +21,11 @@ namespace IDFCR.Abstractions.Persistence
         where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
         where T : class, IMapper<TCommon>, TCommon
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IEntityInterceptorFactory EntityInterceptorFactory => entityInterceptorFactory;
+
         private async Task<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
         {
             Exception? caughtException;

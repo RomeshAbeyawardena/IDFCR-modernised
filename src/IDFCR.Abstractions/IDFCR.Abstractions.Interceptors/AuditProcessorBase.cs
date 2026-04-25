@@ -11,6 +11,9 @@ namespace IDFCR.Abstractions.Interceptors;
 public abstract class AuditProcessorBase<TEntity, TAuditEntity>(string entityName) : IAuditProcessor<TEntity, TAuditEntity>
 {
     /// <inheritdoc />
+    public IAuditProcessorProvider? Provider { get; set; }
+
+    /// <inheritdoc />
     public abstract Task<IUnitResult> AuditChangesAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken);
     /// <inheritdoc />
     public string EntityName => entityName;

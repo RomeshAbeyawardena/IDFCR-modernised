@@ -30,6 +30,9 @@ public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, En
     /// Gets the stage at which the interceptor should be applied. This property is used to determine when the interceptor logic should be executed in relation to the main operation being performed on the entity. The stage can be set to either Pre or Post, indicating whether the interceptor should be applied before or after the main operation, respectively. By defining this property, developers can control the timing of their interceptor logic and ensure that it is executed at the appropriate stage of the entity operation within applications and systems that utilize interception mechanisms.
     /// </summary>
     public int? OrderIndex { get; } = orderIndex;
+    
+    /// <inheritdoc />
+    public IEntityInterceptorFactory? Context { get; set; }
 
     /// <summary>
     /// Determines whether the interceptor should be applied to the given entity interceptor context. This method can be overridden by derived classes to provide custom logic for deciding whether the interceptor should be executed based on the specific context of the entity operation. By default, this method returns true, indicating that the interceptor should be applied to all contexts that match the specified stage and behavior. However, developers can implement additional checks or conditions in their derived interceptor implementations to control when the interceptor logic is executed within applications and systems that utilize interception mechanisms.
