@@ -6,13 +6,16 @@ using IDFCR.Abstractions.Metadata;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
-public class SettingEntity : MapperBase<ISetting>, ISetting, IIdentifiable<Guid>
+public class SettingEntity : MapperBase<ISetting>, IIdentifiable<Guid>, ISetting
 {
     object? ISetting.Id => Id;
     IEnvironment? ISetting.Environment => Environment;
     object? ISetting.EnvironmentId => EnvironmentId;
+
+    [IgnoreAuditing]
     public Guid Id { get; set; }
 
+    [IgnoreAuditing]
     public Guid? EnvironmentId { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;

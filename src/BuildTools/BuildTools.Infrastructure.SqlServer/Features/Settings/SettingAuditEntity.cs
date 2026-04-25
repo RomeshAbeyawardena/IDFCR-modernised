@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
-public class SettingAuditEntity : MapperBase<ISettingAudit>, ISettingAudit, IIdentifiable<Guid>
+public class SettingAuditEntity : MapperBase<ISettingAudit>, ISettingAudit, IIdentifiable<Guid>, IAuditCreatedTimestamp
 {
     object? ISettingAudit.Id => Id;
     object? ISettingAudit.SettingId => SettingId;
@@ -16,6 +16,7 @@ public class SettingAuditEntity : MapperBase<ISettingAudit>, ISettingAudit, IIde
     public string? ChangeDescription { get; set; }
     public string? OldValueJson { get; set; }
     public string? NewValueJson { get; set; }
+    public DateTimeOffset CreatedTimestampUtc { get; set; }
 
     public override void Map(ISettingAudit source)
     {
