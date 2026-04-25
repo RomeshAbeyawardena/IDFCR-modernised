@@ -28,6 +28,12 @@ internal class DefaultAuditProcessorProvider(IEnumerable<IAuditProcessor> auditP
             return UnitResult.Failed(new InvalidOperationException($"Multiple {nameof(IAuditProcessor)}'s found for '{entityName}'"), UnitAction.Get, FailureReason.Conflict);
         }
 
+        if (processors.Length < 1)
+        {
+            //nothing to process and there are no issues with this.
+            return UnitResult.Success(UnitAction.None);
+        }
+
         return await processors[0].AuditChangesAsync(oldValue, newValue, cancellationToken);
     }
 }
