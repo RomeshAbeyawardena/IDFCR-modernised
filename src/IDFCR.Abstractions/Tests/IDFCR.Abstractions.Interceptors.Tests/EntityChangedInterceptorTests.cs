@@ -16,6 +16,7 @@ internal class TestEntity : IAuditable
     public string? DisplayName { get; set; }
     public string? UnitName { get; set; }
     public string? DepartmentName { get; set; }
+    public string? DoesNotChange { get; set; }
 }
 
 internal class TestEntityAudit
@@ -69,7 +70,8 @@ internal class EntityChangedInterceptorTests
             Name = "Test",
             DepartmentName = "Test department",
             DisplayName = "Test entity",
-            UnitName = "Test Unit"
+            UnitName = "Test Unit",
+            DoesNotChange = "Does not change"
         };
 
         TestEntity subject = new()
@@ -77,7 +79,8 @@ internal class EntityChangedInterceptorTests
             Name = "Test",
             DepartmentName = "Another test department",
             DisplayName = "Testy",
-            UnitName = "Another test unit"
+            UnitName = "Another test unit",
+            DoesNotChange = "Does not change"
         };
         
         var context = new TestEntityInterceptContext(EntityContextBehaviorStage.Post, EntityContextBehavior.Update, subject);
@@ -101,5 +104,6 @@ internal class EntityChangedInterceptorTests
         Assert.That(auditEntry.ChangeDescription, Does.Contain("UnitName changed"));
         Assert.That(auditEntry.ChangeDescription, Does.Contain("DepartmentName changed"));
         Assert.That(auditEntry.ChangeDescription, Does.Contain("DisplayName changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Not.Contain("DoesNotChange changed"));
     }
 }
