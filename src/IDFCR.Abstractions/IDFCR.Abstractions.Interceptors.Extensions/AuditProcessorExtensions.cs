@@ -1,4 +1,5 @@
 ﻿using FastMember;
+using IDFCR.Abstractions.Metadata;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text;
@@ -11,6 +12,11 @@ namespace IDFCR.Abstractions.Interceptors.Extensions;
 public static class AuditProcessorExtensions
 {
     private static readonly Lazy<ConcurrentDictionary<Type, string[]>> _mappableMemberCache = new([]);
+
+    private static bool IsApplicableMember(Member member)
+    {
+        return member.CanRead && member.GetAttribute(typeof(IgnoreAuditingAttribute), true) is null;
+    }
 
     /// <summary>
     /// Audits the changes between two entities by comparing their properties and generating a description of the changes. This method takes two entities of the same type, compares their properties, and constructs a string that describes the differences between them. It uses the FastMember library to access the properties of the entities efficiently and considers any display names defined for the properties when generating the change descriptions. The resulting string can be used for logging or auditing purposes to track changes in data over time.
@@ -37,9 +43,9 @@ public static class AuditProcessorExtensions
         var newType = oldEntity.GetType();
         var targetAccessor = TypeAccessor.Create(newType);
 
-        var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanRead).Select(m => m.Name)]);
+        var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
 
-        var newTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. targetAccessor.GetMembers().Where(m => m.CanRead).Select(m => m.Name)]);
+        var newTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. targetAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
 
         var members = sourceAccessor.GetMembers();
 

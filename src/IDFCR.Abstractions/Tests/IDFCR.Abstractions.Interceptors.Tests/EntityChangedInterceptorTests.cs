@@ -37,7 +37,7 @@ internal class TestEntityAuditProcessor(ICollection<TestEntityAudit> testEntityA
             NewValue = JsonSerializer.Serialize(newValue)
         };
 
-        testAuditEntity.ChangeDescription = this.ChangeDescriptor(oldValue, newValue);
+        testAuditEntity.ChangeDescription = this.AuditChanges(oldValue, newValue);
 
         testEntityAuditEntries.Add(testAuditEntity);
         return UnitResult.Success(UnitAction.Add);
