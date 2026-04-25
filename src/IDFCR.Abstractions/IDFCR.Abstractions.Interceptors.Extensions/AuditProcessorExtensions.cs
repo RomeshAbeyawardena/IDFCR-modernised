@@ -36,7 +36,7 @@ public static class AuditProcessorExtensions
         Func<string, object, object, string>? formatLineAction = null,
         Func<string, object, CancellationToken, Task<object?>>? deferredLookupAsyncAction = null)
     {
-        formatLineAction ??= (fieldName, oldValue, newValue) => $"{fieldName} changed from '{oldValue}' to {newValue}.";
+        formatLineAction ??= (fieldName, oldValue, newValue) => $"{fieldName} changed from '{oldValue}' to '{newValue}'.";
 
         var changeDescriptions = new StringBuilder();
 

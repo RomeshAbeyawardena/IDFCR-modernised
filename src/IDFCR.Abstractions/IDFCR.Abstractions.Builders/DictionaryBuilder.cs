@@ -2,6 +2,17 @@ using System.Collections.Concurrent;
 
 namespace IDFCR.Abstractions.Builders;
 
+public static class DictionaryBuilder
+{
+    public static IDictionaryBuilder<TKey, TValue> Create<TKey, TValue>(Action<IDictionaryBuilder<TKey, TValue>> builderAction)
+        where TKey : notnull
+    {
+        var builder = new DictionaryBuilder<TKey, TValue>();
+        builderAction(builder);
+        return builder;
+    }
+}
+
 /// <summary>
 /// Represents a builder for constructing a dictionary with fluent API. It allows adding or updating key-value pairs and building the final dictionary.
 /// </summary>
