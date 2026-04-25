@@ -45,7 +45,7 @@ public static class AuditProcessorExtensions
 
         var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
 
-        var newTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. targetAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
+        var newTypeNames = _mappableMemberCache.Value.GetOrAdd(newType, (t) => [.. targetAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
 
         var members = sourceAccessor.GetMembers();
 

@@ -5,7 +5,6 @@ using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results;
 using NUnit.Framework;
 using System.ComponentModel;
-using System.Text;
 using System.Text.Json;
 
 namespace IDFCR.Abstractions.Interceptors.Tests;
