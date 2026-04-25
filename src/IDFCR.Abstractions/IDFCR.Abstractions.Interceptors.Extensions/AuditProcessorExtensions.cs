@@ -21,14 +21,19 @@ public static class AuditProcessorExtensions
         var type = oldEntity.GetType();
         var sourceAccessor = TypeAccessor.Create(type);
 
+        var newType = oldEntity.GetType();
+        var targetAccessor = TypeAccessor.Create(newType);
+
         var sourceTypeNames = _mappableMemberCache.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanRead).Select(m => m.Name)]);
 
-        foreach(var name in sourceTypeNames)
+        var newTypeNames = _mappableMemberCache.GetOrAdd(type, (t) => [.. targetAccessor.GetMembers().Where(m => m.CanRead).Select(m => m.Name)]);
+
+        foreach (var name in sourceTypeNames)
         {
             var oldValue = sourceAccessor[oldEntity, name];
-            var newValue = sourceAccessor[newEntity, name];
+            var newValue = targetAccessor[newEntity, name];
 
-            if(object.Equals(oldValue, newValue))
+            if(Equals(oldValue, newValue))
             {
                 continue;
             }

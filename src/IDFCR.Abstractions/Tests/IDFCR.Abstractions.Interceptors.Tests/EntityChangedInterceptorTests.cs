@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Interceptors.Interceptors;
+﻿using IDFCR.Abstractions.Interceptors.Extensions;
+using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Interceptors.Tests.Assets;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results;
@@ -35,23 +36,7 @@ internal class TestEntityAuditProcessor(ICollection<TestEntityAudit> testEntityA
             NewValue = JsonSerializer.Serialize(newValue)
         };
 
-        StringBuilder changeDescription = new();
-        if (!StringComparer.Ordinal.Equals(oldValue.UnitName, newValue.UnitName))
-        {
-            changeDescription.AppendLine($"Unit name changed from '{oldValue.UnitName}' to {newValue.UnitName}");
-        }
-
-        if (!StringComparer.Ordinal.Equals(oldValue.DisplayName, newValue.DisplayName))
-        {
-            changeDescription.AppendLine($"Display name changed from '{oldValue.DisplayName}' to {newValue.DisplayName}");
-        }
-
-        if (!StringComparer.Ordinal.Equals(oldValue.DepartmentName, newValue.DepartmentName))
-        {
-            changeDescription.AppendLine($"Department name changed from '{oldValue.DepartmentName}' to {newValue.DepartmentName}");
-        }
-
-        testAuditEntity.ChangeDescription = changeDescription.ToString();
+        testAuditEntity.ChangeDescription = this.ChangeDescriptor(oldValue, newValue);
 
         testEntityAuditEntries.Add(testAuditEntity);
         return UnitResult.Success(UnitAction.Add);
@@ -113,8 +98,8 @@ internal class EntityChangedInterceptorTests
         Assert.That(auditEntry.NewValue, Is.Not.Null.And.Not.Empty);
         
         // Verify change descriptions include the changed fields
-        Assert.That(auditEntry.ChangeDescription, Does.Contain("Unit name changed"));
-        Assert.That(auditEntry.ChangeDescription, Does.Contain("Department name changed"));
-        Assert.That(auditEntry.ChangeDescription, Does.Contain("Display name changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("UnitName changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("DepartmentName changed"));
+        Assert.That(auditEntry.ChangeDescription, Does.Contain("DisplayName changed"));
     }
 }
