@@ -1,8 +1,10 @@
 ﻿using BuildTools.Shared.Contracts.Features.SystemSettings;
 using BuildTools.Shared.Contracts.GRPC.Features.SystemSettings;
 using Grpc.Core;
+using IDFCR.Abstractions.Results.Extensions;
 using MediatR;
 using System.Threading.Tasks;
+using GRPCUnitResultExtensions = IDFCR.Abstractions.GRPC.Extensions;
 
 namespace BuildTools.GRPC.Application.Features.SystemSettings;
 
@@ -22,6 +24,10 @@ public class UpsetSettingService(IMediator mediator) : UpsertSettingCommandServi
             } // request.Setting
         }, context.CancellationToken);
 
-        
+        return new UpsertSettingCommandResult
+        {
+            SettingId = result.GetResultOrDefault()?.ToString(),
+            Result = GRPCUnitResultExtensions.UnitResultExtensions.From(result)
+        };
     }
 }

@@ -17,6 +17,8 @@ public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> o
     public DbSet<PackageTagEntity> PackageTags { get; set; }
     public DbSet<PackageVersionEntity> PackageVersions { get; set; }
     public DbSet<SettingEntity> Settings { get; set; }
+
+    public DbSet<SettingAuditEntity> SettingAudits { get; set; }
     public DbSet<TagEntity> Tags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
