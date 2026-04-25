@@ -1,70 +1,11 @@
-﻿using IDFCR.Abstractions.Interceptors.Extensions;
-using IDFCR.Abstractions.Interceptors.Interceptors;
+﻿using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Interceptors.Tests.Assets;
-using IDFCR.Abstractions.Metadata;
-using IDFCR.Abstractions.Results;
 using NUnit.Framework;
-using System.ComponentModel;
-using System.Text.Json;
 
 namespace IDFCR.Abstractions.Interceptors.Tests;
 
-internal class TestEntity : IAuditable
-{
-    string IAuditable.AuditEntityName => nameof(TestEntity);
-    public required string Name { get; set; }
-    public string? DisplayName { get; set; }
-    public string? UnitName { get; set; }
-    public string? DepartmentName { get; set; }
-    public string? DoesNotChange { get; set; }
-}
-
-internal class TestEntity2 : IAuditable
-{
-    string IAuditable.AuditEntityName => nameof(TestEntity2);
-
-    public required string Name { get; set; }
-    [DisplayName("Display name")]
-    public string? DisplayName { get; set; }
-    [DisplayName("Unit name")]
-    public string? UnitName { get; set; }
-    [DisplayName("Department name")]
-    public string? DepartmentName { get; set; }
-    public string? DoesNotChange { get; set; }
-
-    [IgnoreAuditing]
-    public bool Ignored { get; set; }
-}
-
-internal class TestEntityAudit
-{
-    public string? OldValue { get; set; }
-    public string? NewValue { get; set; }
-    public string? ChangeDescription { get; set; }
-}
-
-internal abstract class TestEntityAuditProcessorBase<TEntity>(string name, ICollection<TestEntityAudit> testEntityAuditEntries) : AuditProcessorBase<TEntity, TEntity>(name)
-{
-    public override async Task<IUnitResult> AuditChangesAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        TestEntityAudit testAuditEntity = new()
-        {
-            OldValue = JsonSerializer.Serialize(oldValue),
-            NewValue = JsonSerializer.Serialize(newValue)
-        };
-
-        testAuditEntity.ChangeDescription = this.AuditChanges(oldValue, newValue);
-
-        testEntityAuditEntries.Add(testAuditEntity);
-        return UnitResult.Success(UnitAction.Add);
-
-    }
-}
-
 internal class TestEntityAuditProcessor(ICollection<TestEntityAudit> testEntityAuditEntries) : TestEntityAuditProcessorBase<TestEntity>(nameof(TestEntity), testEntityAuditEntries);
 internal class TestEntityAuditProcessor2(ICollection<TestEntityAudit> testEntityAuditEntries) : TestEntityAuditProcessorBase<TestEntity2>(nameof(TestEntity2), testEntityAuditEntries);
-
 
 [TestFixture]
 internal class EntityChangedInterceptorTests

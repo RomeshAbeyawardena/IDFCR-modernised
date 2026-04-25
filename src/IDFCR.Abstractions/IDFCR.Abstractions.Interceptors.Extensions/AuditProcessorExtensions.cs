@@ -25,11 +25,16 @@ public static class AuditProcessorExtensions
     /// <param name="auditProcessor">The audit processor instance.</param>
     /// <param name="oldEntity">The original entity.</param>
     /// <param name="newEntity">The updated entity.</param>
+    /// <param name="cancellationToken"></param>
     /// <param name="formatLineAction">An optional function to format the change description for each property.</param>
+    /// <param name="deferredLookupAsyncAction">An optional function to perform asynchronous lookups for each property change.</param>
     /// <returns>A string describing the changes between the two entities.</returns>
 #pragma warning disable IDE0060
-    public static string AuditChanges<TEntity>(
-        this IAuditProcessor auditProcessor, TEntity oldEntity, TEntity newEntity, Func<string, object, object, string>? formatLineAction = null)
+    public static async Task<string> AuditChangeDescriptionAsync<TEntity>(
+        this IAuditProcessor auditProcessor, TEntity oldEntity, TEntity newEntity, 
+        CancellationToken cancellationToken,
+        Func<string, object, object, string>? formatLineAction = null,
+        Func<string, object, CancellationToken, Task<object>> deferredLookupAsyncAction = null)
     {
         formatLineAction ??= (fieldName, oldValue, newValue) => $"{fieldName} changed from '{oldValue}' to {newValue}.";
 
@@ -62,7 +67,15 @@ public static class AuditProcessorExtensions
                 continue;
             }
 
-            var attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DisplayNameAttribute), true);
+            var attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DeferredLookupAttribute), true);
+            if (attribute is not null && attribute is DeferredLookupAttribute deferredLookupAttribute
+                && deferredLookupAsyncAction is not null)
+            {
+                oldValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, oldValue, cancellationToken);
+                newValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, newValue, cancellationToken);
+            }
+
+            attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DisplayNameAttribute), true);
 
             var fieldName = name;
             if (attribute is not null && attribute is DisplayNameAttribute displayNameAttribute)
