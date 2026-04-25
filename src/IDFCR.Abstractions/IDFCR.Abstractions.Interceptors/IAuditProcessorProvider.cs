@@ -39,7 +39,10 @@ internal class DefaultAuditProcessorProvider(IEnumerable<IAuditProcessor> auditP
             //nothing to process and there are no issues with this.
             return UnitResult.Success(UnitAction.None);
         }
-        processors[0].Provider = this;
-        return await processors[0].AuditChangesAsync(oldValue, newValue, cancellationToken);
+
+        var processor = processors[0];
+
+        processor.Provider = this;
+        return await processor.AuditChangesAsync(oldValue, newValue, cancellationToken);
     }
 }
