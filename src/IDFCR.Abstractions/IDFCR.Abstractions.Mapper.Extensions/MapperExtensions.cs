@@ -9,7 +9,7 @@ namespace IDFCR.Abstractions.Mapper.Extensions;
 internal static class MapperExtensions
 {
     // A thread-safe cache to store the specific members we care about for each type
-    private static readonly ConcurrentDictionary<Type, string[]> _mappableMemberCache = [];
+    private static readonly Lazy<ConcurrentDictionary<Type, string[]>> _mappableMemberCache = new([]);
     /// <summary>
     /// Defines a mapping operation that copies values from a source object to a target object of the same type. This method is intended for use with types that implement the <see cref="IMapper{TSource}"/> interface, allowing for a standardized way to perform mapping operations without needing to manually map each property. The method uses the FastMember library to efficiently access and copy properties between the source and target objects.
     /// <para>
@@ -29,12 +29,12 @@ internal static class MapperExtensions
 
         var type = source.GetType();
         var sourceAccessor = TypeAccessor.Create(type);
-        var sourceTypeNames = _mappableMemberCache.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
+        var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
 
         var destinationType = target.GetType();
 
         var destinationAccessor = TypeAccessor.Create(destinationType);
-        var destinationTypeNames = _mappableMemberCache.GetOrAdd(destinationType, (t) => [.. destinationAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
+        var destinationTypeNames = _mappableMemberCache.Value.GetOrAdd(destinationType, (t) => [.. destinationAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
 
         var destinationObjectAccessor = ObjectAccessor.Create(target);
         var sourceObjectAccessor = ObjectAccessor.Create(source);
