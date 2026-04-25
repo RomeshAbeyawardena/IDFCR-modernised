@@ -36,6 +36,7 @@ namespace BuildTools.Application.Features.SystemSettings
                     environment = new()
                     {
                         Name = environmentName,
+                        ExternalReference = environmentName,
                         DisplayName = environmentName
                     };
 

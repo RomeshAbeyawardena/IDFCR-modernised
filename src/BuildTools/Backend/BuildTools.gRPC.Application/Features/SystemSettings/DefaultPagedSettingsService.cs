@@ -2,12 +2,15 @@
 using BuildTools.Shared.Contracts.GRPC.Features.SystemSettings;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using IDFCR.Abstractions.GRPC;
 using IDFCR.Abstractions.GRPC.Extensions;
 using MediatR;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BuildTools.GRPC.Application.Features.SystemSettings;
+
+[RegisteredGRPCServiceImplementation(true)]
 public class DefaultPagedSettingsService(IMediator mediator) : GetPagedSettingsQueryService.GetPagedSettingsQueryServiceBase
 {
     public override async Task<GetPagedSettingsQueryResult> GetPagedSettings(GetPagedSettingsQuery request, 
