@@ -19,17 +19,20 @@ public static class AuditProcessorExtensions
     }
 
     /// <summary>
-    /// Audits the changes between two entities by comparing their properties and generating a description of the changes. This method takes two entities of the same type, compares their properties, and constructs a string that describes the differences between them. It uses the FastMember library to access the properties of the entities efficiently and considers any display names defined for the properties when generating the change descriptions. The resulting string can be used for logging or auditing purposes to track changes in data over time.
+    /// Audits the changes between two entities by comparing their properties and generating a descriptive string of the differences. This method takes in the original entity and the updated entity, and it uses reflection to compare their properties. If a property has changed, it generates a description of the change, optionally using a provided formatting function to customize the output. The method also considers display names for properties when generating change descriptions, making the output more user-friendly. This extension method is intended to be used with implementations of the <see cref="IAuditProcessor"/> interface to facilitate the creation of audit logs based on entity changes.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entities being compared.</typeparam>
     /// <param name="auditProcessor">The audit processor instance.</param>
     /// <param name="oldEntity">The original entity.</param>
     /// <param name="newEntity">The updated entity.</param>
+    /// <param name="formatLineAction">An optional function to format the change description for each property.</param>
     /// <returns>A string describing the changes between the two entities.</returns>
 #pragma warning disable IDE0060
     public static string AuditChanges<TEntity>(
-        this IAuditProcessor auditProcessor, TEntity oldEntity, TEntity newEntity)
+        this IAuditProcessor auditProcessor, TEntity oldEntity, TEntity newEntity, Func<string, object, object, string>? formatLineAction = null)
     {
+        formatLineAction ??= (fieldName, oldValue, newValue) => $"{fieldName} changed from '{oldValue}' to {newValue}.";
+
         var changeDescriptions = new StringBuilder();
 
         if (oldEntity is null || newEntity is null)
@@ -48,8 +51,8 @@ public static class AuditProcessorExtensions
         var newTypeNames = _mappableMemberCache.Value.GetOrAdd(newType, (t) => [.. targetAccessor.GetMembers().Where(IsApplicableMember).Select(m => m.Name)]);
 
         var members = sourceAccessor.GetMembers();
-
-        foreach (var name in sourceTypeNames)
+        var commonNames = sourceTypeNames.Intersect(newTypeNames);
+        foreach (var name in commonNames)
         {
             var oldValue = sourceAccessor[oldEntity, name];
             var newValue = targetAccessor[newEntity, name];
@@ -67,7 +70,7 @@ public static class AuditProcessorExtensions
                 fieldName = string.IsNullOrWhiteSpace(displayNameAttribute.DisplayName) ? fieldName : displayNameAttribute.DisplayName;
             }
 
-            changeDescriptions.AppendLine($"{fieldName} changed from '{oldValue}' to {newValue}.");
+            changeDescriptions.AppendLine(formatLineAction(fieldName, oldValue, newValue));
         }
 
         return changeDescriptions.ToString();
