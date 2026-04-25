@@ -6,8 +6,9 @@ using IDFCR.Abstractions.Metadata;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
-public class SettingEntity : MapperBase<ISetting>, IIdentifiable<Guid>, ISetting
+public class SettingEntity : MapperBase<ISetting>, IIdentifiable<Guid>, ISetting, IAuditable
 {
+    string IAuditable.AuditEntityName => nameof(SettingEntity);
     object? ISetting.Id => Id;
     IEnvironment? ISetting.Environment => Environment;
     object? ISetting.EnvironmentId => EnvironmentId;
@@ -15,7 +16,7 @@ public class SettingEntity : MapperBase<ISetting>, IIdentifiable<Guid>, ISetting
     [IgnoreAuditing]
     public Guid Id { get; set; }
 
-    [IgnoreAuditing]
+    [DeferredLookup("Environment")]
     public Guid? EnvironmentId { get; set; }
     /// <inheritdoc/>
     public string Type { get; set; } = null!;
@@ -23,10 +24,14 @@ public class SettingEntity : MapperBase<ISetting>, IIdentifiable<Guid>, ISetting
     public string Key { get; set; } = null!;
     /// <inheritdoc/>
     public string? Value { get; set; } = null!;
+
+    [IgnoreAuditing]
     public DateTimeOffset CreatedTimestampUtc { get; set; }
-    /// <inheritdoc/>
+
+    [IgnoreAuditing]
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
 
+    [IgnoreAuditing]
     public virtual EnvironmentEntity? Environment { get; set; }
 
     /// <inheritdoc/>
