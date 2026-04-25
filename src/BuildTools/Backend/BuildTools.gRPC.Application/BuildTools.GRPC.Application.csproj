@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.GRPC" Version="2.0.5.8" />
-    <PackageReference Include="IDFCR.Abstractions.GRPC.Extensions" Version="2.0.5.8" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC" Version="2.0.5.10" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.Extensions" Version="2.0.5.10" />
     <PackageReference Include="MediatR" Version="14.1.0" />
   </ItemGroup>
   <ItemGroup>
