@@ -18,12 +18,14 @@ public class SettingRepository(PackageManagerDbContext db, IFilterFactory filter
         entry.ModifiedTimestampUtc = entry.CreatedTimestampUtc;
         return base.OnAddAsync(entry, rawEntry, cancellationToken);
     }
-    public async Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken)
+
+    public async Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, string? environmentName, CancellationToken cancellationToken)
     {
         var query = FilterFactory.Apply(DbSet.AsNoTracking(), new GetPagedSettingsQuery
         {
             Key = key,
-            Type = type
+            Type = type,
+            Environment = environmentName
         });
 
         var result = await query.FirstOrDefaultAsync(cancellationToken);
@@ -34,6 +36,11 @@ public class SettingRepository(PackageManagerDbContext db, IFilterFactory filter
         }
 
         return UnitResult.FromResult(base.Map(result));
+    }
+
+    public Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken)
+    {
+        return GetSettingAsync(key, type, null, cancellationToken);
     }
 
     public async Task<IUnitResult<string>> GetValueAsync(string key, string? type, CancellationToken cancellationToken)
