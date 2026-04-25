@@ -13,6 +13,9 @@ internal class TestEntity3 : IAuditable
     [DeferredLookup("Lookup")]
     public Guid LookupId { get; set; }
 
+    [DeferredLookup("Lookup")]
+    public Guid AnotherLookupId { get; set; }
+
     public required string Name { get; set; }
     [DisplayName("Display name")]
     public string? DisplayName { get; set; }
@@ -85,6 +88,7 @@ internal class EntityChangedInterceptorTests2
         {
             Name = "Test",
             LookupId = oldLookupId,
+            AnotherLookupId = newLookupId,
             DepartmentName = "Department",
             DisplayName = "Display",
             UnitName = "Unit",
@@ -95,6 +99,7 @@ internal class EntityChangedInterceptorTests2
         {
             Name = "Test",
             LookupId = newLookupId,
+            AnotherLookupId = Guid.NewGuid(),
             DepartmentName = "Department",
             DisplayName = "Display",
             UnitName = "Unit",

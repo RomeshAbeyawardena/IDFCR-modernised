@@ -67,15 +67,17 @@ public static class AuditProcessorExtensions
                 continue;
             }
 
-            var attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DeferredLookupAttribute), true);
+            var member = members.FirstOrDefault(x => x.Name == name);
+
+            var attribute = member?.GetAttribute(typeof(DeferredLookupAttribute), true);
             if (attribute is not null && attribute is DeferredLookupAttribute deferredLookupAttribute
                 && deferredLookupAsyncAction is not null)
             {
-                oldValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, oldValue, cancellationToken) ?? oldValue;
-                newValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, newValue, cancellationToken) ?? newValue;
+                oldValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, oldValue, cancellationToken) ?? (deferredLookupAttribute.ExposeLookupIdsInAudits ? oldValue : "[Not found]");
+                newValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, newValue, cancellationToken) ?? (deferredLookupAttribute.ExposeLookupIdsInAudits ? newValue : "[Not found]");
             }
 
-            attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DisplayNameAttribute), true);
+            attribute = member?.GetAttribute(typeof(DisplayNameAttribute), true);
 
             var fieldName = name;
             if (attribute is not null && attribute is DisplayNameAttribute displayNameAttribute)

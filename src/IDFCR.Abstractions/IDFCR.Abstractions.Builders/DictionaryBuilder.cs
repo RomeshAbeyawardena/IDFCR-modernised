@@ -2,8 +2,18 @@ using System.Collections.Concurrent;
 
 namespace IDFCR.Abstractions.Builders;
 
+/// <summary>
+/// Defines a static class that provides a method for creating an instance of a dictionary builder using a fluent API. The Create method allows developers to easily construct a dictionary by providing an action that configures the builder, enabling the addition or updating of key-value pairs in a flexible and readable manner. This class serves as a convenient entry point for utilizing the dictionary builder functionality, allowing developers to build dictionaries in a more intuitive and efficient way within their applications and systems.
+/// </summary>
 public static class DictionaryBuilder
 {
+    /// <summary>
+    /// Creates an instance of a dictionary builder and applies the provided configuration action to it. This method initializes a new instance of the <see cref="DictionaryBuilder{TKey, TValue}"/> class and then invokes the specified builder action, allowing developers to configure the builder by adding or updating key-value pairs. After the builder action is executed, the method returns the configured dictionary builder instance, which can then be used to build the final dictionary containing all the accumulated entries. This approach provides a fluent API for constructing dictionaries in a more readable and efficient manner within applications and systems that require dynamic dictionary construction.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    /// <param name="builderAction">An action that configures the dictionary builder.</param>
+    /// <returns>The configured dictionary builder instance.</returns>
     public static IDictionaryBuilder<TKey, TValue> Create<TKey, TValue>(Action<IDictionaryBuilder<TKey, TValue>> builderAction)
         where TKey : notnull
     {
