@@ -34,7 +34,7 @@ public static class AuditProcessorExtensions
         this IAuditProcessor auditProcessor, TEntity oldEntity, TEntity newEntity, 
         CancellationToken cancellationToken,
         Func<string, object, object, string>? formatLineAction = null,
-        Func<string, object, CancellationToken, Task<object>> deferredLookupAsyncAction = null)
+        Func<string, object, CancellationToken, Task<object?>>? deferredLookupAsyncAction = null)
     {
         formatLineAction ??= (fieldName, oldValue, newValue) => $"{fieldName} changed from '{oldValue}' to {newValue}.";
 
@@ -71,8 +71,8 @@ public static class AuditProcessorExtensions
             if (attribute is not null && attribute is DeferredLookupAttribute deferredLookupAttribute
                 && deferredLookupAsyncAction is not null)
             {
-                oldValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, oldValue, cancellationToken);
-                newValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, newValue, cancellationToken);
+                oldValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, oldValue, cancellationToken) ?? oldValue;
+                newValue = await deferredLookupAsyncAction(deferredLookupAttribute.LookupKey, newValue, cancellationToken) ?? newValue;
             }
 
             attribute = members.FirstOrDefault(x => x.Name == name)?.GetAttribute(typeof(DisplayNameAttribute), true);
