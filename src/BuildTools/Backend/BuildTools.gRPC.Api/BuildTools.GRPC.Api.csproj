@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-    <PackageReference Include="IDFCR.Abstractions.GRPC.HostExtensions" Version="2.0.5.12" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.HostExtensions" Version="2.0.5.13" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BuildTools.Infrastructure.SqlServer\BuildTools.Infrastructure.SqlServer.csproj" />
