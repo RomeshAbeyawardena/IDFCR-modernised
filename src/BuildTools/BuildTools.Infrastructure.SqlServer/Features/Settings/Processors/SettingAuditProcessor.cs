@@ -29,9 +29,14 @@ public class SettingAuditProcessor() : AuditProcessorBase<SettingEntity, Setting
 
     public override async Task<IUnitResult> AuditChangesAsync(SettingEntity oldValue, SettingEntity newValue, CancellationToken cancellationToken)
     {
-        if (Provider!.InterceptorFactory!.ScopedResources.TryGetScopedResource<PackageManagerDbContext>(out context))
+        if (Provider!.InterceptorFactory!.ScopedResources.TryGetScopedResource(out context))
         {
             var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
+
+            if (string.IsNullOrWhiteSpace(changes))
+            {
+                return UnitResult.Success(UnitAction.Add);
+            }
 
             context.SettingAudits.Add(new SettingAuditEntity
             {
