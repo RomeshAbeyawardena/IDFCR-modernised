@@ -192,9 +192,10 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <inheritdoc />
     public override Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
     {
-        if (EntityInterceptorFactory.ScopedResources.Contains<TDbContext>())
+        var scopedResources = EntityInterceptorFactory.ScopedResources;
+        if (!scopedResources.Contains<TDbContext>())
         {
-            EntityInterceptorFactory.ScopedResources.AddOrUpdate<TDbContext>(Db);
+            scopedResources.AddOrUpdate(Db);
         }
 
         return base.UpsertAsync(entry, cancellationToken);
