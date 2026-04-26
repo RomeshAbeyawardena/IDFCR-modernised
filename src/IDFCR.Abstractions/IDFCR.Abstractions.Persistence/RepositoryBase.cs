@@ -6,6 +6,8 @@ using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence.Extensions;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Exceptions;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace IDFCR.Abstractions.Persistence
 {
@@ -88,6 +90,15 @@ namespace IDFCR.Abstractions.Persistence
         {
             return value.Map<T>();
         }
+
+        protected virtual bool HasChanges(TDb original, TDb updated)
+        {
+            var originalNode = JsonSerializer.SerializeToNode(original);
+            var updatedNode = JsonSerializer.SerializeToNode(updated);
+
+            return JsonNode.DeepEquals(originalNode, updatedNode);
+        }
+
 
         /// <summary>
         /// Persists a new record.
@@ -215,6 +226,12 @@ namespace IDFCR.Abstractions.Persistence
                     OnUpdate(foundEntry, entry);
 
                     foundEntry.Apply(dbValue);
+
+                    if (!HasChanges(clonedEntity, foundEntry))
+                    {
+                        return UnitResult.Failed<TKey>(new InvalidOperationException("No changes deteccted"), UnitAction.None, FailureReason.None);
+                    }
+
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
 

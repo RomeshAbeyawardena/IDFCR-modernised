@@ -131,4 +131,20 @@ public class RepositoryTests
 
         Assert.That(data.All(x => x.FirstName.Contains("Ali")), Is.True);
     }
+
+    [Test]
+    public async Task Test11()
+    {
+        var result = await _mockRepository.UpsertAsync(new Customer { FirstName = "Aliyanna", LastName = "Humphreys", Suppressed = true }, default);
+
+        Assert.That(result.IsSuccess, Is.True);
+
+        result = await _mockRepository.UpsertAsync(new Customer { Id = result.Result, FirstName = "Aliyanna", LastName = "Humphreys", Suppressed = true }, default);
+
+        Assert.That(result.IsSuccess, Is.False);
+
+        Assert.That(result.Exception, Is.Not.Null);
+
+        Assert.That(result.Exception, Is.InstanceOf<InvalidOperationException>());
+    }
 }
