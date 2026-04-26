@@ -6,6 +6,7 @@ using IDFCR.Abstractions.Persistence;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using IDFCR.Abstractions.Metadata.Extensions;
 using Microsoft.EntityFrameworkCore;
+using IDFCR.Abstractions.Results;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
 
@@ -150,11 +151,6 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <param name="dto">The DTO containing the updated values.</param>
     protected override void OnUpdate(TDb dbValue, T dto)
     {
-        if (!base.EntityInterceptorFactory.SharedContextObjects.ContainsKey(typeof(TDbContext)))
-        {
-            EntityInterceptorFactory.SharedContextObjects.Add(typeof(TDbContext), Db);
-        }
-
         if (dbValue is IHasRowVersion dbRowVersion && dto is IHasRowVersion rowVersion)
         {
             if (dbRowVersion.RowVersion is not null)
@@ -191,5 +187,16 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         }
 
         return query.OrderBy(x => x.Id);
+    }
+
+    /// <inheritdoc />
+    public override Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
+    {
+        if (!base.EntityInterceptorFactory.SharedContextObjects.ContainsKey(typeof(TDbContext)))
+        {
+            EntityInterceptorFactory.SharedContextObjects.Add(typeof(TDbContext), Db);
+        }
+
+        return base.UpsertAsync(entry, cancellationToken);
     }
 }

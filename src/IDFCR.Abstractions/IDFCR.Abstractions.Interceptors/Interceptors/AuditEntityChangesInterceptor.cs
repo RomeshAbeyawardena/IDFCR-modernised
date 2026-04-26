@@ -16,9 +16,10 @@ public class AuditEntityChangesInterceptor(IAuditProcessorProvider provider)
     public const string OldDataKey = "old-model";
 
     /// <inheritdoc />
-    public override bool CanIntercept(IEntityInterceptorContext context)
+    public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
-        provider.InterceptorFactory = Context;
+        Context = provider.InterceptorFactory;
+
         return context.Data.ContainsKey(OldDataKey)
             && context.Model is IAuditable auditable
             && !string.IsNullOrWhiteSpace(auditable.AuditEntityName);

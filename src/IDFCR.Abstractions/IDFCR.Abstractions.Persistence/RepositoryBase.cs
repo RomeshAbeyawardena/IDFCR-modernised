@@ -176,7 +176,7 @@ namespace IDFCR.Abstractions.Persistence
         protected abstract void OnUpdate(TDb db, T dto);
 
         /// <inheritdoc />
-        public async Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
+        public virtual async Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
         {
             try
             {
