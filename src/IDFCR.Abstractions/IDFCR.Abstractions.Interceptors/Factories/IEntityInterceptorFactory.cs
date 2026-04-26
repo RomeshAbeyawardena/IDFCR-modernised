@@ -10,7 +10,7 @@ public interface IEntityInterceptorFactory
     /// <summary>
     /// Gets a collection of shared context objects that can be used by entity interceptors during their execution. This property provides a way for interceptors to access and share common data or services that may be needed for their logic when processing entity operations. This is to prevent circular dependencies between the factory and the interceptors, allowing for a more flexible and decoupled design. By defining this property, developers can ensure that their interceptors have access to necessary resources or information without creating tight coupling between the factory and the interceptors, enabling better maintainability and extensibility within applications and systems that utilize interception mechanisms for managing entity operations.
     /// </summary>
-    IDictionary<Type, object> SharedContextObjects { get; }
+    IScopedResources ScopedResources { get; }
     /// <summary>
     /// Defines a method for retrieving applicable entity interceptors based on the provided context. This method should return a collection of entity interceptors that are relevant to the specific stage and behavior of the entity operation being intercepted, as well as any additional context provided in the IEntityInterceptorContext. The retrieved interceptors can then be executed in the appropriate order based on their OrderIndex property or other criteria defined by the implementation. By implementing this method, developers can control which interceptors are applied to specific entity operations within applications and systems that utilize interception mechanisms, allowing for more precise control over the interception behavior and its effects on the entity operations.
     /// </summary>

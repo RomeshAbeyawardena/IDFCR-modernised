@@ -3,8 +3,6 @@ using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Interceptors.Processors;
 using IDFCR.Abstractions.Interceptors.Providers;
-using IDFCR.Abstractions.Mapper;
-using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence.Tests.Assets;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
@@ -25,6 +23,14 @@ public class AuditCustomerProcessor() : AuditProcessorBase<DbCustomer, CustomerA
     {
         Assert.That(Provider, Is.Not.Null);
         Assert.That(Provider.InterceptorFactory, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(Provider.InterceptorFactory.ScopedResources.TryGetScopedResource<DbContextMarker<DbCustomer>>(out var marker), Is.True);
+            Assert.That(marker, Is.Not.Null);
+            Assert.That(marker, Is.InstanceOf<DbContextMarker<DbCustomer>>());
+        }
+        
         await Task.CompletedTask;
         return UnitResult.Success(UnitAction.Add);
     }
@@ -51,7 +57,7 @@ public class RepositoriesWithAuditTests
     }
 
     [Test]
-    public async Task Test()
+    public async Task Upsert_PopulatesSharedContext_AccessibleInAuditProcessor()
     {
         var id = (await memoryMockRepository.UpsertAsync(new Customer
         {

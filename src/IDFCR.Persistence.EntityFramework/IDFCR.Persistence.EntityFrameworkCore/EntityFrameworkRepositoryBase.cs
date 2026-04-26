@@ -192,9 +192,9 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <inheritdoc />
     public override Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
     {
-        if (!base.EntityInterceptorFactory.SharedContextObjects.ContainsKey(typeof(TDbContext)))
+        if (EntityInterceptorFactory.ScopedResources.Contains<TDbContext>())
         {
-            EntityInterceptorFactory.SharedContextObjects.Add(typeof(TDbContext), Db);
+            EntityInterceptorFactory.ScopedResources.AddOrUpdate<TDbContext>(Db);
         }
 
         return base.UpsertAsync(entry, cancellationToken);

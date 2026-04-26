@@ -185,9 +185,12 @@ public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFac
     /// <inheritdoc />
     public override Task<IUnitResult<Guid>> UpsertAsync(T entry, CancellationToken cancellationToken)
     {
-        if (!EntityInterceptorFactory.SharedContextObjects.ContainsKey(typeof(DbContextMarker)))
+        if (!EntityInterceptorFactory.ScopedResources.Contains<DbContextMarker<TDb>>())
         {
-            EntityInterceptorFactory.SharedContextObjects.Add(typeof(DbContextMarker), entries);
+            EntityInterceptorFactory.ScopedResources.AddOrUpdate(new DbContextMarker<TDb>
+            {
+                Entries = entries
+            });
         }
 
         return base.UpsertAsync(entry, cancellationToken);
