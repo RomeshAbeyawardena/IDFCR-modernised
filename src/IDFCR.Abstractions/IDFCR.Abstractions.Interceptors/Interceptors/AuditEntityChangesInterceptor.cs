@@ -19,8 +19,6 @@ public class AuditEntityChangesInterceptor(IAuditProcessorProvider provider)
     /// <inheritdoc />
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
-        Context = provider.InterceptorFactory;
-
         return context.Data.ContainsKey(OldDataKey)
             && context.Model is IAuditable auditable
             && !string.IsNullOrWhiteSpace(auditable.AuditEntityName);
@@ -44,6 +42,7 @@ public class AuditEntityChangesInterceptor(IAuditProcessorProvider provider)
     /// <returns>A task representing the asynchronous operation.</returns>
     public override async Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
+        provider.InterceptorFactory = Context;
         if (context.Data.TryGetValue(OldDataKey, out var oldModel) &&
              context.Model is IAuditable auditable
              && !string.IsNullOrWhiteSpace(auditable.AuditEntityName))
