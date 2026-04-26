@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Interceptors;
+﻿using IDFCR.Abstractions.Interceptors.Interceptors;
+
+namespace IDFCR.Abstractions.Interceptors.Factories;
 
 //from DI or whatever 
 internal class DefaultEntityInterceptorFactory(IEnumerable<IEntityInterceptor> interceptors) : IEntityInterceptorFactory

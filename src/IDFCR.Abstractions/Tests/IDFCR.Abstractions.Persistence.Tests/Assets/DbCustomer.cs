@@ -1,9 +1,11 @@
 ﻿using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Metadata;
 
 namespace IDFCR.Abstractions.Persistence.Tests.Assets
 {
-    public class DbCustomer : MapperBase<ICustomer>, ICustomer
+    public class DbCustomer : MapperBase<ICustomer>, ICustomer, IAuditable
     {
+        string IAuditable.AuditEntityName { get; } = "Customer";
         public Guid Id { get; set; }
         public DateTimeOffset CreatedTimestampUtc { get; set; }
         public DateTimeOffset? ModifiedTimestampUtc { get; set; }

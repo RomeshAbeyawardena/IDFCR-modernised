@@ -1,5 +1,4 @@
 ﻿using IDFCR.Abstractions.Filters;
-using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
@@ -7,6 +6,7 @@ using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using IDFCR.Abstractions.Metadata.Extensions;
 using Microsoft.EntityFrameworkCore;
 using IDFCR.Abstractions.Results;
+using IDFCR.Abstractions.Interceptors.Factories;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
 

@@ -1,47 +1,30 @@
 ﻿using IDFCR.Abstractions.Filters;
-using IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Interceptors.Processors;
+using IDFCR.Abstractions.Interceptors.Providers;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Persistence.Tests.Assets;
 using IDFCR.Abstractions.Results;
+using IDFCR.Abstractions.Results.Extensions;
 using IDFCR.TestUtilities;
 using Moq;
 using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Persistence.Tests;
 
-public interface ICustomer : IMapper<ICustomer>
-{
-
-}
-
-public class DbCustomer : MapperBase<ICustomer>, ICustomer, IIdentifiable<Guid>, IAuditable
-{
-    string IAuditable.AuditEntityName => "Customer";
-    public Guid Id { get; set; }
-    public override void Map(ICustomer source)
-    {
-        
-    }
-}
-
-public class Customer : MapperBase<ICustomer>, ICustomer
-{
-    public override void Map(ICustomer source)
-    {
-
-    }
-}
-
 public class CustomerAudit
 {
 
 }
 
-public class AuditCustomerProcessor() : AuditProcessorBase<Customer, CustomerAudit>("Customer")
+public class AuditCustomerProcessor() : AuditProcessorBase<DbCustomer, CustomerAudit>("Customer")
 {
-    public override async Task<IUnitResult> AuditChangesAsync(Customer oldValue, Customer newValue, CancellationToken cancellationToken)
+    public override async Task<IUnitResult> AuditChangesAsync(DbCustomer oldValue, DbCustomer newValue, CancellationToken cancellationToken)
     {
+        Assert.That(Provider, Is.Not.Null);
+        Assert.That(Provider.InterceptorFactory, Is.Not.Null);
         await Task.CompletedTask;
         return UnitResult.Success(UnitAction.Add);
     }
@@ -68,8 +51,16 @@ public class RepositoriesWithAuditTests
     }
 
     [Test]
-    public void Test()
+    public async Task Test()
     {
-        memoryMockRepository.
+        var id = (await memoryMockRepository.UpsertAsync(new Customer
+        {
+
+        }, CancellationToken.None)).GetResultOrDefault();
+
+        await memoryMockRepository.UpsertAsync(new Customer
+        {
+            Id = id
+        }, CancellationToken.None);
     }
 }

@@ -1,4 +1,6 @@
-namespace IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Interceptors;
+
+namespace IDFCR.Abstractions.Interceptors.Factories;
 
 /// <summary>
 /// Represents a factory for creating and invoking entity interceptors based on the provided context. This interface defines the contract for implementing a factory that can retrieve applicable entity interceptors for a given context and execute them in the appropriate order. The IEntityInterceptorFactory allows developers to create flexible and reusable interceptor factories that can be integrated into applications and systems that utilize interception mechanisms for managing entity operations. By implementing this interface, developers can control the retrieval and execution of entity interceptors based on the specific context of the entity operation being performed, allowing for more precise control over the interception behavior and its effects on the entity operations within applications and systems that utilize interception mechanisms.

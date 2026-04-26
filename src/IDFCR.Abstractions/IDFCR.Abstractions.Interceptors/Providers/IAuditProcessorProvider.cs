@@ -1,6 +1,7 @@
-﻿using IDFCR.Abstractions.Results;
+﻿using IDFCR.Abstractions.Interceptors.Factories;
+using IDFCR.Abstractions.Results;
 
-namespace IDFCR.Abstractions.Interceptors;
+namespace IDFCR.Abstractions.Interceptors.Providers;
 
 /// <summary>
 /// Represents a provider for audit processors, allowing for the retrieval and execution of audit processing logic based on the entity name and the changes being audited. This interface defines the contract for implementing a provider that can handle the auditing of changes to entities by invoking the appropriate audit processor based on the entity name and the old and new values of the entity. By implementing this interface, developers can create flexible and reusable audit processor providers that can be integrated into applications and systems to ensure that changes to entities are properly audited and recorded according to the specific requirements of the application or system. The IAuditProcessorProvider interface provides a method for auditing changes by accepting the entity name, old value, new value, and a cancellation token, allowing for asynchronous processing of audit records based on the changes made to entities within applications and systems that utilize auditing mechanisms for tracking entity modifications.
@@ -20,29 +21,4 @@ public interface IAuditProcessorProvider
     /// <param name="cancellation">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation, containing the result of the audit.</returns>
     Task<IUnitResult> AuditChangesAsync(string entityName, object oldValue, object newValue, CancellationToken cancellation);
-}
-
-internal class DefaultAuditProcessorProvider(IEnumerable<IAuditProcessor> auditProcessors) : IAuditProcessorProvider
-{
-    public IEntityInterceptorFactory? InterceptorFactory { get; set; }
-
-    public async Task<IUnitResult> AuditChangesAsync(string entityName, object oldValue, object newValue, CancellationToken cancellationToken)
-    {
-        IAuditProcessor[] processors = [.. auditProcessors.Where(x => x.EntityName == entityName)];
-        if (processors.Length > 1)
-        {
-            return UnitResult.Failed(new InvalidOperationException($"Multiple {nameof(IAuditProcessor)}'s found for '{entityName}'"), UnitAction.Get, FailureReason.Conflict);
-        }
-
-        if (processors.Length < 1)
-        {
-            //nothing to process and there are no issues with this.
-            return UnitResult.Success(UnitAction.None);
-        }
-
-        var processor = processors[0];
-
-        processor.Provider = this;
-        return await processor.AuditChangesAsync(oldValue, newValue, cancellationToken);
-    }
 }

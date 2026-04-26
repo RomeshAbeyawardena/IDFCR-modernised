@@ -1,6 +1,7 @@
-﻿using IDFCR.Abstractions.Results;
+﻿using IDFCR.Abstractions.Interceptors.Providers;
+using IDFCR.Abstractions.Results;
 
-namespace IDFCR.Abstractions.Interceptors;
+namespace IDFCR.Abstractions.Interceptors.Processors;
 
 
 /// <summary>

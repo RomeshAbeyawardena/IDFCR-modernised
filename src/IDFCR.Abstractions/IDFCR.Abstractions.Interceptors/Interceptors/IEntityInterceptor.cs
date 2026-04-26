@@ -1,4 +1,6 @@
-namespace IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Factories;
+
+namespace IDFCR.Abstractions.Interceptors.Interceptors;
 
 /// <summary>
 /// Represents an interceptor that can be applied to specific stages and behaviors of an entity context. This interface defines the contract for implementing custom interceptors that can be executed during the processing of entity operations, such as inserting, updating, or deleting entities. The IEntityInterceptor interface allows developers to specify the conditions under which the interceptor should be applied and to define the logic for handling the interception of entity operations based on the context provided. By implementing this interface, developers can create flexible and reusable interceptors that can be integrated into applications and systems that utilize interception mechanisms for managing entity operations.

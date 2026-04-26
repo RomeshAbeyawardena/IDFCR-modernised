@@ -1,4 +1,6 @@
-namespace IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Factories;
+
+namespace IDFCR.Abstractions.Interceptors.Interceptors;
 
 /// <summary>
 /// Represents a base class for implementing entity interceptors that can be applied to specific stages and behaviors of an entity context. This abstract class provides a foundation for creating custom interceptors by defining common properties and methods that can be overridden by derived classes. The EntityInterceptorBase class allows developers to specify the stage and behavior for which the interceptor should be applied, as well as an optional order index to control the execution order of multiple interceptors. By inheriting from this base class, developers
