@@ -133,7 +133,7 @@ public class RepositoryTests
     }
 
     [Test]
-    public async Task Test11()
+    public async Task UpsertAsync_Update_WithNoChanges_ShouldFail()
     {
         var result = await _mockRepository.UpsertAsync(new Customer { FirstName = "Aliyanna", LastName = "Humphreys", Suppressed = true }, default);
 
@@ -141,10 +141,11 @@ public class RepositoryTests
 
         result = await _mockRepository.UpsertAsync(new Customer { Id = result.Result, FirstName = "Aliyanna", LastName = "Humphreys", Suppressed = true }, default);
 
-        Assert.That(result.IsSuccess, Is.False);
-
-        Assert.That(result.Exception, Is.Not.Null);
-
-        Assert.That(result.Exception, Is.InstanceOf<InvalidOperationException>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Exception, Is.Not.Null);
+            Assert.That(result.Exception, Is.InstanceOf<InvalidOperationException>());
+        }
     }
 }
