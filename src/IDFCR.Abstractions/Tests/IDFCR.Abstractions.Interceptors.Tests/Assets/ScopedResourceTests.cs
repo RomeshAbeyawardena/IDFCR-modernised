@@ -114,6 +114,7 @@ internal class ScopedResourceTests
         {       
             Assert.That(scopedResources.TryGetScopedResource<MyExpensiveTestResource>(out var expensive), Is.True);
             Assert.That(scopedResources.TryGetScopedResource<AnotherTestResource>(out var second), Is.True);
+
             Assert.That(expensive, Is.SameAs(expensiveTestResource));
             Assert.That(second, Is.SameAs(other));
         }

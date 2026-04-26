@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IDFCR.Abstractions.Interceptors;
 
@@ -30,7 +31,7 @@ internal class DefaultScopedResources : IScopedResources
         return default;
     }
 
-    public bool TryGetScopedResource<T>(out T? value)
+    public bool TryGetScopedResource<T>([NotNullWhen(true)] out T? value)
     {
         if (_sharedContextObjects.TryGetValue(typeof(T), out var _value)
             && _value is T val)

@@ -1,4 +1,5 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Diagnostics.CodeAnalysis;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace IDFCR.Abstractions.Interceptors;
 
@@ -34,7 +35,7 @@ public interface IScopedResources
     /// <typeparam name="T">The type of the scoped resource to retrieve.</typeparam>
     /// <param name="value">When this method returns, contains the scoped resource of the specified type if it exists; otherwise, the default value for the type.</param>
     /// <returns>True if a scoped resource of the specified type exists; otherwise, false.</returns>
-    bool TryGetScopedResource<T>(out T? value);
+    bool TryGetScopedResource<T>([NotNullWhen(true)]out T? value);
     /// <summary>
     /// Adds or updates a scoped resource of the specified type in the collection of scoped resources. This method allows for adding a new resource or updating an existing resource within the context of entity interceptors, providing a way to manage resources that may be needed during the interception process. By implementing this method, developers can ensure that the necessary resources are available and up-to-date for their interception logic, enhancing the flexibility and reliability of their interception mechanisms within applications and systems that utilize interception mechanisms for managing entity operations.
     /// </summary>
