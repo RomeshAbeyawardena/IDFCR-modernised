@@ -1,5 +1,5 @@
 ﻿using BuildTools.Infrastructure.Features.Environments;
-using IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Processors;
 using IDFCR.Abstractions.Interceptors.Extensions;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Results.Extensions;
@@ -28,9 +28,20 @@ public class SettingAuditProcessor() : AuditProcessorBase<SettingEntity, Setting
 
     public override async Task<IUnitResult> AuditChangesAsync(SettingEntity oldValue, SettingEntity newValue, CancellationToken cancellationToken)
     {
-        Provider.InterceptorFactory.SharedContextObjects.TryGetValue(typeof(PackageManagerDbContext), out var context);
+        if (Provider!.InterceptorFactory!.ScopedResources.TryGetScopedResource<PackageManagerDbContext>(out var context))
+        {
+            var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
+
+            context.SettingAudits.Add(new SettingAuditEntity
+            {
+                OldValueJson = JsonSerializer.Serialize(oldValue),
+                NewValueJson = JsonSerializer.Serialize(newValue),
+                SettingId = newValue.Id,
+                ChangeDescription = changes
+            });
+        }
         //var context = scope.ServiceProvider.GetRequiredService<PackageManagerDbContext>();
-        //var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
+        //
         //context.SettingAudits.Add(new SettingAuditEntity
         //{
         //    OldValueJson = JsonSerializer.Serialize(oldValue),
