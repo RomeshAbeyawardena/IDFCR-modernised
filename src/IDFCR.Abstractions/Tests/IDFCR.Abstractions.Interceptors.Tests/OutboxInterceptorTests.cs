@@ -28,7 +28,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     }
 }
 
-internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
+internal class MockOutboxEntityNotificationHandler(IScopedResources scopedResources) : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>(scopedResources)
 {
     public IOutboxEntity? LastMapped { get; private set; }
     public OutboxEntity? LastNotified { get; private set; }
@@ -47,6 +47,11 @@ internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHan
         LastNotified = entity;
         return Task.FromResult(NotifyResult);
     }
+
+    public override Task<Guid?> NotifyAsync(Guid id, OutboxEntity entity, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [TestFixture]
@@ -54,12 +59,14 @@ internal class OutboxInterceptorTests
 {
     private OutboxInterceptor _interceptor;
     private Mock<IServiceProvider> _serviceProvider;
+    private DefaultScopedResources _scopedResources;
     private MockOutboxEntityNotificationHandler _handler;
 
     [SetUp]
     public void Setup()
     {
-        _handler = new MockOutboxEntityNotificationHandler();
+        _scopedResources = new();
+        _handler = new MockOutboxEntityNotificationHandler(_scopedResources);
         _serviceProvider = new Mock<IServiceProvider>();
 
         _serviceProvider

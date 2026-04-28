@@ -10,4 +10,5 @@ internal class DefaultOutboxEntity : IOutboxEntity
     public DateTimeOffset? AcknowledgedTimestampUtc { get; set; }
     public DateTimeOffset CreatedTimestampUtc { get; set; }
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
+    public object? Id { get; set; }
 }

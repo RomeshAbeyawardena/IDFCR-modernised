@@ -53,4 +53,18 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(IScoped
 
         return null;
     }
+    
+    /// <inheritdoc />
+    public abstract Task<TKey?> NotifyAsync(TKey id, TEntity entity, CancellationToken cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<object?> NotifyAsync(object id, object entity, CancellationToken cancellationToken)
+    {
+        if (id is TKey key && entity is TEntity typedEntity)
+        {
+            return await NotifyAsync(key, typedEntity, cancellationToken);
+        }
+
+        return null;
+    }
 }

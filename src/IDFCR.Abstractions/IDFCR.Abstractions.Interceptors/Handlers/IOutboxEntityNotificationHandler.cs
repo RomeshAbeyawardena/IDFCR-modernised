@@ -24,7 +24,7 @@ public interface IOutboxEntityNotificationHandler<TEntity, TKey> : IOutboxEntity
     /// <param name="entity">The outbox entity that has changed.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task<object?> NotifyAsync(TKey id, TEntity entity, CancellationToken cancellationToken);
+    Task<TKey?> NotifyAsync(TKey id, TEntity entity, CancellationToken cancellationToken);
 }
 
 /// <summary>

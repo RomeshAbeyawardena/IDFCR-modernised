@@ -28,11 +28,10 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         if (outboxProcessor is not null && scopedResources is not null)
         {
             var outboxEntity = outboxProcessor.Map(entity);
-            if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id)
+            if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id))
             {
-
+                await outboxProcessor.NotifyAsync(outboxEntity, id, cancellationToken);
             }
-            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
         }
     }
 
@@ -53,10 +52,20 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                 {
                     await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                   
+                    await NotifyAsync(new DefaultOutboxEntity
+                    {
+                        CompletedTimestampUtc = timeProvider.GetUtcNow(),
+                        ModifiedTimestampUtc = timeProvider.GetUtcNow()
+                    }, cancellationToken);
                 }
                 catch (Exception)
                 {
+                    await NotifyAsync(new DefaultOutboxEntity
+                    {
+                        FailedTimestampUtc = timeProvider.GetUtcNow(),
+                        ModifiedTimestampUtc = timeProvider.GetUtcNow()
+                    }, cancellationToken);
+
                     throw;
                 }
             }
