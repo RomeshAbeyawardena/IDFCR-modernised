@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Extensions;
@@ -42,6 +43,8 @@ public static class ServiceCollectionExtensions
         {
             throw new InvalidOperationException($"The exception behaviour manager is not registered. Please ensure that you have called {nameof(ConfigureExceptionBehaviourManager)} before adding MediatR services.");
         }
+
+        services.TryAdd(ServiceDescriptor.Singleton(TimeProvider.System));
 
         return services
             .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))
