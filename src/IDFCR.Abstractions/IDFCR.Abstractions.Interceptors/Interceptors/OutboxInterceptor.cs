@@ -32,9 +32,19 @@ public class OutboxInterceptor(IServiceProvider services)
         await InterceptAsync(context, CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    public override Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
+    /// <summary>
+    /// Invokes the asynchronous interception logic for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for checking if the interceptor has a valid handler and if the context contains a model of the entity being processed. If both conditions are met, it invokes the notification handler to process the outbox entity asynchronously, allowing for the handling of outbox messages and the tracking of their status based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="context">The context of the entity interceptor.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public override async Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
-        return base.InterceptAsync(context, cancellationToken);
+        if (_handler is null || context.Model is null)
+        {
+            return;
+        }
+
+        await _handler.NotifyAsync(context.Model, cancellationToken);
     }
 }
