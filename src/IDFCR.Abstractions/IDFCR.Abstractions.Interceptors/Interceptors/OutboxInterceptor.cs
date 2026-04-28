@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Interceptors.Handlers;
+using System.Text.Json;
 
 namespace IDFCR.Abstractions.Interceptors.Interceptors;
 
@@ -57,6 +58,12 @@ public class OutboxInterceptor(IServiceProvider services)
         }
 
         _handler.ScopedResources = base.Context?.ScopedResources;
-        await _handler.NotifyAsync(context.Model, cancellationToken);
+
+        var outboxModel = _handler.Map(new DefaultOutboxEntity
+        {
+            Data = JsonSerializer.Serialize(context.Model, context.Model.GetType())
+        });
+
+        await _handler.NotifyAsync(outboxModel, cancellationToken);
     }
 }

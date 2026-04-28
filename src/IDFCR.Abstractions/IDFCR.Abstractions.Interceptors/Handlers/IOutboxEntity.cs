@@ -2,12 +2,7 @@
 
 namespace IDFCR.Abstractions.Interceptors.Handlers;
 
-/// <summary>
-/// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This interface defines the structure of an outbox entity, which includes properties for storing the data of the message, as well as timestamps for when the message was completed, failed, or acknowledged. By implementing this interface, developers can create custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor can be designed to be applied at various stages of the entity lifecycle, allowing for flexible handling of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
-/// </summary>
-/// <typeparam name="TKey"></typeparam>
-public interface IOutboxEntity<TKey> : IIdentifiable<TKey>, IAuditCreatedTimestamp, IAuditModifiedTimestamp
-    where TKey : struct
+public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp
 {
     /// <summary>
     /// Gets or sets the data associated with the outbox message, which can include the payload or content of the message being processed. This property allows for the storage of relevant information related to the outbox message, such as the message body, metadata, or any other data that is necessary for processing and tracking the status of the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
@@ -25,4 +20,14 @@ public interface IOutboxEntity<TKey> : IIdentifiable<TKey>, IAuditCreatedTimesta
     /// Gets or sets the timestamp indicating when the outbox message was acknowledged by the recipient. This property allows for the tracking of when the message was successfully received and acknowledged by the intended recipient, providing information about the status of the message delivery. By utilizing this timestamp, developers can implement logic for handling acknowledged outbox messages, such as marking the message as completed, removing it from the outbox queue, or taking appropriate actions based on the acknowledgment status within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
     DateTimeOffset? AcknowledgedTimestampUtc { get; set; }
+}
+
+/// <summary>
+/// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This interface defines the structure of an outbox entity, which includes properties for storing the data of the message, as well as timestamps for when the message was completed, failed, or acknowledged. By implementing this interface, developers can create custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor can be designed to be applied at various stages of the entity lifecycle, allowing for flexible handling of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+/// </summary>
+/// <typeparam name="TKey"></typeparam>
+public interface IOutboxEntity<TKey> : IIdentifiable<TKey>, IOutboxEntity
+    where TKey : struct
+{
+    
 }
