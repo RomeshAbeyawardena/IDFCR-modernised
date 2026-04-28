@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.Interceptors.Factories;
+using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Mapper;
 using Moq;
@@ -29,17 +30,22 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
 
 internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
 {
+    public IOutboxEntity? LastMapped { get; private set; }
+    public OutboxEntity? LastNotified { get; private set; }
+    public Guid? NotifyResult { get; set; }
+
     public override IOutboxEntity Map(IOutboxEntity entity)
     {
         var outboxEntity = new OutboxEntity();
-
         outboxEntity.Map(entity);
+        LastMapped = outboxEntity;
         return outboxEntity;
     }
 
     public override Task<Guid?> NotifyAsync(OutboxEntity entity, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        LastNotified = entity;
+        return Task.FromResult(NotifyResult);
     }
 }
 
@@ -48,20 +54,178 @@ internal class OutboxInterceptorTests
 {
     private OutboxInterceptor _interceptor;
     private Mock<IServiceProvider> _serviceProvider;
+    private MockOutboxEntityNotificationHandler _handler;
 
     [SetUp]
     public void Setup()
     {
-        _serviceProvider = new();
+        _handler = new MockOutboxEntityNotificationHandler();
+        _serviceProvider = new Mock<IServiceProvider>();
 
-        _serviceProvider.Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
-            .Returns(new MockOutboxEntityNotificationHandler());
-        _interceptor = new(_serviceProvider.Object);
+        _serviceProvider
+            .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
+            .Returns(_handler);
+
+        _interceptor = new OutboxInterceptor(_serviceProvider.Object);
+    }
+
+    private static Mock<IEntityInterceptorContext> BuildContext(
+        object? model = null,
+        EntityContextBehaviorStage stage = EntityContextBehaviorStage.Post,
+        EntityContextBehavior behavior = EntityContextBehavior.Insert)
+    {
+        var ctx = new Mock<IEntityInterceptorContext>();
+        ctx.Setup(c => c.Stage).Returns(stage);
+        ctx.Setup(c => c.Behavior).Returns(behavior);
+        ctx.Setup(c => c.Model).Returns(model);
+        ctx.Setup(c => c.Data).Returns(new Dictionary<string, object>());
+        return ctx;
+    }
+
+    // ---------------------------------------------------------------------------
+    // ShouldIntercept / CanIntercept
+    // ---------------------------------------------------------------------------
+
+    [Test]
+    public void ShouldIntercept_WhenHandlerIsRegistered_ReturnsTrue()
+    {
+        var ctx = BuildContext().Object;
+        Assert.That(_interceptor.ShouldIntercept(ctx), Is.True);
     }
 
     [Test]
-    public void Test1()
+    public void ShouldIntercept_WhenHandlerIsNotRegistered_ReturnsFalse()
     {
+        _serviceProvider
+            .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
+            .Returns(null);
 
+        var interceptor = new OutboxInterceptor(_serviceProvider.Object);
+        var ctx = BuildContext().Object;
+
+        Assert.That(interceptor.ShouldIntercept(ctx), Is.False);
+    }
+
+    [Test]
+    public void CanIntercept_PostInsert_ReturnsTrue()
+    {
+        var ctx = BuildContext(new object(), EntityContextBehaviorStage.Post, EntityContextBehavior.Insert).Object;
+        Assert.That(_interceptor.CanIntercept(ctx), Is.True);
+    }
+
+    [Test]
+    public void CanIntercept_PostUpdate_ReturnsTrue()
+    {
+        var ctx = BuildContext(new object(), EntityContextBehaviorStage.Post, EntityContextBehavior.Update).Object;
+        Assert.That(_interceptor.CanIntercept(ctx), Is.True);
+    }
+
+    [Test]
+    public void CanIntercept_PreInsert_ReturnsFalse()
+    {
+        var ctx = BuildContext(new object(), EntityContextBehaviorStage.Pre, EntityContextBehavior.Insert).Object;
+        Assert.That(_interceptor.CanIntercept(ctx), Is.False);
+    }
+
+    [Test]
+    public void CanIntercept_PostDelete_ReturnsFalse()
+    {
+        var ctx = BuildContext(new object(), EntityContextBehaviorStage.Post, EntityContextBehavior.Delete).Object;
+        Assert.That(_interceptor.CanIntercept(ctx), Is.False);
+    }
+
+    // ---------------------------------------------------------------------------
+    // InterceptAsync — normal flow
+    // ---------------------------------------------------------------------------
+
+    [Test]
+    public async Task InterceptAsync_WithModel_MapsAndNotifiesHandler()
+    {
+        var model = new { Name = "test-payload" };
+        var ctx = BuildContext(model).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.LastMapped, Is.Not.Null);
+        Assert.That(_handler.LastMapped!.Data, Does.Contain("test-payload"));
+        Assert.That(_handler.LastNotified, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task InterceptAsync_WithModel_SerializesModelAsJson()
+    {
+        var model = new { Value = 42 };
+        var ctx = BuildContext(model).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.LastMapped!.Data, Does.Contain("42"));
+    }
+
+    [Test]
+    public async Task InterceptAsync_WithNullModel_DoesNotCallHandler()
+    {
+        var ctx = BuildContext(model: null).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.LastMapped, Is.Null);
+        Assert.That(_handler.LastNotified, Is.Null);
+    }
+
+    [Test]
+    public async Task InterceptAsync_WhenHandlerNotRegistered_DoesNotThrow()
+    {
+        _serviceProvider
+            .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
+            .Returns(null);
+
+        var interceptor = new OutboxInterceptor(_serviceProvider.Object);
+        var ctx = BuildContext(new object()).Object;
+
+        Assert.DoesNotThrowAsync(() => interceptor.InterceptAsync(ctx, CancellationToken.None));
+        await Task.CompletedTask;
+    }
+
+    // ---------------------------------------------------------------------------
+    // ScopedResources propagation
+    // ---------------------------------------------------------------------------
+
+    [Test]
+    public async Task InterceptAsync_WithModel_PropagatesScopedResourcesToHandler()
+    {
+        var scopedResources = new Mock<IScopedResources>().Object;
+        var factory = new Mock<IEntityInterceptorFactory>();
+        factory.Setup(f => f.ScopedResources).Returns(scopedResources);
+
+        _interceptor.Context = factory.Object;
+
+        var ctx = BuildContext(new { Id = 1 }).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.ScopedResources, Is.SameAs(scopedResources));
+    }
+
+    [Test]
+    public async Task InterceptAsync_WithNullContext_SetsScopedResourcesToNull()
+    {
+        _interceptor.Context = null;
+
+        var ctx = BuildContext(new { Id = 1 }).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.ScopedResources, Is.Null);
+    }
+
+    // ---------------------------------------------------------------------------
+    // OrderIndex
+    // ---------------------------------------------------------------------------
+
+    [Test]
+    public void OrderIndex_IsSetTo99()
+    {
+        Assert.That(_interceptor.OrderIndex, Is.EqualTo(99));
     }
 }
