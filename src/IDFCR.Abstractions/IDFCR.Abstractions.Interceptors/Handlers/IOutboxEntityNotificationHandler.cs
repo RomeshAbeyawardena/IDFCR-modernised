@@ -24,6 +24,10 @@ public interface IOutboxEntityNotificationHandler<TEntity, TKey> : IOutboxEntity
 public interface IOutboxEntityNotificationHandler
 {
     /// <summary>
+    /// Gets or sets a reference to the scoped resources, allowing for the management and access of resources that are scoped to the lifetime of a specific operation or context. This property provides a way for notification handlers to access and manage resources that are specific to the processing of outbox entity notifications, enabling developers to implement custom logic for handling notifications related to outbox entities based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. By utilizing scoped resources, developers can ensure that resources are properly managed and disposed of within the context of processing outbox entity notifications, allowing for efficient resource management and improved performance within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    IScopedResources? ScopedResources { get; set; }
+    /// <summary>
     /// Notifies the handler of changes to an outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
     /// <param name="entity">The outbox entity that has changed.</param>

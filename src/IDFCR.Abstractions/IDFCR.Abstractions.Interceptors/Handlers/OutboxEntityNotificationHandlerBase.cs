@@ -10,6 +10,11 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     where TKey : struct
 {
     /// <summary>
+    /// <inheritdoc />
+    /// </summary>
+    public IScopedResources? ScopedResources { get; set; }
+
+    /// <summary>
     /// Notifies the handler of changes to the outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
     /// <param name="entity">The outbox entity that has changed.</param>

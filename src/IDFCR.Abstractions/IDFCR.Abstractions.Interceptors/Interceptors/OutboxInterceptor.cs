@@ -47,6 +47,7 @@ public class OutboxInterceptor(IServiceProvider services)
             return;
         }
 
+        _handler.ScopedResources = base.Context?.ScopedResources;
         await _handler.NotifyAsync(context.Model, cancellationToken);
     }
 }
