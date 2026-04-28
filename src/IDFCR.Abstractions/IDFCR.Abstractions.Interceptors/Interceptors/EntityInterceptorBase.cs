@@ -51,7 +51,7 @@ public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, En
     public virtual bool CanIntercept(IEntityInterceptorContext context)
     {
         return context.Stage == stage
-            && context.Behavior.HasFlag(behavior)
+            && behavior.HasFlag(context.Behavior)
             && ShouldIntercept(context);
     }
 
