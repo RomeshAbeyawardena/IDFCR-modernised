@@ -2,6 +2,7 @@
 using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Mapper;
+using IDFCR.Abstractions.Metadata;
 using Moq;
 using NUnit.Framework;
 
@@ -234,5 +235,55 @@ internal class OutboxInterceptorTests
     public void OrderIndex_IsSetTo99()
     {
         Assert.That(_interceptor.OrderIndex, Is.EqualTo(99));
+    }
+
+    [Test]
+    public async Task InterceptAsync_WhenHandlerReturnsId_StoresIdentifiableInScopedResources()
+    {
+        var expectedId = Guid.NewGuid();
+        _handler.NotifyResult = expectedId;
+
+        var ctx = BuildContext(new { Id = 1 }).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable<Guid>>(out var identifiable), Is.True);
+            Assert.That(identifiable, Is.Not.Null);
+            Assert.That(identifiable!.Id, Is.EqualTo(expectedId));
+        }
+    }
+
+    [Test]
+    public async Task InterceptAsync_WhenHandlerReturnsNull_DoesNotStoreIdentifiableInScopedResources()
+    {
+        _handler.NotifyResult = null;
+
+        var ctx = BuildContext(new { Id = 1 }).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable<Guid>>(out _), Is.False);
+    }
+
+    [Test]
+    public async Task InterceptAsync_WhenCalledMultipleTimes_ReplacesStoredIdentifiable()
+    {
+        var firstId = Guid.NewGuid();
+        var secondId = Guid.NewGuid();
+
+        _handler.NotifyResult = firstId;
+        await _interceptor.InterceptAsync(BuildContext(new { Id = 1 }).Object, CancellationToken.None);
+
+        _handler.NotifyResult = secondId;
+        await _interceptor.InterceptAsync(BuildContext(new { Id = 2 }).Object, CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable<Guid>>(out var identifiable), Is.True);
+            Assert.That(identifiable, Is.Not.Null);
+            Assert.That(identifiable!.Id, Is.EqualTo(secondId));
+        }
     }
 }
