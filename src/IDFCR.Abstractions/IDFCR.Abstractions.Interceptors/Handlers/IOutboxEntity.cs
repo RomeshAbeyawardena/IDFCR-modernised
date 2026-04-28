@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Metadata;
 
-namespace IDFCR.Abstractions.Interceptors.Interceptors;
+namespace IDFCR.Abstractions.Interceptors.Handlers;
 
 /// <summary>
 /// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This interface defines the structure of an outbox entity, which includes properties for storing the data of the message, as well as timestamps for when the message was completed, failed, or acknowledged. By implementing this interface, developers can create custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor can be designed to be applied at various stages of the entity lifecycle, allowing for flexible handling of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.

@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Interceptors.Interceptors;
+﻿namespace IDFCR.Abstractions.Interceptors.Handlers;
 
 /// <summary>
 /// Represents a base class for handling notifications related to outbox entities, allowing for the processing of outbox messages and the tracking of their status. This abstract class provides a foundation for creating custom notification handlers by defining common properties and methods that can be overridden by derived classes. The OutboxEntityNotificationHandlerBase class allows developers to specify the entity type and corresponding key type for outbox entities, as well as an implementation of the NotifyAsync method to handle notifications related to outbox entities. By inheriting from this base class, developers

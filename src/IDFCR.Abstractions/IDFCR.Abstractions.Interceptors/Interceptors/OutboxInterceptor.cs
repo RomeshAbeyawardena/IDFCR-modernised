@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Interceptors.Interceptors;
+﻿using IDFCR.Abstractions.Interceptors.Handlers;
+
+namespace IDFCR.Abstractions.Interceptors.Interceptors;
 
 /// <summary>
 /// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This class provides a base implementation for intercepting changes to outbox entities, allowing developers to implement custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor is designed to be applied at the Post stage of Insert and Update behaviors, allowing it to capture changes to outbox entities after they have been made, enabling the tracking of message status and the processing of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.

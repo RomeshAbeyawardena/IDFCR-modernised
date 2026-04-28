@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Interceptors.Interceptors;
+﻿namespace IDFCR.Abstractions.Interceptors.Handlers;
 
 /// <summary>
 /// Represents an interface for handling notifications related to outbox entities, allowing for the processing of outbox messages and the tracking of their status. This interface defines a contract for implementing custom notification handlers that can process notifications related to outbox entities based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The IOutboxEntityNotificationHandler interface provides a method for handling notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
