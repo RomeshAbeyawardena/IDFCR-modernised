@@ -18,6 +18,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
     where TRequest : notnull
     where TException : Exception
 {
+    const string GenericExceptionMessage = "Unable to find generic method";
     /// <inheritdoc />
     public Task Handle(
         TRequest request,
@@ -52,7 +53,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
             if (responseType.IsAssignableTo(typeof(IUnitPagedResult<>).MakeGenericType(genericTypes)))
             {
                 var methodInfo = typeof(UnitPagedResult).GetMethod(nameof(UnitPagedResult.FromResult))?
-                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
                 IPagedQuery? pagedQuery = null;
 
@@ -70,7 +71,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
             else if (responseType.IsAssignableTo(typeof(IUnitResultCollection<>).MakeGenericType(genericTypes)))
             {
                 var methodInfo = typeof(UnitResultCollection).GetMethod(nameof(UnitResultCollection.Failed))?
-                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
                 result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction])!;
 
@@ -82,7 +83,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
             {
                 var methodInfo = typeof(UnitResult).GetMethods()
                     .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))?
-                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"Unable to find generic method");
+                    .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
                 result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason])!;
 
@@ -95,7 +96,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
         {
             var methodInfo = typeof(UnitResult).GetMethods()
                     .FirstOrDefault(x => !x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))
-                    ?? throw new InvalidOperationException($"Unable to find generic method");
+                    ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
             result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason])!;
 
