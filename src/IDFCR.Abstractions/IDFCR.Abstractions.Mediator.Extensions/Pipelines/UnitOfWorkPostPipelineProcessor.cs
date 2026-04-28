@@ -1,5 +1,8 @@
-﻿using IDFCR.Abstractions.Persistence;
+﻿using IDFCR.Abstractions.Interceptors.Handlers;
+using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
@@ -9,7 +12,8 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <typeparam name="TRequest">The type of request being processed.</typeparam>
 /// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
 /// <param name="unitOfWork">The unit of work instance used to commit changes.</param>
-public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
+public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork, TimeProvider timeProvider,
+    IServiceProvider serviceProvider) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
     /// <summary>
@@ -25,7 +29,20 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             if (response is IUnitResult unitResult && unitResult.IsSuccess)
             {
-                await unitOfWork.SaveChangesAsync(cancellationToken);
+                IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
+
+                try
+                {
+                    var outboxEntity = outboxProcessor?.Map(new DefaultOutboxEntity
+                    {
+                        CompletedTimestampUtc = timeProvider.GetUtcNow()
+                    });
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
     }

@@ -98,7 +98,7 @@ internal class OutboxInterceptorTests
     {
         _serviceProvider
             .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
-            .Returns(null);
+            .Returns(() => null);
 
         var interceptor = new OutboxInterceptor(_serviceProvider.Object);
         var ctx = BuildContext().Object;
@@ -178,7 +178,7 @@ internal class OutboxInterceptorTests
     {
         _serviceProvider
             .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
-            .Returns(null);
+            .Returns(() => null);
 
         var interceptor = new OutboxInterceptor(_serviceProvider.Object);
         var ctx = BuildContext(new object()).Object;

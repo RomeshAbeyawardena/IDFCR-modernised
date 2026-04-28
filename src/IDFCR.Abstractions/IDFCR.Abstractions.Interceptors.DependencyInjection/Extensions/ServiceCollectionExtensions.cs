@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
             .AddSingleton<IAuditProcessorProvider, DefaultAuditProcessorProvider>()
+            .AddScoped<IScopedResources, DefaultScopedResources>()
             .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, [.. allAssemblies])
             .ScanGenericServices<IAuditProcessor>(ServiceLifetime.Transient, [.. allAssemblies]);
     }

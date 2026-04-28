@@ -2,8 +2,15 @@
 
 namespace IDFCR.Abstractions.Interceptors.Handlers;
 
+/// <summary>
+/// Represents an entity that can be used in an outbox pattern for reliable message delivery and tracking of message status. This interface defines the structure of an outbox entity, which includes properties for storing the data of the message, as well as timestamps for when the message was completed, failed, or acknowledged. By implementing this interface, developers can create custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The outbox entity can be designed to be stored in a database or other persistent storage mechanism, allowing for the reliable tracking and management of messages as they are processed and delivered within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+/// </summary>
 public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the outbox message, which can be used to track and manage the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. This property allows for the identification and correlation of outbox messages, enabling developers to implement logic for handling specific messages based on their unique identifiers, such as retrying failed messages, acknowledging successful deliveries, or performing other actions based on the status of the outbox message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    object Id { get; set; }
     /// <summary>
     /// Gets or sets the data associated with the outbox message, which can include the payload or content of the message being processed. This property allows for the storage of relevant information related to the outbox message, such as the message body, metadata, or any other data that is necessary for processing and tracking the status of the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>

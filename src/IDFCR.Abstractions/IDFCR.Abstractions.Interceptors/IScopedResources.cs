@@ -42,4 +42,11 @@ public interface IScopedResources
     /// <typeparam name="T">The type of the scoped resource to add or update.</typeparam>
     /// <param name="value">The scoped resource to add or update.</param>
     void AddOrUpdate<T>(T value);
+
+    /// <summary>
+    /// Attempts to remove a scoped resource of the specified type from the collection of scoped resources. This method allows for trying to remove a resource of a particular type that may no longer be needed within the context of entity interceptors, providing a way to manage the lifecycle of resources during the interception process. By implementing this method, developers can ensure that they are effectively managing the resources used in their interception logic, allowing for cleanup and optimization of resource usage within applications and systems that utilize interception mechanisms for managing entity operations.
+    /// </summary>
+    /// <typeparam name="T">The type of the scoped resource to remove.</typeparam>
+    /// <returns>True if a scoped resource of the specified type was successfully removed; otherwise, false.</returns>
+    bool TryRemove<T>(out T? oldValue);
 }

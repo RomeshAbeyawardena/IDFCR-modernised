@@ -43,4 +43,16 @@ internal class DefaultScopedResources : IScopedResources
         value = default;
         return false;
     }
+
+    public bool TryRemove<T>(out T? oldValue)
+    {
+        oldValue = default;
+        if (_sharedContextObjects.TryRemove(typeof(T), out var _oldValue))
+        {
+            oldValue = _oldValue is null ? default :  (T)_oldValue;
+            return true;
+        }
+
+        return false;
+    }
 }

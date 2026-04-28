@@ -6,6 +6,7 @@
     <PackageReference Include="MediatR" Version="14.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IDFCR.Abstractions.Interceptors\IDFCR.Abstractions.Interceptors.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Mediator\IDFCR.Abstractions.Mediator.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
   </ItemGroup>
