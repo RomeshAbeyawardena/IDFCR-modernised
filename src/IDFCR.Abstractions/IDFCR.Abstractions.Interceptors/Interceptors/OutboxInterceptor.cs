@@ -9,17 +9,23 @@ public class OutboxInterceptor(IServiceProvider services)
     : EntityInterceptorBase(EntityContextBehaviorStage.Post, EntityContextBehavior.Insert | EntityContextBehavior.Update, 99)
 {
     private IOutboxEntityNotificationHandler? _handler;
-    /// <inheritdoc />
-    public override bool ShouldIntercept(IEntityInterceptorContext context)
+
+    private IOutboxEntityNotificationHandler? GetHandler()
     {
         var service = services.GetService(typeof(IOutboxEntityNotificationHandler));
 
         if(service is null)
         {
-            return false;
+            return null;
         }
 
-        _handler = service as IOutboxEntityNotificationHandler;
+        return service as IOutboxEntityNotificationHandler;
+    }
+
+    /// <inheritdoc />
+    public override bool ShouldIntercept(IEntityInterceptorContext context)
+    {
+        _handler ??= GetHandler();
 
         return _handler is not null;
     }
@@ -43,7 +49,9 @@ public class OutboxInterceptor(IServiceProvider services)
     /// <returns>A task that represents the asynchronous operation.</returns>
     public override async Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
-        if (_handler is null || context.Model is null)
+        _handler ??= GetHandler();
+
+        if (context.Model is null || _handler is null)
         {
             return;
         }

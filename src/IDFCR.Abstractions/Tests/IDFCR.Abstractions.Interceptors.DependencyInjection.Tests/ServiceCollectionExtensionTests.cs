@@ -22,7 +22,7 @@ public class ServiceCollectionExtensionTests
     {
         services.AddInterceptors();
 
-        Assert.That(services, Has.Count.EqualTo(5));
+        Assert.That(services, Has.Count.EqualTo(6));
 
         var factoryService = services.FirstOrDefault(x => x.ImplementationType == typeof(DefaultEntityInterceptorFactory));
         Assert.That(factoryService, Is.Not.Null);
@@ -58,6 +58,15 @@ public class ServiceCollectionExtensionTests
             Assert.That(auditChangesService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
             Assert.That(auditChangesService.ImplementationType, Is.EqualTo(typeof(AuditEntityChangesInterceptor)));
             Assert.That(auditChangesService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+        }
+
+        var outboxService = services.FirstOrDefault(x => x.ImplementationType == typeof(OutboxInterceptor));
+        Assert.That(outboxService, Is.Not.Null);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(outboxService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
+            Assert.That(outboxService.ImplementationType, Is.EqualTo(typeof(OutboxInterceptor)));
+            Assert.That(outboxService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
         }
     }
 }
