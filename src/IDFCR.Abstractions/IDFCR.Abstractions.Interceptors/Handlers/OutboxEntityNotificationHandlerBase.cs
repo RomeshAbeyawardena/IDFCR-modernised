@@ -1,11 +1,19 @@
-﻿namespace IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.Metadata;
+
+namespace IDFCR.Abstractions.Interceptors.Handlers;
+
+internal record DefaultIdentifiable<TKey>() : IIdentifiable<TKey>
+    where TKey : struct
+{
+    public TKey Id { get; set; }
+}
 
 /// <summary>
 /// Represents a base class for handling notifications related to outbox entities, allowing for the processing of outbox messages and the tracking of their status. This abstract class provides a foundation for creating custom notification handlers by defining common properties and methods that can be overridden by derived classes. The OutboxEntityNotificationHandlerBase class allows developers to specify the entity type and corresponding key type for outbox entities, as well as an implementation of the NotifyAsync method to handle notifications related to outbox entities. By inheriting from this base class, developers
 /// </summary>
 /// <typeparam name="TEntity">The type of the outbox entity.</typeparam>
 /// <typeparam name="TKey">The type of the key for the outbox entity.</typeparam>
-public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutboxEntityNotificationHandler<TEntity, TKey>
+public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(IScopedResources scopedResources) : IOutboxEntityNotificationHandler<TEntity, TKey>
     where TEntity : IOutboxEntity<TKey>
     where TKey : struct
 {
@@ -35,7 +43,12 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     {
         if (entity is TEntity typedEntity)
         {
-            return await NotifyAsync(typedEntity, cancellationToken);
+            var id = await NotifyAsync(typedEntity, cancellationToken);
+
+            if (id.HasValue)
+            {
+                scopedResources.AddOrUpdate<IIdentifiable<TKey>>(new DefaultIdentifiable<TKey> { Id = id.Value });
+            }
         }
 
         return null;

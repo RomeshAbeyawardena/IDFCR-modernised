@@ -1,5 +1,7 @@
-﻿using IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.Interceptors;
+using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,10 +14,28 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <typeparam name="TRequest">The type of request being processed.</typeparam>
 /// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
 /// <param name="unitOfWork">The unit of work instance used to commit changes.</param>
+/// <param name="timeProvider"></param>
+/// <param name="serviceProvider"></param>
 public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork, TimeProvider timeProvider,
     IServiceProvider serviceProvider) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
+    private async Task NotifyAsync(IOutboxEntity entity, CancellationToken cancellationToken)
+    {
+        IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
+        IScopedResources? scopedResources = serviceProvider.GetService<IScopedResources>();
+
+        if (outboxProcessor is not null && scopedResources is not null)
+        {
+            var outboxEntity = outboxProcessor.Map(entity);
+            if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id)
+            {
+
+            }
+            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
+        }
+    }
+
     /// <summary>
     /// Processes the request and response after the main handler has executed. If the request implements IUnitOfWorkRequest and indicates that changes should be committed, and if the response indicates a successful operation, it calls SaveChangesAsync on the unit of work to persist changes to the data store.
     /// </summary>
@@ -29,15 +49,11 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             if (response is IUnitResult unitResult && unitResult.IsSuccess)
             {
-                IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
-
                 try
                 {
-                    var outboxEntity = outboxProcessor?.Map(new DefaultOutboxEntity
-                    {
-                        CompletedTimestampUtc = timeProvider.GetUtcNow()
-                    });
                     await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                   
                 }
                 catch (Exception)
                 {
