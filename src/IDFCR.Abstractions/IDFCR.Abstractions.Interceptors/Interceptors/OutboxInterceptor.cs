@@ -23,7 +23,7 @@ public class OutboxInterceptor(IServiceProvider services)
 
         return _handler is not null;
     }
-
+#pragma warning disable CS0809
     /// <summary>
     /// Synchronously intercepts the entity changes after they have been made, allowing for the auditing of modifications to the entity. This method is responsible for checking if the context contains a new model of the entity being audited, and if so, it retrieves the audit processor provider to perform the audit of changes between the old and new values of the entity. The implementation of this method can include logic for determining which properties or fields have been modified, capturing the previous and current values, and creating audit entries that can be stored or processed further for compliance, security, or other purposes related to tracking entity modifications within applications and systems that utilize auditing mechanisms for tracking entity modifications.
     /// </summary>
@@ -33,6 +33,7 @@ public class OutboxInterceptor(IServiceProvider services)
     {
         await InterceptAsync(context, CancellationToken.None);
     }
+#pragma warning restore
 
     /// <summary>
     /// Invokes the asynchronous interception logic for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for checking if the interceptor has a valid handler and if the context contains a model of the entity being processed. If both conditions are met, it invokes the notification handler to process the outbox entity asynchronously, allowing for the handling of outbox messages and the tracking of their status based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
