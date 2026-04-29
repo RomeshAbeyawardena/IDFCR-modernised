@@ -257,7 +257,7 @@ internal class OutboxInterceptorTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable<Guid>>(out var identifiable), Is.True);
+            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable>(out var identifiable), Is.True);
             Assert.That(identifiable, Is.Not.Null);
             Assert.That(identifiable!.Id, Is.EqualTo(expectedId));
         }
@@ -295,7 +295,7 @@ internal class OutboxInterceptorTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable<Guid>>(out var identifiable), Is.True);
+            Assert.That(_scopedResources.TryGetScopedResource<IIdentifiable>(out var identifiable), Is.True);
             Assert.That(identifiable, Is.Not.Null);
             Assert.That(identifiable!.Id, Is.EqualTo(secondId));
         }

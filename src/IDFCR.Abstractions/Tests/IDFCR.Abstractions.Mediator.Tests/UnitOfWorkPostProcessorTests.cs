@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
+using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -30,7 +31,7 @@ internal class UnitOfWorkPostProcessorTests
     private Mock<IOutboxEntityNotificationHandler> _outboxHandler = null!;
     private Mock<IScopedResources> _scopedResources = null!;
     private Mock<IServiceProvider> _serviceProvider = null!;
-    
+    private ITestLoggerFactory _loggerFactory;
     private ManualTimeProvider _time = null!;
 
     [SetUp]
@@ -51,9 +52,16 @@ internal class UnitOfWorkPostProcessorTests
         _serviceProvider = new Mock<IServiceProvider>();
 
         _time = new ManualTimeProvider(new DateTimeOffset(2025, 1, 1, 12, 0, 0, TimeSpan.Zero));
+        _loggerFactory = TestLoggerFactory.Create();
     }
 
     // ── Guard: request not IUnitOfWorkRequest ─────────────────────────────────
+
+    [TearDown]
+    public void TearDown()
+    {
+        _loggerFactory?.Dispose();
+    }
 
     [Test]
     public async Task Process_WhenRequestIsNotUnitOfWorkRequest_DoesNotSaveChanges()
@@ -284,7 +292,7 @@ internal class UnitOfWorkPostProcessorTests
 
     private UnitOfWorkPostPipelineProcessor<TReq, TRes> BuildSut<TReq, TRes>()
         where TReq : notnull
-        => new(_unitOfWork.Object, _time, _serviceProvider.Object, );
+        => new(_unitOfWork.Object, _time, _serviceProvider.Object, _loggerFactory.CreateLogger<UnitOfWorkPostPipelineProcessor<TReq,TRes>>());
 
     private void RegisterOutboxHandler()
         => _serviceProvider
