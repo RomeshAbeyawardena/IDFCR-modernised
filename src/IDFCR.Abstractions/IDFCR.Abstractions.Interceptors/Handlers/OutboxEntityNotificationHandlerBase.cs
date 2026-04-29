@@ -47,7 +47,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
 
             if (id.HasValue)
             {
-                ScopedResources?.AddOrUpdate<IIdentifiable<TKey>>(new DefaultIdentifiable<TKey> { Id = id.Value });
+                ScopedResources?.AddOrUpdate<IIdentifiable>(new DefaultIdentifiable<TKey> { Id = id.Value });
             }
 
             return id;
@@ -62,9 +62,9 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     /// <inheritdoc />
     public async Task<object?> NotifyAsync(object id, object entity, CancellationToken cancellationToken)
     {
-        if (id is TKey key && entity is TEntity typedEntity)
+        if (id is IIdentifiable key && key.Id is not null && entity is TEntity typedEntity)
         {
-            return await NotifyAsync(key, typedEntity, cancellationToken);
+            return await NotifyAsync(key.Id, typedEntity, cancellationToken);
         }
 
         return null;

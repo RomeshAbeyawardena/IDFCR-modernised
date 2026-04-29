@@ -27,10 +27,15 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
         IScopedResources? scopedResources = serviceProvider.GetService<IScopedResources>();
 
-        logger.LogInformation("Notifying outbox pattern");
+        logger.LogInformation("Notifying outbox pattern:");
 
         if (outboxProcessor is not null && scopedResources is not null)
         {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("Scoped resources count: {count}", scopedResources.Items.Count);
+            }
+
             var outboxEntity = outboxProcessor.Map(entity);
             if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id))
             {
