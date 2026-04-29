@@ -13,7 +13,7 @@ internal record DefaultIdentifiable<TKey>() : IIdentifiable<TKey>
 /// </summary>
 /// <typeparam name="TEntity">The type of the outbox entity.</typeparam>
 /// <typeparam name="TKey">The type of the key for the outbox entity.</typeparam>
-public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(IScopedResources scopedResources) : IOutboxEntityNotificationHandler<TEntity, TKey>
+public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutboxEntityNotificationHandler<TEntity, TKey>
     where TEntity : IOutboxEntity<TKey>
     where TKey : struct
 {
@@ -47,7 +47,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(IScoped
 
             if (id.HasValue)
             {
-                scopedResources.AddOrUpdate<IIdentifiable<TKey>>(new DefaultIdentifiable<TKey> { Id = id.Value });
+                ScopedResources?.AddOrUpdate<IIdentifiable<TKey>>(new DefaultIdentifiable<TKey> { Id = id.Value });
             }
         }
 

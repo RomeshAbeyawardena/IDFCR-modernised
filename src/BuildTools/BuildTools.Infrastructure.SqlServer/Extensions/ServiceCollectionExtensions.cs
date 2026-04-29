@@ -1,5 +1,7 @@
-﻿using IDFCR.Abstractions.Filters.Extensions;
+﻿using BuildTools.Infrastructure.SqlServer.Features.Outbox;
+using IDFCR.Abstractions.Filters.Extensions;
 using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
+using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +53,7 @@ public static class ServiceCollectionExtensions
         }
 
         return services
+            .AddTransient<IOutboxEntityNotificationHandler, OutboxEntityNotificationHandler>()
             .AddRepositories(currentAssembly)
             .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionStringBuilder.ToString())
             .EnableDetailedErrors(settings.EnableDetailedErrors))

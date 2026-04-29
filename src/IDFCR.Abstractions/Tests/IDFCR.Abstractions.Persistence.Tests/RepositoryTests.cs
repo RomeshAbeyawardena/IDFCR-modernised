@@ -1,5 +1,6 @@
 using IDFCR.Abstractions.Filters;
 using IDFCR.Abstractions.Filters.Extensions;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Persistence.Tests.Assets;
@@ -39,7 +40,7 @@ public class RepositoryTests
         _serviceProvider = services.BuildServiceProvider();
         _entityInterceptorFactory = _serviceProvider.GetRequiredService<IEntityInterceptorFactory>();
         _filterFactory = _serviceProvider.GetRequiredService<IFilterFactory>();
-        _mockRepository = new(_entityInterceptorFactory, _filterFactory);
+        _mockRepository = new(_entityInterceptorFactory, _filterFactory, new DefaultScopedResources());
 
         new DbCustomer();
     }

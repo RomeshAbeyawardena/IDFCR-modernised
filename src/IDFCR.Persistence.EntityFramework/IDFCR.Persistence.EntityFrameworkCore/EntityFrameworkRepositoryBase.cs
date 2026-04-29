@@ -7,6 +7,7 @@ using IDFCR.Abstractions.Metadata.Extensions;
 using Microsoft.EntityFrameworkCore;
 using IDFCR.Abstractions.Results;
 using IDFCR.Abstractions.Interceptors.Factories;
+using IDFCR.Abstractions.Interceptors;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
 
@@ -21,7 +22,11 @@ namespace IDFCR.Persistence.EntityFrameworkCore;
 /// <param name="db">The DbContext instance.</param>
 /// <param name="filterFactory">The filter factory instance.</param>
 /// <param name="entityInterceptorFactory">The entity interceptor factory instance.</param>
-public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T, TKey>(TDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
+/// <param name="scopedResources"></param>
+public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T, TKey>(TDbContext db, 
+        IFilterFactory filterFactory, 
+        IEntityInterceptorFactory entityInterceptorFactory, 
+        IScopedResources scopedResources)
     : RepositoryBase<TCommon, TDb, T, TKey>(entityInterceptorFactory)
     where TDbContext : DbContext
     where TKey : struct
@@ -192,7 +197,8 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <inheritdoc />
     public override Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
     {
-        var scopedResources = EntityInterceptorFactory.ScopedResources;
+        EntityInterceptorFactory.ScopedResources = scopedResources;
+
         if (!scopedResources.Contains<TDbContext>())
         {
             scopedResources.AddOrUpdate(Db);

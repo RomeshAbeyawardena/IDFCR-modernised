@@ -14,13 +14,14 @@ public class OutboxInterceptor(IServiceProvider services)
     private IOutboxEntityNotificationHandler? GetHandler()
     {
         var service = services.GetService(typeof(IOutboxEntityNotificationHandler));
-
         if(service is null)
         {
             return null;
         }
 
-        return service as IOutboxEntityNotificationHandler;
+        var outboxHandler = service as IOutboxEntityNotificationHandler;
+        outboxHandler?.ScopedResources = base.Context?.ScopedResources;
+        return outboxHandler;
     }
 
     /// <inheritdoc />

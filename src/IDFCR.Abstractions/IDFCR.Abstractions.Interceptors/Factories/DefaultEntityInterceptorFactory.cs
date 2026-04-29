@@ -5,7 +5,7 @@ namespace IDFCR.Abstractions.Interceptors.Factories;
 //from DI or whatever 
 internal class DefaultEntityInterceptorFactory(IEnumerable<IEntityInterceptor> interceptors) : IEntityInterceptorFactory
 {
-    public IScopedResources ScopedResources { get; } = new DefaultScopedResources();
+    public IScopedResources? ScopedResources { get; set; }
 
     public async ValueTask<IEnumerable<IEntityInterceptor>> GetEntityInterceptorsAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {

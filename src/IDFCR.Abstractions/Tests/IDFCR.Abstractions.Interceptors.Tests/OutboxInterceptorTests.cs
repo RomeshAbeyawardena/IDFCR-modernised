@@ -29,7 +29,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     }
 }
 
-internal class MockOutboxEntityNotificationHandler(IScopedResources scopedResources) : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>(scopedResources)
+internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
 {
     public IOutboxEntity? LastMapped { get; private set; }
     public OutboxEntity? LastNotified { get; private set; }
@@ -67,7 +67,12 @@ internal class OutboxInterceptorTests
     public void Setup()
     {
         _scopedResources = new();
-        _handler = new MockOutboxEntityNotificationHandler(_scopedResources);
+        
+        _handler = new MockOutboxEntityNotificationHandler()
+        {
+            ScopedResources = _scopedResources
+        };
+
         _serviceProvider = new Mock<IServiceProvider>();
 
         _serviceProvider
@@ -244,7 +249,10 @@ internal class OutboxInterceptorTests
         _handler.NotifyResult = expectedId;
 
         var ctx = BuildContext(new { Id = 1 }).Object;
+        var factory = new Mock<IEntityInterceptorFactory>();
+        factory.Setup(f => f.ScopedResources).Returns(_scopedResources);
 
+        _interceptor.Context = factory.Object;
         await _interceptor.InterceptAsync(ctx, CancellationToken.None);
 
         using (Assert.EnterMultipleScope())
@@ -274,6 +282,12 @@ internal class OutboxInterceptorTests
         var secondId = Guid.NewGuid();
 
         _handler.NotifyResult = firstId;
+
+        var factory = new Mock<IEntityInterceptorFactory>();
+        factory.Setup(f => f.ScopedResources).Returns(_scopedResources);
+
+        _interceptor.Context = factory.Object;
+
         await _interceptor.InterceptAsync(BuildContext(new { Id = 1 }).Object, CancellationToken.None);
 
         _handler.NotifyResult = secondId;

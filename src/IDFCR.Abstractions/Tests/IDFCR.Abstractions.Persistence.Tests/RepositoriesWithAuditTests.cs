@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Interceptors.Processors;
@@ -53,7 +54,7 @@ public class RepositoriesWithAuditTests
         defaultAuditProcessorProvider = new([new AuditCustomerProcessor()]);
         auditEntityChangesInterceptor = new(defaultAuditProcessorProvider);
         defaultEntityInterceptorFactory = new([auditEntityChangesInterceptor]);
-        memoryMockRepository = new(defaultEntityInterceptorFactory, filterFactoryMock.Object);
+        memoryMockRepository = new(defaultEntityInterceptorFactory, filterFactoryMock.Object, new DefaultScopedResources());
     }
 
     [Test]

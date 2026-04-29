@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
@@ -22,7 +23,8 @@ namespace IDFCR.TestUtilities;
 /// <typeparam name="T">The domain entity type, which must implement IMapper and TCommon.</typeparam>
 /// <param name="entityInterceptorFactory">The factory used to create entity interceptors for handling entity lifecycle events.</param>
 /// <param name="filterFactory">The factory used to apply filtering and paging to in-memory entity collections.</param>
-public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory)
+/// <param name="scopedResources"></param>
+public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFactory entityInterceptorFactory, IFilterFactory filterFactory, IScopedResources scopedResources)
     : RepositoryBase<TCommon, TDb, T, Guid>(entityInterceptorFactory)
     where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<Guid>
     where T : class, IMapper<TCommon>, TCommon
@@ -185,7 +187,9 @@ public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFac
     /// <inheritdoc />
     public override Task<IUnitResult<Guid>> UpsertAsync(T entry, CancellationToken cancellationToken)
     {
-        if (!EntityInterceptorFactory.ScopedResources.Contains<DbContextMarker<TDb>>())
+        EntityInterceptorFactory.ScopedResources = scopedResources;
+
+        if (!scopedResources.Contains<DbContextMarker<TDb>>())
         {
             EntityInterceptorFactory.ScopedResources.AddOrUpdate(new DbContextMarker<TDb>
             {
