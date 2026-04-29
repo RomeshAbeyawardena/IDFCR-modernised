@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -29,6 +30,7 @@ internal class UnitOfWorkPostProcessorTests
     private Mock<IOutboxEntityNotificationHandler> _outboxHandler = null!;
     private Mock<IScopedResources> _scopedResources = null!;
     private Mock<IServiceProvider> _serviceProvider = null!;
+    
     private ManualTimeProvider _time = null!;
 
     [SetUp]
@@ -282,7 +284,7 @@ internal class UnitOfWorkPostProcessorTests
 
     private UnitOfWorkPostPipelineProcessor<TReq, TRes> BuildSut<TReq, TRes>()
         where TReq : notnull
-        => new(_unitOfWork.Object, _time, _serviceProvider.Object);
+        => new(_unitOfWork.Object, _time, _serviceProvider.Object, );
 
     private void RegisterOutboxHandler()
         => _serviceProvider

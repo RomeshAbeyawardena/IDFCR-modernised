@@ -39,7 +39,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
             var outboxEntity = outboxProcessor.Map(entity);
             if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id))
             {
-                await outboxProcessor.NotifyAsync(outboxEntity, id, cancellationToken);
+                await outboxProcessor.NotifyAsync(id, outboxEntity, cancellationToken);
             }
             else
             {
