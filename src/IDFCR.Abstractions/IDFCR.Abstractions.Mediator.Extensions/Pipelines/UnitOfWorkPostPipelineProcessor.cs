@@ -5,6 +5,7 @@ using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
@@ -16,8 +17,9 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <param name="unitOfWork">The unit of work instance used to commit changes.</param>
 /// <param name="timeProvider"></param>
 /// <param name="serviceProvider"></param>
+/// <param name="logger"></param>
 public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork, TimeProvider timeProvider,
-    IServiceProvider serviceProvider) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
+    IServiceProvider serviceProvider, ILogger<UnitOfWorkPostPipelineProcessor<TRequest, TResponse>> logger) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
     private async Task NotifyAsync(IOutboxEntity entity, CancellationToken cancellationToken)
@@ -25,12 +27,32 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
         IScopedResources? scopedResources = serviceProvider.GetService<IScopedResources>();
 
+        logger.LogInformation("Notifying outbox pattern");
+
         if (outboxProcessor is not null && scopedResources is not null)
         {
             var outboxEntity = outboxProcessor.Map(entity);
             if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id))
             {
                 await outboxProcessor.NotifyAsync(outboxEntity, id, cancellationToken);
+            }
+            else
+            {
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("Unable to get outbox ID");
+                }
+            }
+        }
+        else
+        {
+            bool hasOutboxProcessor = outboxProcessor is not null;
+            bool hasScopedResources = scopedResources is not null;
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(@"Outbox pattern not supported: 
+                Has OutboxProcessor: {hasOutboxProcessor}
+                Has ScopedResources: {hasScopedResources}", hasOutboxProcessor, hasScopedResources);
             }
         }
     }
