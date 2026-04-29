@@ -48,6 +48,9 @@ internal class UnitOfWorkPostProcessorTests
                       .ReturnsAsync((object?)null);
 
         _scopedResources = new Mock<IScopedResources>();
+        _scopedResources
+            .SetupGet(s => s.Items)
+            .Returns(new Dictionary<Type, object?>());
 
         _serviceProvider = new Mock<IServiceProvider>();
 
