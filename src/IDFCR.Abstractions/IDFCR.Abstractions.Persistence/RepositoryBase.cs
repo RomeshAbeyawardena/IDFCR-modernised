@@ -91,6 +91,13 @@ namespace IDFCR.Abstractions.Persistence
             return value.Map<T>();
         }
 
+        /// <summary>
+        /// Determines whether there are changes between the original and updated entities. By default, this performs a deep comparison of the serialized JSON representations of the objects, but can be overridden for more efficient change detection based on the specific properties of the entities.
+        /// <para>As it this does a deep comparison it will compare collections that may not be relevant for change detection. Overriding this method is recommended when the data model contains large or complex collections that do not impact the entity's state.</para>
+        /// </summary>
+        /// <param name="original">The original entity.</param>
+        /// <param name="updated">The updated entity.</param>
+        /// <returns>True if there are changes; otherwise, false.</returns>
         protected virtual bool HasChanges(TDb original, TDb updated)
         {
             var originalNode = JsonSerializer.SerializeToNode(original);
