@@ -81,7 +81,7 @@ public class RepositoryTests
         var id = insertResult.GetResultOrDefault();
 
         var stored = (await _mockRepository.FindAsync(id, CancellationToken.None)).GetResultOrDefault();
-
+        stored?.FirstName = "Bob";
         var originalCreated = stored!.CreatedTimestampUtc;
 
         _timeProvider.Advance(TimeSpan.FromHours(1));

@@ -103,6 +103,15 @@ namespace IDFCR.Abstractions.Persistence
             var originalNode = JsonSerializer.SerializeToNode(original);
             var updatedNode = JsonSerializer.SerializeToNode(updated);
 
+            if (originalNode?.AsObject() is JsonObject originalObj && updatedNode?.AsObject() is JsonObject updatedObj)
+            {
+                // Remove audit timestamp fields before comparison
+                originalObj.Remove("CreatedTimestampUtc");
+                originalObj.Remove("ModifiedTimestampUtc");
+                updatedObj.Remove("CreatedTimestampUtc");
+                updatedObj.Remove("ModifiedTimestampUtc");
+            }
+
             return !JsonNode.DeepEquals(originalNode, updatedNode);
         }
 
