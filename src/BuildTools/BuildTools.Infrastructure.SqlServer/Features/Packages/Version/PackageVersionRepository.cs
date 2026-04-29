@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Packages.Version;
 using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -10,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 
 [RegisteredRepository]
-public class PackageVersionRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IPackageVersion, PackageVersionEntity, PackageVersion, Guid>(db, filterFactory, entityInterceptorFactory), IPackageVersionRepository
+public class PackageVersionRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IPackageVersion, PackageVersionEntity, PackageVersion, Guid>(db, filterFactory, entityInterceptorFactory, scopedResources), IPackageVersionRepository
 {
     public async Task<IUnitResult<PackageVersion>> GetLatestVersionAsync(object? packageId, string prefix, CancellationToken cancellationToken)
     {

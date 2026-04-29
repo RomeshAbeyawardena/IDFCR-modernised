@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Tags;
 using BuildTools.Shared.Features.Tags;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -10,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Tags;
 
 [RegisteredRepository]
-public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, ITag, TagEntity, Tag, Guid>(db, filterFactory, entityInterceptorFactory), ITagRepository
+public class TagRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, ITag, TagEntity, Tag, Guid>(db, filterFactory, entityInterceptorFactory, scopedResources), ITagRepository
 {
     public async Task<IUnitResult> AddTagsAsync(IEnumerable<Tag> tags, CancellationToken cancellationToken)
     {

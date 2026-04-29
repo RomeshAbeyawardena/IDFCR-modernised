@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Environments;
 using BuildTools.Shared.Features.Environments;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -11,8 +12,8 @@ using EnvironmentDto = BuildTools.Shared.Features.Environments.Environment;
 namespace BuildTools.Infrastructure.SqlServer.Features.Environments;
 
 [RegisteredRepository]
-public class EnvironmentRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IEnvironment, EnvironmentEntity, EnvironmentDto, Guid>(db, filterFactory, entityInterceptorFactory),
+public class EnvironmentRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IEnvironment, EnvironmentEntity, EnvironmentDto, Guid>(db, filterFactory, entityInterceptorFactory, scopedResources),
     IEnvironmentRepository
 {
     public async Task<IUnitResult<EnvironmentDto>> GetEnvironmentAsync(IEnvironmentQuery request, CancellationToken cancellationToken)

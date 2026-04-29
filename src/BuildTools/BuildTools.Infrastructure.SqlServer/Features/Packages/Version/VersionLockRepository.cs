@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Packages.Version;
 using BuildTools.Shared.Features.Packages.Version;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -10,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 
 [RegisteredRepository]
-public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, TimeProvider timeProvider)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IVersionLock, VersionLockEntity, VersionLock, Guid>(db, filterFactory, entityInterceptorFactory), IVersionLockRepository
+public class VersionLockRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, TimeProvider timeProvider, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IVersionLock, VersionLockEntity, VersionLock, Guid>(db, filterFactory, entityInterceptorFactory, scopedResources), IVersionLockRepository
 {
     public async Task<IUnitResult<VersionLock>> GetVersionLockAsync(object packageId, string versionPrefix, CancellationToken cancellationToken)
     {

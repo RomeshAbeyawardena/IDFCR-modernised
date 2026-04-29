@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Settings;
 using BuildTools.Shared.Features.Settings;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -10,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings;
 
 [RegisteredRepository]
-public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory), ISettingRepository
+public class SettingRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, ISetting, SettingEntity, Setting, Guid>(db, filterFactory, entityInterceptorFactory, scopedResources), ISettingRepository
 {
     protected override Task<Guid> OnAddAsync(SettingEntity entry, Setting rawEntry, CancellationToken cancellationToken)
     {

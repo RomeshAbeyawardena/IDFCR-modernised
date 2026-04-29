@@ -17,11 +17,16 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IIdentifiable<Guid>, IOut
 
     public override void Map(IOutboxEntity source)
     {
-        Map(source);
+        Data = source.Data;
+        CompletedTimestampUtc = source.CompletedTimestampUtc;
+        FailedTimestampUtc = source.FailedTimestampUtc;
+        AcknowledgedTimestampUtc = source.AcknowledgedTimestampUtc;
+        CreatedTimestampUtc = source.CreatedTimestampUtc;
+        ModifiedTimestampUtc = source.ModifiedTimestampUtc;
     }
 }
 
-public class OutboxEntityNotificationHandler(IScopedResources scopedResources) : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>(scopedResources)
+public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
 {
     public override IOutboxEntity Map(IOutboxEntity entity)
     {

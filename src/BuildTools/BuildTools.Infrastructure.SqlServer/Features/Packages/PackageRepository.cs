@@ -1,6 +1,7 @@
 ﻿using BuildTools.Infrastructure.Features.Packages;
 using BuildTools.Shared.Features.Packages;
 using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore;
@@ -10,9 +11,9 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildTools.Infrastructure.SqlServer.Features.Packages;
 
 [RegisteredRepository]
-public class PackageRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory)
-    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IPackage, PackageEntity, Package, Guid>(
-        db, filterFactory, entityInterceptorFactory), IPackageRepository
+public class PackageRepository(PackageManagerDbContext db, IFilterFactory filterFactory, IEntityInterceptorFactory entityInterceptorFactory, IScopedResources scopedResources)
+    : EntityFrameworkRepositoryBase<PackageManagerDbContext, IPackage, PackageEntity, Package, Guid>
+    (db, filterFactory, entityInterceptorFactory, scopedResources), IPackageRepository
 {
     public async Task<IUnitResult<Package>> GetPackageAsync(string? name, string? @namespace, CancellationToken cancellationToken)
     {
