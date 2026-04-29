@@ -103,7 +103,7 @@ namespace IDFCR.Abstractions.Persistence
             var originalNode = JsonSerializer.SerializeToNode(original);
             var updatedNode = JsonSerializer.SerializeToNode(updated);
 
-            return JsonNode.DeepEquals(originalNode, updatedNode);
+            return !JsonNode.DeepEquals(originalNode, updatedNode);
         }
 
 
@@ -236,7 +236,7 @@ namespace IDFCR.Abstractions.Persistence
 
                     if (!HasChanges(clonedEntity, foundEntry))
                     {
-                        return UnitResult.Failed<TKey>(new InvalidOperationException("No changes deteccted"), UnitAction.None, FailureReason.None);
+                        return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
                     }
 
                     var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,

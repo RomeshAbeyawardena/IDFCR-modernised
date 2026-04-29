@@ -38,6 +38,12 @@ public class SettingRepository(PackageManagerDbContext db, IFilterFactory filter
         return UnitResult.FromResult(base.Map(result));
     }
 
+    protected override bool HasChanges(SettingEntity original, SettingEntity updated)
+    {
+        return original.Value != updated.Value
+            || original.Type != updated.Type;
+    }
+
     public Task<IUnitResult<Setting>> GetSettingAsync(string key, string? type, CancellationToken cancellationToken)
     {
         return GetSettingAsync(key, type, null, cancellationToken);
