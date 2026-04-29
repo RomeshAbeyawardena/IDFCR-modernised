@@ -4,6 +4,7 @@ using BuildTools.Infrastructure.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildTools.Infrastructure.SqlServer.Migrations
 {
     [DbContext(typeof(PackageManagerDbContext))]
-    partial class PackageManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429203737_Added_outbox_entity")]
+    partial class Added_outbox_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

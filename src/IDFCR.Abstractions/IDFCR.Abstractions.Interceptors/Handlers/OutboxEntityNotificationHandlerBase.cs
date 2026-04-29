@@ -49,6 +49,8 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
             {
                 ScopedResources?.AddOrUpdate<IIdentifiable<TKey>>(new DefaultIdentifiable<TKey> { Id = id.Value });
             }
+
+            return id;
         }
 
         return null;
