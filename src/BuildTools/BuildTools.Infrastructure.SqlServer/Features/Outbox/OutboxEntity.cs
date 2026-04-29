@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.Interceptors;
-using IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
 
@@ -23,27 +22,5 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IIdentifiable<Guid>, IOut
         AcknowledgedTimestampUtc = source.AcknowledgedTimestampUtc;
         CreatedTimestampUtc = source.CreatedTimestampUtc;
         ModifiedTimestampUtc = source.ModifiedTimestampUtc;
-    }
-}
-
-public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
-{
-    public override IOutboxEntity Map(IOutboxEntity entity)
-    {
-        var outbox = new OutboxEntity();
-
-        outbox.Map(entity);
-
-        return outbox;
-    }
-
-    public override Task<Guid?> NotifyAsync(Guid id, OutboxEntity entity, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task<Guid?> NotifyAsync(OutboxEntity entity, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 }

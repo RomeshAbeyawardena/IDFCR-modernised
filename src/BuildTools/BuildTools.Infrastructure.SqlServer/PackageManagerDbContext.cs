@@ -1,4 +1,5 @@
 ﻿using BuildTools.Infrastructure.SqlServer.Features.Environments;
+using BuildTools.Infrastructure.SqlServer.Features.Outbox;
 using BuildTools.Infrastructure.SqlServer.Features.Packages;
 using BuildTools.Infrastructure.SqlServer.Features.Packages.Version;
 using BuildTools.Infrastructure.SqlServer.Features.Settings;
@@ -12,6 +13,7 @@ public class PackageManagerDbContext(DbContextOptions<PackageManagerDbContext> o
     : DbContext(options), IUnitOfWork
 {
     public DbSet<EnvironmentEntity> Environments { get; set; }
+    public DbSet<OutboxEntity> OutboxEntities { get; set; }
     public DbSet<PackageEntity> Packages { get; set; }
 
     public DbSet<PackageTagEntity> PackageTags { get; set; }
