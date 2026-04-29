@@ -9,4 +9,8 @@ public class DbSettings
     public string? InitialCatalog { get; set; }
     public string? UserId { get; set; }
     public string? Password { get; set; }
+
+    // Outbox file backup (for later replay service)
+    public bool EnableOutboxFileBackup { get; set; } = true;
+    public string? OutboxFileBackupDirectory { get; set; }
 }

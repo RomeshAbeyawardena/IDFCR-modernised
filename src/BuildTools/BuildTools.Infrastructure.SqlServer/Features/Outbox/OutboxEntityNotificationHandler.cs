@@ -3,11 +3,12 @@ using IDFCR.Abstractions.Persistence.Extensions;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Outbox;
 
-public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
+public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupAppender)
+    : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
 {
     private static async Task<Guid?> UpsertOutboxEntityAsync(PackageManagerDbContext context, OutboxEntity entity, bool commitChanges, Guid? id, CancellationToken cancellationToken)
     {
-        var foundEntity = id.HasValue 
+        var foundEntity = id.HasValue
             ? await context.OutboxEntities.FindAsync([id.Value], cancellationToken)
             : entity;
 
@@ -17,9 +18,7 @@ public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBa
         }
         else
         {
-            //add it anyway, at least it won't be lost!
             var entry = await context.OutboxEntities.AddAsync(entity, cancellationToken);
-
             id = entry.Property(x => x.Id).CurrentValue;
         }
 
@@ -34,9 +33,7 @@ public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBa
     public override IOutboxEntity Map(IOutboxEntity entity)
     {
         var outbox = new OutboxEntity();
-
         outbox.Map(entity);
-
         return outbox;
     }
 
@@ -47,6 +44,8 @@ public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBa
             return null;
         }
 
+        entity.Id = id;
+        await backupAppender.AppendAsync(entity, cancellationToken); // write-ahead durable backup
         return await UpsertOutboxEntityAsync(context, entity, true, id, cancellationToken);
     }
 
@@ -57,6 +56,7 @@ public class OutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBa
             return null;
         }
 
+        await backupAppender.AppendAsync(entity, cancellationToken); // write-ahead durable backup
         return await UpsertOutboxEntityAsync(context, entity, false, null, cancellationToken);
     }
 }

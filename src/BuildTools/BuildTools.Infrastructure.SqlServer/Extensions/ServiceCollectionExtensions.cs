@@ -15,22 +15,19 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         var currentAssembly = typeof(PackageManagerDbContext).Assembly;
-
         var settings = configuration.Get<DbSettings>() ?? throw new InvalidOperationException("Unable to bind settings");
 
-        if (!settings.ConnectionStrings.TryGetValue(settings.DefaultConnectionStringName
-            ?? throw new InvalidOperationException("Default connection string not specified")
-            , out var connectionString))
+        if (!settings.ConnectionStrings.TryGetValue(
+                settings.DefaultConnectionStringName ?? throw new InvalidOperationException("Default connection string not specified"),
+                out var connectionString))
         {
             throw new InvalidOperationException("Connection string unavailable");
         }
-
 
         DbConnectionStringBuilder connectionStringBuilder = new()
         {
             ConnectionString = connectionString
         };
-
 
         if (!string.IsNullOrWhiteSpace(settings.Server))
         {
@@ -52,6 +49,18 @@ public static class ServiceCollectionExtensions
             connectionStringBuilder.Add("Password", settings.Password);
         }
 
+        if (settings.EnableOutboxFileBackup)
+        {
+            var backupDir = settings.OutboxFileBackupDirectory
+                ?? Path.Combine(AppContext.BaseDirectory, "outbox-replay");
+
+            services.AddSingleton<IOutboxFileBackupAppender>(_ => new OutboxFileBackupAppender(backupDir));
+        }
+        else
+        {
+            services.AddSingleton<IOutboxFileBackupAppender>(_ => new NoOpOutboxFileBackupAppender());
+        }
+
         return services
             .AddTransient<IOutboxEntityNotificationHandler, OutboxEntityNotificationHandler>()
             .AddRepositories(currentAssembly)
@@ -59,6 +68,10 @@ public static class ServiceCollectionExtensions
             .EnableDetailedErrors(settings.EnableDetailedErrors))
             .AddInterceptors(currentAssembly)
             .ScanFilters(currentAssembly);
+    }
 
+    private sealed class NoOpOutboxFileBackupAppender : IOutboxFileBackupAppender
+    {
+        public Task AppendAsync(OutboxEntity entity, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }
