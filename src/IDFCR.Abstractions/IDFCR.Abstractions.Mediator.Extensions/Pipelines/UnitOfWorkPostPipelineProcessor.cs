@@ -31,6 +31,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
 
         if (outboxProcessor is not null && scopedResources is not null)
         {
+            outboxProcessor.ScopedResources = scopedResources;
             if (logger.IsEnabled(LogLevel.Information))
             {
                 logger.LogInformation("Scoped resources count: {count}", scopedResources.Items.Count);

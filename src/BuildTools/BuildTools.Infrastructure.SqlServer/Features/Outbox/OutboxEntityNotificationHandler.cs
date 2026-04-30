@@ -59,4 +59,9 @@ public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupApp
         await backupAppender.AppendAsync(entity, cancellationToken); // write-ahead durable backup
         return await UpsertOutboxEntityAsync(context, entity, false, null, cancellationToken);
     }
+
+    public override Task<object?> NotifyAsync(object id, object entity, CancellationToken cancellationToken)
+    {
+        return base.NotifyAsync(id, entity, cancellationToken);
+    }
 }

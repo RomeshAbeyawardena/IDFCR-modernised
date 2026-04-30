@@ -60,11 +60,11 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     public abstract Task<TKey?> NotifyAsync(TKey id, TEntity entity, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public async Task<object?> NotifyAsync(object id, object entity, CancellationToken cancellationToken)
+    public virtual async Task<object?> NotifyAsync(object id, object entity, CancellationToken cancellationToken)
     {
-        if (id is IIdentifiable key && key.Id is not null && entity is TEntity typedEntity)
+        if (id is IIdentifiable key && key.Id is TKey keyId && entity is TEntity typedEntity)
         {
-            return await NotifyAsync(key.Id, typedEntity, cancellationToken);
+            return await NotifyAsync(keyId, typedEntity, cancellationToken);
         }
 
         return null;
