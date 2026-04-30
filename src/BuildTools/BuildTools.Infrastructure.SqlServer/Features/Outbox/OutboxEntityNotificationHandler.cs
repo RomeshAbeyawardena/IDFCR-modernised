@@ -7,7 +7,7 @@ namespace BuildTools.Infrastructure.SqlServer.Features.Outbox;
 public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupAppender)
     : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
 {
-    private static async Task<Guid?> UpsertOutboxEntityAsync(PackageManagerDbContext context, OutboxEntity entity, bool commitChanges, Guid? id, CancellationToken cancellationToken)
+    private async Task<Guid?> UpsertOutboxEntityAsync(PackageManagerDbContext context, OutboxEntity entity, bool commitChanges, Guid? id, CancellationToken cancellationToken)
     {
         var foundEntity = id.HasValue
             ? await context.OutboxEntities.FindAsync([id.Value], cancellationToken)
@@ -15,10 +15,7 @@ public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupApp
 
         if (id.HasValue && foundEntity is not null)
         {
-            foundEntity.AcknowledgedTimestampUtc = entity.AcknowledgedTimestampUtc;
-            foundEntity.CompletedTimestampUtc = entity.CompletedTimestampUtc;
-            foundEntity.FailedTimestampUtc = entity.FailedTimestampUtc;
-            foundEntity.ModifiedTimestampUtc = entity.ModifiedTimestampUtc;
+            SetMetaData(foundEntity, entity);
         }
         else
         {
