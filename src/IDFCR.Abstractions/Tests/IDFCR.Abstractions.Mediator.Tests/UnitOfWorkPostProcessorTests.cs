@@ -194,7 +194,7 @@ internal class UnitOfWorkPostProcessorTests
         IOutboxEntity? captured = null;
         _outboxHandler
             .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((entity, _, _) => captured = entity as IOutboxEntity)
+            .Callback<object, object, CancellationToken>((_, entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
@@ -223,7 +223,7 @@ internal class UnitOfWorkPostProcessorTests
         IOutboxEntity? captured = null;
         _outboxHandler
             .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((entity, _, _) => captured = entity as IOutboxEntity)
+            .Callback<object, object, CancellationToken>((_, entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
@@ -276,7 +276,7 @@ internal class UnitOfWorkPostProcessorTests
         IOutboxEntity? captured = null;
         _outboxHandler
             .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((e, _, _) => captured = e as IOutboxEntity)
+            .Callback<object, object, CancellationToken>((_, e, _) => captured = e as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
