@@ -14,6 +14,7 @@ public class OutboxEntityConfiguration : IEntityTypeConfiguration<OutboxEntity>
 
         builder.Property(e => e.Id)
             .HasColumnName("OutboxId")
+            .ValueGeneratedOnAdd()
             .HasDefaultValueSql("NEWSEQUENTIALID()", "DF_OutboxId")
             .IsRequired();
 

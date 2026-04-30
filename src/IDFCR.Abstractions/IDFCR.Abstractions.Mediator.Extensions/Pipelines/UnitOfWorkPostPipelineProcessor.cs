@@ -15,9 +15,9 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 /// <typeparam name="TRequest">The type of request being processed.</typeparam>
 /// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
 /// <param name="unitOfWork">The unit of work instance used to commit changes.</param>
-/// <param name="timeProvider"></param>
-/// <param name="serviceProvider"></param>
-/// <param name="logger"></param>
+/// <param name="timeProvider">The time provider used to obtain the current time.</param>
+/// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
+/// <param name="logger">The logger used to log information and errors.</param>
 public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork unitOfWork, TimeProvider timeProvider,
     IServiceProvider serviceProvider, ILogger<UnitOfWorkPostPipelineProcessor<TRequest, TResponse>> logger) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull

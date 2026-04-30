@@ -63,8 +63,8 @@ public abstract class MapperBase<TSource>() : IMapper<TSource>
     }
 
     /// <summary>
-    /// 
+    /// Maps the values from the specified source object to the current instance. This method must be implemented by derived classes to define the specific mapping logic for the source type. The implementation should copy relevant properties and values from the source object to the current instance, allowing for transformation and mapping of data as needed. The Map method serves as the core mapping function that enables derived classes to perform custom mapping operations based on their specific requirements and use cases.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="source">The source object from which values will be mapped to the current instance.</param>
     public abstract void Map(TSource source);
 }

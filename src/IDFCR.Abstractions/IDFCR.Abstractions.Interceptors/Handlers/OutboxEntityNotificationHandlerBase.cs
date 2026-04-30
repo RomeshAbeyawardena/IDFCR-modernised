@@ -18,6 +18,19 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     where TKey : struct
 {
     /// <summary>
+    /// Sets the metadata properties of the target outbox entity based on the source outbox entity. This method is responsible for copying the relevant metadata properties (AcknowledgedTimestampUtc, CompletedTimestampUtc, FailedTimestampUtc, ModifiedTimestampUtc) from the source entity to the target entity, allowing for the tracking of the status and timestamps associated with outbox messages. By using this method, developers can ensure that the metadata properties of outbox entities are properly updated and maintained during processing and notification handling within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="target">The target outbox entity whose metadata properties will be updated.</param>
+    /// <param name="source">The source outbox entity from which metadata properties will be copied.</param>
+    protected void SetMetaData(TEntity target, TEntity source)
+    {
+        target.AcknowledgedTimestampUtc = source.AcknowledgedTimestampUtc;
+        target.CompletedTimestampUtc = source.CompletedTimestampUtc;
+        target.FailedTimestampUtc = source.FailedTimestampUtc;
+        target.ModifiedTimestampUtc = source.ModifiedTimestampUtc;
+    }
+
+    /// <summary>
     /// <inheritdoc />
     /// </summary>
     public IScopedResources? ScopedResources { get; set; }

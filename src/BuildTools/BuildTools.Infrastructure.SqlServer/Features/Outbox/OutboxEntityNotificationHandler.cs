@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Persistence.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Outbox;
 
@@ -14,12 +15,15 @@ public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupApp
 
         if (id.HasValue && foundEntity is not null)
         {
-            foundEntity.Apply(entity);
+            foundEntity.AcknowledgedTimestampUtc = entity.AcknowledgedTimestampUtc;
+            foundEntity.CompletedTimestampUtc = entity.CompletedTimestampUtc;
+            foundEntity.FailedTimestampUtc = entity.FailedTimestampUtc;
+            foundEntity.ModifiedTimestampUtc = entity.ModifiedTimestampUtc;
         }
         else
         {
-            var entry = await context.OutboxEntities.AddAsync(entity, cancellationToken);
-            id = entry.Property(x => x.Id).CurrentValue;
+            entity.Id = Guid.NewGuid();
+            await context.OutboxEntities.AddAsync(entity, cancellationToken);
         }
 
         if (commitChanges)
@@ -27,7 +31,7 @@ public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupApp
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        return id;
+        return entity.Id;
     }
 
     public override IOutboxEntity Map(IOutboxEntity entity)
