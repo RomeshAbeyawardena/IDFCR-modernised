@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings.Processors;
 
-public class SettingAuditProcessor() : AuditProcessorBase<SettingEntity, SettingAuditEntity>(nameof(SettingEntity))
+public class SettingAuditProcessor(TimeProvider timeProvider) : AuditProcessorBase<SettingEntity, SettingAuditEntity>(nameof(SettingEntity))
 {
     private PackageManagerDbContext? context;
 
@@ -35,7 +35,7 @@ public class SettingAuditProcessor() : AuditProcessorBase<SettingEntity, Setting
 
             if (string.IsNullOrWhiteSpace(changes))
             {
-                return UnitResult.Success(UnitAction.Add);
+                return UnitResult.Success(UnitAction.None);
             }
 
             context.SettingAudits.Add(new SettingAuditEntity
@@ -43,7 +43,8 @@ public class SettingAuditProcessor() : AuditProcessorBase<SettingEntity, Setting
                 OldValueJson = JsonSerializer.Serialize(oldValue),
                 NewValueJson = JsonSerializer.Serialize(newValue),
                 SettingId = newValue.Id,
-                ChangeDescription = changes
+                ChangeDescription = changes,
+                CreatedTimestampUtc = timeProvider.GetUtcNow()
             });
         }
         
