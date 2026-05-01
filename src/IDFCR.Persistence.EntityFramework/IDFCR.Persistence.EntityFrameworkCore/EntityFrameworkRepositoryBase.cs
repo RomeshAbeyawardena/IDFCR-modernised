@@ -60,7 +60,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         if (entry is IIdentifiable<Guid> guidEntry && guidEntry.Id == Guid.Empty)
         {
             // Generate the sequential GUID before the tracker gets involved
-            guidEntry.Id = new SequentialGuidValueGenerator().Next(null);
+            guidEntry.Id = new SequentialGuidValueGenerator().Next(null!);
         }
 
         var trackedEntry = await DbSet.AddAsync(entry, cancellationToken);
