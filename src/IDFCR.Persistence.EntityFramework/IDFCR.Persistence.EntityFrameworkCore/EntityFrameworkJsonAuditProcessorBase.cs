@@ -47,6 +47,30 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     }
 
     /// <summary>
+    /// Formats a line of the change description for a given field name, old value, and new value. This method can be overridden by derived classes to provide custom logic for formatting the change description, allowing developers to customize the output based on specific requirements or preferences. The default implementation of this method returns a string in the format "{fieldName} changed from '{oldValue}' to '{newValue}'.", indicating the change that occurred for the specified field. By overriding this method, developers can implement custom formatting logic to generate change descriptions that are more suitable for their specific use cases or requirements related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
+    /// </summary>
+    /// <param name="fieldName">The name of the field that changed.</param>
+    /// <param name="oldValue">The old value of the field.</param>
+    /// <param name="newValue">The new value of the field.</param>
+    /// <returns>A formatted string describing the change.</returns>
+    protected virtual string FormatLine(string fieldName, TEntity oldValue, TEntity newValue)
+    {
+        return $"{fieldName} changed from '{oldValue}' to '{newValue}'.";
+    }
+
+    /// <summary>
+    /// Audits the changes between the old and new values of the entity being audited, generating a change description based on the differences between the old and new values. This method can be overridden by derived classes to provide custom logic for generating the change description, allowing developers to customize the output based on specific requirements or preferences. The default implementation of this method calls the base implementation of AuditChangeDescriptionAsync, passing in a formatting function that utilizes the FormatLine method to generate the change description for each field that has changed. By overriding this method, developers can implement custom logic to generate change descriptions that are more suitable for their specific use cases or requirements related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
+    /// </summary>
+    /// <param name="oldValue">The old value of the entity being audited.</param>
+    /// <param name="newValue">The new value of the entity being audited.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the change description.</returns>
+    protected virtual Task<string> AuditChangeDescriptionAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
+    {
+        return this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, (f,o,n) => FormatLine(f, (TEntity)o, (TEntity)n), LookupAsync);
+    }
+
+    /// <summary>
     /// Audits the changes between the old and new values of the entity being audited, creating an audit entry in the database context if there are changes to be recorded. This method retrieves the current DbContext from the scoped resources, generates a change description based on the differences between the old and new values, and creates a new audit entity with the relevant information, including the old and new values serialized as JSON, the change description, and a timestamp. The audit entry is then added to the database context for persistence. If there are no changes to be recorded, the method returns a successful result without adding an audit entry. By overriding this method, developers can implement custom logic for auditing changes to entities based on specific requirements and use cases related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
     /// </summary>
     /// <param name="oldValue">The old value of the entity being audited.</param>
@@ -57,7 +81,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     {
         if (Provider!.InterceptorFactory!.ScopedResources!.TryGetScopedResource(out TDbContext? context))
         {
-            var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
+            var changes = await AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken);
 
             if (string.IsNullOrWhiteSpace(changes))
             {
