@@ -74,7 +74,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
 
             ApplyEntryData(oldValue, newValue);
 
-            audit.Add(entity);
+            await audit.AddAsync(entity, cancellationToken);
         }
 
         return UnitResult.Success(UnitAction.Add);
