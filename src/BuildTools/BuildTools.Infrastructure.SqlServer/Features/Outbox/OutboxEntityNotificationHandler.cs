@@ -45,7 +45,7 @@ public class OutboxEntityNotificationHandler(IOutboxFileBackupAppender backupApp
             return null;
         }
 
-        entity.Id = id;
+        //entity.Id = id;
         await backupAppender.AppendAsync(entity, cancellationToken); // write-ahead durable backup
         return await UpsertOutboxEntityAsync(context, entity, true, id, cancellationToken);
     }

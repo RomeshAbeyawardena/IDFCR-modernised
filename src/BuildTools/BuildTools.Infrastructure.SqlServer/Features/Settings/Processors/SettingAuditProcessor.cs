@@ -1,8 +1,4 @@
 ﻿using IDFCR.Persistence.EntityFrameworkCore;
-using IDFCR.Abstractions.Interceptors.Extensions;
-using IDFCR.Abstractions.Results;
-
-using System.Text.Json;
 
 using Microsoft.EntityFrameworkCore;
 

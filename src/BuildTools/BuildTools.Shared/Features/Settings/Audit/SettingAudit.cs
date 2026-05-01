@@ -9,6 +9,7 @@ public class SettingAudit : MapperBase<ISettingAudit>, ISettingAudit
     public string? ChangeDescription { get; set; }
     public string? OldValueJson { get; set; }
     public string? NewValueJson { get; set; }
+    public DateTimeOffset CreatedTimestampUtc { get; set; }
 
     public override void Map(ISettingAudit source)
     {
@@ -17,5 +18,6 @@ public class SettingAudit : MapperBase<ISettingAudit>, ISettingAudit
         ChangeDescription = source.ChangeDescription;
         OldValueJson = source.OldValueJson;
         NewValueJson = source.NewValueJson;
+        CreatedTimestampUtc = source.CreatedTimestampUtc;
     }
 }
