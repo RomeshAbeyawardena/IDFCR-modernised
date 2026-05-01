@@ -7,7 +7,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Filters\IDFCR.Abstractions.Filters.csproj" />
-    <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Interceptors\IDFCR.Abstractions.Interceptors.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Interceptors.Extensions\IDFCR.Abstractions.Interceptors.Extensions.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Mapper\IDFCR.Abstractions.Mapper.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
