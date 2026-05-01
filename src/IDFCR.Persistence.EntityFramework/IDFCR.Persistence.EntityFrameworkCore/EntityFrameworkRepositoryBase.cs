@@ -28,7 +28,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         IFilterFactory filterFactory, 
         IEntityInterceptorFactory entityInterceptorFactory, 
         IScopedResources scopedResources)
-    : RepositoryBase<TCommon, TDb, T, TKey>(entityInterceptorFactory)
+    : RepositoryBase<TCommon, TDb, T, TKey>(entityInterceptorFactory), ITransactionalUnitOfWork
     where TDbContext : DbContext
     where TKey : struct
     where TDb : class, IMapper<TCommon>, TCommon, IIdentifiable<TKey>
@@ -213,5 +213,35 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         }
 
         return base.UpsertAsync(entry, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public IDbTransaction BeginTransaction()
+    {
+        return new DbTransactionWrapper(Db.Database.BeginTransaction());
+    }
+
+    /// <inheritdoc />
+    public void Commit(IDbTransaction transaction)
+    {
+        transaction.Commit();
+    }
+
+    /// <inheritdoc />
+    public void Rollback(IDbTransaction transaction)
+    {
+        transaction.Rollback();
+    }
+
+    /// <inheritdoc />
+    public Task CommitAsync(IDbTransaction transaction, CancellationToken cancellationToken)
+    {
+        return transaction.CommitAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task RollbackAsync(IDbTransaction transaction, CancellationToken cancellationToken)
+    {
+        return transaction.RollbackAsync(cancellationToken);
     }
 }
