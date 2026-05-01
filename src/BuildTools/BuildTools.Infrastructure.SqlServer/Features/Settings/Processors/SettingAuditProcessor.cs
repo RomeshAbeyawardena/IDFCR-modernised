@@ -1,4 +1,4 @@
-﻿using IDFCR.Abstractions.Interceptors.Processors;
+﻿using IDFCR.Persistence.EntityFrameworkCore;
 using IDFCR.Abstractions.Interceptors.Extensions;
 using IDFCR.Abstractions.Results;
 
@@ -8,15 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Settings.Processors;
 
-public class SettingAuditProcessor(TimeProvider timeProvider) : AuditProcessorBase<SettingEntity, SettingAuditEntity>(nameof(SettingEntity))
+public class SettingAuditProcessor(TimeProvider timeProvider) 
+    : EntityFrameworkJsonAuditProcessorBase<PackageManagerDbContext, SettingEntity, SettingAuditEntity>(nameof(SettingEntity), ctx => ctx.SettingAudits, timeProvider)
 {
-    private PackageManagerDbContext? context;
-
-    private async Task<object?> LookupAsync(string key, object value, CancellationToken cancellationToken)
+    protected async override Task<object?> LookupAsync(string key, object value, CancellationToken cancellationToken)
     {
         if (key == "Environment" && value is Guid id)
         {
-            var environment = (await context!.Environments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken));
+            var environment = (await Context!.Environments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken));
 
             if (environment is not null)
             {
@@ -27,27 +26,8 @@ public class SettingAuditProcessor(TimeProvider timeProvider) : AuditProcessorBa
         return null;
     }
 
-    public override async Task<IUnitResult> AuditChangesAsync(SettingEntity oldValue, SettingEntity newValue, CancellationToken cancellationToken)
+    protected override void ApplyEntryData(SettingAuditEntity auditEntity, SettingEntity oldValue, SettingEntity newValue)
     {
-        if (Provider!.InterceptorFactory!.ScopedResources!.TryGetScopedResource(out context))
-        {
-            var changes = await this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, deferredLookupAsyncAction: LookupAsync);
-
-            if (string.IsNullOrWhiteSpace(changes))
-            {
-                return UnitResult.Success(UnitAction.None);
-            }
-
-            context.SettingAudits.Add(new SettingAuditEntity
-            {
-                OldValueJson = JsonSerializer.Serialize(oldValue),
-                NewValueJson = JsonSerializer.Serialize(newValue),
-                SettingId = newValue.Id,
-                ChangeDescription = changes,
-                CreatedTimestampUtc = timeProvider.GetUtcNow()
-            });
-        }
-        
-        return UnitResult.Success(UnitAction.Add);
+        auditEntity.SettingId = newValue.Id;
     }
 }
