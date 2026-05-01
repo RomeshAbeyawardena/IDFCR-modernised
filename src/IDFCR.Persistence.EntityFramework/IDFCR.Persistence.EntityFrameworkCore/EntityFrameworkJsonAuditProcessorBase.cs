@@ -8,7 +8,7 @@ using IDFCR.Abstractions.Metadata;
 namespace IDFCR.Persistence.EntityFrameworkCore;
 
 /// <summary>
-/// Represents a base class for processing audit changes in an Entity Framework context, allowing for the tracking of changes to entities and the generation of audit logs. This abstract class provides a foundation for creating custom audit processors by defining common properties and methods that can be overridden by derived classes. The EntityFrameworkAuditProcessorBase class allows developers to specify the entity type and corresponding audit entity type for auditing changes, as well as an implementation of the AuditChangesAsync method to handle the processing of audit changes related to entities within an Entity Framework context. By inheriting from this base class, developers can implement custom logic for auditing changes to entities based on specific requirements and use cases related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
+/// Represents a base class for processing JSON-based audits using Entity Framework, allowing for the tracking of changes to entities in a JSON format within a database context. This abstract class provides a foundation for creating custom audit processors by defining common properties and methods that can be overridden by derived classes. The EntityFrameworkJsonAuditProcessorBase class allows developers to specify the entity type and corresponding audit entity type for JSON-based audits, as well as an implementation of the AuditChangesAsync method to handle the auditing of changes to entities. By inheriting from this base class, developers can implement custom logic for auditing changes to entities based on specific requirements and use cases related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
 /// </summary>
 /// <typeparam name="TDbContext">The type of the Entity Framework DbContext.</typeparam>
 /// <typeparam name="TEntity">The type of the entity being audited.</typeparam>
@@ -16,7 +16,7 @@ namespace IDFCR.Persistence.EntityFrameworkCore;
 /// <param name="entityName">The name of the entity.</param>
 /// <param name="contextEntityFactory">A factory function to create the DbSet for the entity.</param>
 /// <param name="timeProvider">A provider for the current time.</param>
-public abstract class EntityFrameworkAuditProcessorBase<TDbContext, TEntity, TAuditEntity>(string entityName, 
+public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity, TAuditEntity>(string entityName, 
     Func<TDbContext, DbSet<TEntity>> contextEntityFactory,
     TimeProvider timeProvider) :  AuditProcessorBase<TEntity, TAuditEntity>(entityName)
     where TDbContext : DbContext
