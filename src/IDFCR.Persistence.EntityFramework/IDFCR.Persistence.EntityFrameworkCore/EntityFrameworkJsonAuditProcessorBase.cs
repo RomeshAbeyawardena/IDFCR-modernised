@@ -16,9 +16,9 @@ namespace IDFCR.Persistence.EntityFrameworkCore;
 /// <param name="entityName">The name of the entity.</param>
 /// <param name="contextEntityFactory">A factory function to create the DbSet for the entity.</param>
 /// <param name="timeProvider">A provider for the current time.</param>
-public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity, TAuditEntity>(string entityName, 
+public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity, TAuditEntity>(string entityName,
     Func<TDbContext, DbSet<TAuditEntity>> contextEntityFactory,
-    TimeProvider timeProvider) :  AuditProcessorBase<TEntity, TAuditEntity>(entityName)
+    TimeProvider timeProvider) : AuditProcessorBase<TEntity, TAuditEntity>(entityName)
     where TDbContext : DbContext
     where TEntity : class
     where TAuditEntity : class, IJsonAudit, new()
@@ -53,7 +53,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <param name="oldValue">The old value of the field.</param>
     /// <param name="newValue">The new value of the field.</param>
     /// <returns>A formatted string describing the change.</returns>
-    protected virtual string FormatLine(string fieldName, TEntity oldValue, TEntity newValue)
+    protected virtual string FormatLine(string fieldName, object oldValue, object newValue)
     {
         return $"{fieldName} changed from '{oldValue}' to '{newValue}'.";
     }
@@ -67,7 +67,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <returns>A task that represents the asynchronous operation. The task result contains the change description.</returns>
     protected virtual Task<string> AuditChangeDescriptionAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
     {
-        return this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, (f,o,n) => FormatLine(f, (TEntity)o, (TEntity)n), LookupAsync);
+        return this.AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken, FormatLine, LookupAsync);
     }
 
     /// <summary>
@@ -79,29 +79,32 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <returns>A task that represents the asynchronous operation. The task result contains the result of the audit operation.</returns>
     public override async Task<IUnitResult> AuditChangesAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
     {
-        if (Provider!.InterceptorFactory!.ScopedResources!.TryGetScopedResource(out TDbContext? context))
+        if (!Provider!.InterceptorFactory!.ScopedResources!.TryGetScopedResource(out TDbContext? context))
         {
-            var changes = await AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken);
-
-            if (string.IsNullOrWhiteSpace(changes))
-            {
-                return UnitResult.Success(UnitAction.None);
-            }
-
-            var audit = contextEntityFactory(context);
-
-            var entity = new TAuditEntity
-            {
-                OldValueJson = JsonSerializer.Serialize(oldValue),
-                NewValueJson = JsonSerializer.Serialize(newValue),
-                ChangeDescription = changes,
-                CreatedTimestampUtc = timeProvider.GetUtcNow()
-            };
-
-            ApplyEntryData(entity, oldValue, newValue);
-
-            await audit.AddAsync(entity, cancellationToken);
+            return UnitResult.Success(UnitAction.None);
         }
+
+        var changes = await AuditChangeDescriptionAsync(oldValue, newValue, cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(changes))
+        {
+            return UnitResult.Success(UnitAction.None);
+        }
+
+        var audit = contextEntityFactory(context);
+
+        var entity = new TAuditEntity
+        {
+            OldValueJson = JsonSerializer.Serialize(oldValue),
+            NewValueJson = JsonSerializer.Serialize(newValue),
+            ChangeDescription = changes,
+            CreatedTimestampUtc = timeProvider.GetUtcNow()
+        };
+
+        ApplyEntryData(entity, oldValue, newValue);
+
+        await audit.AddAsync(entity, cancellationToken);
+
 
         return UnitResult.Success(UnitAction.Add);
     }
