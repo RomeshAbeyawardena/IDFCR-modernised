@@ -23,6 +23,35 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     where TEntity : class
     where TAuditEntity : class, IJsonAudit, new()
 {
+    private TDbContext? _context;
+
+    /// <summary>
+    /// Gets the current DbContext from the scoped resources of the interceptor factory. This property provides access to the DbContext for performing database operations related to auditing changes to entities. The DbContext is retrieved using the GetDbContext method, which checks if the DbContext is cached and retrieves it from the scoped resources if it is not already cached. If the DbContext cannot be retrieved, this property returns null, allowing derived classes to handle cases where the DbContext is not available for auditing operations.
+    /// </summary>
+    protected TDbContext? Context => GetDbContext();
+
+    /// <summary>
+    /// Gets the current DbContext from the scoped resources of the interceptor factory. This method checks if the DbContext is cached, and if not, it attempts to retrieve it from the scoped resources of the interceptor factory. If the DbContext is successfully retrieved, it is cached for future use. If the DbContext cannot be retrieved, the method returns null. This allows derived classes to access the DbContext for performing database operations related to auditing changes to entities.
+    /// </summary>
+    /// <returns>The current DbContext if available; otherwise, null.</returns>
+    protected TDbContext? GetDbContext()
+    {
+        if (_context is not null)
+        {
+            return _context;
+        }
+
+        if (Provider is null
+            || Provider.InterceptorFactory is null
+            || Provider.InterceptorFactory.ScopedResources is null
+            || !Provider.InterceptorFactory.ScopedResources.TryGetScopedResource(out TDbContext? context))
+        {
+            return null;
+        }
+
+        return _context = context;
+    }
+
     /// <summary>
     /// Looks up additional information for a given key and value, allowing for the retrieval of related data or context that may be relevant to the audit process. This method can be overridden by derived classes to provide custom logic for looking up information based on specific keys and values, enabling developers to enhance the audit logs with additional context or details that may be relevant to the changes being audited. The default implementation of this method returns a completed task with a null result, indicating that no additional information is available for the given key and value. By overriding this method, developers can implement custom lookup logic to enrich the audit logs with relevant information based on specific keys and values related to the entities being audited.
     /// </summary>
@@ -79,10 +108,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <returns>A task that represents the asynchronous operation. The task result contains the result of the audit operation.</returns>
     public override async Task<IUnitResult> AuditChangesAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
     {
-        if (Provider is null
-            || Provider.InterceptorFactory is null
-            || Provider.InterceptorFactory.ScopedResources is null
-            || !Provider.InterceptorFactory.ScopedResources.TryGetScopedResource(out TDbContext? context))
+        if (Context is null)
         {
             return UnitResult.Success(UnitAction.None);
         }
@@ -94,7 +120,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
             return UnitResult.Success(UnitAction.None);
         }
 
-        var audit = contextEntityFactory(context);
+        var audit = contextEntityFactory(Context!);
 
         var entity = new TAuditEntity
         {
