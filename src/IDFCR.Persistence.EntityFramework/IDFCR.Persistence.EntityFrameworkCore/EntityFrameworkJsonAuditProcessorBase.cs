@@ -17,10 +17,11 @@ namespace IDFCR.Persistence.EntityFrameworkCore;
 /// <param name="contextEntityFactory">A factory function to create the DbSet for the entity.</param>
 /// <param name="timeProvider">A provider for the current time.</param>
 public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity, TAuditEntity>(string entityName, 
-    Func<TDbContext, DbSet<TEntity>> contextEntityFactory,
+    Func<TDbContext, DbSet<TAuditEntity>> contextEntityFactory,
     TimeProvider timeProvider) :  AuditProcessorBase<TEntity, TAuditEntity>(entityName)
     where TDbContext : DbContext
-    where TEntity : class, IJsonAudit, new()
+    where TEntity : class
+    where TAuditEntity : class, IJsonAudit, new()
 {
     /// <summary>
     /// Looks up additional information for a given key and value, allowing for the retrieval of related data or context that may be relevant to the audit process. This method can be overridden by derived classes to provide custom logic for looking up information based on specific keys and values, enabling developers to enhance the audit logs with additional context or details that may be relevant to the changes being audited. The default implementation of this method returns a completed task with a null result, indicating that no additional information is available for the given key and value. By overriding this method, developers can implement custom lookup logic to enrich the audit logs with relevant information based on specific keys and values related to the entities being audited.
@@ -37,15 +38,16 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <summary>
     /// Applies additional data to the audit entry based on the old and new values of the entity being audited. This method can be overridden by derived classes to provide custom logic for applying additional data to the audit entry, allowing developers to include relevant information or context that may be important for understanding the changes being audited. The default implementation of this method does not perform any operations, indicating that no additional data is applied to the audit entry by default. By overriding this method, developers can implement custom logic to enrich the audit entry with relevant information based on the old and new values of the entity being audited.
     /// </summary>
+    /// <param name="auditEntity">The audit entity being updated.</param>
     /// <param name="oldValue">The old value of the entity being audited.</param>
     /// <param name="newValue">The new value of the entity being audited.</param>
-    protected virtual void ApplyEntryData(TEntity oldValue, TEntity newValue)
+    protected virtual void ApplyEntryData(TAuditEntity auditEntity, TEntity oldValue, TEntity newValue)
     {
 
     }
 
     /// <summary>
-    /// Audits the changes between the old and new values of the entity being audited, generating an audit log entry that captures the changes made to the entity. This method is responsible for comparing the old and new values of the entity, generating a change description, and creating an audit entry in the database context if there are changes to be recorded. The method retrieves the database context from the scoped resources of the interceptor factory, generates a change description using the AuditChangeDescriptionAsync method, and creates a new audit entity with the relevant information about the changes. If there are no changes to be recorded, the method returns a successful result without adding an audit entry. By overriding this method, developers can implement custom logic for auditing changes to entities based on specific requirements and use cases related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
+    /// Audits the changes between the old and new values of the entity being audited, creating an audit entry in the database context if there are changes to be recorded. This method retrieves the current DbContext from the scoped resources, generates a change description based on the differences between the old and new values, and creates a new audit entity with the relevant information, including the old and new values serialized as JSON, the change description, and a timestamp. The audit entry is then added to the database context for persistence. If there are no changes to be recorded, the method returns a successful result without adding an audit entry. By overriding this method, developers can implement custom logic for auditing changes to entities based on specific requirements and use cases related to data auditing and change tracking within applications that utilize Entity Framework for data access and management.
     /// </summary>
     /// <param name="oldValue">The old value of the entity being audited.</param>
     /// <param name="newValue">The new value of the entity being audited.</param>
@@ -64,7 +66,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
 
             var audit = contextEntityFactory(context);
 
-            var entity = new TEntity
+            var entity = new TAuditEntity
             {
                 OldValueJson = JsonSerializer.Serialize(oldValue),
                 NewValueJson = JsonSerializer.Serialize(newValue),
@@ -72,7 +74,7 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
                 CreatedTimestampUtc = timeProvider.GetUtcNow()
             };
 
-            ApplyEntryData(oldValue, newValue);
+            ApplyEntryData(entity, oldValue, newValue);
 
             await audit.AddAsync(entity, cancellationToken);
         }
