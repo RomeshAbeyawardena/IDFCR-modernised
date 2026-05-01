@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace BuildTools.Infrastructure.SqlServer.Features.Outbox;
 
@@ -14,7 +15,7 @@ public class OutboxEntityConfiguration : IEntityTypeConfiguration<OutboxEntity>
 
         builder.Property(e => e.Id)
             .HasColumnName("OutboxId")
-            .ValueGeneratedOnAdd()
+            .HasValueGenerator<SequentialGuidValueGenerator>()
             .HasDefaultValueSql("NEWSEQUENTIALID()", "DF_OutboxId")
             .IsRequired();
 
