@@ -12,6 +12,12 @@ public interface ITransactionalUnitOfWork : IUnitOfWork
     IDbTransaction BeginTransaction();
 
     /// <summary>
+    /// Gets the current transaction associated with this unit of work. If no transaction is currently active, this method may return null or throw an exception, depending on the implementation. This allows callers to access the transaction for committing or rolling back changes as needed.
+    /// </summary>
+    /// <returns>The current transaction associated with this unit of work.</returns>
+    IDbTransaction GetCurrentTransaction();
+
+    /// <summary>
     /// Commits all pending changes to the underlying data store as a single atomic operation. If the operation fails, no changes are saved. This method is typically used in unit of work or transactional scenarios to ensure data consistency.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -28,6 +34,7 @@ public interface ITransactionalUnitOfWork : IUnitOfWork
     /// <summary>
     /// Rolls back all pending changes to the underlying data store, discarding any modifications made since the last commit. This method is typically used in unit of work or transactional scenarios to undo changes when an error occurs or when the operations performed within the transaction need to be discarded for any reason.
     /// </summary>
+    /// <param name="transaction">The transaction to roll back.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous rollback operation.</returns>
     Task RollbackAsync(IDbTransaction transaction, CancellationToken cancellationToken);

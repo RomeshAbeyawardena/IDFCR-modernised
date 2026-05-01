@@ -9,6 +9,7 @@ using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
 
@@ -218,7 +219,20 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <inheritdoc />
     public IDbTransaction BeginTransaction()
     {
+        if (Db.Database.CurrentTransaction is not null)
+        {
+            throw new InvalidOperationException("Transaction already in progress.");
+        }
+
         return new DbTransactionWrapper(Db.Database.BeginTransaction());
+    }
+
+    /// <inheritdoc />
+    public IDbTransaction GetCurrentTransaction()
+    {
+        return Db.Database.CurrentTransaction is null
+            ? throw new InvalidOperationException("No active transaction.")
+            : new DbTransactionWrapper(Db.Database.CurrentTransaction);
     }
 
     /// <inheritdoc />
