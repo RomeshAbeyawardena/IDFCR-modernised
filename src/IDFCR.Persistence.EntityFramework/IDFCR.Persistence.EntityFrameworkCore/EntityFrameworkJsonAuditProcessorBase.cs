@@ -79,7 +79,10 @@ public abstract class EntityFrameworkJsonAuditProcessorBase<TDbContext, TEntity,
     /// <returns>A task that represents the asynchronous operation. The task result contains the result of the audit operation.</returns>
     public override async Task<IUnitResult> AuditChangesAsync(TEntity oldValue, TEntity newValue, CancellationToken cancellationToken)
     {
-        if (!Provider!.InterceptorFactory!.ScopedResources!.TryGetScopedResource(out TDbContext? context))
+        if (Provider is null
+            || Provider.InterceptorFactory is null
+            || Provider.InterceptorFactory.ScopedResources is null
+            || !Provider.InterceptorFactory.ScopedResources.TryGetScopedResource(out TDbContext? context))
         {
             return UnitResult.Success(UnitAction.None);
         }
