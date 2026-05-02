@@ -1,6 +1,23 @@
 namespace IDFCR.Abstractions.Mapper;
 
 /// <summary>
+/// Represents a dual mapping interface that defines methods for mapping between two source types. This interface extends the <see cref="IMapper{TSource}"/> interface, allowing for mapping operations that involve two different source types. The Map method with two source parameters enables mapping from both source types to the current instance, facilitating complex mapping scenarios where data from multiple sources needs to be combined or transformed. By implementing this interface, developers can create flexible and reusable mapping logic that can handle various mapping scenarios involving multiple source types, improving code maintainability and versatility in applications and systems that utilize this interface.
+/// </summary>
+/// <typeparam name="TSource">The type of the first source object to be mapped.</typeparam>
+/// <typeparam name="TSource1">The type of the second source object to be mapped.</typeparam>
+public interface IMapper<TSource, TSource1> : IMapper<TSource>
+    where TSource : IMapper<TSource>
+    where TSource1 : IMapper<TSource1>
+{
+    /// <summary>
+    /// Maps the specified source objects to the current instance. This method allows for updating the current instance with values from both source objects, enabling complex mapping scenarios where data from multiple sources needs to be combined or transformed. By using this method, developers can efficiently update existing instances with new data from both source objects, improving the versatility and reusability of mapping operations within applications and systems that utilize this interface.
+    /// </summary>
+    /// <param name="source">The first source object to be mapped.</param>
+    /// <param name="secondSource">The second source object to be mapped.</param>
+    void Map(TSource source, TSource1 secondSource);
+}
+
+/// <summary>
 /// Represents a mapping interface that defines methods for mapping between a source type and a target type. This interface provides a contract for implementing classes to perform mapping operations, allowing for the transformation of data from one type to another. The Map methods allow for both parameterized and parameterless mapping, while the Map method with a source parameter allows for mapping from a specific source instance. By implementing this interface, developers can create flexible and reusable mapping logic that can be used across different parts of an application or system, facilitating data transformation and improving code maintainability.
 /// </summary>
 /// <typeparam name="TSource">The type of the source object to be mapped.</typeparam>

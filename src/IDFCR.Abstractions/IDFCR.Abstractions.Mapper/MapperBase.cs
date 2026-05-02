@@ -68,3 +68,28 @@ public abstract class MapperBase<TSource>() : IMapper<TSource>
     /// <param name="source">The source object from which values will be mapped to the current instance.</param>
     public abstract void Map(TSource source);
 }
+
+
+/// <summary>
+/// Represents a base class for implementing the <see cref="IMapper{TSource, TSource1}"/> interface, providing a foundation for mapping between two source types. This abstract class implements the mapping logic for both source types, allowing derived classes to focus on the specific mapping implementation. The Map method with two source parameters is implemented to call the individual Map methods for each source type, enabling a structured approach to mapping from multiple sources. By inheriting from this base class, developers
+/// </summary>
+/// <typeparam name="TSource">The type of the first source object to be mapped.</typeparam>
+/// <typeparam name="TSource1">The type of the second source object to be mapped.</typeparam>
+public abstract class MapperBase<TSource, TSource1> : MapperBase<TSource>, IMapper<TSource, TSource1>
+    where TSource : IMapper<TSource>
+    where TSource1 : IMapper<TSource1>
+{
+    /// <inheritdoc />
+    public abstract void Map(TSource1 secondSource);
+
+    /// <summary>
+    /// Maps the specified source objects to the current instance. This method allows for mapping from both source types to the current instance by calling the individual Map methods for each source type. By using this method, developers can efficiently combine or transform data from multiple sources, improving the versatility and reusability of mapping operations within applications and systems that utilize this interface.
+    /// </summary>
+    /// <param name="source">The first source object to be mapped.</param>
+    /// <param name="secondSource">The second source object to be mapped.</param>
+    public void Map(TSource source, TSource1 secondSource)
+    {
+        Map(source);
+        Map(secondSource);
+    }
+}
