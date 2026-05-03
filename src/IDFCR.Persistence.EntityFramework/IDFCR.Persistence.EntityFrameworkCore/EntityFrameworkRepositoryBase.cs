@@ -24,11 +24,12 @@ namespace IDFCR.Persistence.EntityFrameworkCore;
 /// <param name="db">The DbContext instance.</param>
 /// <param name="filterFactory">The filter factory instance.</param>
 /// <param name="entityInterceptorFactory">The entity interceptor factory instance.</param>
-/// <param name="scopedResources"></param>
+/// <param name="scopedResources">The scoped resources instance.</param>
+/// <param name="upsertBehaviour">The upsert behavior for the repository.</param>
 public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T, TKey>(TDbContext db, 
         IFilterFactory filterFactory, 
         IEntityInterceptorFactory entityInterceptorFactory, 
-        IScopedResources scopedResources)
+        IScopedResources scopedResources, RepositoryUpsertBehaviour upsertBehaviour = default)
     : RepositoryBase<TCommon, TDb, T, TKey>(entityInterceptorFactory), ITransactionalUnitOfWork
     where TDbContext : DbContext
     where TKey : struct
@@ -153,6 +154,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <returns>The key of the updated entity.</returns>
     protected override async Task<TKey> OnUpdateAsync(TDb entry, T rawEntry, CancellationToken cancellationToken)
     {
+        if (upsertBehaviour == RepositoryUpsertBehaviour.ForwardOnly)
+        {
+            throw new InvalidOperationException("Update operations are not allowed with ForwardOnly upsert type repositories.");
+        }
+
         await Task.CompletedTask;
         DbSet.Update(entry);
         return entry.Id;
