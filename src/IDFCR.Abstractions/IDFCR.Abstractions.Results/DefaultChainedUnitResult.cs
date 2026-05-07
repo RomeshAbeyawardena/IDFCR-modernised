@@ -2,29 +2,29 @@ namespace IDFCR.Abstractions.Results;
 
 internal static class ChainedUnitResultResolver
 {
-    public static bool ResolveIsSuccess(IUnitResult first, IUnitResult second, bool setAsFailWhenAnyUnitsFail)
+    public static bool ResolveIsSuccess(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
         => setAsFailWhenAnyUnitsFail
-            ? first.IsSuccess && second.IsSuccess
-            : second.IsSuccess;
+            ? current.IsSuccess && last.IsSuccess
+            : current.IsSuccess;
 
-    public static Exception? ResolveException(IUnitResult first, IUnitResult second, bool setAsFailWhenAnyUnitsFail)
+    public static Exception? ResolveException(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
     {
         if (!setAsFailWhenAnyUnitsFail)
         {
-            return second.Exception;
+            return current.Exception;
         }
 
-        return first.Exception ?? second.Exception;
+        return current.Exception ?? last.Exception;
     }
 
-    public static FailureReason? ResolveFailureReason(IUnitResult first, IUnitResult second, bool setAsFailWhenAnyUnitsFail)
+    public static FailureReason? ResolveFailureReason(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
     {
         if (!setAsFailWhenAnyUnitsFail)
         {
-            return second.FailureReason;
+            return current.FailureReason;
         }
 
-        return first.FailureReason ?? second.FailureReason;
+        return current.FailureReason ?? last.FailureReason;
     }
 }
 
