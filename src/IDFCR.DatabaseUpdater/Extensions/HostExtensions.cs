@@ -22,13 +22,15 @@ public static class HostExtensions
     /// <param name="args">A collection of command-line arguments.</param>
     /// <param name="configurationHostConfiguration">An optional action to configure the host's configuration.</param>
     /// <param name="configureServices">An optional action to configure additional services in the host.</param>
-    /// /// <param name="listOperations">A boolean indicating whether to list available operations.</param>
+    /// <param name="configureHost">An optional action to configure the host itself.</param>
+    /// <param name="listOperations">A boolean indicating whether to list available operations.</param>
     /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
     /// <param name="assembliesToScan">An array of assemblies to scan for database update operations.</param>
     /// <returns>An <see cref="IDisposable"/> representing the configured host.</returns>
     public static async Task<IDisposable> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance,
         IEnumerable<string> args, Action<IConfigurationBuilder>? configurationHostConfiguration = null,
         Action<HostBuilderContext, IServiceCollection>? configureServices = null,
+        Action<IHostBuilder>? configureHost = null,
         bool listOperations = false, CancellationToken? cancellationToken = null,
         params System.Reflection.Assembly[] assembliesToScan)
     {
@@ -46,6 +48,8 @@ public static class HostExtensions
 
         hostBuilder.ConfigureServices((hostContext, services) => services
             .ConfigureDatabaseUpdater(configurationInstance, assembliesToScan));
+
+        configureHost?.Invoke(hostBuilder);
 
         var host = hostBuilder.Build();
 
