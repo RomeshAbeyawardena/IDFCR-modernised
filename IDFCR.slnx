@@ -45,6 +45,7 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
+    <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Results.Tests/IDFCR.Abstractions.Results.Tests.csproj" />
     <Project Path="src/IDFCR.TestUtilities/IDFCR.TestUtilities.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.DatabaseUpdater/">
