@@ -5,17 +5,15 @@ internal static class ChainedUnitResultResolver
     public static bool ResolveIsSuccess(IUnitResult first, IUnitResult second, bool setAsFailWhenAnyUnitsFail)
         => setAsFailWhenAnyUnitsFail
             ? first.IsSuccess && second.IsSuccess
-            : first.IsSuccess;
+            : second.IsSuccess;
 
     public static Exception? ResolveException(IUnitResult first, IUnitResult second, bool setAsFailWhenAnyUnitsFail)
     {
         if (!setAsFailWhenAnyUnitsFail)
         {
-            return first.Exception;
+            return second.Exception;
         }
 
-        if (!first.IsSuccess) return first.Exception;
-        if (!second.IsSuccess) return second.Exception;
         return first.Exception ?? second.Exception;
     }
 
@@ -23,11 +21,9 @@ internal static class ChainedUnitResultResolver
     {
         if (!setAsFailWhenAnyUnitsFail)
         {
-            return first.FailureReason;
+            return second.FailureReason;
         }
 
-        if (!first.IsSuccess) return first.FailureReason;
-        if (!second.IsSuccess) return second.FailureReason;
         return first.FailureReason ?? second.FailureReason;
     }
 }
@@ -37,20 +33,20 @@ internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception 
 {
     public IUnitResult Current { get; } = null!;
 
-    public DefaultChainedUnitResult(IUnitResult unitResult, IUnitResult secondUnitResult, bool setAsFailWhenAnyUnitsFail = true)
+    public DefaultChainedUnitResult(IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
         : this(
-            secondUnitResult,
-            ChainedUnitResultResolver.ResolveException(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail),
-            unitResult.Action,
-            ChainedUnitResultResolver.ResolveIsSuccess(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail),
-            ChainedUnitResultResolver.ResolveFailureReason(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail))
+            lastResult,
+            ChainedUnitResultResolver.ResolveException(currentResult, lastResult, setAsFailWhenAnyUnitsFail),
+            currentResult.Action,
+            ChainedUnitResultResolver.ResolveIsSuccess(currentResult, lastResult, setAsFailWhenAnyUnitsFail),
+            ChainedUnitResultResolver.ResolveFailureReason(currentResult, lastResult, setAsFailWhenAnyUnitsFail))
     {
-        foreach (var (key, value) in unitResult.Meta)
+        foreach (var (key, value) in lastResult.Meta)
         {
             AddMeta(key, value);
         }
 
-        Current = unitResult;
+        Current = currentResult;
     }
 }
 
@@ -60,20 +56,20 @@ internal record DefaultChainedUnitResult<T>(IUnitResult Last, T? Value = default
     IUnitResult IChainedUnitResult.Current => Current;
     public IUnitResult<T> Current { get; } = null!;
 
-    public DefaultChainedUnitResult(IUnitResult<T> unitResult, IUnitResult secondUnitResult, bool setAsFailWhenAnyUnitsFail = true)
+    public DefaultChainedUnitResult(IUnitResult<T> currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
         : this(
-            secondUnitResult,
-            unitResult.Result,
-            ChainedUnitResultResolver.ResolveException(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail),
-            unitResult.Action,
-            ChainedUnitResultResolver.ResolveIsSuccess(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail),
-            ChainedUnitResultResolver.ResolveFailureReason(unitResult, secondUnitResult, setAsFailWhenAnyUnitsFail))
+            lastResult,
+            currentResult.Result,
+            ChainedUnitResultResolver.ResolveException(currentResult, lastResult, setAsFailWhenAnyUnitsFail),
+            currentResult.Action,
+            ChainedUnitResultResolver.ResolveIsSuccess(currentResult, lastResult, setAsFailWhenAnyUnitsFail),
+            ChainedUnitResultResolver.ResolveFailureReason(currentResult, lastResult, setAsFailWhenAnyUnitsFail))
     {
-        foreach (var (key, value) in unitResult.Meta)
+        foreach (var (key, value) in lastResult.Meta)
         {
             AddMeta(key, value);
         }
 
-        Current = unitResult;
+        Current = currentResult;
     }
 }
