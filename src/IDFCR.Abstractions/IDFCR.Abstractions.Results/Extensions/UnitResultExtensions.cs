@@ -1,4 +1,5 @@
 using IDFCR.Abstractions.Mapper;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IDFCR.Abstractions.Results.Extensions;
 
@@ -17,7 +18,7 @@ public static class UnitResultExtensions
     {
         int? value = null;
         if (result.Meta.TryGetValue(key, out var val)
-            && int.TryParse(value?.ToString(), out int _value))
+            && int.TryParse(val?.ToString(), out int _value))
         {
             value = _value;
         }
@@ -149,5 +150,24 @@ public static class UnitResultExtensions
             result.Map(x);
             return result;
         });
+    }
+
+    /// <summary>
+    /// Checks if the unit result is a chained result and outputs the chained result if it is. Returns true if the result is a chained result, otherwise false.
+    /// </summary>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="chainedResult">The chained result if the unit result is a chained result, otherwise null.</param>
+    /// <returns>True if the unit result is a chained result, otherwise false.</returns>
+    public static bool IsChainedResult(this IUnitResult result,
+        [NotNullWhen(true)] out IChainedUnitResult? chainedResult)
+    {
+        chainedResult = default;
+        if (result is IChainedUnitResult chained)
+        {
+            chainedResult = chained;
+            return true;
+        }
+        
+        return false;
     }
 }
