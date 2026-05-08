@@ -19,10 +19,10 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.HostExtensions/IDFCR.Abstractions.GRPC.HostExtensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC/IDFCR.Abstractions.GRPC.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
-	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.Extensions/IDFCR.Abstractions.Interceptors.Extensions.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.Extensions/IDFCR.Abstractions.Interceptors.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors/IDFCR.Abstractions.Interceptors.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mapper.Extensions/IDFCR.Abstractions.Mapper.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mapper/IDFCR.Abstractions.Mapper.csproj" />
-	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mapper.Extensions/IDFCR.Abstractions.Mapper.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator.Extensions/IDFCR.Abstractions.Mediator.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator/IDFCR.Abstractions.Mediator.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
@@ -45,7 +45,9 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
-    <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Results.Tests/IDFCR.Abstractions.Results.Tests.csproj" />
+    <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Results.Tests/IDFCR.Abstractions.Results.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="src/IDFCR.TestUtilities/IDFCR.TestUtilities.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.DatabaseUpdater/">

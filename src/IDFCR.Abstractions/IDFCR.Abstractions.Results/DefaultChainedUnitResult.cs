@@ -1,36 +1,32 @@
 namespace IDFCR.Abstractions.Results;
 
-internal static class ChainedUnitResultResolver
-{
-    public static bool ResolveIsSuccess(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
-        => setAsFailWhenAnyUnitsFail
-            ? current.IsSuccess && last.IsSuccess
-            : current.IsSuccess;
-
-    public static Exception? ResolveException(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
-    {
-        if (!setAsFailWhenAnyUnitsFail)
-        {
-            return current.Exception;
-        }
-
-        return current.Exception ?? last.Exception;
-    }
-
-    public static FailureReason? ResolveFailureReason(IUnitResult current, IUnitResult last, bool setAsFailWhenAnyUnitsFail)
-    {
-        if (!setAsFailWhenAnyUnitsFail)
-        {
-            return current.FailureReason;
-        }
-
-        return current.FailureReason ?? last.FailureReason;
-    }
-}
-
 internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception = null, UnitAction Action = UnitAction.None, bool IsSuccess = false, FailureReason? FailureReason = FailureReason.None)
     : DefaultUnitResult(Exception, Action, IsSuccess, FailureReason), IChainedUnitResult
 {
+    public static IEnumerable<IUnitResult> Enumerate(IUnitResult target)
+    {
+        List<IUnitResult> items = [];
+        Stack<IUnitResult> stack = [];
+        stack.Push(target);
+
+        while (stack.Count > 0)
+        {
+            var result = stack.Pop();
+
+            if (result is IChainedUnitResult chained)
+            {
+                // Push in reverse so Current is processed before Last.
+                stack.Push(chained.Last);
+                stack.Push(chained.Current);
+                continue;
+            }
+
+            items.Add(result);
+        }
+
+        return items;
+    }
+
     public IUnitResult Current { get; } = null!;
 
     public DefaultChainedUnitResult(IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
@@ -47,6 +43,26 @@ internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception 
         }
 
         Current = currentResult;
+    }
+
+    public IUnitResult GetRoot()
+    {
+        return Enumerate().LastOrDefault() ?? this;
+    }
+
+    public IUnitResult GetFirstFailure()
+    {
+        return Enumerate().FirstOrDefault(r => !r.IsSuccess) ?? this;
+    }
+
+    public IEnumerable<IUnitResult> Enumerate()
+    {
+        return Enumerate(this);
+    }
+
+    public IUnitResult GetDeepest()
+    {
+        return Enumerate().FirstOrDefault() ?? this;
     }
 }
 
@@ -71,5 +87,25 @@ internal record DefaultChainedUnitResult<T>(IUnitResult Last, T? Value = default
         }
 
         Current = currentResult;
+    }
+
+    public IUnitResult GetRoot()
+    {
+        return Enumerate().LastOrDefault() ?? this;
+    }
+
+    public IUnitResult GetFirstFailure()
+    {
+        return Enumerate().FirstOrDefault(r => !r.IsSuccess) ?? this;
+    }
+
+    public IEnumerable<IUnitResult> Enumerate()
+    {
+        return DefaultChainedUnitResult.Enumerate(this);
+    }
+
+    public IUnitResult GetDeepest()
+    {
+        return Enumerate().FirstOrDefault() ?? this;
     }
 }

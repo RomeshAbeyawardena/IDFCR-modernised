@@ -134,5 +134,8 @@ internal class ChainUnitResultTests
             Assert.That(chained.Last, Is.SameAs(second));
             Assert.That(chained.Current, Is.SameAs(first));
         });
+
+        IEnumerable<IUnitResult> chainedList = [.. chained.Enumerate()];
+        Assert.That(chainedList, Has.Exactly(2).Items);
     }
 }
