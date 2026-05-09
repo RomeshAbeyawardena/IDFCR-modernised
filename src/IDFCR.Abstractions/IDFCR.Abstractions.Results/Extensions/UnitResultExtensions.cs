@@ -64,11 +64,31 @@ public static class UnitResultExtensions
         }
     }
 
+    
     /// <summary>
     /// Returns the result value when available, otherwise a supplied default value.
+    /// <para>Use this when you don't need to inspect the unit result itself.</para>
     /// </summary>
+    /// <typeparam name="T">The type of the result value.</typeparam>
+    /// <param name="value">The unit result containing the value.</param>
+    /// <param name="default">The default value to return if the result is not available.</param>
+    /// <returns>The result value if available; otherwise, the default value.</returns>
     public static T? GetResultOrDefault<T>(this IUnitResult<T> value, T? @default = default)
     {
+        return GetResultOrDefault(value, out _, @default);
+    }
+
+    /// <summary>
+    /// Return the result value when available, otherwise a supplied default value. Also outputs the unit result for further inspection if needed.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value.</typeparam>
+    /// <param name="value">The unit result containing the value.</param>
+    /// <param name="result">The unit result for further inspection.</param>
+    /// <param name="default">The default value to return if the result is not available.</param>
+    /// <returns>The result value if available; otherwise, the default value.</returns>
+    public static T? GetResultOrDefault<T>(this IUnitResult<T> value, out IUnitResult result, T? @default = default)
+    {
+        result = value;
         if (value.HasValue)
         {
             return value.Result;
