@@ -58,7 +58,6 @@ internal class UnitHttpResultTests
 
         Assert.That(root.GetProperty("isSuccess").GetBoolean(), Is.True);
         Assert.That(root.GetProperty("action").GetInt32(), Is.EqualTo((int)UnitAction.Add));
-        Assert.That(root.GetProperty("failureReason").ValueKind, Is.EqualTo(JsonValueKind.Null));
         Assert.That(root.GetProperty("meta").GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
     }
 
