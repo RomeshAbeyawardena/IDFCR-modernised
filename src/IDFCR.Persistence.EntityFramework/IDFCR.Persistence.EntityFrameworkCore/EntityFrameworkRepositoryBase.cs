@@ -38,6 +38,10 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     where T : class, IMapper<TCommon>, TCommon
 {
     /// <summary>
+    /// Gets a boolean value indicating whether the repository should default to using no tracking for queries. This property is set to true by default, meaning that when retrieving entities from the database, the repository will not track changes to those entities in the DbContext. This can improve performance for read-only scenarios where tracking is not necessary. However, derived classes can override this property to change the default behavior if they require tracking for certain operations. By providing this property, the repository base class allows for flexibility in how entities are managed and tracked within the context of Entity Framework Core while adhering to the repository pattern.
+    /// </summary>
+    public bool DefaultsToNoTracking { get; protected set; } = true;
+    /// <summary>
     /// Gets the last tracked entity entry for the database entity type. This property provides access to the EntityEntry object that represents the last tracked entity of the specified database entity type. The EntityEntry contains information about the state of the entity, such as whether it is added, modified, or deleted, and allows for tracking changes to the entity during the lifecycle of the DbContext. By exposing this property, the repository base class enables derived classes to access and utilize the tracking information for entities when performing operations such as updates or deletes, while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>
     protected EntityEntry<TDb>? LastTrackedEntry { get; private set; }
@@ -53,7 +57,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <summary>
     /// Gets the DbSet for the specified database entity type with no tracking. This property provides access to the DbSet of the specified database entity type, allowing derived classes to perform read-only operations without tracking changes to the entities. By using AsNoTracking, this property ensures that the entities retrieved from the database are not tracked by the DbContext, which can improve performance for read-only scenarios. Derived classes can use this property when they do not need to modify the entities and want to optimize query performance while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>
-    protected IQueryable<TDb> DbSet => RawDbSet.AsNoTracking();
+    protected IQueryable<TDb> DbSet => DefaultsToNoTracking ? RawDbSet.AsNoTracking() : RawDbSet;
 
     /// <summary>
     /// Gets the raw DbSet for the specified database entity type. This property provides direct access to the DbSet without applying AsNoTracking, allowing derived classes to perform operations that require tracking changes to entities, such as updates or deletes. By exposing this property, the repository base class enables derived classes to have more control over the tracking behavior of entities when necessary, while still providing the option to use the DbSet property for read-only operations that do not require tracking. This design allows for flexibility in how entities are managed and manipulated within the repository while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
