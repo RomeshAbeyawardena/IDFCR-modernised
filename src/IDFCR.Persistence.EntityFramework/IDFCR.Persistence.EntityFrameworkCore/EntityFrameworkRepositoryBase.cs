@@ -8,6 +8,7 @@ using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
@@ -37,6 +38,10 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     where T : class, IMapper<TCommon>, TCommon
 {
     /// <summary>
+    /// Gets the last tracked entity entry for the database entity type. This property provides access to the EntityEntry object that represents the last tracked entity of the specified database entity type. The EntityEntry contains information about the state of the entity, such as whether it is added, modified, or deleted, and allows for tracking changes to the entity during the lifecycle of the DbContext. By exposing this property, the repository base class enables derived classes to access and utilize the tracking information for entities when performing operations such as updates or deletes, while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    protected EntityEntry<TDb>? LastTrackedEntry { get; private set; }
+    /// <summary>
     /// Gets the DbContext instance used for database operations. This property provides access to the underlying DbContext, allowing derived classes to perform various database operations such as querying, adding, updating, and deleting entities. By exposing this property, the repository base class enables derived classes to leverage the full capabilities of Entity Framework Core for data management while adhering to the repository pattern. This allows for efficient and flexible data access while maintaining a clean separation of concerns between the repository and the database context.
     /// </summary>
     protected TDbContext Db => db;
@@ -46,10 +51,14 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// </summary>
     protected IFilterFactory FilterFactory { get; } = filterFactory;
     /// <summary>
-    /// Gets the DbSet for the specified database entity type. This property provides access to the DbSet, which represents the collection of entities in the database context. The DbSet is used for performing CRUD operations on the entities, such as adding, updating, deleting, and querying data. By exposing this property, the repository base class allows derived classes to easily access and manipulate the underlying data in the database through Entity Framework Core's DbSet functionality. This enables efficient data access and management while adhering to the repository pattern.
+    /// Gets the DbSet for the specified database entity type with no tracking. This property provides access to the DbSet of the specified database entity type, allowing derived classes to perform read-only operations without tracking changes to the entities. By using AsNoTracking, this property ensures that the entities retrieved from the database are not tracked by the DbContext, which can improve performance for read-only scenarios. Derived classes can use this property when they do not need to modify the entities and want to optimize query performance while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>
-    protected DbSet<TDb> DbSet { get; } = db.Set<TDb>();
+    protected IQueryable<TDb> DbSet => RawDbSet.AsNoTracking();
 
+    /// <summary>
+    /// Gets the raw DbSet for the specified database entity type. This property provides direct access to the DbSet without applying AsNoTracking, allowing derived classes to perform operations that require tracking changes to entities, such as updates or deletes. By exposing this property, the repository base class enables derived classes to have more control over the tracking behavior of entities when necessary, while still providing the option to use the DbSet property for read-only operations that do not require tracking. This design allows for flexibility in how entities are managed and manipulated within the repository while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    protected DbSet<TDb> RawDbSet { get; } = db.Set<TDb>();
     /// <summary>
     /// Defines an asynchronous method for adding a new entity to the database. This method takes an instance of the database entity, the raw entity, and a cancellation token as parameters. It adds the entity to the DbSet and returns the key of the newly added entity. The method is designed to be overridden by derived classes to provide specific implementation details for adding entities to the database. By utilizing this method, developers can ensure that new entities are properly added to the database while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
     /// </summary>
@@ -65,10 +74,10 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
             guidEntry.Id = new SequentialGuidValueGenerator().Next(null!);
         }
 
-        var trackedEntry = await DbSet.AddAsync(entry, cancellationToken);
+        LastTrackedEntry = await RawDbSet.AddAsync(entry, cancellationToken);
 
         // Now CurrentValue is guaranteed to be the sequential GUID you just set
-        return trackedEntry.Property(x => x.Id).CurrentValue;
+        return LastTrackedEntry.Property(x => x.Id).CurrentValue;
     }
 
     /// <summary>
@@ -79,14 +88,14 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <returns>A boolean value indicating whether the deletion was successful.</returns>
     protected override async Task<bool> OnDeleteAsync(TKey key, CancellationToken cancellationToken)
     {
-        var item = await DbSet.FindAsync([key], cancellationToken);
+        var item = await RawDbSet.FindAsync([key], cancellationToken);
 
         if (item is null)
         {
             return false;
         }
 
-        DbSet.Remove(item);
+        RawDbSet.Remove(item);
         return true;
     }
 
@@ -101,7 +110,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     {
         if (trackChanges)
         {
-            return await DbSet.FindAsync([key], cancellationToken);
+            return await RawDbSet.FindAsync([key], cancellationToken);
         }
 
         return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id.Equals(key), cancellationToken);
@@ -118,12 +127,12 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     {
         if (trackChanges)
         {
-            return await DbSet.FindAsync(keys, cancellationToken);
+            return await RawDbSet.FindAsync(keys, cancellationToken);
         }
 
         if (keys.Length > 0)
         {
-            return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id.Equals(keys.First()), cancellationToken);
+            return await DbSet.FirstOrDefaultAsync(x => x.Id.Equals(keys.First()), cancellationToken);
         }
 
         return null;
@@ -160,7 +169,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         }
 
         await Task.CompletedTask;
-        DbSet.Update(entry);
+        LastTrackedEntry = RawDbSet.Update(entry);
         return entry.Id;
     }
 
@@ -175,7 +184,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         {
             if (dbRowVersion.RowVersion is not null)
             {
-                DbSet.Entry(dbValue)
+                RawDbSet.Entry(dbValue)
                     .Property("RowVersion")
                     .OriginalValue = rowVersion.RowVersion;
             }
