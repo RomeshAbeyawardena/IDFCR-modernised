@@ -11,6 +11,7 @@ public interface IUnitResult
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyName(Metadata.Meta.Key)]
     IReadOnlyDictionary<string, object?> Meta { get; }
     
     /// <summary>

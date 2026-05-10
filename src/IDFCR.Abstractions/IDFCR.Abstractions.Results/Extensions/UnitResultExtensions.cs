@@ -33,7 +33,7 @@ public static class UnitResultExtensions
     /// <returns>The total rows value if found and successfully parsed; otherwise, null.</returns>
     public static int? GetTotalPages(IUnitResult result)
     {
-        return GetValue(result, "totalPages");
+        return GetValue(result, Metadata.Meta.Paging.TotalPages);
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public static class UnitResultExtensions
     /// <returns>The page index value if found and successfully parsed; otherwise, null.</returns>
     public static int? GetPageIndex(IUnitResult result)
     {
-        return GetValue(result, "pageIndex");
+        return GetValue(result, Metadata.Meta.Paging.PageIndex);
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public static class UnitResultExtensions
     /// <returns>The page size value if found and successfully parsed; otherwise, null.</returns>
     public static int? GetPageSize(IUnitResult result)
     {
-        return GetValue(result, "pageSize");
+        return GetValue(result, Metadata.Meta.Paging.PageSize);
     }
 
     private static void CloneMeta<TDestination>(IReadOnlyDictionary<string, object?> data, IUnitResult<TDestination> target)
