@@ -55,10 +55,11 @@ internal class UnitHttpResultTests
 
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
-
+        var meta = root.GetProperty("_meta");
+    
         Assert.That(root.GetProperty("isSuccess").GetBoolean(), Is.True);
-        Assert.That(root.GetProperty("action").GetInt32(), Is.EqualTo((int)UnitAction.Add));
-        Assert.That(root.GetProperty("meta").GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
+        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+        Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
     }
 
     [Test]
@@ -104,5 +105,42 @@ internal class UnitHttpResultTests
 
         Assert.That(_httpResponse.StatusCode, Is.EqualTo(StatusCodes.Status406NotAcceptable));
         Assert.That(body, Is.EqualTo("Invalid accept header"));
+    }
+
+    internal class Customer
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public DateTimeOffset RegisteredDate { get; set; }
+    }
+
+    [Test]
+    public async Task ExecuteAsyncWithResultPayload()
+    {
+        // Arrange
+        var result = UnitResult.FromResult(new Customer
+        {
+            Id = 43428,
+            Name = "Bobertson",
+            RegisteredDate = new DateTimeOffset(2025, 02, 03, 11, 30, 00, TimeSpan.Zero)
+        }, UnitAction.Add);
+
+        result.AddMeta("traceId", "abc-123");
+        var httpResult = result.AsHttp();
+
+        // Act
+        await httpResult.ExecuteAsync(_httpContext);
+
+        // Assert
+        var body = _httpResponse.GetBodyAsString();
+        Assert.That(body, Is.Not.Empty);
+
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+        var meta = root.GetProperty("_meta");
+
+        Assert.That(root.GetProperty("isSuccess").GetBoolean(), Is.True);
+        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+        Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
     }
 }
