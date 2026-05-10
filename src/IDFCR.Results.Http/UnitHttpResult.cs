@@ -19,19 +19,23 @@ internal class ChainedUnitHttpResult<T>(IChainedUnitResult<T> result) : UnitHttp
     }
 }
 
-internal class UnitHttpResult<T>(IUnitResult<T> result) : UnitHttpResult(result)
+internal class UnitHttpResult<T>(Abstractions.Results.IUnitResult<T> result) : UnitHttpResult(result)
 {
     public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
     {
-        return response.WriteAsJsonAsync(result, cancellationToken);
+        var unitResult = new UnitResult<T>(result);
+
+        return response.WriteAsJsonAsync(unitResult, cancellationToken);
     }
 }
 
-internal class UnitHttpResult(IUnitResult result) : IUnitHttpResult
+internal class UnitHttpResult(Abstractions.Results.IUnitResult result) : IUnitHttpResult
 {
     public virtual Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
     {
-        return response.WriteAsJsonAsync(result, cancellationToken);
+        var unitResult = new UnitResult(result);
+
+        return response.WriteAsJsonAsync(unitResult, cancellationToken);
     }
 
     public virtual int GetStatusCode()

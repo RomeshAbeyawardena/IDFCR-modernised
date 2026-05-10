@@ -9,6 +9,14 @@ public static class Meta
     /// Defines the key used to store metadata in unit results and other related types.
     /// </summary>
     public const string Key = "_meta";
+    /// <summary>
+    /// Defines the key 
+    /// </summary>
+    public const string FailureReason = "failure_reason";
+    /// <summary>
+    /// 
+    /// </summary>
+    public const string Action = "action";
 
     /// <summary>
     /// Defines the keys used for paging information in paged query results.
