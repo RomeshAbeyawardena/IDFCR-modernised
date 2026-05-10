@@ -72,4 +72,7 @@
   <Folder Name="/src/IDFCR.Results.Http/">
     <Project Path="src/IDFCR.Results.Http/IDFCR.Results.Http.csproj" />
   </Folder>
+  <Folder Name="/src/IDFCR.Results.Http/Tests/">
+    <Project Path="src/IDFCR.Results.Http.Tests/IDFCR.Results.Http.Tests.csproj" />
+  </Folder>
 </Solution>
