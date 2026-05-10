@@ -39,6 +39,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
 {
     /// <summary>
     /// Gets a boolean value indicating whether the repository should default to using no tracking for queries. This property is set to true by default, meaning that when retrieving entities from the database, the repository will not track changes to those entities in the DbContext. This can improve performance for read-only scenarios where tracking is not necessary. However, derived classes can override this property to change the default behavior if they require tracking for certain operations. By providing this property, the repository base class allows for flexibility in how entities are managed and tracked within the context of Entity Framework Core while adhering to the repository pattern.
+    /// <para>⚠️ Unless you know what you're doing it is advisable to leave this field alone as it can impact the behavior of the repository and the performance of database operations.</para>
     /// </summary>
     public bool DefaultsToNoTracking { get; protected set; } = true;
     /// <summary>
