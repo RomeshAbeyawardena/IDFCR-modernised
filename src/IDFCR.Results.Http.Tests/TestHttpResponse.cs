@@ -4,11 +4,16 @@ using System.Text;
 
 namespace IDFCR.Results.Http.Tests;
 
-internal class TestHttpResponse() : HttpResponse
+internal class TestHttpResponse : HttpResponse
 {
     private readonly MemoryStream _bodyStream = new();
-    private readonly TestPipeWriter _pipeWriter = new();
-    private bool _started = false;
+    private readonly PipeWriter _bodyWriter;
+    private bool _started;
+
+    public TestHttpResponse()
+    {
+        _bodyWriter = PipeWriter.Create(_bodyStream);
+    }
 
     public HttpContext Context { get; set; }
 
@@ -16,18 +21,22 @@ internal class TestHttpResponse() : HttpResponse
 
     public override int StatusCode { get; set; } = StatusCodes.Status200OK;
     public override IHeaderDictionary Headers { get; } = new HeaderDictionary();
-    public override Stream Body 
-    { 
-        get => _bodyStream; 
-        set { } // Allow assignment but use internal stream
+    public override Stream Body
+    {
+        get => _bodyStream;
+        set { }
     }
     public override long? ContentLength { get; set; }
     public override string ContentType { get; set; }
     public override IResponseCookies Cookies => throw new NotImplementedException();
-    public override PipeWriter BodyWriter => _pipeWriter;
+    public override PipeWriter BodyWriter => _bodyWriter;
     public override bool HasStarted => _started;
 
-    public string GetBodyAsString() => Encoding.UTF8.GetString(_bodyStream.ToArray());
+    public string GetBodyAsString()
+    {
+        _bodyStream.Position = 0;
+        return Encoding.UTF8.GetString(_bodyStream.ToArray());
+    }
 
     public override Task StartAsync(CancellationToken cancellationToken = default)
     {
