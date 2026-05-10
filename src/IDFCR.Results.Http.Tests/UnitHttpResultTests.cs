@@ -139,8 +139,8 @@ internal class UnitHttpResultTests
         var root = document.RootElement;
         var meta = root.GetProperty("_meta");
 
-        Assert.That(root.GetProperty("isSuccess").GetBoolean(), Is.True);
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+        Assert.That(root.GetProperty(Abstractions.Metadata.Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(meta.GetProperty(Abstractions.Metadata.Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Add)));
         Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
     }
 }

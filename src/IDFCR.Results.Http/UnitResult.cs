@@ -18,7 +18,7 @@ internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitRe
 
         _meta = data.ToDictionary(x => x.Key, y => y.Value?.ToString());
 
-        _meta.Add(Abstractions.Metadata.Meta.Action, unitResult.Action.ToString());
+        _meta.Add(Abstractions.Metadata.Meta.ActionKey, unitResult.Action.ToString());
 
         if (unitResult.FailureReason.HasValue)
         {
@@ -30,34 +30,54 @@ internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitRe
 
     [JsonPropertyName(Abstractions.Metadata.Meta.Key)]
     public IReadOnlyDictionary<string, string?> Meta => ToImmutableDictionary(unitResult.Meta);
+
+    [JsonPropertyName(Abstractions.Metadata.Meta.SuccessKey)]
     public bool IsSuccess { get; } = unitResult.IsSuccess;
 }
 
 internal class UnitResult<T> : UnitResult, IUnitResult<T>
 {
-    private readonly IReadOnlyDictionary<string, string?> results;
-    public UnitResult(Abstractions.Results.IUnitResult<T> unitResult) : base(unitResult)
-    {
-        Dictionary<string, string?> dictionary = unitResult.HasValue
-        ? new (unitResult.Result.ToDictionary())
-        : new ();
+    private readonly IReadOnlyDictionary<string, object?> results;
 
-        dictionary.TryAdd(Abstractions.Metadata.Meta.Key, JsonSerializer.Serialize(Meta, JsonSerializerOptions.Web));
+    protected virtual void AppendToSelf(Dictionary<string, object?> source)
+    {
+        
+    }
+
+    public UnitResult(
+        Abstractions.Results.IUnitResult? unitResult = null,
+        Abstractions.Results.IUnitResult<T>? unitResultWithValue = null) : base(unitResult 
+            ?? unitResultWithValue 
+            ?? throw new ArgumentNullException(nameof(unitResult), "Must provide at least one type of unit result"))
+    {
+        Dictionary<string, object?> dictionary = [];
+
+        if (unitResultWithValue is not null
+            && unitResultWithValue.HasValue)
+        {
+            dictionary = new(unitResultWithValue.Result.ToDictionary());
+        }
+
+        dictionary.TryAdd(Abstractions.Metadata.Meta.SuccessKey, (unitResult 
+            ?? unitResultWithValue
+            ?? throw new ArgumentNullException(nameof(unitResult), "Must provide at least one type of unit result")).IsSuccess);
+        dictionary.TryAdd(Abstractions.Metadata.Meta.Key, Meta);
+        AppendToSelf(dictionary);
         results = dictionary;
     }
 
-    string? IReadOnlyDictionary<string, string?>.this[string key] => results[key];
+    object? IReadOnlyDictionary<string, object?>.this[string key] => results[key];
 
-    IEnumerable<string> IReadOnlyDictionary<string, string?>.Keys => results.Keys;
-    IEnumerable<string?> IReadOnlyDictionary<string, string?>.Values => results.Values;
-    int IReadOnlyCollection<KeyValuePair<string, string?>>.Count => results.Count;
+    IEnumerable<string> IReadOnlyDictionary<string, object?>.Keys => results.Keys;
+    IEnumerable<object?> IReadOnlyDictionary<string, object?>.Values => results.Values;
+    int IReadOnlyCollection<KeyValuePair<string, object?>>.Count => results.Count;
 
-    public IEnumerator<KeyValuePair<string, string?>> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
         return results.GetEnumerator();
     }
 
-    bool IReadOnlyDictionary<string, string?>.ContainsKey(string key)
+    bool IReadOnlyDictionary<string, object?>.ContainsKey(string key)
     {
         return results.ContainsKey(key);
     }
@@ -67,7 +87,7 @@ internal class UnitResult<T> : UnitResult, IUnitResult<T>
         return GetEnumerator();
     }
 
-    bool IReadOnlyDictionary<string, string?>.TryGetValue(string key, out string? value)
+    bool IReadOnlyDictionary<string, object?>.TryGetValue(string key, out object? value)
     {
         return results.TryGetValue(key, out value);
     }

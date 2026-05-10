@@ -24,7 +24,7 @@ internal interface IUnitResult
     bool IsSuccess { get; }
 }
 
-internal interface IUnitResult<T> : IReadOnlyDictionary<string, string?>, IUnitResult
+internal interface IUnitResult<T> : IReadOnlyDictionary<string, object?>, IUnitResult
 {
     
 }

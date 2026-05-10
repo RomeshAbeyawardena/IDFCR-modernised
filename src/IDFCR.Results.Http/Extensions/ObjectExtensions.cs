@@ -6,17 +6,17 @@ namespace IDFCR.Results.Http.Extensions;
 public static class ObjectExtensions
 {
     private static readonly Lazy<ConcurrentDictionary<Type, string[]>> _mappableMemberCache = new([]);
-    public static IReadOnlyDictionary<string, string?> ToDictionary<T>(this T source)
+    public static IReadOnlyDictionary<string, object?> ToDictionary<T>(this T source)
     {
-        Dictionary<string, string?> itemValueDictionary = [];
-        var type = source.GetType();
+        Dictionary<string, object?> itemValueDictionary = [];
+        var type = source?.GetType() ?? typeof(T);
         var sourceAccessor = TypeAccessor.Create(type);
         var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(type, (t) => [.. sourceAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]);
 
         foreach (var name in sourceTypeNames)
         {
             var s = sourceAccessor[source, name];
-            itemValueDictionary.TryAdd(name, s?.ToString());
+            itemValueDictionary.TryAdd(name, s);
         }
 
         return itemValueDictionary;

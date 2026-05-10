@@ -10,13 +10,22 @@ public static class Meta
     /// </summary>
     public const string Key = "_meta";
     /// <summary>
+    /// 
+    /// </summary>
+    public const string ItemKey = "items";
+    /// <summary>
+    /// Defines the key
+    /// </summary>
+    public const string SuccessKey = "is_success";
+
+    /// <summary>
     /// Defines the key 
     /// </summary>
     public const string FailureReason = "failure_reason";
     /// <summary>
     /// 
     /// </summary>
-    public const string Action = "action";
+    public const string ActionKey = "action";
 
     /// <summary>
     /// Defines the keys used for paging information in paged query results.

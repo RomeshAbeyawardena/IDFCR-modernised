@@ -23,7 +23,7 @@ internal class UnitHttpResult<T>(Abstractions.Results.IUnitResult<T> result) : U
 {
     public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
     {
-        var unitResult = new UnitResult<T>(result);
+        var unitResult = new UnitResult<T>(unitResultWithValue: result);
 
         return response.WriteAsJsonAsync(unitResult, cancellationToken);
     }

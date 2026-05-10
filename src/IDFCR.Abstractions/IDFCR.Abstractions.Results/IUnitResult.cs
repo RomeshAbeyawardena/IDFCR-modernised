@@ -11,19 +11,16 @@ public interface IUnitResult
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName(Metadata.Meta.Key)]
     IReadOnlyDictionary<string, object?> Meta { get; }
     
     /// <summary>
     /// Gets the failure reason, when one is available.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     FailureReason? FailureReason { get; }
 
     /// <summary>
     /// Gets the exception captured by the result, if any.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull | JsonIgnoreCondition.WhenWritingDefault)]
     Exception? Exception { get; }
 
     /// <summary>
