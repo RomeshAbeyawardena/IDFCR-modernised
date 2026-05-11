@@ -3,47 +3,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace IDFCR.Results.Http;
 
-internal class ChainedUnitHttpResult(IChainedUnitResult result) : UnitHttpResult(result)
-{
-    public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
-    {
-        foreach (var item in result.Enumerate().GroupBy(x => x.FailureReason))
-        {
-            foreach (var result in item)
-            {
-                if (result.Exception is null)
-                {
-                    continue;
-                }
-
-                ///result.Meta
-            }
-        }
-
-
-
-        return response.WriteAsJsonAsync(result, cancellationToken);
-    }
-}
-
-internal class ChainedUnitHttpResult<T>(IChainedUnitResult<T> result) : UnitHttpResult(result)
-{
-    public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
-    {
-        return response.WriteAsJsonAsync(result, cancellationToken);
-    }
-}
-
-internal class UnitHttpResultCollection<T>(IUnitResultCollection<T> result) : UnitHttpResult(result)
-{
-    public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
-    {
-        var unitResult = new UnitResultCollection<T>(result);
-
-        return response.WriteAsJsonAsync(unitResult, cancellationToken);
-    }
-}
-
 internal class UnitHttpResult<T>(Abstractions.Results.IUnitResult<T> result) : UnitHttpResult(result)
 {
     public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)

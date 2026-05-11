@@ -8,6 +8,9 @@ namespace IDFCR.Results.Http;
 internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitResult
 {
     private Dictionary<string, string?>? _meta = null;
+
+    internal Dictionary<string, string?> InternalMeta = [];
+
     public IReadOnlyDictionary<string, string?> ToImmutableDictionary(IReadOnlyDictionary<string, object?> data)
     {
         if (_meta is not null)
@@ -22,6 +25,11 @@ internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitRe
         if (unitResult.FailureReason.HasValue)
         {
             _meta.Add(Abstractions.Metadata.Meta.FailureReason, unitResult.FailureReason.ToString());
+        }
+
+        foreach(var (key, value) in InternalMeta)
+        {
+            _meta[key] = value;
         }
 
         return _meta.ToImmutableDictionary();

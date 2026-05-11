@@ -6,7 +6,7 @@ internal class UnitResultCollection<T>(Abstractions.Results.IUnitResultCollectio
     {
         if (items.HasValue)
         {
-            source.TryAdd(Abstractions.Metadata.Meta.ItemKey, items.Result);
+            source.TryAdd(items.NamedResult ?? Abstractions.Metadata.Meta.ItemKey, items.Result);
         }
     }
 }
