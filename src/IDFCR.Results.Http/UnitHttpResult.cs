@@ -16,7 +16,7 @@ internal class ChainedUnitHttpResult(IChainedUnitResult result) : UnitHttpResult
                     continue;
                 }
 
-                result.Meta
+                ///result.Meta
             }
         }
 
