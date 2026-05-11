@@ -19,6 +19,16 @@ internal class ChainedUnitHttpResult<T>(IChainedUnitResult<T> result) : UnitHttp
     }
 }
 
+internal class UnitHttpResultCollection<T>(IUnitResultCollection<T> result) : UnitHttpResult(result)
+{
+    public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
+    {
+        var unitResult = new UnitResultCollection<T>(result);
+
+        return response.WriteAsJsonAsync(unitResult, cancellationToken);
+    }
+}
+
 internal class UnitHttpResult<T>(Abstractions.Results.IUnitResult<T> result) : UnitHttpResult(result)
 {
     public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)

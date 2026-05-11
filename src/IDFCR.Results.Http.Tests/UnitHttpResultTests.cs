@@ -115,6 +115,33 @@ internal class UnitHttpResultTests
     }
 
     [Test]
+    public async Task ExecuteAsyncWithResultCollectionPayload()
+    {
+        // Arrange
+        var result = UnitResultCollection.FromResult([new Customer
+        {
+            Id = 43428,
+            Name = "Bobertson",
+            RegisteredDate = new DateTimeOffset(2025, 02, 03, 11, 30, 00, TimeSpan.Zero)
+        }, new Customer
+        {
+            Id = 43428,
+            Name = "Bobertson",
+            RegisteredDate = new DateTimeOffset(2025, 02, 03, 11, 30, 00, TimeSpan.Zero)
+        }], UnitAction.Add).AsHttp();
+        // Act
+        await result.ExecuteAsync(_httpContext);
+        // Assert
+        var body = _httpResponse.GetBodyAsString();
+        Assert.That(body, Is.Not.Empty);
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+        var meta = root.GetProperty("_meta");
+        Assert.That(root.GetProperty(Abstractions.Metadata.Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(meta.GetProperty(Abstractions.Metadata.Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+    }
+
+    [Test]
     public async Task ExecuteAsyncWithResultPayload()
     {
         // Arrange

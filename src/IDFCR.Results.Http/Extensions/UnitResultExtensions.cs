@@ -21,6 +21,8 @@ public static class UnitResultExtensions
     /// <returns>An IUnitHttpResult that represents the HTTP response for the given unit result with a value.</returns>
     public static IUnitHttpResult AsHttp<T>(this Abstractions.Results.IUnitResult<T> result) => new UnitHttpResult<T>(result);
 
+    public static IUnitHttpResult AsHttp<T>(this IUnitResultCollection<T> result) => new UnitHttpResultCollection<T>(result);
+
     /// <summary>
     /// Creates an IUnitHttpResult from an <see cref="IChainedUnitResult{T}"/>. This method allows you to easily convert a chained unit result with a value into an HTTP result that can be returned from an API endpoint. A chained unit result represents a sequence of operations that may have been executed, and this method will create an HTTP result that reflects the final outcome of those operations.
     /// </summary>
