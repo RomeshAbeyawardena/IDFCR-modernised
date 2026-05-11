@@ -12,10 +12,11 @@ public static class UnitResultCollection
     /// <param name="result">The source sequence.</param>
     /// <param name="action">The associated action.</param>
     /// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
+    /// <param name="namedResult">An optional name for the result.</param>
     /// <returns>A collection unit result.</returns>
-    public static IUnitResultCollection<T> FromResult<T>(IEnumerable<T>? result, UnitAction action = UnitAction.Get, bool isSuccess = true)
+    public static IUnitResultCollection<T> FromResult<T>(IEnumerable<T>? result, UnitAction action = UnitAction.Get, bool isSuccess = true, string? namedResult = null)
     {
-        return new UnitResultCollection<T>(result?.ToArray(), action, isSuccess);
+        return new UnitResultCollection<T>(result?.ToArray(), action, isSuccess, NamedResult: namedResult);
     }
 
     /// <summary>
@@ -40,8 +41,9 @@ public static class UnitResultCollection
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
+/// <param name="NamedResult">An optional name for the result.</param>
 internal record UnitResultCollection<TResult>(IEnumerable<TResult>? Result = null, UnitAction Action = UnitAction.Get,
-    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null)
-        : UnitResultBase<IEnumerable<TResult>>(Result, Action, IsSuccess, Exception, FailureReason), IUnitResultCollection<TResult>
+    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
+        : UnitResultBase<IEnumerable<TResult>>(Result, Action, IsSuccess, Exception, FailureReason, NamedResult), IUnitResultCollection<TResult>
 {
 }

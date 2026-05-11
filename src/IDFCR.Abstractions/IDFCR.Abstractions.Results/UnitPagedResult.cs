@@ -16,6 +16,7 @@ public static class UnitPagedResult
     /// <param name="isSuccess">A value indicating whether the operation succeeded.</param>
     /// <param name="exception">The captured exception.</param>
     /// <param name="failureReason">The failure reason.</param>
+    /// <param name="namedResult">An optional name for the result.</param>
     /// <returns>A paged unit result.</returns>
     public static IUnitPagedResult<TResult> FromResult<TResult>(
         IEnumerable<TResult>? result,
@@ -24,9 +25,10 @@ public static class UnitPagedResult
         UnitAction action = UnitAction.None,
         bool isSuccess = true,
         Exception? exception = null,
-        FailureReason? failureReason = null)
+        FailureReason? failureReason = null,
+        string? namedResult = null)
     {
-        return new UnitPagedResult<TResult>(result, totalRows, pagedQuery, action, isSuccess, exception, failureReason);
+        return new UnitPagedResult<TResult>(result, totalRows, pagedQuery, action, isSuccess, exception, failureReason, namedResult);
     }
 }
 
@@ -61,8 +63,9 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
         UnitAction action = UnitAction.None,
         bool isSuccess = true,
         Exception? exception = null,
-        FailureReason? failureReason = null)
-        : base(result, action, isSuccess, exception, failureReason)
+        FailureReason? failureReason = null,
+        string? namedResult = null)
+        : base(result, action, isSuccess, exception, failureReason, namedResult)
     {
         PagedQuery = pagedQuery;
         if (pagedQuery is not null)
@@ -82,8 +85,8 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
     /// Creates a paged result without paging metadata.
     /// </summary>
     public UnitPagedResult(IEnumerable<TResult>? result, UnitAction action = UnitAction.None, bool isSuccess = true, Exception? exception = null,
-        FailureReason? failureReason = null)
-        : this(result, 0, null!, action, isSuccess, exception, failureReason)
+        FailureReason? failureReason = null, string? namedResult = null)
+        : this(result, 0, null!, action, isSuccess, exception, failureReason, namedResult)
     {
 
     }
