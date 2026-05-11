@@ -14,7 +14,6 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
     bool IsSuccess = false, FailureReason? FailureReason = null) : IUnitResult
 {
     private readonly ConcurrentDictionary<string, object?> _metaProperties = [];
-
     /// <inheritdoc />
     public IReadOnlyDictionary<string, object?> Meta => _metaProperties;
 
@@ -45,8 +44,9 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
+/// <param name="NamedResult">The name of the result.</param>
 public abstract record UnitResultBase<TResult>(TResult? Result = default, UnitAction Action = UnitAction.None,
-    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null)
+    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
     : UnitResultBase(Exception, Action, IsSuccess, FailureReason), IUnitResult<TResult>
 {
     /// <inheritdoc />

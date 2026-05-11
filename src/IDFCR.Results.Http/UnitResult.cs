@@ -54,7 +54,7 @@ internal class UnitResult<T> : UnitResult, IUnitResult<T>
         if (unitResultWithValue is not null
             && unitResultWithValue.HasValue)
         {
-            dictionary = new(unitResultWithValue.Result.ToDictionary());
+            dictionary = new(unitResultWithValue.Result.ToDictionary(unitResultWithValue.NamedResult));
         }
 
         dictionary.TryAdd(Abstractions.Metadata.Meta.SuccessKey, (unitResult 

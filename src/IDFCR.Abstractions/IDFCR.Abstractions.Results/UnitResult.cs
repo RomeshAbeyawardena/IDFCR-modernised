@@ -29,16 +29,16 @@ public static class UnitResult
     /// <summary>
     /// Creates a failed result.
     /// </summary>
-    public static IUnitResult<T> Failed<T>(Exception exception, UnitAction action = UnitAction.None, FailureReason? FailureReason = null)
-        => new DefaultUnitResult<T>(default, action, false, exception, FailureReason);
+    public static IUnitResult<T> Failed<T>(Exception exception, UnitAction action = UnitAction.None, FailureReason? failureReason = null, string? namedResult = null)
+        => new DefaultUnitResult<T>(default, action, false, exception, failureReason, namedResult);
 
     /// <summary>
     /// Creates a unit result from the supplied value.
     /// </summary>
     public static IUnitResult<T> FromResult<T>(T? result, UnitAction action = UnitAction.Get,
-        bool isSuccess = true, Exception? exception = null)
+        bool isSuccess = true, Exception? exception = null, string? namedResult = null)
     {
-        return new DefaultUnitResult<T>(result, action, isSuccess, exception);
+        return new DefaultUnitResult<T>(result, action, isSuccess, exception, null, namedResult);
     }
 
     /// <summary>

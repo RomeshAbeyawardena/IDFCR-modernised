@@ -7,8 +7,8 @@ internal record DefaultUnitResult(Exception? Exception = null, UnitAction Action
 }
 
 internal record DefaultUnitResult<TResult>(TResult? Result = default, UnitAction Action = UnitAction.None,
-    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null)
-    : UnitResultBase<TResult>(Result, Action, IsSuccess, Exception, FailureReason)
+    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
+    : UnitResultBase<TResult>(Result, Action, IsSuccess, Exception, FailureReason, NamedResult)
 {
 
 }

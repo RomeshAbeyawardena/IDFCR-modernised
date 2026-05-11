@@ -9,7 +9,7 @@ namespace IDFCR.Abstractions.Results;
 public interface IUnitResult
 {
     /// <summary>
-    /// 
+    /// Gets the metadata associated with the result.
     /// </summary>
     IReadOnlyDictionary<string, object?> Meta { get; }
     
@@ -55,6 +55,10 @@ public interface IUnitResult
 /// <typeparam name="TResult">The result value type.</typeparam>
 public interface IUnitResult<TResult> : IUnitResult
 {
+    /// <summary>
+    /// Gets the name of the result, if one is available. This can be used to identify the result in a collection of results or to provide additional context about the result.
+    /// </summary>
+    string? NamedResult { get; }
     /// <summary>
     /// Gets the underlying result value.
     /// </summary>
