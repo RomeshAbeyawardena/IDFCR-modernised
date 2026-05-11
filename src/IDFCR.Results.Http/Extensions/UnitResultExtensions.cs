@@ -21,6 +21,12 @@ public static class UnitResultExtensions
     /// <returns>An IUnitHttpResult that represents the HTTP response for the given unit result with a value.</returns>
     public static IUnitHttpResult AsHttp<T>(this Abstractions.Results.IUnitResult<T> result) => new UnitHttpResult<T>(result);
 
+    /// <summary>
+    /// Creates an IUnitHttpResult from an <see cref="IUnitResultCollection{T}"/>. This method allows you to easily convert a unit result that represents a collection of items into an HTTP result that can be returned from an API endpoint. A unit result collection represents the outcome of an operation that may have produced multiple items, and this method will create an HTTP result that reflects the final outcome of that operation, including the collection of items if available.
+    /// </summary>
+    /// <typeparam name="T">The type of the items contained in the <see cref="IUnitResultCollection{T}"/>.</typeparam>
+    /// <param name="result">The <see cref="IUnitResultCollection{T}"/> to convert.</param>
+    /// <returns>An IUnitHttpResult that represents the HTTP response for the given unit result collection.</returns>
     public static IUnitHttpResult AsHttp<T>(this IUnitResultCollection<T> result) => new UnitHttpResultCollection<T>(result);
 
     /// <summary>
