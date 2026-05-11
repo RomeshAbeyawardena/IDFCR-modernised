@@ -7,6 +7,21 @@ internal class ChainedUnitHttpResult(IChainedUnitResult result) : UnitHttpResult
 {
     public override Task WriteResponse(HttpResponse response, CancellationToken cancellationToken)
     {
+        foreach (var item in result.Enumerate().GroupBy(x => x.FailureReason))
+        {
+            foreach (var result in item)
+            {
+                if (result.Exception is null)
+                {
+                    continue;
+                }
+
+                result.Meta
+            }
+        }
+
+
+
         return response.WriteAsJsonAsync(result, cancellationToken);
     }
 }
