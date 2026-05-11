@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results;
+using IDFCR.Abstractions.Results.Extensions;
 using IDFCR.Results.Http.Extensions;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
@@ -477,6 +478,54 @@ internal class UnitHttpResultTests
         Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("trace-123"));
         Assert.That(meta.GetProperty("userId").GetString(), Is.EqualTo("user-456"));
         Assert.That(meta.GetProperty("timestamp").GetString(), Is.EqualTo("2025-01-15T10:30:00Z"));
+    }
+
+    #endregion
+
+    #region Chained Result Extension Tests
+
+    [Test]
+    public async Task ExecuteAsync_WithTypedChainedResult_AsHttp_ReturnsSuccessResponse()
+    {
+        // Arrange
+        var current = UnitResult.FromResult("value", UnitAction.Get, isSuccess: true)
+            .AddMeta("traceId", "chain-123");
+        var last = UnitResult.Success(UnitAction.Add);
+        var chained = current.Chain(last);
+
+        var result = chained.AsChainedHttp();
+
+        // Act
+        await result.ExecuteAsync(_httpContext);
+
+        // Assert
+        Assert.That(_httpResponse.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+
+        var body = _httpResponse.GetBodyAsString();
+        Assert.That(body, Is.Not.Empty);
+
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+        Assert.That(root.TryGetProperty("current", out _), Is.True);
+        Assert.That(root.TryGetProperty("last", out _), Is.True);
+    }
+
+    [Test]
+    public async Task ExecuteAsync_WithTypedChainedFailure_AsHttp_MapsFailureToHttpStatusCode()
+    {
+        // Arrange
+        var current = UnitResult.FromResult("value", UnitAction.Get, isSuccess: true);
+        var last = UnitResult.Failed(new InvalidOperationException("conflict"), UnitAction.Update, FailureReason.Conflict);
+        var chained = current.Chain(last);
+
+        var result = chained.AsChainedHttp();
+
+        // Act
+        await result.ExecuteAsync(_httpContext);
+
+        // Assert
+        Assert.That(result.GetStatusCode(), Is.EqualTo(StatusCodes.Status409Conflict));
+        Assert.That(_httpResponse.StatusCode, Is.EqualTo(StatusCodes.Status409Conflict));
     }
 
     #endregion
