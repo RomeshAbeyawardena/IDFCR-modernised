@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Results;
+﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 using IDFCR.Results.Http.Extensions;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
@@ -189,12 +190,12 @@ internal class UnitHttpResultTests
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
 
-        Assert.That(root.TryGetProperty("is_success", out _), Is.True, "JSON should contain is_success");
-        Assert.That(root.TryGetProperty("_meta", out _), Is.True, "JSON should contain _meta");
+        Assert.That(root.TryGetProperty(Meta.SuccessKey, out _), Is.True, $"JSON should contain {Meta.SuccessKey}");
+        Assert.That(root.TryGetProperty(Meta.Key, out _), Is.True, $"JSON should contain {Meta.Key}");
 
-        var meta = root.GetProperty("_meta");
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.True);
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+        var meta = root.GetProperty(Meta.Key);
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(meta.GetProperty(Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Add)));
         Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("abc-123"));
     }
 
@@ -213,11 +214,11 @@ internal class UnitHttpResultTests
         var body = _httpResponse.GetBodyAsString();
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
-        var meta = root.GetProperty("_meta");
+        var meta = root.GetProperty(Meta.Key);
 
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.False);
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Update)));
-        Assert.That(meta.GetProperty("failure_reason").GetString(), Is.EqualTo(nameof(FailureReason.ValidationError)));
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.False);
+        Assert.That(meta.GetProperty(Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Update)));
+        Assert.That(meta.GetProperty(Meta.FailureReason).GetString(), Is.EqualTo(nameof(FailureReason.ValidationError)));
         Assert.That(meta.GetProperty("errorCode").GetString(), Is.EqualTo("ERR001"));
     }
 
@@ -245,11 +246,11 @@ internal class UnitHttpResultTests
 
         // The typed result serializes with is_success and _meta
         // The actual value properties are accessible through the dictionary interface but not serialized as JSON
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.True);
-        Assert.That(root.TryGetProperty("_meta", out var metaProp), Is.True);
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(root.TryGetProperty(Meta.Key, out var metaProp), Is.True);
 
-        var meta = root.GetProperty("_meta");
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Add)));
+        var meta = root.GetProperty(Meta.Key);
+        Assert.That(meta.GetProperty(Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Add)));
         Assert.That(meta.GetProperty("correlationId").GetString(), Is.EqualTo("xyz-789"));
 
         // Verify response is valid JSON and status code is 200
@@ -278,11 +279,11 @@ internal class UnitHttpResultTests
         var root = document.RootElement;
 
         // Collection results serialize with is_success and _meta
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.True);
-        Assert.That(root.TryGetProperty("_meta", out _), Is.True);
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(root.TryGetProperty(Meta.Key, out _), Is.True);
 
-        var meta = root.GetProperty("_meta");
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(nameof(UnitAction.Get)));
+        var meta = root.GetProperty(Meta.Key);
+        Assert.That(meta.GetProperty(Meta.ActionKey).GetString(), Is.EqualTo(nameof(UnitAction.Get)));
         Assert.That(meta.GetProperty("pageSize").GetString(), Is.EqualTo("2"));
 
         // Verify response is valid JSON and status code is 200
@@ -409,8 +410,8 @@ internal class UnitHttpResultTests
         // Assert
         var body = _httpResponse.GetBodyAsString();
         using var document = JsonDocument.Parse(body);
-        var meta = document.RootElement.GetProperty("_meta");
-        Assert.That(meta.GetProperty("action").GetString(), Is.EqualTo(action.ToString()));
+        var meta = document.RootElement.GetProperty(Meta.Key);
+        Assert.That(meta.GetProperty(Meta.ActionKey).GetString(), Is.EqualTo(action.ToString()));
     }
 
     #endregion
@@ -431,7 +432,7 @@ internal class UnitHttpResultTests
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
 
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.True);
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.True);
         Assert.That(root.TryGetProperty("Id", out _), Is.False);
         Assert.That(root.TryGetProperty("Name", out _), Is.False);
     }
@@ -450,8 +451,8 @@ internal class UnitHttpResultTests
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
 
-        Assert.That(root.GetProperty("is_success").GetBoolean(), Is.True);
-        Assert.That(root.TryGetProperty("_meta", out _), Is.True);
+        Assert.That(root.GetProperty(Meta.SuccessKey).GetBoolean(), Is.True);
+        Assert.That(root.TryGetProperty(Meta.Key, out _), Is.True);
         Assert.That(_httpResponse.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
     }
 
@@ -471,7 +472,7 @@ internal class UnitHttpResultTests
         // Assert
         var body = _httpResponse.GetBodyAsString();
         using var document = JsonDocument.Parse(body);
-        var meta = document.RootElement.GetProperty("_meta");
+        var meta = document.RootElement.GetProperty(Meta.Key);
 
         Assert.That(meta.GetProperty("traceId").GetString(), Is.EqualTo("trace-123"));
         Assert.That(meta.GetProperty("userId").GetString(), Is.EqualTo("user-456"));
