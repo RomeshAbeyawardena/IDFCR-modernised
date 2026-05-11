@@ -506,8 +506,9 @@ internal class UnitHttpResultTests
 
         using var document = JsonDocument.Parse(body);
         var root = document.RootElement;
-        Assert.That(root.TryGetProperty("current", out _), Is.True);
-        Assert.That(root.TryGetProperty("last", out _), Is.True);
+        Assert.That(root.TryGetProperty("_meta", out var meta), Is.True);
+        Assert.That(meta.TryGetProperty("current", out _), Is.True);
+        Assert.That(meta.TryGetProperty("last", out _), Is.True);
     }
 
     [Test]

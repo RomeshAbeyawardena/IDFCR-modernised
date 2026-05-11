@@ -1,6 +1,7 @@
 ﻿using FastMember;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 namespace IDFCR.Results.Http.Extensions;
 
@@ -83,13 +84,20 @@ public static class ObjectExtensions
         var sourceAccessor = TypeAccessor.Create(type);
         var sourceTypeNames = _mappableMemberCache.Value.GetOrAdd(
             type,
-            _ => [.. sourceAccessor.GetMembers().Where(m => m.CanWrite && m.CanRead).Select(m => m.Name)]
+            _ => [.. sourceAccessor.GetMembers().Where(m => m.CanRead).Select(m => m.Name)]
         );
 
         foreach (var name in sourceTypeNames)
         {
-            var s = sourceAccessor[source, name];
-            itemValueDictionary.TryAdd(name, s);
+            try
+            {
+                var s = sourceAccessor[source, name];
+                itemValueDictionary.TryAdd(JsonNamingPolicy.CamelCase.ConvertName(name), s);
+            }
+            catch
+            {
+                
+            }
         }
 
         return itemValueDictionary;

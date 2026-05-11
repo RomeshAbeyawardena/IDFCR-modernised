@@ -1,6 +1,8 @@
 ﻿using IDFCR.Abstractions.Results;
+using IDFCR.Results.Http.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using System.Text.Json;
 
 namespace IDFCR.Results.Http;
 
@@ -8,6 +10,12 @@ internal class ChainedUnitHttpResult(IChainedUnitResult result) : UnitHttpResult
 {
     protected void PopulateMeta(UnitResult unitResult)
     {
+        var entries = result.ToDictionary();
+
+        foreach(var (key, value) in entries)
+        {
+            unitResult.InternalMeta.TryAdd(key, JsonSerializer.Serialize(value, JsonSerializerOptions.Web));
+        }
 
         foreach (var item in result.Enumerate().GroupBy(x => x.FailureReason))
         {
