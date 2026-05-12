@@ -7,7 +7,7 @@ on:
 
 jobs:
   validate-merged-pr:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,13 +43,13 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Build solution
-        run: dotnet build ./src/src.sln -c Release
+        run: dotnet build ./IDFCR.slnx -c Release
 
       - name: Run unit tests
-        run: dotnet test ./src/src.sln -c Release --no-build
+        run: dotnet test ./IDFCR.slnx -c Release --no-build
 
       - name: Pack NuGet packages
-        run: dotnet pack ./src/src.sln -c Release --no-build -o ./artifacts/nupkgs
+        run: dotnet pack ./IDFCR.slnx -c Release --no-build -o ./artifacts/nupkgs
 
       - name: Push NuGet packages
         env:
