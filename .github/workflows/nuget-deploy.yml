@@ -1,0 +1,49 @@
+name: NuGet Deploy Validation
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  validate-merged-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Ensure Directory.Build.props changed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
+
+            const hasDirectoryBuildPropsChange = files.some(file => file.filename === "Directory.Build.props");
+
+            if (!hasDirectoryBuildPropsChange) {
+              core.setFailed("Directory.Build.props must be changed in the merged PR.");
+            }
+
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build solution
+        run: dotnet build ./src/src.sln
+
+      - name: Run unit tests
+        run: dotnet test ./src/src.sln --no-build
