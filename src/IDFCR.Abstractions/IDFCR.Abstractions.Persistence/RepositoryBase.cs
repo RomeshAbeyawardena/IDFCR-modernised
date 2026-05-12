@@ -29,6 +29,16 @@ namespace IDFCR.Abstractions.Persistence
         /// </summary>
         protected IEntityInterceptorFactory EntityInterceptorFactory => entityInterceptorFactory;
 
+        /// <summary>
+        /// Gets the computed entity name based on the domain model type. This is used for generating consistent result metadata and can be overridden by derived classes to provide a custom name if needed.
+        /// </summary>
+        protected virtual string ComputedEntityName => typeof(T).Name;
+
+        /// <summary>
+        /// Gets or sets the custom entity name. This can be used to override the computed entity name for generating consistent result metadata.
+        /// </summary>
+        protected string? EntityName { get; set; }
+
         private async Task<IUnitResult<T>> WrapFindResult(Func<CancellationToken, Task<TDb?>> onFindAsync, object key, CancellationToken cancellationToken)
         {
             Exception? caughtException;
@@ -208,6 +218,7 @@ namespace IDFCR.Abstractions.Persistence
         {
             try
             {
+                string resultName = $"{EntityName ?? ComputedEntityName}Id";
                 var dbValue = Map(entry) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
@@ -226,7 +237,7 @@ namespace IDFCR.Abstractions.Persistence
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
                         EntityContextBehavior.Insert, dbValue, null, cancellationToken);
 
-                    return UnitResult.FromResult(id, UnitAction.Add);
+                    return UnitResult.FromResult(id, UnitAction.Add, namedResult: resultName);
                 }
                 else
                 {
@@ -260,7 +271,7 @@ namespace IDFCR.Abstractions.Persistence
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
                         EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
 
-                    return UnitResult.FromResult(id, UnitAction.Update);
+                    return UnitResult.FromResult(id, UnitAction.Update, namedResult: resultName);
                 }
             }
             catch (Exception exception)
