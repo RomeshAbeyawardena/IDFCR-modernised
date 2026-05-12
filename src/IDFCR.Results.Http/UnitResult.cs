@@ -27,6 +27,11 @@ internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitRe
             _meta.Add(Abstractions.Metadata.Meta.FailureReason, unitResult.FailureReason.ToString());
         }
 
+        if (unitResult.Exception is not null)
+        {
+            _meta.Add(Abstractions.Metadata.Meta.ErrorMessage, unitResult.Exception.Message);
+        }
+
         foreach(var (key, value) in InternalMeta)
         {
             _meta[key] = value;

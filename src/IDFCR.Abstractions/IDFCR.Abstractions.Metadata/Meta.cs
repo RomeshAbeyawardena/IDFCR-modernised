@@ -14,14 +14,20 @@ public static class Meta
     /// </summary>
     public const string ItemKey = "items";
     /// <summary>
-    /// Defines the key
+    /// Defines the success key
     /// </summary>
     public const string SuccessKey = "is_success";
 
     /// <summary>
-    /// Defines the key 
+    /// Defines the failure reason key
     /// </summary>
     public const string FailureReason = "failure_reason";
+
+    /// <summary>
+    /// Defines the error message
+    /// </summary>
+    public const string ErrorMessage = "error_message";
+
     /// <summary>
     /// 
     /// </summary>
