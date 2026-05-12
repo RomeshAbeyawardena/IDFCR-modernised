@@ -62,7 +62,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                     pagedQuery = paged;
                 }
 
-                result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, finalException, _saferException?.FailureReason ?? behaviour.FailureReason])!;
+                result = (TResponse)methodInfo.Invoke(null, [emptyArray, 0, pagedQuery, behaviour.UnitAction, false, finalException, _saferException?.FailureReason ?? behaviour.FailureReason, string.Empty])!;
 
                 state.SetHandled(result);
 
