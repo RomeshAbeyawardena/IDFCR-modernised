@@ -12,9 +12,9 @@ public static class ChainedUnitResultExtensions
     /// <param name="currentResult">The second unit result in the chain. This result becomes the last result in the chain.</param>
     /// <param name="setAsFailWhenAnyUnitsFail">Determines whether the resulting chained unit result should be considered a failure if any of the individual unit results in the chain are failures. If set to true, the resulting chained unit result will be marked as a failure if either the current or last unit result is a failure. If set to false, the resulting chained unit result will only be marked as a failure if the last unit result is a failure, regardless of the status of the current unit result.</param>
     /// <returns></returns>
-    public static IChainedUnitResult Chain(this IUnitResult lastResult, IUnitResult currentResult, bool setAsFailWhenAnyUnitsFail = true)
+    public static IChainedUnitResult Chain(this IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
     { 
-        return new DefaultChainedUnitResult(lastResult, currentResult, setAsFailWhenAnyUnitsFail);
+        return new DefaultChainedUnitResult(currentResult, lastResult, setAsFailWhenAnyUnitsFail);
     }
 
     /// <summary>
