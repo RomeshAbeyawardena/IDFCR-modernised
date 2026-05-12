@@ -55,6 +55,7 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           NUGET_SOURCE_URL: ${{ secrets.NUGET_SOURCE_URL }}
+        shell: bash
         run: |
           if [ -z "$NUGET_API_KEY" ]; then
             echo "NUGET_API_KEY secret is required for package publishing."
