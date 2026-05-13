@@ -14,7 +14,7 @@
     <PackageReference Include="IDFCR.Abstractions.Metadata" Version="2.0.7.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\Audits\" />
+    <Folder Include="Features/Audits/" />
   </ItemGroup>
 
 </Project>
