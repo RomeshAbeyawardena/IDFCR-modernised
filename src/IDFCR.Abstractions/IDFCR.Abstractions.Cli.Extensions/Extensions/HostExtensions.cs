@@ -15,14 +15,15 @@ public static class HostExtensions
     /// <param name="args">A collection of command-line arguments to be passed to the command dispatcher.</param>
     /// <param name="listOperations">A flag indicating whether to list available operations instead of executing a command.</param>
     /// <param name="cancellationToken">An optional cancellation token to cancel the command execution.</param>
-    /// <returns></returns>
-    public static Task RunCommandsAsync(this IHost host, IEnumerable<string> args, bool listOperations = false, CancellationToken? cancellationToken = null)
+    /// <returns>A Task representing the asynchronous operation, with an integer result indicating the command execution outcome.</returns>
+    public static async Task<int> RunCommandsAsync(this IHost host, IEnumerable<string> args, bool listOperations = false, CancellationToken? cancellationToken = null)
     {
         using var commandDispatcher = new CommandRouteDispatcher(host)
         {
             ListOperations = listOperations
         };
 
-        return commandDispatcher.BeginAsync(args, cancellationToken);
+        await commandDispatcher.BeginAsync(args, cancellationToken);
+        return ReturnResult.Value.GetValueOrDefault(0);
     }
 }

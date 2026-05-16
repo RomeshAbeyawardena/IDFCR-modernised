@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Cli.Extensions;
+﻿using IDFCR.Abstractions.Cli;
+using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 
@@ -32,10 +33,12 @@ public class ApplyDatabaseMigrationsCommand(IServiceProvider serviceProvider, ID
             await managedStream.Out.WriteLineAsync("Applying pending migrations...", cancellationToken);
             await databaseFascade.MigrateAsync(cancellationToken);
             await managedStream.Out.WriteLineAsync("Database migration completed successfully.", cancellationToken);
+            ReturnResult.Value = ReturnResults.Success_WorkCompleted;
         }
         catch (Exception ex)
         {
             await managedStream.Out.WriteLineAsync($"An error occurred during database migration: {ex.Message}", cancellationToken);
+            ReturnResult.Value = ReturnResults.Error;
         }
     }
 }

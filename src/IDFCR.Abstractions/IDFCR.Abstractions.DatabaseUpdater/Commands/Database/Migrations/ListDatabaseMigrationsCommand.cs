@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Cli.Extensions;
+﻿using IDFCR.Abstractions.Cli;
+using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 
@@ -33,6 +34,7 @@ public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, IDa
             if (!migrations.Any())
             {
                 await managedStream.Out.WriteLineAsync("No pending migrations found. The database is already up to date.", cancellationToken);
+                ReturnResult.Value = ReturnResults.Success_NoActionRequired;
                 return;
             }
 
@@ -42,10 +44,13 @@ public class ListDatabaseMigrationsCommand(IServiceProvider serviceProvider, IDa
                 await managedStream.Out.WriteLineAsync($"\t- {migration}", cancellationToken);
             }
 
+            ReturnResult.Value = ReturnResults.Success_WorkPending;
+
         }
         catch (Exception ex)
         {
             await managedStream.Error.WriteLineAsync($"An error occurred during database migration: {ex.Message}", cancellationToken);
+            ReturnResult.Value = ReturnResults.Error;
         }
     }
 }

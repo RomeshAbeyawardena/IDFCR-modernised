@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Cli.Extensions;
+﻿using IDFCR.Abstractions.Cli;
+using IDFCR.Abstractions.Cli.Extensions;
 using IDFCR.Abstractions.DatabaseUpdater;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +27,8 @@ public static class HostExtensions
     /// <param name="listOperations">A boolean indicating whether to list available operations.</param>
     /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
     /// <param name="assembliesToScan">An array of assemblies to scan for database update operations.</param>
-    /// <returns>An <see cref="IDisposable"/> representing the configured host.</returns>
-    public static async Task<IDisposable> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance,
+    /// <returns>An instance of <see cref="IConfiguredDatabaseUpdaterHost"/> that represents the configured host for database updating operations.</returns>
+    public static async Task<IConfiguredDatabaseUpdaterHost> ConfigureDatabaseUpdaterHost(ITargetDatabaseConfiguration configurationInstance,
         IEnumerable<string> args, Action<IConfigurationBuilder>? configurationHostConfiguration = null,
         Action<HostBuilderContext, IServiceCollection>? configureServices = null,
         Action<IHostBuilder>? configureHost = null,
@@ -55,6 +56,9 @@ public static class HostExtensions
 
         await host.RunCommandsAsync(args, listOperations, cancellationToken.GetValueOrDefault(CancellationToken.None));
 
-        return host;
+        return new ConfiguredDatabaseUpdaterHost(host)
+        {
+            CommandResult = ReturnResult.Value
+        };
     }
 }
