@@ -5,9 +5,9 @@ using System.Text.Json;
 
 namespace IDFCR.Results.Http.Extensions;
 
-// <summary>
-// Defines extension methods for converting objects into dictionaries. These extension methods allow you to easily convert an object's properties into a dictionary format, which can be useful for various purposes such as serialization, logging, or creating metadata for results. By using these extension methods, you can quickly and efficiently transform an object's properties into a key-value pair representation that can be easily consumed in different contexts.
-// </summary>
+/// <summary>
+/// Defines extension methods for converting objects into dictionaries. These extension methods allow you to easily convert an object's properties into a dictionary format, which can be useful for various purposes such as serialization, logging, or creating metadata for results. By using these extension methods, you can quickly and efficiently transform an object's properties into a key-value pair representation that can be easily consumed in different contexts.
+/// </summary>
 public static class ObjectExtensions
 {
     private static readonly Lazy<ConcurrentDictionary<Type, string[]>> _mappableMemberCache = new([]);
