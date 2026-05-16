@@ -67,6 +67,16 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds a standard console managed stream service to the dependency injection container, allowing for interaction with the console's standard input, output, and error streams. This method registers a singleton instance of the ConsoleStream class, which provides access to the console streams in a structured manner. By calling this method, developers can easily integrate console stream functionality into their CLI applications and interact with the console for input and output operations using the IManagedStream interface.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add the managed stream service to.</param>
+    /// <returns>The IServiceCollection with the managed stream service added.</returns>
+    public static IServiceCollection AddStandardConsoleManagedStream(this IServiceCollection services)
+    {
+        return services.AddSingleton(ConsoleStream.Std);
+    }
+
+    /// <summary>
     /// Adds a logger-derived managed stream service to the dependency injection container, allowing for logging output to be captured and written to the appropriate log levels. This method registers an implementation of IManagedStream that uses an ILogger to write output to the console or other logging targets based on the configured log levels. By calling this method, developers can easily integrate logging functionality into their CLI applications and capture output in a structured manner using the ILogger interface.
     /// </summary>
     /// <param name="services">The IServiceCollection to add the managed stream service to.</param>
