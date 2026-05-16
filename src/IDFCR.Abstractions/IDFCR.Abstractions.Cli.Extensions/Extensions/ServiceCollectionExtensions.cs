@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Cli.Dispatchers;
+using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 using IDFCR.Abstractions.Cli.Prompts;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,12 +57,22 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds services related to injectable command operations in a CLI application by scanning the specified assemblies for classes that implement the IInjectableCommandOperation interface. This method registers the base command services and feature-specific command services with transient lifetimes, allowing them to be resolved using service keys based on the FeatureCommandAttribute. By calling this method, developers can easily set up dependency injection for their CLI applications and manage command operations in a modular and extensible way.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="assemblies"></param>
-    /// <returns></returns>
+    /// <param name="services">The IServiceCollection to add the injectable command services to.</param>
+    /// <param name="assemblies">The assemblies to scan for injectable command services.</param>
+    /// <returns>The IServiceCollection with the injectable command services added.</returns>
     public static IServiceCollection AddInjectableCommandServices(this IServiceCollection services, params Assembly[] assemblies)
     {
         return services.AddBaseCommandServices()
             .AddFeatureCommandServices(assemblies);
+    }
+
+    /// <summary>
+    /// Adds a logger-derived managed stream service to the dependency injection container, allowing for logging output to be captured and written to the appropriate log levels. This method registers an implementation of IManagedStream that uses an ILogger to write output to the console or other logging targets based on the configured log levels. By calling this method, developers can easily integrate logging functionality into their CLI applications and capture output in a structured manner using the ILogger interface.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add the managed stream service to.</param>
+    /// <returns>The IServiceCollection with the managed stream service added.</returns>
+    public static IServiceCollection AddLoggerDerivedManagedStream(this IServiceCollection services)
+    {
+        return services.AddSingleton<IManagedStream, LoggerDerivedManagedStream>();
     }
 }
