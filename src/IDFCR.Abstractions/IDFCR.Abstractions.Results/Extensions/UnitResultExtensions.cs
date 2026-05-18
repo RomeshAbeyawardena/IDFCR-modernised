@@ -204,6 +204,6 @@ public static class UnitResultExtensions
             return null;
         }
 
-        return chainedResult.OfType<T>();
+        return chainedResult.Of<T>();
     }
 }

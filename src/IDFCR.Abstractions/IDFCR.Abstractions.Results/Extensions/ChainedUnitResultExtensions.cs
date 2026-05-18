@@ -37,7 +37,7 @@ public static class ChainedUnitResultExtensions
     /// <param name="chainedUnitResult">The chained unit result to search through.</param>
     /// <param name="predicate">An optional predicate to filter the results.</param>
     /// <returns>The first unit result of the specified type that matches the predicate, or null if no such result is found.</returns>
-    public static IUnitResult<T>? OfType<T>(this IChainedUnitResult chainedUnitResult, Func<IUnitResult<T>, bool> predicate)
+    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult, Func<IUnitResult<T>, bool> predicate)
     {
         return chainedUnitResult.Enumerate()
             .OfType<IUnitResult<T>>()
@@ -50,8 +50,8 @@ public static class ChainedUnitResultExtensions
     /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>
     /// <param name="chainedUnitResult">The chained unit result to search through.</param>
     /// <returns>The first unit result of the specified type that has a value, or null if no such result is found.</returns>
-    public static IUnitResult<T>? OfType<T>(this IChainedUnitResult chainedUnitResult)
+    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult)
     {
-        return OfType<T>(chainedUnitResult, x => x.HasValue);
+        return Of<T>(chainedUnitResult, x => x.HasValue);
     }
 }
