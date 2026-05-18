@@ -22,19 +22,19 @@ internal class ObjectExtensionTests
     public void TestIsOfAndNotDefault()
     {
         object? obj = 5;
-        Assert.IsTrue(obj.IsOfAndNotDefault<int>(out var value));
+        Assert.IsTrue(obj.IsOf<int>(And.NotDefault, out var value));
         Assert.AreEqual(5, value);
         obj = default;
-        Assert.IsFalse(obj.IsOfAndNotDefault<int>(out _));
+        Assert.IsFalse(obj.IsOf<int>(And.NotDefault, out _));
         obj = null;
-        Assert.IsFalse(obj.IsOfAndNotDefault<int>(out _));
+        Assert.IsFalse(obj.IsOf<int>(And.NotDefault, out _));
         obj = "string";
-        Assert.IsFalse(obj.IsOfAndNotDefault<int>(out _));
+        Assert.IsFalse(obj.IsOf<int>(And.NotDefault, out _));
 
         obj = Guid.Empty;
-        Assert.IsFalse(obj.IsOfAndNotDefault<Guid>(out _));
+        Assert.IsFalse(obj.IsOf<Guid>(And.NotDefault, out _));
 
         obj = Guid.NewGuid();
-        Assert.True(obj.IsOfAndNotDefault<Guid>(out _));
+        Assert.True(obj.IsOf<Guid>(And.NotDefault, out _));
     }
 }
