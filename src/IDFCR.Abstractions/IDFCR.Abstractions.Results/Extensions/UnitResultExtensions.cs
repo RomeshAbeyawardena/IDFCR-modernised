@@ -190,4 +190,20 @@ public static class UnitResultExtensions
         
         return false;
     }
+
+    /// <summary>
+    /// Checks if the unit result is a chained result and outputs the chained result of the specified type if it is. Returns the chained result of the specified type if the unit result is a chained result, otherwise null.
+    /// </summary>
+    /// <typeparam name="T">The type of the chained result.</typeparam>
+    /// <param name="result">The unit result to check.</param>
+    /// <returns>The chained result of the specified type if the unit result is a chained result, otherwise null.</returns>
+    public static IUnitResult<T>? ChainedResultOf<T>(this IUnitResult result)
+    {
+        if(!result.IsChainedResult(out var chainedResult))
+        {
+            return null;
+        }
+
+        return chainedResult.OfType<T>();
+    }
 }
