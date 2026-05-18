@@ -29,4 +29,29 @@ public static class ChainedUnitResultExtensions
     {
         return new DefaultChainedUnitResult<T>(currentResult, lastResult, setAsFailWhenAnyUnitsFail);
     }
+
+    /// <summary>
+    /// Retrieves the first unit result of a specified type from a chained unit result, optionally filtered by a provided predicate. This method allows you to search through the chain of unit results and find the first result that matches the specified type and satisfies the given condition defined by the predicate. If no matching result is found, it returns null.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>
+    /// <param name="chainedUnitResult">The chained unit result to search through.</param>
+    /// <param name="predicate">An optional predicate to filter the results.</param>
+    /// <returns>The first unit result of the specified type that matches the predicate, or null if no such result is found.</returns>
+    public static IUnitResult<T>? OfType<T>(this IChainedUnitResult chainedUnitResult, Func<IUnitResult<T>, bool> predicate)
+    {
+        return chainedUnitResult.Enumerate()
+            .OfType<IUnitResult<T>>()
+            .FirstOrDefault(predicate);
+    }
+
+    /// <summary>
+    /// Retrieves the first unit result of a specified type from a chained unit result that has a value, without applying any additional filtering. This method is a convenience overload of the OfType method that automatically filters for results that have a value, allowing you to quickly find the first successful result of the specified type in the chain. If no such result is found, it returns null.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>
+    /// <param name="chainedUnitResult">The chained unit result to search through.</param>
+    /// <returns>The first unit result of the specified type that has a value, or null if no such result is found.</returns>
+    public static IUnitResult<T>? OfType<T>(this IChainedUnitResult chainedUnitResult)
+    {
+        return OfType<T>(chainedUnitResult, x => x.HasValue);
+    }
 }
