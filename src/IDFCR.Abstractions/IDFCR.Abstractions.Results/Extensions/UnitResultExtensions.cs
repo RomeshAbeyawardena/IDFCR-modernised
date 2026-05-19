@@ -206,4 +206,40 @@ public static class UnitResultExtensions
 
         return chainedResult.Of<T>();
     }
+
+    /// <summary>
+    /// Determines whether any or all of the results in a chained unit result satisfy a specified condition defined by the provided expression. This method allows you to evaluate the results in a chained unit result against a given condition and determine if any or all of the results meet that condition based on the specified applicability (either any or all). It returns true if the condition is satisfied according to the specified applicability, otherwise false.
+    /// </summary>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="expression">The condition to evaluate.</param>
+    /// <returns>True if the condition is satisfied according to the specified applicability, otherwise false.</returns>
+    public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression)
+    {
+#pragma warning disable CS0618
+        return result.ChainedResultHas(expression, ApplicableTo.None);
+#pragma warning restore
+    }
+
+    /// <summary>
+    /// Determines whether any or all of the results in a chained unit result satisfy a specified condition defined by the provided expression, based on the specified applicability.
+    /// </summary>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="expression">The condition to evaluate.</param>
+    /// <param name="applicableTo">Specifies whether the condition should be applied to any or all results.</param>
+    /// <returns>True if the condition is satisfied according to the specified applicability, otherwise false.</returns>
+    public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression, ApplicableTo applicableTo)
+    {
+        if (!result.IsChainedResult(out var chainedResult))
+        {
+            return false;
+        }
+
+        var results = chainedResult.Enumerate();
+
+        return applicableTo switch
+        {
+            ApplicableTo.All => results.All(expression),
+            _ => results.Any(expression),
+        };
+    }
 }
