@@ -272,4 +272,27 @@ public static class UnitResultExtensions
             _ => results.Any(expression),
         };
     }
+
+    /// <summary>
+    /// Gets the type of the result value from a unit result. If the unit result is a typed unit result, it returns the type of the result value. If the unit result is not a typed unit result, it attempts to find an implemented generic interface of type <see cref="IUnitResult{T}"/> and returns the type argument T. If no such interface is found, it returns null.
+    /// </summary>
+    /// <param name="result">The unit result to get the type from.</param>
+    /// <returns>The type of the result value, or null if it cannot be determined.</returns>
+    public static Type? GetResultType(this IUnitResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        var concreteType = result.GetType();
+
+        // Fall back to scanning implemented interfaces if the concrete type wrapped it oddly
+        if (!concreteType.IsGenericType)
+        {
+            var genericInterface = concreteType.GetInterfaces()
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IUnitResult<>));
+
+            return genericInterface?.GenericTypeArguments.FirstOrDefault();
+        }
+
+        return concreteType.GenericTypeArguments.FirstOrDefault();
+    }
 }
