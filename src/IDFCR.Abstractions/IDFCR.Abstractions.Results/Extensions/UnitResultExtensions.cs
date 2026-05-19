@@ -216,7 +216,7 @@ public static class UnitResultExtensions
     public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression)
     {
 #pragma warning disable CS0618
-        return result.ChainedResultHas(expression, ApplicableTo.None);
+        return ChainedResultHas(result, expression, ApplicableTo.None);
 #pragma warning restore
     }
 
@@ -229,12 +229,42 @@ public static class UnitResultExtensions
     /// <returns>True if the condition is satisfied according to the specified applicability, otherwise false.</returns>
     public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression, ApplicableTo applicableTo)
     {
+        return result.ChainedResultHas(expression, applicableTo, out _);
+    }
+
+    /// <summary>
+    /// Determines whether any or all of the results in a chained unit result satisfy a specified condition defined by the provided expression. Also outputs the results that satisfy the condition.
+    /// </summary>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="expression">The condition to evaluate.</param>
+    /// <param name="applicableFilters">Outputs the results that satisfy the condition.</param>
+    /// <returns>True if the condition is satisfied according to the specified applicability, otherwise false.</returns>
+    public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression, out IEnumerable<IUnitResult> applicableFilters)
+    {
+#pragma warning disable CS0618
+        return result.ChainedResultHas(expression, ApplicableTo.None, out applicableFilters);
+#pragma warning restore
+    }
+
+    /// <summary>
+    /// Determines whether any or all of the results in a chained unit result satisfy a specified condition defined by the provided expression, based on the specified applicability. Also outputs the results that satisfy the condition.
+    /// </summary>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="expression">The condition to evaluate.</param>
+    /// <param name="applicableTo">Specifies whether the condition should be applied to any or all results.</param>
+    /// <param name="applicableFilters">Outputs the results that satisfy the condition.</param>
+    /// <returns>True if the condition is satisfied according to the specified applicability, otherwise false.</returns>
+    public static bool ChainedResultHas(this IUnitResult result, Func<IUnitResult, bool> expression, ApplicableTo applicableTo, out IEnumerable<IUnitResult> applicableFilters)
+    {
+        applicableFilters = [];
         if (!result.IsChainedResult(out var chainedResult))
         {
             return false;
         }
 
         var results = chainedResult.Enumerate();
+
+        applicableFilters = results.Where(expression);
 
         return applicableTo switch
         {
