@@ -6,6 +6,27 @@ namespace IDFCR.Abstractions.Results.Extensions;
 public static class ChainedUnitResultExtensions
 {
     /// <summary>
+    /// Chains multiple unit results together, creating a new chained unit result that contains the information from all the results in the chain. The first result becomes the last result in the chain, while the last result's information is preserved and accessible through the Last property of the resulting chained unit result. This method allows for chaining an arbitrary number of unit results together, providing a convenient way to combine multiple results into a single cohesive result chain.
+    /// </summary>
+    /// <param name="result">The first unit result in the chain.</param>
+    /// <param name="results">The subsequent unit results to chain.</param>
+    /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
+    public static IChainedUnitResult Chain(this IUnitResult result, IEnumerable<IUnitResult> results)
+    {
+        IUnitResult[] _results = [.. results];
+        ArgumentOutOfRangeException.ThrowIfZero(_results.Length, nameof(results));
+
+        IChainedUnitResult currentChain = result.Chain(_results[0]);
+
+        for (int i = 1; i < _results.Length; i++)
+        {
+            var _result = _results[i];
+            currentChain = currentChain.Chain(_result);
+        }
+
+        return currentChain;
+    }
+    /// <summary>
     /// Chains two unit results together, creating a new chained unit result that contains the information from both results. The second result becomes the last result in the chain, while the first result's information is preserved and accessible through the Last property of the resulting chained unit result.
     /// </summary>
     /// <param name="lastResult">The first unit result in the chain. This result's information will be preserved and accessible through the Last property of the resulting chained unit result.</param>
