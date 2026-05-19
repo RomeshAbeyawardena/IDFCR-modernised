@@ -138,4 +138,60 @@ internal class ChainUnitResultTests
         IEnumerable<IUnitResult> chainedList = [.. chained.Enumerate()];
         Assert.That(chainedList, Has.Exactly(2).Items);
     }
+
+    [Test]
+    public void Chain_MultipleResults_ShouldCreateChainInOrder()
+    {
+        var first = UnitResult.Success(UnitAction.Add);
+        var second = UnitResult.Success(UnitAction.Update);
+        var third = UnitResult.Success(UnitAction.Delete);
+
+        var chained = first.Chain([second, third]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(chained.IsSuccess, Is.True);
+            Assert.That(chained.Current, Is.AssignableTo<IChainedUnitResult>());
+
+            var results = chained.Enumerate();
+            Assert.That(results, Is.EqualTo([first, second, third]));
+        });
+
+        var nested = (IChainedUnitResult)chained.Current;
+        Assert.Multiple(() =>
+        {
+            Assert.That(nested.Current, Is.SameAs(first));
+            Assert.That(nested.Last, Is.SameAs(second));
+        });
+    }
+
+    [Test]
+    public void Chain_MultipleResults_WhenLaterResultFails_ShouldUseFirstFailure()
+    {
+        var first = UnitResult.Success(UnitAction.Get);
+        var secondException = new InvalidOperationException("second failed");
+        var second = UnitResult.Failed(secondException, UnitAction.Update, FailureReason.ValidationError);
+        var third = UnitResult.Success(UnitAction.Delete);
+
+        var chained = first.Chain([second, third]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(chained.IsSuccess, Is.False);
+            Assert.That(chained.Exception, Is.SameAs(secondException));
+            Assert.That(chained.FailureReason, Is.EqualTo(FailureReason.ValidationError));
+            Assert.That(chained.GetFirstFailure(), Is.SameAs(second));
+            Assert.That(chained.Enumerate(), Is.EqualTo(new IUnitResult[] { first, second, third }));
+        });
+    }
+
+    [Test]
+    public void Chain_MultipleResults_EmptyEnumerable_ShouldThrow()
+    {
+        var first = UnitResult.Success(UnitAction.Add);
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => first.Chain([]));
+
+        Assert.That(exception!.ParamName, Is.EqualTo("results"));
+    }
 }
