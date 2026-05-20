@@ -11,6 +11,31 @@ public static class ChainedUnitResultExtensions
     /// <param name="result">The first unit result in the chain.</param>
     /// <param name="results">The subsequent unit results to chain.</param>
     /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
+    public static IChainedUnitResult<T> Chain<T>(this IUnitResult<T> result, IEnumerable<IUnitResult> results)
+    {
+        using IEnumerator<IUnitResult> enumerator = results.GetEnumerator();
+
+        if (!enumerator.MoveNext())
+        {
+            throw new ArgumentOutOfRangeException(nameof(results));
+        }
+
+        IChainedUnitResult<T> currentChain = new DefaultChainedUnitResult<T>(result, enumerator.Current);
+
+        while (enumerator.MoveNext())
+        {
+            currentChain = new DefaultChainedUnitResult<T>(currentChain, enumerator.Current);
+        }
+
+        return currentChain;
+    }
+
+    /// <summary>
+    /// Chains multiple unit results together, creating a new chained unit result that contains the information from all the results in the chain. The first result becomes the last result in the chain, while the last result's information is preserved and accessible through the Last property of the resulting chained unit result. This method allows for chaining an arbitrary number of unit results together, providing a convenient way to combine multiple results into a single cohesive result chain.
+    /// </summary>
+    /// <param name="result">The first unit result in the chain.</param>
+    /// <param name="results">The subsequent unit results to chain.</param>
+    /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
     public static IChainedUnitResult Chain(this IUnitResult result, IEnumerable<IUnitResult> results)
     {
         using IEnumerator<IUnitResult> enumerator = results.GetEnumerator();
