@@ -13,15 +13,18 @@ public static class ChainedUnitResultExtensions
     /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
     public static IChainedUnitResult Chain(this IUnitResult result, IEnumerable<IUnitResult> results)
     {
-        IUnitResult[] _results = [.. results];
-        ArgumentOutOfRangeException.ThrowIfZero(_results.Length, nameof(results));
+        using IEnumerator<IUnitResult> enumerator = results.GetEnumerator();
 
-        IChainedUnitResult currentChain = result.Chain(_results[0]);
-
-        for (int i = 1; i < _results.Length; i++)
+        if (!enumerator.MoveNext())
         {
-            var _result = _results[i];
-            currentChain = currentChain.Chain(_result);
+            throw new ArgumentOutOfRangeException(nameof(results));
+        }
+
+        IChainedUnitResult currentChain = new DefaultChainedUnitResult(result, enumerator.Current);
+
+        while (enumerator.MoveNext())
+        {
+            currentChain = new DefaultChainedUnitResult(currentChain, enumerator.Current);
         }
 
         return currentChain;

@@ -166,6 +166,22 @@ internal class ChainUnitResultTests
     }
 
     [Test]
+    public void Chain_MultipleResults_WithSingleItem_ShouldCreateTwoItemChainInOrder()
+    {
+        var first = UnitResult.Success(UnitAction.Add);
+        var second = UnitResult.Success(UnitAction.Update);
+
+        var chained = first.Chain([second]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(chained.Current, Is.SameAs(first));
+            Assert.That(chained.Last, Is.SameAs(second));
+            Assert.That(chained.Enumerate(), Is.EqualTo(new IUnitResult[] { first, second }));
+        });
+    }
+
+    [Test]
     public void Chain_MultipleResults_WhenLaterResultFails_ShouldUseFirstFailure()
     {
         var first = UnitResult.Success(UnitAction.Get);
