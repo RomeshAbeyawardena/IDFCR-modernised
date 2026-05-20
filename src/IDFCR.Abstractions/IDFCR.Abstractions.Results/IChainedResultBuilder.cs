@@ -1,18 +1,6 @@
 ﻿namespace IDFCR.Abstractions.Results;
 
 /// <summary>
-/// Represents a utility class for creating builders that can be used to construct chained unit results, providing a convenient way to create complex result chains by adding individual unit results and then building a final chained unit result that combines the information from all the added results. This class serves as a factory for obtaining instances of IChainedResultBuilder, which can be used to build chained unit results in a flexible and modular manner.
-/// </summary>
-public static class ChainedResult
-{
-    /// <summary>
-    /// Creates a new instance of a chained result builder, which can be used to construct a chained unit result by adding individual unit results and then building a final chained unit result that combines the information from all the added results.
-    /// </summary>
-    /// <returns>An instance of IChainedResultBuilder.</returns>
-    public static IChainedResultBuilder Builder() => new DefaultChainedResultBuilder();
-}
-
-/// <summary>
 /// Represents a builder for creating chained unit results, allowing for the construction of complex result chains by adding individual unit results and then building a final chained unit result that combines the information from all the added results. This interface provides methods to add individual unit results to the builder and to build a final chained unit result based on the added results, facilitating the creation of cohesive result chains that preserve the information and status of each individual result in the chain.
 /// </summary>
 public interface IChainedResultBuilder
