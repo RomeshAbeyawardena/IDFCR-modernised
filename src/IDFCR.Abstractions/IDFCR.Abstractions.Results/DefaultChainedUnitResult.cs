@@ -3,6 +3,34 @@ namespace IDFCR.Abstractions.Results;
 internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception = null, UnitAction Action = UnitAction.None, bool IsSuccess = false, FailureReason? FailureReason = FailureReason.None)
     : DefaultUnitResult(Exception, Action, IsSuccess, FailureReason), IChainedUnitResult
 {
+    public static IEnumerable<(IChainedUnitResult? Parent, IUnitResult Result)> EnumerateWithParents(IUnitResult target)
+    {
+        List<(IChainedUnitResult? Parent, IUnitResult Result)> items = [];
+        Stack<(IChainedUnitResult? Parent, IUnitResult Node)> stack = [];
+
+        // The root target has no parent, so we pass null
+        stack.Push((null, target));
+
+        while (stack.Count > 0)
+        {
+            var (parent, current) = stack.Pop();
+
+            if (current is IChainedUnitResult chained)
+            {
+                // Push in reverse so Chained.Current is processed before Chained.Last.
+                // Both children belong to the 'chained' parent container.
+                stack.Push((chained, chained.Last));
+                stack.Push((chained, chained.Current));
+                continue;
+            }
+
+            // Add the leaf node along with the parent that contained it
+            items.Add((parent, current));
+        }
+
+        return items;
+    }
+
     public static IEnumerable<IUnitResult> Enumerate(IUnitResult target)
     {
         List<IUnitResult> items = [];
@@ -70,6 +98,11 @@ internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception 
         return Enumerate(this);
     }
 
+    public IEnumerable<(IChainedUnitResult? Parent, IUnitResult Result)> EnumerateWithParents()
+    {
+        return EnumerateWithParents(this);
+    }
+
     public IUnitResult GetDeepest()
     {
         return Enumerate().FirstOrDefault() ?? this;
@@ -125,6 +158,12 @@ internal record DefaultChainedUnitResult<T>(IUnitResult Last, T? Value = default
     {
         return DefaultChainedUnitResult.Enumerate(this);
     }
+
+    public IEnumerable<(IChainedUnitResult? Parent, IUnitResult Result)> EnumerateWithParents()
+    {
+        return DefaultChainedUnitResult.EnumerateWithParents(this);
+    }
+
 
     public IUnitResult GetDeepest()
     {

@@ -94,6 +94,22 @@ public static class ChainedUnitResultExtensions
     }
 
     /// <summary>
+    /// Retrieves the first unit result of a specified type from a chained unit result that has a parent with a specific key. This method allows you to search through the chain of unit results and find the first result that matches the specified type and is associated with a parent that has the given key. If no matching result is found, it returns null.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>
+    /// <param name="chainedUnitResult">The chained unit result to search through.</param>
+    /// <param name="key">The key of the parent unit result to match.</param>
+    /// <returns>The first unit result of the specified type that has a parent with the given key, or null if no such result is found.</returns>
+    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult, string key)
+    {
+        return chainedUnitResult.EnumerateWithParents()
+            .Where(x => x.Parent?.Key == key)
+            .Select(x => x.Result)
+            .OfType<IUnitResult<T>>()
+            .FirstOrDefault();
+    }
+
+    /// <summary>
     /// Retrieves the first unit result of a specified type from a chained unit result that has a value, without applying any additional filtering. This method is a convenience overload of the OfType method that automatically filters for results that have a value, allowing you to quickly find the first successful result of the specified type in the chain. If no such result is found, it returns null.
     /// </summary>
     /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>

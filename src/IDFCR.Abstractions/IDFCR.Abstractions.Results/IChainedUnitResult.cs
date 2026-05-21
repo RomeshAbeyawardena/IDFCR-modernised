@@ -42,6 +42,12 @@ public interface IChainedUnitResult : IUnitResult
     /// <returns></returns>
     IEnumerable<IUnitResult> Enumerate();
     /// <summary>
+    /// Enumerates all unit results in the chain along with their parent chained unit result, allowing access to each result's information and status in the order they were added to the chain. This method provides a way to iterate through the entire sequence of results, from the root to the current result, enabling analysis of the progression of results and identification of any patterns or issues that may have occurred along the way.
+    /// </summary>
+    /// <param name="target">The target unit result to start enumeration from.</param>
+    /// <returns>An enumerable of tuples containing the parent chained unit result and the current unit result.</returns>
+    IEnumerable<(IChainedUnitResult? Parent, IUnitResult Result)> EnumerateWithParents();
+    /// <summary>
     /// Gets the deepest unit result in the chain, which is the most recent result that has been added to the chain. This method allows access to the information and status of the latest result, providing insight into the current state of the chain of results and any recent developments or changes that may have occurred.
     /// </summary>
     /// <returns></returns>
