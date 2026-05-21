@@ -6,6 +6,18 @@ namespace IDFCR.Abstractions.Results;
 public interface IChainedUnitResult : IUnitResult
 {
     /// <summary>
+    /// Gets the key associated with the current unit result in the chain, allowing identification and differentiation of results within the chain. This property provides a way to label and organize results based on their context or purpose, enabling easier tracking and analysis of the sequence of results in the chain.
+    /// </summary>
+    string? Key { get; }
+
+    /// <summary>
+    /// Sets the key for the current unit result in the chain, allowing identification and differentiation of results within the chain. This method provides a way to label and organize results based on their context or purpose, enabling easier tracking and analysis of the sequence of results in the chain. By assigning a key to each result, it becomes easier to understand the flow of results and identify specific points of interest or concern within the chain.
+    /// </summary>
+    /// <param name="key">The key to assign to the current unit result.</param>
+    /// <returns>The current chained unit result with the updated key.</returns>
+    IChainedUnitResult WithKey(string key);
+
+    /// <summary>
     /// Gets the current unit result in the chain, allowing access to the information and status of the current result. This property represents the most recent result in the chain, while the Last property allows access to the previous result's information and status.
     /// </summary>
     IUnitResult Current { get; }
@@ -43,6 +55,12 @@ public interface IChainedUnitResult : IUnitResult
 /// <typeparam name="T">The type of the value contained in the result.</typeparam>
 public interface IChainedUnitResult<T> : IUnitResult<T>, IChainedUnitResult
 {
+    /// <summary>
+    /// Sets the key for the current unit result in the chain, allowing identification and differentiation of results within the chain. This method provides a way to label and organize results based on their context or purpose, enabling easier tracking and analysis of the sequence of results in the chain. By assigning a key to each result, it becomes easier to understand the flow of results and identify specific points of interest or concern within the chain.
+    /// </summary>
+    /// <param name="key">The key to assign to the current unit result.</param>
+    /// <returns>The current chained unit result with the updated key.</returns>
+    new IChainedUnitResult<T> WithKey(string key);
     /// <summary>
     /// Gets the current unit result in the chain, allowing access to the information and status of the current result. This property represents the most recent result in the chain, while the Last property allows access to the previous result's information and status.
     /// </summary>

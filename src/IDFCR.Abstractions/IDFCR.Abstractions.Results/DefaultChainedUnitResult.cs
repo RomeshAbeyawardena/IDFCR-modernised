@@ -27,6 +27,16 @@ internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception 
         return items;
     }
 
+    /// <inheritdoc/>
+    public string? Key { get; private set; }
+
+    /// <inheritdoc/>
+    public IChainedUnitResult WithKey(string key)
+    {
+        Key = key;
+        return this;
+    }
+
     public IUnitResult Current { get; } = null!;
 
     public DefaultChainedUnitResult(IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
@@ -71,6 +81,18 @@ internal record DefaultChainedUnitResult<T>(IUnitResult Last, T? Value = default
 {
     IUnitResult IChainedUnitResult.Current => Current;
     public IUnitResult<T> Current { get; } = null!;
+
+    /// <inheritdoc/>
+    public string? Key { get; private set; }
+
+    /// <inheritdoc/>
+    IChainedUnitResult IChainedUnitResult.WithKey(string key) => WithKey(key);
+
+    public IChainedUnitResult<T> WithKey(string key)
+    {
+        Key = key;
+        return this;
+    }
 
     public DefaultChainedUnitResult(IUnitResult<T> currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
         : this(
