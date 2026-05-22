@@ -208,6 +208,24 @@ public static class UnitResultExtensions
     }
 
     /// <summary>
+    /// Checks if the unit result is a chained result and outputs the chained result of the specified type that has a parent with the given key if it is. Returns the chained result of the specified type that has a parent with the given key if the unit result is a chained result, otherwise null.
+    /// </summary>
+    /// <typeparam name="T">The type of the chained result.</typeparam>
+    /// <param name="result">The unit result to check.</param>
+    /// <param name="key">The key of the parent result.</param>
+    /// <returns>The chained result of the specified type that has a parent with the given key if the unit result is a chained result, otherwise null.</returns>
+    public static IUnitResult<T>? ChainedResultOf<T>(this IUnitResult result, string key)
+    {
+        if (!result.IsChainedResult(out var chainedResult))
+        {
+            return null;
+        }
+
+        return chainedResult.Of<T>(key);
+    }
+
+
+    /// <summary>
     /// Determines whether any or all of the results in a chained unit result satisfy a specified condition defined by the provided expression. This method allows you to evaluate the results in a chained unit result against a given condition and determine if any or all of the results meet that condition based on the specified applicability (either any or all). It returns true if the condition is satisfied according to the specified applicability, otherwise false.
     /// </summary>
     /// <param name="result">The unit result to check.</param>
