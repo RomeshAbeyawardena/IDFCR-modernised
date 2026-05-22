@@ -24,6 +24,12 @@ public static class ChainedUnitResultExtensions
 
         while (enumerator.MoveNext())
         {
+            if (enumerator.Current is IChainedUnitResult chainedUnitResult)
+            {
+                currentChain = currentChain.Chain(chainedUnitResult.Enumerate());
+                continue;
+            }
+
             currentChain = new DefaultChainedUnitResult<T>(currentChain, enumerator.Current);
         }
 

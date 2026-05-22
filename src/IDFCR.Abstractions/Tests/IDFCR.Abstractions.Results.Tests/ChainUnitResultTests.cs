@@ -210,4 +210,28 @@ internal class ChainUnitResultTests
 
         Assert.That(exception!.ParamName, Is.EqualTo("results"));
     }
+
+    [Test]
+    public void Chain_with_key()
+    {
+        Guid testGuid = Guid.NewGuid();
+        var addedClient = UnitResult.FromResult(1, UnitAction.Add);
+        var addedClientSecurity = UnitResult.FromResult(testGuid, UnitAction.Add);
+        var addedClientSecurityToken = UnitResult.FromResult(3, UnitAction.Add);
+
+        var chainedClientResult = addedClient.Chain([addedClientSecurity, addedClientSecurityToken]).WithKey("client_security");
+
+        Guid testGuid2 = Guid.NewGuid();
+        var addedApplication = UnitResult.FromResult(4, UnitAction.Add);
+        var addedApplicationSecurity = UnitResult.FromResult(testGuid2, UnitAction.Add);
+        var addedApplicationSecurityToken = UnitResult.FromResult(6, UnitAction.Add);
+
+        var chainedApplicationResult = addedApplication.Chain([addedApplicationSecurity, addedApplicationSecurityToken]).WithKey("application_security");
+
+        var chainedTransactionResult = chainedClientResult.Chain(chainedApplicationResult);
+
+        var idResult = chainedTransactionResult.Of<Guid>("client_security");
+
+         Assert.That(idResult, Is.Not.Null);
+    }
 }

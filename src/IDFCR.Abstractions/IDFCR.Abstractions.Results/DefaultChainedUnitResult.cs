@@ -17,10 +17,13 @@ internal record DefaultChainedUnitResult(IUnitResult Last, Exception? Exception 
 
             if (current is IChainedUnitResult chained)
             {
+                // When we encounter a chained result, use it as the parent for its children.
+                // If the chained result has a key, it becomes the parent; otherwise use the passed parent.
+                var effectiveParent = chained.Key != null ? chained : parent;
+
                 // Push in reverse so Chained.Current is processed before Chained.Last.
-                // Both children belong to the 'chained' parent container.
-                stack.Push((chained, chained.Last));
-                stack.Push((chained, chained.Current));
+                stack.Push((effectiveParent, chained.Last));
+                stack.Push((effectiveParent, chained.Current));
                 continue;
             }
 
