@@ -232,6 +232,12 @@ internal class ChainUnitResultTests
 
         var idResult = chainedTransactionResult.Of<Guid>("client_security");
 
-         Assert.That(idResult, Is.Not.Null);
+        Assert.That(idResult, Is.Not.Null);
+        Assert.That(idResult, Is.SameAs(addedClientSecurity));
+
+        idResult = chainedTransactionResult.Of<Guid>("application_security");
+
+        Assert.That(idResult, Is.Not.Null);
+        Assert.That(idResult, Is.SameAs(addedApplicationSecurity));
     }
 }
