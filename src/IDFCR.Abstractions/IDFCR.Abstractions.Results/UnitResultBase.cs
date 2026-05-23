@@ -35,7 +35,7 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
     public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
 
     /// <inheritdoc />
-    public virtual bool TrySetState(object value) => false;
+    public virtual bool TrySetState(object? value) => false;
 
     /// <inheritdoc />
     public virtual bool Equals(UnitResultBase? other)
@@ -138,18 +138,24 @@ public abstract record UnitResultBase<TResult>(TResult? OriginalState = default,
             NamedResult);
     }
 
+    /// <inheritdoc />
+    public bool TrySetState(TResult? result)
+    {
+        IsStateModified = result is not null;
+        ModifiedState = result;
+        return IsStateModified;
+    }
+
     /// <summary>
     /// Attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false.
     /// </summary>
     /// <param name="value">The value to set as the modified state.</param>
     /// <returns>True if the modified state was set successfully; otherwise, false.</returns>
-    public override bool TrySetState(object value)
+    public override bool TrySetState(object? value)
     {
         if (value is TResult result)
         {
-            IsStateModified = true;
-            ModifiedState = result;
-            return true;
+            return TrySetState(result);
         }
 
         return false;
