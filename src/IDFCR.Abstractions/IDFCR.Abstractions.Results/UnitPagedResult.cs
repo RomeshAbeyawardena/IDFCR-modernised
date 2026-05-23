@@ -70,13 +70,13 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
         PagedQuery = pagedQuery;
         if (pagedQuery is not null)
         {
-            base.AddMeta("pageIndex", pagedQuery.PageIndex);
-            base.AddMeta("pageSize", pagedQuery.PageSize);
+            base.AddMeta(Metadata.Meta.Paging.PageIndex, pagedQuery.PageIndex);
+            base.AddMeta(Metadata.Meta.Paging.PageSize, pagedQuery.PageSize);
             TotalRows = totalRows;
-            base.AddMeta("totalRows", totalRows);
+            base.AddMeta(Metadata.Meta.Paging.TotalRows, totalRows);
             if (pagedQuery.PageSize.HasValue)
             {
-                base.AddMeta("totalPages", (int)Math.Ceiling((double)totalRows / pagedQuery.PageSize.Value));
+                base.AddMeta(Metadata.Meta.Paging.TotalPages, (int)Math.Ceiling((double)totalRows / pagedQuery.PageSize.Value));
             }
         }
     }

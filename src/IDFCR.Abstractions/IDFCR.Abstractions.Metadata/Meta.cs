@@ -29,15 +29,24 @@ public static class Meta
     public const string ErrorMessage = "error_message";
 
     /// <summary>
-    /// 
+    /// Defines the key used to store the action associated with a unit result or other related types.
     /// </summary>
     public const string ActionKey = "action";
+
+    /// <summary>
+    /// Defines the key used to store the current entity state in unit results and other related types.
+    /// </summary>
+    public const string CurrentEntityState = "entity_state";
 
     /// <summary>
     /// Defines the keys used for paging information in paged query results.
     /// </summary>
     public static class Paging
     {
+        /// <summary>
+        /// The key used to store the total number of rows in paged query results.
+        /// </summary>
+        public const string TotalRows = "total_rows";
         /// <summary>
         /// The key used to store the total number of pages in paged query results.
         /// </summary>

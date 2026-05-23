@@ -75,7 +75,7 @@ namespace IDFCR.Abstractions.Persistence
 
             if (oldModel is not null)
             {
-                context = RepositoryInterceptorContext.Create(stage, behavior, model, 
+                context = RepositoryInterceptorContext.Create(stage, behavior, model,
                     b => b.AddOrUpdate(AuditEntityChangesInterceptor.OldDataKey, oldModel));
             }
 
@@ -220,10 +220,12 @@ namespace IDFCR.Abstractions.Persistence
             {
                 string resultName = $"{EntityName ?? ComputedEntityName}Id";
                 var dbValue = Map(entry) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
+                RepositoryInterceptorContext context;
+                TKey id;
 
                 if (EqualityComparer<TKey>.Default.Equals(dbValue.Id, default))
                 {
-                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
+                    context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                         EntityContextBehavior.Insert, dbValue, null, cancellationToken);
 
                     if (context.BypassOperation)
@@ -232,47 +234,53 @@ namespace IDFCR.Abstractions.Persistence
                             .AddMeta("bypassed", true).As<TKey>();
                     }
 
-                    var id = await OnAddAsync(dbValue, entry, cancellationToken);
+                    id = await OnAddAsync(dbValue, entry, cancellationToken);
 
                     await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
                         EntityContextBehavior.Insert, dbValue, null, cancellationToken);
 
-                    return UnitResult.FromResult(id, UnitAction.Add, namedResult: resultName);
+                    var addedResult = UnitResult.FromResult(id, UnitAction.Add, namedResult: resultName);
+
+                    addedResult.AddMeta(Meta.CurrentEntityState, Map(dbValue));
+
+                    return addedResult;
                 }
-                else
+
+                var foundEntry = await OnFindAsync(dbValue.Id, true, cancellationToken);
+
+                if (foundEntry is null)
                 {
-                    var foundEntry = await OnFindAsync(dbValue.Id, true, cancellationToken);
-                    
-                    if (foundEntry is null)
-                    {
-                        return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
-                    }
-
-                    var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
-
-                    OnUpdate(foundEntry, entry);
-
-                    foundEntry.Apply(dbValue);
-
-                    if (!HasChanges(clonedEntity, foundEntry))
-                    {
-                        return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
-                    }
-
-                    var context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
-                        EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
-
-                    if (context.BypassOperation)
-                    {
-                        return UnitResult.FromResult(dbValue.Id, UnitAction.None)
-                            .AddMeta("bypassed", true).As<TKey>();
-                    }
-                    var id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
-                    await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                        EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
-
-                    return UnitResult.FromResult(id, UnitAction.Update, namedResult: resultName);
+                    return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                 }
+
+                var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+
+                OnUpdate(foundEntry, entry);
+
+                foundEntry.Apply(dbValue);
+
+                if (!HasChanges(clonedEntity, foundEntry))
+                {
+                    return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
+                }
+
+                context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
+                    EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
+
+                if (context.BypassOperation)
+                {
+                    return UnitResult.FromResult(dbValue.Id, UnitAction.None)
+                        .AddMeta("bypassed", true).As<TKey>();
+                }
+
+                id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
+                await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
+                    EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
+
+                var result = UnitResult.FromResult(id, UnitAction.Update, namedResult: resultName);
+
+                result.AddMeta(Meta.CurrentEntityState, Map(dbValue));
+                return result;
             }
             catch (Exception exception)
             {
@@ -280,6 +288,7 @@ namespace IDFCR.Abstractions.Persistence
                 {
                     return UnitResult.Failed<TKey>(exception);
                 }
+
                 return UnitResult.Failed<TKey>(exception).AddMeta("unexpected", "true").As<TKey>();
             }
         }
