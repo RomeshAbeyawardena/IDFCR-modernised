@@ -1,7 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using SysCryptography = System.Security.Cryptography;
 using System.Text;
 
-namespace IDFCR.Cryptography;
+namespace IDFCR.Cryptography.SHA256;
 
 /// <summary>
 /// Represents a utility class for deriving a token encryption key from a signing key. This is typically used to generate a consistent encryption key that can be used for protecting token payloads, based on a given signing key. The derived encryption key is generated using a hash function (SHA256) to ensure it has the appropriate length and randomness for cryptographic operations.
@@ -17,6 +17,6 @@ public static class TokenEncryptionKey
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(signingKey);
 
-        return SHA256.HashData(Encoding.UTF8.GetBytes(signingKey));
+        return SysCryptography.SHA256.HashData(Encoding.UTF8.GetBytes(signingKey));
     }
 }

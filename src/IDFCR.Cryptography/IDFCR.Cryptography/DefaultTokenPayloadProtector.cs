@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using IDFCR.Cryptography.SHA256;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 
