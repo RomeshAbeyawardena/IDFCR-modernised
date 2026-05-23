@@ -8,7 +8,7 @@ namespace IDFCR.Abstractions.Results;
 /// </summary>
 public interface IUnitResult
 {
-				bool TrySetState(object value);
+	bool TrySetState(object value);
     /// <summary>
     /// Gets the metadata associated with the result.
     /// </summary>
