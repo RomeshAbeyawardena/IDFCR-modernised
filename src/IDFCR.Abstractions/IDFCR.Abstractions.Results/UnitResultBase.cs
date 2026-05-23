@@ -36,6 +36,39 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 
     /// <inheritdoc />
     public virtual bool TrySetState(object value) => false;
+
+    /// <inheritdoc />
+    public virtual bool Equals(UnitResultBase? other)
+    // Mutable runtime state (metadata/state overlays) is intentionally
+    // excluded from record equality/hash semantics because it is not
+    // part of the immutable value identity of the result.
+    {
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        if (other is null || EqualityContract != other.EqualityContract)
+        {
+            return false;
+        }
+
+        return Action == other.Action
+               && IsSuccess == other.IsSuccess
+               && Equals(Exception, other.Exception)
+               && FailureReason == other.FailureReason;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(
+            Action,
+            IsSuccess,
+            Exception,
+            FailureReason);
+    }
+
 }
 
 /// <summary>
@@ -52,13 +85,58 @@ public abstract record UnitResultBase<TResult>(TResult? OriginalState = default,
     bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
     : UnitResultBase(Exception, Action, IsSuccess, FailureReason), IUnitResult<TResult>
 {
+    /// <summary>
+    /// Gets a value indicating whether the state has been modified. This property is used to track whether the original state has been changed or updated, allowing for scenarios where the result may need to be modified after its initial creation. By tracking this state, it enables the implementation of features such as change tracking, auditing, or conditional logic based on whether the result has been modified since it was created.
+    /// </summary>
+    protected bool IsStateModified;
+    
     /// <inheritdoc />
     public TResult? ModifiedState { get; private set; }
 
     /// <summary>
     /// Gets the underlying result value. If a modified state is available, it returns the modified state; otherwise, it returns the original state. This allows for a flexible representation of the result, where the original state can be preserved while still allowing for modifications or updates to be tracked through the modified state.
     /// </summary>
-    public TResult? Result => ModifiedState ?? OriginalState;
+    public TResult? Result => IsStateModified ? ModifiedState : OriginalState;
+
+    /// <inheritdoc />
+    protected override Type EqualityContract => typeof(UnitResultBase<TResult>);
+
+    
+    /// <inheritdoc />
+    public virtual bool Equals(UnitResultBase<TResult>? other)
+    // Mutable runtime state (metadata/state overlays) is intentionally
+    // excluded from record equality/hash semantics because it is not
+    // part of the immutable value identity of the result.
+    {
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        if (other is null || EqualityContract != other.EqualityContract)
+        {
+            return false;
+        }
+
+        return EqualityComparer<TResult?>.Default.Equals(OriginalState, other.OriginalState)
+               && Action == other.Action
+               && IsSuccess == other.IsSuccess
+               && Equals(Exception, other.Exception)
+               && FailureReason == other.FailureReason
+               && NamedResult == other.NamedResult;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(
+            OriginalState,
+            Action,
+            IsSuccess,
+            Exception,
+            FailureReason,
+            NamedResult);
+    }
 
     /// <summary>
     /// Attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false.
@@ -69,6 +147,7 @@ public abstract record UnitResultBase<TResult>(TResult? OriginalState = default,
     {
         if (value is TResult result)
         {
+            IsStateModified = true;
             ModifiedState = result;
             return true;
         }
