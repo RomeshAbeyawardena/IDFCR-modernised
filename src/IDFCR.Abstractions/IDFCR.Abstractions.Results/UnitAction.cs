@@ -1,8 +1,10 @@
 namespace IDFCR.Abstractions.Results;
 
+
 /// <summary>
 /// Describes the action associated with a unit result.
 /// </summary>
+[Flags]
 public enum UnitAction
 {
     /// <summary>
@@ -23,20 +25,20 @@ public enum UnitAction
     /// <summary>
     /// The result represents an update operation.
     /// </summary>
-    Update = 3,
+    Update = 4,
 
     /// <summary>
     /// The result represents a delete operation.
     /// </summary>
-    Delete = 4,
+    Delete = 8,
 
     /// <summary>
     /// The result represents a pending operation.
     /// </summary>
-    Pending = 5,
+    Pending = 16,
 
     /// <summary>
     /// The result represents a conflict.
     /// </summary>
-    Conflict = 6
+    Conflict = 32
 }

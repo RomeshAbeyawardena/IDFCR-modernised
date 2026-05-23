@@ -1,5 +1,6 @@
 using IDFCR.Abstractions.Mapper;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace IDFCR.Abstractions.Results.Extensions;
 
@@ -325,17 +326,68 @@ public static class UnitResultExtensions
     public static bool TrySetResultState<T>(this IUnitResult<T> sourceEntityResult, IUnitResult updateEntityResult,
         UnitAction action = UnitAction.Update)
     {
-        if (sourceEntityResult.IsSuccess
-            && updateEntityResult.IsSuccess
-            && updateEntityResult.Action == action
-            && updateEntityResult.Meta
-                .TryGetValue(Metadata.Meta.CurrentEntityState, out var entityState)
-                && entityState is T entity
-                && sourceEntityResult.TrySetState(entity))
+        return TrySetResultState(sourceEntityResult, updateEntityResult, out _, action);
+    }
+
+    /// <summary>
+    /// Attempts to set the state of a source entity result based on the state of an update entity result. This method checks if both results are successful and if the update action is an update. If so, it tries to retrieve the current entity state from the update result metadata and sets it to the source entity result if it is of the correct type. Returns true if the state was successfully set, otherwise false. Also outputs a reason string that provides details on why the state could not be set if it fails.
+    /// </summary>
+    /// <typeparam name="T">The type of the entity state.</typeparam>
+    /// <param name="sourceEntityResult">The source entity result.</param>
+    /// <param name="updateEntityResult">The update entity result.</param>
+    /// <param name="reason">The reason why the state could not be set if it fails.</param>
+    /// <param name="action">The action to check for.</param>
+    /// <returns>True if the state was successfully set, otherwise false.</returns>
+    public static bool TrySetResultState<T>(
+    this IUnitResult<T> sourceEntityResult,
+    IUnitResult updateEntityResult,
+    out string reason,
+    UnitAction action = UnitAction.Update)
+    {
+        if (!sourceEntityResult.IsSuccess)
         {
-            return true;
+            reason = "Source entity result was not successful.";
+            return false;
         }
 
-        return false;
+        if (!updateEntityResult.IsSuccess)
+        {
+            reason = "Update entity result was not successful.";
+            return false;
+        }
+
+        if (!updateEntityResult.Action.HasFlag(action))
+        {
+            reason =
+                $"Update entity result action '{updateEntityResult.Action}' " +
+                $"does not contain expected action '{action}'.";
+            return false;
+        }
+
+        if (!updateEntityResult.Meta.TryGetValue(
+                Metadata.Meta.CurrentEntityState,
+                out var entityState))
+        {
+            reason = "Current entity state metadata was not found.";
+            return false;
+        }
+
+        if (entityState is not T entity)
+        {
+            reason =
+                $"Current entity state was of type " +
+                $"'{entityState?.GetType().Name ?? "null"}' " +
+                $"instead of expected type '{typeof(T).Name}'.";
+            return false;
+        }
+
+        if (!sourceEntityResult.TrySetState(entity))
+        {
+            reason = "Source entity result rejected the promoted state.";
+            return false;
+        }
+
+        reason = string.Empty;
+        return true;
     }
 }

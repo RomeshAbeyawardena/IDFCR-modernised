@@ -34,7 +34,11 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
     /// <inheritdoc />
     public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
 
-    /// <inheritdoc />
+    /// <summary>
+    /// When inherited by a derived type, attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false. By default, this method returns false, indicating that the modified state cannot be set for this result type. Derived types that support a modified state should override this method to provide the appropriate logic for setting the modified state based on the specific requirements of that result type.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public virtual bool TrySetState(object? value) => false;
 
     /// <inheritdoc />
