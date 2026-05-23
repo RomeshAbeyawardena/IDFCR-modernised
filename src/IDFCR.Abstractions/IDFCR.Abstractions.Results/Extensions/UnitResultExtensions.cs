@@ -64,7 +64,7 @@ public static class UnitResultExtensions
         }
     }
 
-    
+
     /// <summary>
     /// Returns the result value when available, otherwise a supplied default value.
     /// <para>Use this when you don't need to inspect the unit result itself.</para>
@@ -187,7 +187,7 @@ public static class UnitResultExtensions
             chainedResult = chained;
             return true;
         }
-        
+
         return false;
     }
 
@@ -199,7 +199,7 @@ public static class UnitResultExtensions
     /// <returns>The chained result of the specified type if the unit result is a chained result, otherwise null.</returns>
     public static IUnitResult<T>? ChainedResultOf<T>(this IUnitResult result)
     {
-        if(!result.IsChainedResult(out var chainedResult))
+        if (!result.IsChainedResult(out var chainedResult))
         {
             return null;
         }
@@ -312,5 +312,30 @@ public static class UnitResultExtensions
         }
 
         return concreteType.GenericTypeArguments.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Attempts to set the state of a source entity result based on the state of an update entity result. This method checks if both results are successful and if the update action is an update. If so, it tries to retrieve the current entity state from the update result metadata and sets it to the source entity result if it is of the correct type. Returns true if the state was successfully set, otherwise false.
+    /// </summary>
+    /// <typeparam name="T">The type of the entity state.</typeparam>
+    /// <param name="sourceEntityResult">The source entity result.</param>
+    /// <param name="updateEntityResult">The update entity result.</param>
+    /// <param name="action">The action to check for.</param>
+    /// <returns>True if the state was successfully set, otherwise false.</returns>
+    public static bool TrySetResultState<T>(this IUnitResult<T> sourceEntityResult, IUnitResult updateEntityResult,
+        UnitAction action = UnitAction.Update)
+    {
+        if (sourceEntityResult.IsSuccess
+            && updateEntityResult.IsSuccess
+            && updateEntityResult.Action == action
+            && updateEntityResult.Meta
+                .TryGetValue(Metadata.Meta.CurrentEntityState, out var entityState)
+                && entityState is T entity
+                && sourceEntityResult.TrySetState(entity))
+        {
+            return true;
+        }
+
+        return false;
     }
 }
