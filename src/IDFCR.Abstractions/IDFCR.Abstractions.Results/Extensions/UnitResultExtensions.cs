@@ -323,7 +323,8 @@ public static class UnitResultExtensions
     /// <param name="updateEntityResult">The update entity result.</param>
     /// <param name="action">The action to check for.</param>
     /// <returns>True if the state was successfully set, otherwise false.</returns>
-    public static bool TrySetResultState<T>(this IUnitResult<T> sourceEntityResult, IUnitResult updateEntityResult,
+    public static bool TrySetResultState<T>(this IUnitResult<T> sourceEntityResult, 
+        IUnitResult updateEntityResult,
         UnitAction action = UnitAction.Update)
     {
         return TrySetResultState(sourceEntityResult, updateEntityResult, out _, action);
@@ -359,8 +360,7 @@ public static class UnitResultExtensions
         if (!updateEntityResult.Action.HasFlag(action))
         {
             reason =
-                $"Update entity result action '{updateEntityResult.Action}' " +
-                $"does not contain expected action '{action}'.";
+                $"Update entity result action '{updateEntityResult.Action}' does not contain expected action '{action}'.";
             return false;
         }
 
@@ -375,9 +375,7 @@ public static class UnitResultExtensions
         if (entityState is not T entity)
         {
             reason =
-                $"Current entity state was of type " +
-                $"'{entityState?.GetType().Name ?? "null"}' " +
-                $"instead of expected type '{typeof(T).Name}'.";
+                $"Current entity state was of type '{entityState?.GetType().Name ?? "null"}' instead of expected type '{typeof(T).Name}'.";
             return false;
         }
 
