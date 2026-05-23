@@ -55,10 +55,16 @@ public abstract record UnitResultBase<TResult>(TResult? OriginalState = default,
     /// <inheritdoc />
     public TResult? ModifiedState { get; private set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the underlying result value. If a modified state is available, it returns the modified state; otherwise, it returns the original state. This allows for a flexible representation of the result, where the original state can be preserved while still allowing for modifications or updates to be tracked through the modified state.
+    /// </summary>
     public TResult? Result => ModifiedState ?? OriginalState;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false.
+    /// </summary>
+    /// <param name="value">The value to set as the modified state.</param>
+    /// <returns>True if the modified state was set successfully; otherwise, false.</returns>
     public override bool TrySetState(object value)
     {
         if (value is TResult result)
