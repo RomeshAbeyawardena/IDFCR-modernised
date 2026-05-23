@@ -59,7 +59,8 @@ internal class UnitResultTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.True);
+            Assert.That(findResult.TrySetResultState(upsertResultSignal, out var reason), Is.True);
+            Assert.That(reason, Is.Empty);
             Assert.That(findResult.Result, Is.SameAs(persistedEntity));
         }
 
@@ -67,7 +68,8 @@ internal class UnitResultTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.TrySetResultState(upsertResultSignal, out var reason), Is.False);
+            Assert.That(reason, Is.EqualTo("Source entity result was not successful."));
             Assert.That(findResult.Result, Is.Null);
         }
 
@@ -76,7 +78,8 @@ internal class UnitResultTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.TrySetResultState(upsertResultSignal, out var reason), Is.False);
+            Assert.That(reason, Is.EqualTo("Update entity result was not successful."));
             Assert.That(findResult.Result, Is.SameAs(originalResult));
         }
     }
@@ -90,7 +93,8 @@ internal class UnitResultTests
         
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.TrySetResultState(upsertResultSignal, out var reason), Is.False);
+            Assert.That(reason, Is.EqualTo("Update entity result action 'Add' does not contain expected action 'Update'."));
             Assert.That(findResult.Result, Is.SameAs(originalResult));
         }
     }
