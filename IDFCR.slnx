@@ -63,7 +63,8 @@
     <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.OpenAI.Tests/IDFCR.AI.OpenAI.Tests.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Cryptography/">
-	<Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography.Extensions/IDFCR.Cryptography.Extensions.csproj" />
+  <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography/IDFCR.Cryptography.csproj" />
+  <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography.Extensions/IDFCR.Cryptography.Extensions.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Persistence.EntityFramework/">
     <Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Extensions/IDFCR.Persistence.EntityFrameworkCore.Extensions.csproj" />
