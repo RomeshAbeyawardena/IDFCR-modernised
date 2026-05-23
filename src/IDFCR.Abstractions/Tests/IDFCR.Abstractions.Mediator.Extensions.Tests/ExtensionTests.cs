@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
+using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results;
 using MediatR.Pipeline;
 using Moq;
@@ -213,10 +214,10 @@ public class ExtensionTests
             Assert.That(response.PagedQuery.PageSize, Is.EqualTo(2));
             Assert.That(response.PagedQuery.PageIndex, Is.EqualTo(1));
             Assert.That(result, Is.Empty);
-            Assert.That(response.Meta["pageSize"], Is.EqualTo(2));
-            Assert.That(response.Meta["pageIndex"], Is.EqualTo(1));
-            Assert.That(response.Meta["totalRows"], Is.EqualTo(0));
-            Assert.That(response.Meta["totalPages"], Is.EqualTo(0));
+            Assert.That(response.Meta[Meta.Paging.PageSize], Is.EqualTo(2));
+            Assert.That(response.Meta[Meta.Paging.PageIndex], Is.EqualTo(1));
+            Assert.That(response.Meta[Meta.Paging.TotalRows], Is.EqualTo(0));
+            Assert.That(response.Meta[Meta.Paging.TotalPages], Is.EqualTo(0));
         }
     }
 
