@@ -9,6 +9,12 @@ namespace IDFCR.Abstractions.Results;
 public interface IUnitResult
 {
     /// <summary>
+    /// Attempts to set the state of the result to the provided value. The specific behavior of this method may depend on the implementation, but it generally allows for updating the result's state based on new information or conditions. The method returns a boolean indicating whether the state was successfully set, which can be used to determine if the operation was valid or if any constraints were violated.
+    /// </summary>
+    /// <param name="value">The value to set the state to.</param>
+    /// <returns>True if the state was successfully set; otherwise, false.</returns>
+    bool TrySetState(object value);
+    /// <summary>
     /// Gets the metadata associated with the result.
     /// </summary>
     IReadOnlyDictionary<string, object?> Meta { get; }
@@ -55,6 +61,14 @@ public interface IUnitResult
 /// <typeparam name="TResult">The result value type.</typeparam>
 public interface IUnitResult<TResult> : IUnitResult
 {
+    /// <summary>
+    /// Gets the original state of the result, if one is available. This property represents the initial value of the result before any modifications or updates have been made. It can be used to compare against the modified state to determine if any changes have occurred, or to provide a reference point for the original data that was processed to produce the result.
+    /// </summary>
+    TResult? OriginalState { get; }
+    /// <summary>
+    /// Gets the modified state of the result, if one is available. This property can be used to track changes to the result's state after it has been created, allowing for more dynamic and flexible handling of results in various scenarios. The specific meaning and usage of the modified state may depend on the context in which the result is being used, but it generally provides insight into how the result has evolved over time.
+    /// </summary>
+    TResult? ModifiedState { get; }
     /// <summary>
     /// Gets the name of the result, if one is available. This can be used to identify the result in a collection of results or to provide additional context about the result.
     /// </summary>

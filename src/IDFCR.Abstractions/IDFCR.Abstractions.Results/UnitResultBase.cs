@@ -33,22 +33,49 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 
     /// <inheritdoc />
     public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
+
+    /// <inheritdoc />
+    public virtual bool TrySetState(object value) => false;
 }
 
 /// <summary>
 /// Base type for typed unit results.
 /// </summary>
 /// <typeparam name="TResult">The result value type.</typeparam>
-/// <param name="Result">The result value.</param>
+/// <param name="OriginalState">The result value.</param>
 /// <param name="Action">The associated action.</param>
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
 /// <param name="NamedResult">The name of the result.</param>
-public abstract record UnitResultBase<TResult>(TResult? Result = default, UnitAction Action = UnitAction.None,
+public abstract record UnitResultBase<TResult>(TResult? OriginalState = default, UnitAction Action = UnitAction.None,
     bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
     : UnitResultBase(Exception, Action, IsSuccess, FailureReason), IUnitResult<TResult>
 {
+    /// <inheritdoc />
+    public TResult? ModifiedState { get; private set; }
+
+    /// <summary>
+    /// Gets the underlying result value. If a modified state is available, it returns the modified state; otherwise, it returns the original state. This allows for a flexible representation of the result, where the original state can be preserved while still allowing for modifications or updates to be tracked through the modified state.
+    /// </summary>
+    public TResult? Result => ModifiedState ?? OriginalState;
+
+    /// <summary>
+    /// Attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false.
+    /// </summary>
+    /// <param name="value">The value to set as the modified state.</param>
+    /// <returns>True if the modified state was set successfully; otherwise, false.</returns>
+    public override bool TrySetState(object value)
+    {
+        if (value is TResult result)
+        {
+            ModifiedState = result;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <inheritdoc />
     public override IUnitResult<T> As<T>(T? value) where T : default
     {
