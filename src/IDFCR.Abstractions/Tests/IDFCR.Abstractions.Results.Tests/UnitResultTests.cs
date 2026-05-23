@@ -41,7 +41,7 @@ internal class UnitResultTests
     record Foo(int Id, string Key, string Value, DateTime? LastUpdatedTimestampUtc = null);
 
     [Test]
-    public void ModifiedState_UnitResultPath()
+    public void ModifiedState_UnitResultPaths()
     {
         //find result
 
@@ -71,13 +71,27 @@ internal class UnitResultTests
             Assert.That(findResult.Result, Is.Null);
         }
 
-        findResult = UnitResult.FromResult(new Foo(1, "bar", "mars"));
+        findResult = UnitResult.FromResult(originalResult);
         upsertResultSignal = UnitResult.Failed<Foo>(new DataException("Update failed due to a data error"));
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
-            Assert.That(findResult.Result, Is.EqualTo(originalResult));
+            Assert.That(findResult.Result, Is.SameAs(originalResult));
+        }
+    }
+
+    [Test]
+    public void ModifiedState_UnitResult_AdditionalPaths()
+    {
+        var originalResult = new Foo(1, "bar", "mars");
+        var findResult = UnitResult.FromResult(originalResult);
+        var upsertResultSignal = UnitResult.Success(UnitAction.Add);
+        
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.Result, Is.SameAs(originalResult));
         }
     }
 }
