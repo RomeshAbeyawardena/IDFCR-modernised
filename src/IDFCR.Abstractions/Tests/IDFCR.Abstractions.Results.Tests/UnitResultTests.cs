@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using IDFCR.Abstractions.Results.Extensions;
+using System.Data;
 
 namespace IDFCR.Abstractions.Results.Tests;
 
@@ -43,7 +44,10 @@ internal class UnitResultTests
     public void ModifiedState_UnitResultPath()
     {
         //find result
-        var findResult = UnitResult.FromResult(new Foo(1, "bar", "mars"));
+
+        var originalResult = new Foo(1, "bar", "mars");
+
+        var findResult = UnitResult.FromResult(originalResult);
 
         //update signal
         var upsertResultSignal = UnitResult.Success(UnitAction.Update);
@@ -57,6 +61,23 @@ internal class UnitResultTests
         {
             Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.True);
             Assert.That(findResult.Result, Is.SameAs(persistedEntity));
+        }
+
+        findResult = UnitResult.NotFound<Foo>(1);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.Result, Is.Null);
+        }
+
+        findResult = UnitResult.FromResult(new Foo(1, "bar", "mars"));
+        upsertResultSignal = UnitResult.Failed<Foo>(new DataException("Update failed due to a data error"));
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(findResult.TrySetResultState(upsertResultSignal), Is.False);
+            Assert.That(findResult.Result, Is.EqualTo(originalResult));
         }
     }
 }
