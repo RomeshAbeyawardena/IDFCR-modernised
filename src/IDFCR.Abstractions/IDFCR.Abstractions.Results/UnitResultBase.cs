@@ -33,22 +33,43 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 
     /// <inheritdoc />
     public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
+
+    /// <inheritdoc />
+    public virtual bool TrySetState(object value) => false;
 }
 
 /// <summary>
 /// Base type for typed unit results.
 /// </summary>
 /// <typeparam name="TResult">The result value type.</typeparam>
-/// <param name="Result">The result value.</param>
+/// <param name="OriginalState">The result value.</param>
 /// <param name="Action">The associated action.</param>
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
 /// <param name="NamedResult">The name of the result.</param>
-public abstract record UnitResultBase<TResult>(TResult? Result = default, UnitAction Action = UnitAction.None,
+public abstract record UnitResultBase<TResult>(TResult? OriginalState = default, UnitAction Action = UnitAction.None,
     bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
     : UnitResultBase(Exception, Action, IsSuccess, FailureReason), IUnitResult<TResult>
 {
+    /// <inheritdoc />
+    public TResult? ModifiedState { get; private set; }
+
+    /// <inheritdoc />
+    public TResult? Result => ModifiedState ?? OriginalState;
+
+    /// <inheritdoc />
+    public override bool TrySetState(object value)
+    {
+        if (value is TResult result)
+        {
+            ModifiedState = result;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <inheritdoc />
     public override IUnitResult<T> As<T>(T? value) where T : default
     {
