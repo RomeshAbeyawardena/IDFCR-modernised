@@ -7,4 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Cryptography\IDFCR.Abstractions.Cryptography.csproj" />
+  </ItemGroup>
  </Project>

@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Cryptography;
+﻿namespace IDFCR.Abstractions.Cryptography;
 
 /// <summary>
 /// Represents a service that can protect and unprotect token payloads using a signing key. This is typically used to ensure the integrity and confidentiality of token data when generating and validating tokens.

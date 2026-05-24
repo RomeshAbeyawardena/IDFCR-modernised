@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IDFCR.Abstractions.Cryptography;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Cryptography.Extensions;
 

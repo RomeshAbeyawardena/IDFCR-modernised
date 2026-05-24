@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Cryptography;
+﻿namespace IDFCR.Abstractions.Cryptography;
 
 /// <summary>
 /// Represents a service that can generate a derived key from a password and a constant value, and can also validate the derived key against a stored hash. This is typically used for securely storing and validating passwords or other secrets by deriving a key from the secret and comparing it to a stored hash. The interface also includes methods for computing checksums to ensure data integrity.

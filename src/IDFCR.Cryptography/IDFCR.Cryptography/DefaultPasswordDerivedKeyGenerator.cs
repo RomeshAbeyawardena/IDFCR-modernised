@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using IDFCR.Abstractions.Cryptography;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 

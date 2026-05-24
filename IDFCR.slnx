@@ -10,6 +10,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Caching/IDFCR.Abstractions.Caching.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli.Extensions/IDFCR.Abstractions.Cli.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli/IDFCR.Abstractions.Cli.csproj" />
+	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cryptography/IDFCR.Abstractions.Cryptography.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DatabaseUpdater/IDFCR.Abstractions.DatabaseUpdater.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DependencyInjection/IDFCR.Abstractions.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Filters/IDFCR.Abstractions.Filters.csproj" />

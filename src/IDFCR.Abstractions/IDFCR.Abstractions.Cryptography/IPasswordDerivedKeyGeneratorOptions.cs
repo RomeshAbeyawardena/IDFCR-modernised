@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Cryptography;
+﻿namespace IDFCR.Abstractions.Cryptography;
 
 /// <summary>
 /// Represents options for generating a key derived from a password. This interface defines properties that can be used to specify parameters for the key derivation process, such as a checksum, key length, and nonce length.
