@@ -6,12 +6,18 @@
 public interface IRequestContext
 {
     /// <summary>
+    /// Gets items associated with the authenticated HTTP request, allowing storage and retrieval of arbitrary data related to the request, such as user information, request metadata, or other contextual data that may be needed during the processing of the request.
+    /// </summary>
+    IItems Items { get; }
+    /// <summary>
     /// Gets the headers from the authenticated HTTP request, allowing access to additional information sent by the client, such as authentication tokens or custom headers.
     /// </summary>
     IHeaders Headers { get; }
 }
 
-internal class DefaultRequestContext(IDictionary<string, object?> values, Func<object, string> getStringValue) : IRequestContext
+internal class DefaultRequestContext(IDictionary<string, object?> values, Func<object, string> getStringValue,
+    IDictionary<string, object?> items, Func<object, string> getItemValue) : IRequestContext
 {
+    public IItems Items { get; } = new DefaultItems(items, getItemValue);
     public IHeaders Headers { get; } = new DefaultHeaders(values, getStringValue);
 }

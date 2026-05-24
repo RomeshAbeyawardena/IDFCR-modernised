@@ -22,9 +22,14 @@ public static class ServiceCollectionExtensions
 
         Dictionary<string, object?> headers = context.Request.Headers.ToDictionary(x => x.Key, x => (object?)x.Value);
 
+        Dictionary<string, object?> items = context.Items.ToDictionary(x => x.Key?.ToString()
+        ?? throw new KeyNotFoundException(), x => x.Value);
+
         return new DefaultAuthenticatedContext(isAuthenticated,
             headers,
             x => x is StringValues value ? string.Join(',', value!) : string.Empty,
+            items,
+            x => x?.ToString() ?? string.Empty,
             claims,
             x => x is Claim claim ? claim.Value : string.Empty);
     }

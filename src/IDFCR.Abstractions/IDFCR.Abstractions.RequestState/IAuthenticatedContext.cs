@@ -20,9 +20,11 @@ public interface IAuthenticatedContext : IRequestContext
 internal class DefaultAuthenticatedContext(bool isAuthenticated,
     IDictionary<string, object?> headerValues, 
     Func<object, string> getHeaderStringValue,
+    IDictionary<string, object?> items, 
+    Func<object, string> getItemValue,
     IDictionary<string, object?> claimValues,
     Func<object, string> getClaimStringValue) 
-    : DefaultRequestContext(headerValues, getHeaderStringValue), IAuthenticatedContext
+    : DefaultRequestContext(headerValues, getHeaderStringValue, items, getItemValue), IAuthenticatedContext
 {
     public bool IsAuthenticated { get; } = isAuthenticated;
     public IAuthenticatedClaims Claims { get; } = new DefaultAuthenticatedClaims(claimValues, getClaimStringValue);
