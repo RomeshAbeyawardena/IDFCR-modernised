@@ -51,6 +51,9 @@
     </Project>
     <Project Path="src/IDFCR.TestUtilities/IDFCR.TestUtilities.csproj" />
   </Folder>
+  <Folder Name="/src/IDFCR.Cryptography/Tests/">
+    <Project Path="src/IDFCR.Cryptography/Tests/IDFCR.Cryptography.Tests/IDFCR.Cryptography.Tests.csproj" />
+  </Folder>
   <Folder Name="/src/IDFCR.DatabaseUpdater/">
     <Project Path="src/IDFCR.DatabaseUpdater/IDFCR.DatabaseUpdater.csproj" />
   </Folder>

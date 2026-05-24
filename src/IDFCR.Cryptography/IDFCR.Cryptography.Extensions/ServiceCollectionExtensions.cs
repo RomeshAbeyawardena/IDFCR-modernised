@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection to which the cryptography services will be added.</param>
     /// <returns>The updated service collection with the cryptography services registered.</returns>
-    public static IServiceCollection AddCryptographyServices(IServiceCollection services)
+    public static IServiceCollection AddCryptographyServices(this IServiceCollection services)
     {
         return services
             .AddSingleton<ITokenPayloadProtector, DefaultTokenPayloadProtector>()
