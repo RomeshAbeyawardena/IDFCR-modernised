@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     private static DefaultAuthenticatedContext GetAuthenticatedRequestContext(IHttpContextAccessor accessor)
     {
-        var context = accessor.HttpContext ?? throw new InvalidOperationException("HttpContext is not available.");
+        var context = accessor.HttpContext ?? throw new InvalidOperationException($"{nameof(HttpContext)} is not available.");
 
         var user = context.User;
         bool isAuthenticated = user.Identity is not null && user.Identity.IsAuthenticated;
