@@ -23,6 +23,7 @@ public abstract class StateDictionaryBase(IDictionary<string, object?> values, F
         if (base.TryGetValue(key, out var val) && val is not null)
         {
             value = getStringValue?.Invoke(val);
+            return true;
         }
 
         return false;
