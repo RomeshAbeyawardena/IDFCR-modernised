@@ -5,6 +5,57 @@ using System.Text;
 namespace IDFCR.Cryptography.Tests;
 
 [TestFixture]
+internal class DefaultTokenPayloadProtectorTests
+{
+    private const string SigningKey = "this-is-a-long-test-signing-key-for-token-encryption";
+
+    [Test]
+    public void Protect_DoesNotExposePlainText()
+    {
+        DefaultTokenPayloadProtector sut = new();
+
+        var protectedValue = sut.Protect("client-secret-value", SigningKey);
+
+        Assert.That(protectedValue, Does.Not.Contain("client-secret-value"));
+    }
+
+    [Test]
+    public void Unprotect_WithMatchingSigningKey_ReturnsOriginalValue()
+    {
+        DefaultTokenPayloadProtector sut = new();
+
+        var protectedValue = sut.Protect("client-secret-value", SigningKey);
+        var result = sut.Unprotect(protectedValue, SigningKey);
+
+        Assert.That(result, Is.EqualTo("client-secret-value"));
+    }
+
+    [Test]
+    public void Unprotect_WithDifferentSigningKey_ThrowsCryptographicException()
+    {
+        DefaultTokenPayloadProtector sut = new();
+
+        var protectedValue = sut.Protect("client-secret-value", SigningKey);
+
+        Assert.That(
+            () => sut.Unprotect(protectedValue, "different-long-test-signing-key"),
+            Throws.InstanceOf<CryptographicException>());
+    }
+
+    [Test]
+    public void Protect_UsesDifferentNonceForEachPayload()
+    {
+        DefaultTokenPayloadProtector sut = new();
+
+        var first = sut.Protect("client-secret-value", SigningKey);
+        var second = sut.Protect("client-secret-value", SigningKey);
+
+        Assert.That(first, Is.Not.EqualTo(second));
+    }
+}
+
+
+[TestFixture]
 internal class DefaultPasswordDerivedKeyGeneratorTests
 {
     private DefaultPasswordDerivedKeyGenerator _generator;
