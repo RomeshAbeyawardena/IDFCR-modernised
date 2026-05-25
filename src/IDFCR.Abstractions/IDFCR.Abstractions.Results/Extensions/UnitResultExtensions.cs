@@ -388,4 +388,26 @@ public static class UnitResultExtensions
         reason = string.Empty;
         return true;
     }
+
+    /// <summary>
+    /// Produces a new typed unit result from an untyped unit result by copying the success status, exception, action, and failure reason. The result value of the new typed unit result is set to the default value of the specified type. This can be useful when you have an untyped unit result and want to create a typed unit result that carries the same metadata but with a specific result type.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value.</typeparam>
+    /// <param name="result">The untyped unit result.</param>
+    /// <returns>A new typed unit result with the same metadata as the original.</returns>
+    public static IUnitResult<T> ToDerivedResult<T>(this IUnitResult result)
+    {
+        var derivedResult = UnitResult.Create<T>(default, 
+            result.IsSuccess, 
+            result.Exception, 
+            result.Action, 
+            result.FailureReason);
+
+        foreach(var (key, value) in result.Meta)
+        {
+            derivedResult.AddMeta(key, value);
+        }
+
+        return derivedResult;
+    }
 }
