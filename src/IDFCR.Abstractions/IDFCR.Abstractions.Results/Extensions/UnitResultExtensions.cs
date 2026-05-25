@@ -395,7 +395,7 @@ public static class UnitResultExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="result">The untyped unit result.</param>
     /// <returns>A new typed unit result with the same metadata as the original.</returns>
-    public static IUnitResult<T> ToDerivedResult<T>(this IUnitResult result)
+    public static IUnitResult<T> ToResult<T>(this IUnitResult result)
     {
         var derivedResult = UnitResult.Create<T>(default, 
             result.IsSuccess, 
