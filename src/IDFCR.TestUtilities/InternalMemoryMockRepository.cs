@@ -199,5 +199,10 @@ public class InternalMemoryMockRepository<TCommon, TDb, T>(IEntityInterceptorFac
 
         return base.UpsertAsync(entry, cancellationToken);
     }
+
+    protected override Task OnReloadEntityAsync(TDb entity)
+    {
+        return Task.CompletedTask;
+    }
 }
 

@@ -262,16 +262,16 @@ namespace IDFCR.Abstractions.Persistence
                 }
 
                 var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+                clonedEntity.Apply(dbValue);
+
+                if (!HasChanges(clonedEntity, foundEntry))
+                {
+                    return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
+                }
 
                 OnUpdate(foundEntry, entry);
 
                 foundEntry.Apply(dbValue);
-
-                if (!HasChanges(clonedEntity, foundEntry))
-                {
-                    await OnReloadEntityAsync(foundEntry);
-                    return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
-                }
 
                 context = await InvokeInterceptorsAsync(EntityContextBehaviorStage.Pre,
                     EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
