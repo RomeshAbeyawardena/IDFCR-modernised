@@ -10,7 +10,6 @@ using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace IDFCR.Persistence.EntityFrameworkCore;
 
@@ -277,5 +276,11 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     public Task RollbackAsync(IDbTransaction transaction, CancellationToken cancellationToken)
     {
         return transaction.RollbackAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnReloadEntityAsync(TDb entity)
+    {
+        await RawDbSet.Entry(entity).ReloadAsync();
     }
 }

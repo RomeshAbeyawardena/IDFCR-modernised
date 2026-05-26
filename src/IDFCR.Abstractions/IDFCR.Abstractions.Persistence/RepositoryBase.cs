@@ -213,9 +213,17 @@ namespace IDFCR.Abstractions.Persistence
         /// <param name="dto">The data transfer object.</param>
         protected abstract void OnUpdate(TDb db, T dto);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        protected abstract Task OnReloadEntityAsync(TDb entity);
+
         /// <inheritdoc />
         public virtual async Task<IUnitResult<TKey>> UpsertAsync(T entry, CancellationToken cancellationToken)
         {
+            TDb? foundEntry = null;
             try
             {
                 string resultName = $"{EntityName ?? ComputedEntityName}Id";
@@ -246,7 +254,7 @@ namespace IDFCR.Abstractions.Persistence
                     return addedResult;
                 }
 
-                var foundEntry = await OnFindAsync(dbValue.Id, true, cancellationToken);
+                foundEntry = await OnFindAsync(dbValue.Id, true, cancellationToken);
 
                 if (foundEntry is null)
                 {
@@ -261,6 +269,7 @@ namespace IDFCR.Abstractions.Persistence
 
                 if (!HasChanges(clonedEntity, foundEntry))
                 {
+                    await OnReloadEntityAsync(foundEntry);
                     return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
                 }
 
@@ -284,6 +293,11 @@ namespace IDFCR.Abstractions.Persistence
             }
             catch (Exception exception)
             {
+                if (foundEntry is not null)
+                {
+                    await OnReloadEntityAsync(foundEntry);
+                }
+
                 if (IsHandled(exception))
                 {
                     return UnitResult.Failed<TKey>(exception);
