@@ -10,20 +10,6 @@
     <PackageVersion Include="Grpc.AspNetCore.Server" Version="2.80.0" />
     <PackageVersion Include="Grpc.Core.Api" Version="2.80.0" />
     <PackageVersion Include="Grpc.Tools" Version="2.80.0" />
-    <PackageVersion Include="IDFCR.Abstractions.Cli.Extensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.GRPC" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.GRPC.Contracts" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.GRPC.Extensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.GRPC.Generated" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.GRPC.HostExtensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Interceptors.DependencyInjection" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Interceptors.Extensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Mapper.Extensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Mediator.Extensions" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Metadata" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Abstractions.Persistence" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.DatabaseUpdater" Version="2.0.7.1" />
-    <PackageVersion Include="IDFCR.Persistence.EntityFrameworkCore.Extensions" Version="2.0.7.1" />
     <PackageVersion Include="IDFCR.TestUtilities" Version="2.0.7.1" />
     <PackageVersion Include="LinqKit" Version="1.3.11" />
     <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
