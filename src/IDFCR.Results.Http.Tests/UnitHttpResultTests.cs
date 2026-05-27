@@ -517,7 +517,7 @@ internal class UnitHttpResultTests
         // Arrange
         var current = UnitResult.FromResult("value", UnitAction.Get, isSuccess: true);
         var last = UnitResult.Failed(new InvalidOperationException("conflict"), UnitAction.Update, FailureReason.Conflict);
-        var chained = current.Chain(last);
+        var chained = current.Chain(last, true);
 
         var result = chained.AsChainedHttp();
 

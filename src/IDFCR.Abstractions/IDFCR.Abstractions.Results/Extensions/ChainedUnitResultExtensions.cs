@@ -10,8 +10,9 @@ public static class ChainedUnitResultExtensions
     /// </summary>
     /// <param name="result">The first unit result in the chain.</param>
     /// <param name="results">The subsequent unit results to chain.</param>
+    /// <param name="setAsFailWhenAnyUnitsFail">Sets whether the chained result should be marked as failed if any of the individual unit results fail.</param>
     /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
-    public static IChainedUnitResult<T> Chain<T>(this IUnitResult<T> result, IEnumerable<IUnitResult> results)
+    public static IChainedUnitResult<T> Chain<T>(this IUnitResult<T> result, IEnumerable<IUnitResult> results, bool setAsFailWhenAnyUnitsFail = false)
     {
         using IEnumerator<IUnitResult> enumerator = results.GetEnumerator();
 
@@ -30,7 +31,7 @@ public static class ChainedUnitResultExtensions
                 continue;
             }
 
-            currentChain = new DefaultChainedUnitResult<T>(currentChain, enumerator.Current);
+            currentChain = new DefaultChainedUnitResult<T>(currentChain, enumerator.Current, setAsFailWhenAnyUnitsFail);
         }
 
         return currentChain;
@@ -41,8 +42,9 @@ public static class ChainedUnitResultExtensions
     /// </summary>
     /// <param name="result">The first unit result in the chain.</param>
     /// <param name="results">The subsequent unit results to chain.</param>
+    /// <param name="setAsFailWhenAnyUnitsFail">Sets whether the chained result should be marked as failed if any of the individual unit results fail.</param>
     /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
-    public static IChainedUnitResult Chain(this IUnitResult result, IEnumerable<IUnitResult> results)
+    public static IChainedUnitResult Chain(this IUnitResult result, IEnumerable<IUnitResult> results, bool setAsFailWhenAnyUnitsFail = false)
     {
         using IEnumerator<IUnitResult> enumerator = results.GetEnumerator();
 
@@ -55,7 +57,7 @@ public static class ChainedUnitResultExtensions
 
         while (enumerator.MoveNext())
         {
-            currentChain = new DefaultChainedUnitResult(currentChain, enumerator.Current);
+            currentChain = new DefaultChainedUnitResult(currentChain, enumerator.Current, setAsFailWhenAnyUnitsFail);
         }
 
         return currentChain;
@@ -67,7 +69,7 @@ public static class ChainedUnitResultExtensions
     /// <param name="currentResult">The second unit result in the chain. This result becomes the last result in the chain.</param>
     /// <param name="setAsFailWhenAnyUnitsFail">Determines whether the resulting chained unit result should be considered a failure if any of the individual unit results in the chain are failures. If set to true, the resulting chained unit result will be marked as a failure if either the current or last unit result is a failure. If set to false, the resulting chained unit result will only be marked as a failure if the last unit result is a failure, regardless of the status of the current unit result.</param>
     /// <returns></returns>
-    public static IChainedUnitResult Chain(this IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
+    public static IChainedUnitResult Chain(this IUnitResult currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = false)
     { 
         return new DefaultChainedUnitResult(currentResult, lastResult, setAsFailWhenAnyUnitsFail);
     }
@@ -80,7 +82,7 @@ public static class ChainedUnitResultExtensions
     /// <param name="currentResult">The second unit result in the chain. This result becomes the last result in the chain.</param>
     /// <param name="setAsFailWhenAnyUnitsFail">Determines whether the resulting chained unit result should be considered a failure if any of the individual unit results in the chain are failures. If set to true, the resulting chained unit result will be marked as a failure if either the current or last unit result is a failure. If set to false, the resulting chained unit result will only be marked as a failure if the last unit result is a failure, regardless of the status of the current unit result.</param>
     /// <returns></returns>
-    public static IChainedUnitResult<T> Chain<T>(this IUnitResult<T> currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = true)
+    public static IChainedUnitResult<T> Chain<T>(this IUnitResult<T> currentResult, IUnitResult lastResult, bool setAsFailWhenAnyUnitsFail = false)
     {
         return new DefaultChainedUnitResult<T>(currentResult, lastResult, setAsFailWhenAnyUnitsFail);
     }
