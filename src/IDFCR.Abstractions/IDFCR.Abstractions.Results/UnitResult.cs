@@ -108,8 +108,19 @@ public static class UnitResult
     /// Throws an <see cref="InternalResultFailureException"/> if the provided result indicates a failure with an internal failure origin.
     /// </summary>
     /// <param name="result">The result to check for internal failure.</param>
-    public static void ThrowIfInternal(this IUnitResult result)
+    public static void ThrowIfInternalFailure(this IUnitResult result)
     {
-        InternalResultFailureException.ThrowOnFailure(result);
+        InternalResultFailureException.ThrowOnInternalFailure(result);
+    }
+
+    /// <summary>
+    /// Determines whether the provided result indicates a failure with an internal failure origin.
+    /// </summary>
+    /// <param name="result">The result to check for internal failure.</param>
+    /// <returns>True if the result indicates an internal failure; otherwise, false.</returns>
+    public static bool IsInternalFailure(this IUnitResult result)
+    {
+        return  !result.IsSuccess 
+                && result.FailureOrigin == FailureOrigin.Internal;
     }
 }

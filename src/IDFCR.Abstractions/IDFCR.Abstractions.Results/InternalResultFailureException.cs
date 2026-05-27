@@ -15,12 +15,13 @@ public sealed class InternalResultFailureException(IUnitResult failedResult,
     /// </summary>
     /// <param name="result">The result to check for internal failure.</param>
     /// <exception cref="InternalResultFailureException">Thrown if the result indicates an internal failure.</exception>
-    public static void ThrowOnFailure(IUnitResult result)
+    public static void ThrowOnInternalFailure(IUnitResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        if (!result.IsSuccess && result.FailureOrigin == FailureOrigin.Internal)
+        if (result.IsInternalFailure())
         {
-            throw new InternalResultFailureException(result, result.Exception?.Message ?? "An internal result exception occurred", result.Exception);
+            throw new InternalResultFailureException(result, result.Exception?.Message 
+                ?? "An internal result exception occurred", result.Exception);
         }
     }
 
