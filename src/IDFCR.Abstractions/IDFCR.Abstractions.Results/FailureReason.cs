@@ -53,5 +53,9 @@ public enum FailureReason
     /// <summary>
     /// An authorisation error
     /// </summary>
-    AuthorizationError = 8
+    AuthorizationError = 8,
+    /// <summary>
+    /// A not supported error, such as an unsupported media type or operation.
+    /// </summary>
+    NotSupported = 9
 }

@@ -135,7 +135,7 @@ public static class ChainedUnitResultExtensions
     /// <typeparam name="T">The type of the result value to search for in the chained unit result.</typeparam>
     /// <param name="chainedUnitResult">The chained unit result to search through.</param>
     /// <returns>The first unit result of the specified type that has a value, or null if no such result is found.</returns>
-    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult)
+    public static IUnitResult<T> Of<T>(this IChainedUnitResult chainedUnitResult)
     {
         return Of<T>(chainedUnitResult, x => x.HasValue);
     }

@@ -198,11 +198,11 @@ public static class UnitResultExtensions
     /// <typeparam name="T">The type of the chained result.</typeparam>
     /// <param name="result">The unit result to check.</param>
     /// <returns>The chained result of the specified type if the unit result is a chained result, otherwise null.</returns>
-    public static IUnitResult<T>? ChainedResultOf<T>(this IUnitResult result)
+    public static IUnitResult<T> ChainedResultOf<T>(this IUnitResult result)
     {
         if (!result.IsChainedResult(out var chainedResult))
         {
-            return null;
+            return UnitResult.Failed<T>(new InvalidOperationException($"This instance {nameof(UnitResult)} does not support chained results"), failureReason: FailureReason.NotSupported);
         }
 
         return chainedResult.Of<T>();
@@ -215,11 +215,11 @@ public static class UnitResultExtensions
     /// <param name="result">The unit result to check.</param>
     /// <param name="key">The key of the parent result.</param>
     /// <returns>The chained result of the specified type that has a parent with the given key if the unit result is a chained result, otherwise null.</returns>
-    public static IUnitResult<T>? ChainedResultOf<T>(this IUnitResult result, string key)
+    public static IUnitResult<T> ChainedResultOf<T>(this IUnitResult result, string key)
     {
         if (!result.IsChainedResult(out var chainedResult))
         {
-            return null;
+            return UnitResult.Failed<T>(new InvalidOperationException($"This instance {nameof(UnitResult)} does not support chained results"), failureReason: FailureReason.NotSupported);
         }
 
         return chainedResult.Of<T>(key);
