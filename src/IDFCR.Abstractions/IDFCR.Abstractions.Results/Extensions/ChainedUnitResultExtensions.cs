@@ -92,11 +92,18 @@ public static class ChainedUnitResultExtensions
     /// <param name="chainedUnitResult">The chained unit result to search through.</param>
     /// <param name="predicate">An optional predicate to filter the results.</param>
     /// <returns>The first unit result of the specified type that matches the predicate, or null if no such result is found.</returns>
-    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult, Func<IUnitResult<T>, bool> predicate)
+    public static IUnitResult<T> Of<T>(this IChainedUnitResult chainedUnitResult, Func<IUnitResult<T>, bool> predicate)
     {
-        return chainedUnitResult.Enumerate()
+        var result = chainedUnitResult.Enumerate()
             .OfType<IUnitResult<T>>()
             .FirstOrDefault(predicate);
+
+        if (result is null)
+        {
+            return UnitResult.NotFound<T>(predicate, new NullReferenceException("Chained result not found"));
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -106,13 +113,20 @@ public static class ChainedUnitResultExtensions
     /// <param name="chainedUnitResult">The chained unit result to search through.</param>
     /// <param name="key">The key of the parent unit result to match.</param>
     /// <returns>The first unit result of the specified type that has a parent with the given key, or null if no such result is found.</returns>
-    public static IUnitResult<T>? Of<T>(this IChainedUnitResult chainedUnitResult, string key)
+    public static IUnitResult<T> Of<T>(this IChainedUnitResult chainedUnitResult, string key)
     {
-        return chainedUnitResult.EnumerateWithParents()
+        var result =  chainedUnitResult.EnumerateWithParents()
             .Where(x => x.Parent?.Key == key)
             .Select(x => x.Result)
             .OfType<IUnitResult<T>>()
             .FirstOrDefault();
+
+        if (result is null)
+        {
+            return UnitResult.NotFound<T>(key, new NullReferenceException("Chained result not found"));
+        }
+
+        return result;
     }
 
     /// <summary>
