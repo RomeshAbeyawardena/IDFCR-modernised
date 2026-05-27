@@ -1,4 +1,5 @@
 using IDFCR.Abstractions.Results.Exceptions;
+using System.Reflection.Metadata;
 
 namespace IDFCR.Abstractions.Results;
 
@@ -101,5 +102,14 @@ public static class UnitResult
     public static IUnitResult Failed(Exception exception, UnitAction action, FailureReason failureReason, FailureOrigin? failureOrigin = null)
     {
         return new DefaultUnitResult(exception, action, false, failureReason, failureOrigin);
+    }
+
+    /// <summary>
+    /// Throws an <see cref="InternalResultFailureException"/> if the provided result indicates a failure with an internal failure origin.
+    /// </summary>
+    /// <param name="result">The result to check for internal failure.</param>
+    public static void ThrowIfInternal(this IUnitResult result)
+    {
+        InternalResultFailureException.ThrowOnFailure(result);
     }
 }
