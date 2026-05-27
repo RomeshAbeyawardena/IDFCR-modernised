@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Cryptography\IDFCR.Abstractions.Cryptography.csproj" />

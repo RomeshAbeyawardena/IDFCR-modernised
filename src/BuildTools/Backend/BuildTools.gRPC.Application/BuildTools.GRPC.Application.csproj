@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDFCR.Abstractions.GRPC" Version="2.0.7.1" />
-    <PackageReference Include="IDFCR.Abstractions.GRPC.Extensions" Version="2.0.7.1" />
-    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.Extensions" />
+    <PackageReference Include="MediatR" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildTools.gRPC.Shared.Contracts\BuildTools.GRPC.Shared.Contracts.csproj" />

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,8 +7,8 @@
     <UserSecretsId>0fa7bb76-8950-4fce-bf82-08d43a0776c4</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-    <PackageReference Include="IDFCR.Abstractions.GRPC.HostExtensions" Version="2.0.7.1" />
+    <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="IDFCR.Abstractions.GRPC.HostExtensions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BuildTools.Infrastructure.SqlServer\BuildTools.Infrastructure.SqlServer.csproj" />

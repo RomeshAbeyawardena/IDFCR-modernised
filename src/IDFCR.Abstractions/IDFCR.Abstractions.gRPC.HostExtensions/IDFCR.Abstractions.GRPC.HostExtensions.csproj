@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.80.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.gRPC\IDFCR.Abstractions.GRPC.csproj" />
