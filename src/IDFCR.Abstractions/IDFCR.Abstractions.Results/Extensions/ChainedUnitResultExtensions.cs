@@ -100,7 +100,7 @@ public static class ChainedUnitResultExtensions
 
         if (result is null)
         {
-            return UnitResult.NotFound<T>(predicate, new NullReferenceException("Chained result not found"));
+            return UnitResult.NotFound<T>(predicate, new NullReferenceException("Chained result not found"), failureOrigin: FailureOrigin.Internal);
         }
 
         return result;
@@ -123,7 +123,7 @@ public static class ChainedUnitResultExtensions
 
         if (result is null)
         {
-            return UnitResult.NotFound<T>(key, new NullReferenceException("Chained result not found"));
+            return UnitResult.NotFound<T>(key, new NullReferenceException("Chained result not found"), failureOrigin: FailureOrigin.Internal);
         }
 
         return result;

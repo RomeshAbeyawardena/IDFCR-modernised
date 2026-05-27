@@ -1,8 +1,4 @@
-﻿using IDFCR.Results.Http.Extensions;
-using Microsoft.AspNetCore.Http;
-using System.Collections;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace IDFCR.Results.Http;
 

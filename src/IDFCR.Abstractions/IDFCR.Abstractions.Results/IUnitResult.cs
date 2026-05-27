@@ -25,6 +25,11 @@ public interface IUnitResult
     FailureReason? FailureReason { get; }
 
     /// <summary>
+    /// Gets the origin of the failure, when one is available. This property provides insight into where the failure occurred, which can be useful for debugging and error handling. The specific values for failure origin may include categories such as internal failures, caller code failures, or unknown origins, allowing for more granular classification of failures and better understanding of their context.
+    /// </summary>
+    FailureOrigin? FailureOrigin { get; }
+
+    /// <summary>
     /// Gets the exception captured by the result, if any.
     /// </summary>
     Exception? Exception { get; }

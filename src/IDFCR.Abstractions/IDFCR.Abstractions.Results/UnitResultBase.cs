@@ -10,8 +10,9 @@ namespace IDFCR.Abstractions.Results;
 /// <param name="Action">The associated action.</param>
 /// <param name="IsSuccess">A value indicating whether the operation succeeded.</param>
 /// <param name="FailureReason">The failure reason.</param>
+/// <param name="FailureOrigin">The origin of the failure.</param>
 public abstract record UnitResultBase(Exception? Exception = null, UnitAction Action = UnitAction.None,
-    bool IsSuccess = false, FailureReason? FailureReason = null) : IUnitResult
+    bool IsSuccess = false, FailureReason? FailureReason = null, FailureOrigin? FailureOrigin = FailureOrigin.CallerCode) : IUnitResult
 {
     private readonly ConcurrentDictionary<string, object?> _metaProperties = [];
     /// <inheritdoc />
@@ -85,9 +86,10 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
 /// <param name="Exception">The captured exception.</param>
 /// <param name="FailureReason">The failure reason.</param>
 /// <param name="NamedResult">The name of the result.</param>
+/// <param name="FailureOrigin"></param>
 public abstract record UnitResultBase<TResult>(TResult? OriginalState = default, UnitAction Action = UnitAction.None,
-    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null)
-    : UnitResultBase(Exception, Action, IsSuccess, FailureReason), IUnitResult<TResult>
+    bool IsSuccess = true, Exception? Exception = null, FailureReason? FailureReason = null, string? NamedResult = null, FailureOrigin? FailureOrigin = FailureOrigin.CallerCode)
+    : UnitResultBase(Exception, Action, IsSuccess, FailureReason, FailureOrigin), IUnitResult<TResult>
 {
     /// <summary>
     /// Gets a value indicating whether the state has been modified. This property is used to track whether the original state has been changed or updated, allowing for scenarios where the result may need to be modified after its initial creation. By tracking this state, it enables the implementation of features such as change tracking, auditing, or conditional logic based on whether the result has been modified since it was created.
