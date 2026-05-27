@@ -36,7 +36,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
 
         var saferExceptionProvider = serviceProvider.GetService<ISaferExceptionProvider>(); // we don't care if this is registered, if it isn't it will just expose the raw exceptions
         Exception finalException = exception; //will be either the converted to a safer exception OR just expose the raw exception
-        ISaferException? _saferException = null;
+        SaferException? _saferException = null;
         if (saferExceptionProvider is not null && saferExceptionProvider.TryGetImplementation(exception, out var saferException))
         {
             finalException = (Exception?)saferException ?? exception;
