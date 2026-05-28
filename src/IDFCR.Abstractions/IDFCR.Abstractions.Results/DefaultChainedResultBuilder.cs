@@ -10,13 +10,13 @@ internal class DefaultChainedResultBuilder : IChainedResultBuilder
         results.Add(result);
     }
 
-    public IChainedUnitResult Build(IUnitResult result)
+    public IChainedUnitResult Build(IUnitResult result, bool setAsFailWhenAnyUnitsFail = false)
     {
-        return result.Chain(results);
+        return result.Chain(results, setAsFailWhenAnyUnitsFail);
     }
 
-    public IChainedUnitResult<T> Build<T>(IUnitResult<T> result)
+    public IChainedUnitResult<T> Build<T>(IUnitResult<T> result, bool setAsFailWhenAnyUnitsFail = false)
     {
-        return result.Chain(results);
+        return result.Chain(results, setAsFailWhenAnyUnitsFail);
     }
 }
