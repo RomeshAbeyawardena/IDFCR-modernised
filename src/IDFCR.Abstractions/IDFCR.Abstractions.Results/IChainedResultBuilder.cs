@@ -14,7 +14,11 @@ public interface IChainedResultBuilder
     /// Builds a final chained unit result based on the individual unit results that have been added to the builder. This method takes an instance of IUnitResult as a parameter, which represents the initial result that will be included in the chain. The method then combines this initial result with all the previously added results to create a new chained unit result that contains the information from all the results in the chain. The resulting chained unit result preserves the information and status of each individual result in the chain, allowing for a cohesive representation of the combined results when this method is called. There is also an overload of this method that accepts an <see cref="IUnitResult{T}"/> parameter, allowing for the creation of a typed chained unit result that includes a value of type T in addition to the information from the individual results in the chain.
     /// </summary>
     /// <param name="result">The initial unit result to include in the chain.</param>
-    /// <param name="setAsFailWhenAnyUnitsFail">Determines whether the resulting chained unit result should be considered a failure if any of the individual unit results in the chain are failures. If set to true, the resulting chained unit result will be marked as a failure if either the current or last unit result is a failure. If set to false, the resulting chained unit result will only be marked as a failure if the last unit result is a failure, regardless of the status of the current unit result.</param>
+    /// <param name="setAsFailWhenAnyUnitsFail">
+    /// When true, the built chained result is marked as failed if the initial result
+    /// or any added result has failed. When false, added results are preserved in the
+    /// chain but do not affect the success state of the built result.
+    ///</param>
     /// <returns>A chained unit result containing the information from all the results in the chain.</returns>
     IChainedUnitResult Build(IUnitResult result, bool setAsFailWhenAnyUnitsFail = false);
     /// <summary>
@@ -22,7 +26,11 @@ public interface IChainedResultBuilder
     /// </summary>
     /// <typeparam name="T">The type of the result value in the initial unit result.</typeparam>
     /// <param name="result">The initial typed unit result to include in the chain.</param>
-    /// <param name="setAsFailWhenAnyUnitsFail">Determines whether the resulting chained unit result should be considered a failure if any of the individual unit results in the chain are failures. If set to true, the resulting chained unit result will be marked as a failure if either the current or last unit result is a failure. If set to false, the resulting chained unit result will only be marked as a failure if the last unit result is a failure, regardless of the status of the current unit result.</param>
+    /// <param name="setAsFailWhenAnyUnitsFail">
+    /// When true, the built chained result is marked as failed if the initial result
+    /// or any added result has failed. When false, added results are preserved in the
+    /// chain but do not affect the success state of the built result.
+    ///</param>
     /// <returns>A typed chained unit result containing the information from all the results in the chain, including the typed value from the initial result.</returns>
     IChainedUnitResult<T> Build<T>(IUnitResult<T> result, bool setAsFailWhenAnyUnitsFail = false);
 }
