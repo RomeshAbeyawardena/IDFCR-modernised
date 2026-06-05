@@ -25,7 +25,7 @@ internal class LoggerDerivedManagedStream(ILogger<LoggerDerivedManagedStream> lo
 {
     public bool IsInteractive { get; }
     public IIOWriteableStream Error { get; } = new LoggerWriteableStream(logger, LogLevel.Error);
-    public IIOReadableStream In => throw new NotSupportedException("An ILogger stream is read-only");
+    public IIOReadableStream In => NullReadableStream.Instance;
     public IIOWriteableStream Out { get; } = new LoggerWriteableStream(logger, LogLevel.Information);
     public long Width { get; } = 0;
 }
