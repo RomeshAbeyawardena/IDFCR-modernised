@@ -1,3 +1,5 @@
+using IDFCR.Abstractions.Metadata;
+
 namespace IDFCR.Abstractions.Results;
 
 /// <summary>
@@ -67,16 +69,18 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
         string? namedResult = null)
         : base(result, action, isSuccess, exception, failureReason, namedResult)
     {
+        var pagingMetaNamingConvention = MetaNaming.Convention.Paging;
+
         PagedQuery = pagedQuery;
         if (pagedQuery is not null)
         {
-            base.AddMeta(Metadata.Meta.Paging.PageIndex, pagedQuery.PageIndex);
-            base.AddMeta(Metadata.Meta.Paging.PageSize, pagedQuery.PageSize);
+            base.AddMeta(pagingMetaNamingConvention.PageIndex, pagedQuery.PageIndex);
+            base.AddMeta(pagingMetaNamingConvention.PageSize, pagedQuery.PageSize);
             TotalRows = totalRows;
-            base.AddMeta(Metadata.Meta.Paging.TotalRows, totalRows);
-            if (pagedQuery.PageSize.HasValue)
+            base.AddMeta(pagingMetaNamingConvention.TotalRows, totalRows);
+            if (pagedQuery.PageSize > 0)
             {
-                base.AddMeta(Metadata.Meta.Paging.TotalPages, (int)Math.Ceiling((double)totalRows / pagedQuery.PageSize.Value));
+                base.AddMeta(pagingMetaNamingConvention.TotalPages, (int)Math.Ceiling((double)totalRows / pagedQuery.PageSize.Value));
             }
         }
     }
