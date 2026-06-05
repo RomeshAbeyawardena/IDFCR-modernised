@@ -1,4 +1,5 @@
-﻿using IDFCR.Results.Http.Extensions;
+﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Results.Http.Extensions;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Text.Json.Serialization;
@@ -20,16 +21,18 @@ internal class UnitResult(Abstractions.Results.IUnitResult unitResult) : IUnitRe
 
         _meta = data.ToDictionary(x => x.Key, y => y.Value?.ToString());
 
-        _meta.Add(Abstractions.Metadata.Meta.ActionKey, unitResult.Action.ToString());
+        var metaNamingConvention = MetaNaming.Convention;
+        
+        _meta.Add(metaNamingConvention.ActionKey, unitResult.Action.ToString());
 
         if (unitResult.FailureReason.HasValue)
         {
-            _meta.Add(Abstractions.Metadata.Meta.FailureReason, unitResult.FailureReason.ToString());
+            _meta.Add(metaNamingConvention.FailureReason, unitResult.FailureReason.ToString());
         }
 
         if (unitResult.Exception is not null)
         {
-            _meta.Add(Abstractions.Metadata.Meta.ErrorMessage, unitResult.Exception.Message);
+            _meta.Add(metaNamingConvention.ErrorMessage, unitResult.Exception.Message);
         }
 
         foreach(var (key, value) in InternalMeta)
@@ -70,10 +73,12 @@ internal class UnitResult<T> : UnitResult, IUnitResult<T>
             dictionary = new(unitResultWithValue.Result.ToDictionary(unitResultWithValue.NamedResult));
         }
 
-        dictionary.TryAdd(Abstractions.Metadata.Meta.SuccessKey, (unitResult 
+        var metaNamingConvention = MetaNaming.Convention;
+
+        dictionary.TryAdd(metaNamingConvention.SuccessKey, (unitResult 
             ?? unitResultWithValue
             ?? throw new ArgumentNullException(nameof(unitResult), "Must provide at least one type of unit result")).IsSuccess);
-        dictionary.TryAdd(Abstractions.Metadata.Meta.Key, Meta);
+        dictionary.TryAdd(metaNamingConvention.Key, Meta);
         AppendToSelf(dictionary);
         results = dictionary;
     }
