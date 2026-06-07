@@ -15,7 +15,7 @@ public static class UnitResultExtensions
     /// <param name="result">The unit result containing the metadata.</param>
     /// <param name="key">The key of the metadata value to retrieve.</param>
     /// <returns>The integer value if found and successfully parsed; otherwise, null.</returns>
-    public static int? GetValue(IUnitResult result, string key)
+    public static int? GetValue(this IUnitResult result, string key)
     {
         int? value = null;
         if (result.Meta.TryGetValue(key, out var val)
@@ -32,7 +32,7 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="result">The unit result containing the metadata.</param>
     /// <returns>The total rows value if found and successfully parsed; otherwise, null.</returns>
-    public static int? GetTotalPages(IUnitResult result)
+    public static int? GetTotalPages(this IUnitResult result)
     {
         return GetValue(result, Metadata.Meta.Paging.TotalPages);
     }
@@ -42,7 +42,7 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="result">The unit result containing the metadata.</param>
     /// <returns>The page index value if found and successfully parsed; otherwise, null.</returns>
-    public static int? GetPageIndex(IUnitResult result)
+    public static int? GetPageIndex(this IUnitResult result)
     {
         return GetValue(result, Metadata.Meta.Paging.PageIndex);
     }
@@ -52,7 +52,7 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="result">The unit result containing the metadata.</param>
     /// <returns>The page size value if found and successfully parsed; otherwise, null.</returns>
-    public static int? GetPageSize(IUnitResult result)
+    public static int? GetPageSize(this IUnitResult result)
     {
         return GetValue(result, Metadata.Meta.Paging.PageSize);
     }

@@ -17,3 +17,15 @@ public static class MetaNaming
         }
     }
 }
+
+internal class BuildableMetaNamingConvention : IMetaNamingConvention
+{
+    public required string Key { get; internal set; }
+    public required string ItemKey { get; internal set; }
+    public required string SuccessKey { get; internal set; }
+    public required string FailureReason { get; internal set; }
+    public required string ErrorMessage { get; internal set; }
+    public required string ActionKey { get; internal set; }
+    public required string CurrentEntityState { get; internal set; }
+    public IMetaPagingNamingConvention Paging { get; internal set; }
+}
