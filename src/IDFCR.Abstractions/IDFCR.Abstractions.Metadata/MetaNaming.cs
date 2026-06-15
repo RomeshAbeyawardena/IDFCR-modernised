@@ -27,5 +27,5 @@ internal class BuildableMetaNamingConvention : IMetaNamingConvention
     public required string ErrorMessage { get; internal set; }
     public required string ActionKey { get; internal set; }
     public required string CurrentEntityState { get; internal set; }
-    public IMetaPagingNamingConvention Paging { get; internal set; }
+    public required IMetaPagingNamingConvention Paging { get; internal set; }
 }
