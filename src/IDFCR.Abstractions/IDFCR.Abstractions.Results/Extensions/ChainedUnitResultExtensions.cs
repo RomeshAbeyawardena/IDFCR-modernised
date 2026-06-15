@@ -22,7 +22,7 @@ public static class ChainedUnitResultExtensions
 
         if (!enumerator.MoveNext())
         {
-            throw new ArgumentOutOfRangeException(nameof(results));
+            return result as IChainedUnitResult<T> ?? new DefaultChainedUnitResult<T>(result, UnitResult.Create(true), setAsFailWhenAnyUnitsFail);
         }
 
         IChainedUnitResult<T> currentChain = new DefaultChainedUnitResult<T>(result, enumerator.Current);
@@ -58,7 +58,7 @@ public static class ChainedUnitResultExtensions
 
         if (!enumerator.MoveNext())
         {
-            throw new ArgumentOutOfRangeException(nameof(results));
+            return result as IChainedUnitResult ?? new DefaultChainedUnitResult(result, UnitResult.Create(true), setAsFailWhenAnyUnitsFail);
         }
 
         IChainedUnitResult currentChain = new DefaultChainedUnitResult(result, enumerator.Current);
