@@ -8,23 +8,25 @@ internal class DefaultCacheGroups : ConcurrentDictionary<string, ICacheGroup>, I
 {
     public bool TryAssignToGroup(string key, params string[] cacheKeys)
     {
-        if (TryGetValue(key, out var cacheGroup))
-        {
-            int addedCount = 0;
+        // Get or add the group atomically
+        var cacheGroup = GetOrAdd(key, _ => new DefaultCacheGroup { Key = key });
 
-            foreach(var itemKey in cacheKeys)
+        bool mutated = false;
+
+        // Lock on the individual group to prevent concurrent collection corruption
+        lock (cacheGroup)
+        {
+            foreach (var itemKey in cacheKeys)
             {
                 if (!cacheGroup.CacheKeys.Contains(itemKey))
                 {
                     cacheGroup.CacheKeys.Add(itemKey);
-                    addedCount++;
+                    mutated = true;
                 }
             }
-
-            return addedCount > 0;
         }
 
-        return false;
+        return mutated;
     }
 
     public bool TryRemoveFromGroup(string key, params string[] cacheKeys)
@@ -33,11 +35,14 @@ internal class DefaultCacheGroups : ConcurrentDictionary<string, ICacheGroup>, I
         {
             int removedCount = 0;
 
-            foreach (var itemKey in cacheKeys)
+            lock (cacheGroup)
             {
-                if (cacheGroup.CacheKeys.Remove(itemKey))
+                foreach (var itemKey in cacheKeys)
                 {
-                    removedCount++;
+                    if (cacheGroup.CacheKeys.Remove(itemKey))
+                    {
+                        removedCount++;
+                    }
                 }
             }
 

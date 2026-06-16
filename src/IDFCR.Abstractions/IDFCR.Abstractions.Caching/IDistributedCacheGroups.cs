@@ -16,6 +16,27 @@ public interface IDistributedCacheGroups
     public Task<byte[]?> GetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Sets the cached value associated with the specified group key and composite key, using a custom format function to generate the cache key. This method stores the provided data for a specific cache entry within a designated cache group, allowing for efficient management of related cache items. If the specified group or composite key does not exist, it will be created.
+    /// </summary>
+    /// <param name="groupKey">The key that identifies the cache group.</param>
+    /// <param name="compositeKey">The composite key that identifies the specific cache entry within the group.</param>
+    /// <param name="format">A function to generate the cache key based on the group key and composite key.</param>
+    /// <param name="data">The data to be cached.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous set operation.</returns>
+    public Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Sets the cached value associated with the specified group key and composite key. This method stores the provided data for a specific cache entry within a designated cache group, allowing for efficient management of related cache items. If the specified group or composite key does not exist, it will be created.
+    /// </summary>
+    /// <param name="groupKey">The key that identifies the cache group.</param>
+    /// <param name="compositeKey">The composite key that identifies the specific cache entry within the group.</param>
+    /// <param name="data">The data to be cached.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous set operation.</returns>
+    public Task SetAsync(string groupKey, string compositeKey, byte[] data, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the cached value associated with the specified group key and composite key. This method retrieves the cached data for a specific cache entry within a designated cache group, allowing for efficient access to related cache items. If the specified group or composite key does not exist, the method returns null.
     /// </summary>
     /// <param name="groupKey">The key that identifies the cache group.</param>

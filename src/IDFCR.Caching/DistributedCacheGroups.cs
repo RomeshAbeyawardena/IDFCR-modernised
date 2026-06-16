@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace IDFCR.Caching;
 
 /// <inheritdoc />
-public class DistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
+internal class DistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
 {
     /// <inheritdoc />
     public ICacheGroups Groups { get; private set; } = new DefaultCacheGroups();
@@ -24,7 +24,7 @@ public class DistributedCacheGroups(IDistributedCache distributedCache, MessageP
     /// <inheritdoc />
     public Task<byte[]?> GetAsync(string groupKey, string compositeKey, CancellationToken cancellationToken)
     {
-        return GetAsync(groupKey, compositeKey, cancellationToken);
+        return GetAsync(groupKey, compositeKey, null, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -53,5 +53,27 @@ public class DistributedCacheGroups(IDistributedCache distributedCache, MessageP
         await MessagePack.MessagePackSerializer.SerializeAsync(memoryStream, Groups, options, cancellationToken: cancellationToken);
 
         await distributedCache.SetAsync(nameof(DefaultCacheGroups), memoryStream.ToArray(), cancellationToken);
+    }
+
+    public async Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var cachedKey = format?.Invoke(groupKey, compositeKey) ?? compositeKey;
+
+            if (Groups.TryAssignToGroup(groupKey, compositeKey))
+            {
+                await distributedCache.SetAsync(cachedKey, data, cancellationToken);
+            }
+        }
+        catch
+        {
+            Groups.TryRemoveFromGroup(groupKey, compositeKey);
+        }
+    }
+
+    public Task SetAsync(string groupKey, string compositeKey, byte[] data, CancellationToken cancellationToken)
+    {
+        return SetAsync(groupKey, compositeKey, null, data, cancellationToken);
     }
 }
