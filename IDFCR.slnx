@@ -5,7 +5,9 @@
     <File Path="get-version.ps1" />
     <File Path="update-version.ps1" />
   </Folder>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/IDFCR.Caching/IDFCR.Caching.csproj" />
+  </Folder>
   <Folder Name="/src/IDFCR.Abstractions/">
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Builders/IDFCR.Abstractions.Builders.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Caching/IDFCR.Abstractions.Caching.csproj" />
