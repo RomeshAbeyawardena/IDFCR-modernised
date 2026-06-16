@@ -10,6 +10,24 @@ public class DistributedCacheGroups(IDistributedCache distributedCache, MessageP
     public ICacheGroups Groups { get; private set; } = new DefaultCacheGroups();
 
     /// <inheritdoc />
+    public Task<byte[]?> GetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, CancellationToken cancellationToken)
+    {
+        if (Groups.TryGetValue(groupKey, out var cacheGroup)
+            && cacheGroup.CacheKeys.Contains(compositeKey))
+        {
+            return distributedCache.GetAsync(format?.Invoke(groupKey, compositeKey) ?? compositeKey, cancellationToken);
+        }
+
+        return Task.FromResult<byte[]?>(null);
+    }
+
+    /// <inheritdoc />
+    public Task<byte[]?> GetAsync(string groupKey, string compositeKey, CancellationToken cancellationToken)
+    {
+        return GetAsync(groupKey, compositeKey, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task LoadAsync(CancellationToken cancellationToken)
     {
         var data = await distributedCache.GetAsync(nameof(DefaultCacheGroups), cancellationToken);
@@ -19,7 +37,7 @@ public class DistributedCacheGroups(IDistributedCache distributedCache, MessageP
             return;
         }
 
-        using var memoryStream = new MemoryStream();
+        using var memoryStream = new MemoryStream(data);
         var result = await MessagePack.MessagePackSerializer.DeserializeAsync<DefaultCacheGroups>(memoryStream, options, cancellationToken);
         
         if (result is not null)
