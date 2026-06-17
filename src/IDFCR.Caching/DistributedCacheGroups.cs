@@ -96,5 +96,16 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
     {
         return SetAsync(groupKey, compositeKey, null, data, cancellationToken);
     }
+
+    public async Task<IEnumerable<string>> GetCacheKeysAsync(string groupKey, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        if (Groups.TryGetValue(groupKey, out var cacheGroup))
+        {
+            return cacheGroup.CacheKeys;
+        }
+
+        return [];
+    }
 }
 #pragma warning restore

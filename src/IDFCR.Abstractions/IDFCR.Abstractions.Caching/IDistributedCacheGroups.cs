@@ -6,6 +6,13 @@
 public interface IDistributedCacheGroups
 {
     /// <summary>
+    /// Gets the collection of cache keys associated with the specified group key. This method retrieves the list of cache keys that are part of the designated cache group, allowing for efficient enumeration of related cache items. If the specified group does not exist, an empty collection is returned.
+    /// </summary>
+    /// <param name="groupKey">The key that identifies the cache group.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the collection of cache keys associated with the specified group key.</returns>
+    public Task<IEnumerable<string>> GetCacheKeysAsync(string groupKey, CancellationToken cancellationToken);
+    /// <summary>
     /// Gets the cached value associated with the specified group key and composite key, using a custom format function to generate the cache key. This method retrieves the cached data for a specific cache entry within a designated cache group, allowing for efficient access to related cache items. If the specified group or composite key does not exist, the method returns null.
     /// </summary>
     /// <param name="groupKey">The key that identifies the cache group.</param>
