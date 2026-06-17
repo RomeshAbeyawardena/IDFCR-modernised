@@ -5,7 +5,9 @@
     <File Path="get-version.ps1" />
     <File Path="update-version.ps1" />
   </Folder>
-  <Folder Name="/src/">
+  <Folder Name="/src/" />
+  <Folder Name="/src/Caching/">
+    <Project Path="src/IDFCR.Caching.Tests/IDFCR.Caching.Tests.csproj" />
     <Project Path="src/IDFCR.Caching/IDFCR.Caching.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Abstractions/">
@@ -13,7 +15,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Caching/IDFCR.Abstractions.Caching.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli.Extensions/IDFCR.Abstractions.Cli.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cli/IDFCR.Abstractions.Cli.csproj" />
-	<Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cryptography/IDFCR.Abstractions.Cryptography.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Cryptography/IDFCR.Abstractions.Cryptography.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DatabaseUpdater/IDFCR.Abstractions.DatabaseUpdater.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.DependencyInjection/IDFCR.Abstractions.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Filters/IDFCR.Abstractions.Filters.csproj" />
@@ -22,8 +24,6 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.Generated/IDFCR.Abstractions.GRPC.Generated.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC.HostExtensions/IDFCR.Abstractions.GRPC.HostExtensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.gRPC/IDFCR.Abstractions.GRPC.csproj" />
-    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState.Http/IDFCR.Abstractions.RequestState.Http.csproj" />
-    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState/IDFCR.Abstractions.RequestState.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.DependencyInjection/IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors.Extensions/IDFCR.Abstractions.Interceptors.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Interceptors/IDFCR.Abstractions.Interceptors.csproj" />
@@ -33,6 +33,8 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator/IDFCR.Abstractions.Mediator.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState.Http/IDFCR.Abstractions.RequestState.Http.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState/IDFCR.Abstractions.RequestState.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Results/IDFCR.Abstractions.Results.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Abstractions/Tests/">
@@ -72,8 +74,8 @@
     <Project Path="src/IDFCR.AI/Tests/IDFCR.AI.OpenAI.Tests/IDFCR.AI.OpenAI.Tests.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Cryptography/">
-  <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography/IDFCR.Cryptography.csproj" />
-  <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography.Extensions/IDFCR.Cryptography.Extensions.csproj" />
+    <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography.Extensions/IDFCR.Cryptography.Extensions.csproj" />
+    <Project Path="src/IDFCR.Cryptography/IDFCR.Cryptography/IDFCR.Cryptography.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Persistence.EntityFramework/">
     <Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Extensions/IDFCR.Persistence.EntityFrameworkCore.Extensions.csproj" />

@@ -2,13 +2,18 @@
 
 namespace IDFCR.Caching;
 
-[MessagePack.MessagePackObject(false, AllowPrivate = true)]
-internal class DefaultCacheGroup : ICacheGroupWithLock
+/// <inheritdoc/>
+[Obsolete("Not to be used in consumer code"),
+ MessagePack.MessagePackObject(false, AllowPrivate = true)]
+internal record DefaultCacheGroup : ICacheGroupWithLock
 {
+    /// <inheritdoc/>
     [MessagePack.Key(0)]
-    public required string Key { get; set; }
+    public required string Key { get; init; }
+    /// <inheritdoc/>
     [MessagePack.Key(1)]
-    public IList<string> CacheKeys { get; set; } = [];
+    public IList<string> CacheKeys { get; } = [];
+    /// <inheritdoc/>
     [MessagePack.IgnoreMember]
     public Lock @Lock { get; } = new();
 }
