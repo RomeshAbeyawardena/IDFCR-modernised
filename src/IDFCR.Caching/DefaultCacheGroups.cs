@@ -4,12 +4,29 @@ using System.Collections.Concurrent;
 
 namespace IDFCR.Caching;
 
-/// <inheritdoc />
+/// <inheritdoc cref="ICacheGroups" />
 [Obsolete("Not to be used in consumer code")]
 [MessagePack.MessagePackObject(true)]
-public sealed class DefaultCacheGroups : ICacheGroups
+public sealed partial class DefaultCacheGroups : ICacheGroups
 {
     private readonly ConcurrentDictionary<string, ICacheGroupWithLock> cacheGroups = new();
+
+    /// <summary>
+    /// Gets or sets an externally exposed dictionary of cache groups. This property allows for MessagePack serialization and deserialization of the cache groups, enabling the persistence and retrieval of cache group data. The dictionary is read-only, ensuring that external code cannot modify the internal state of the cache groups directly. When setting this property, the internal collection is cleared and repopulated with the provided values, maintaining thread safety and consistency.
+    /// </summary>
+    [MessagePack.Key(0)]
+    public IReadOnlyDictionary<string, DefaultCacheGroup> CacheGroups
+    {
+        get => cacheGroups.ToDictionary(x => x.Key, x => (DefaultCacheGroup)x.Value);
+        set
+        {
+            cacheGroups.Clear();
+            foreach(var (key, val) in value)
+            {
+                cacheGroups.TryAdd(key, val);
+            }
+        }
+    }
 
     ICacheGroup IReadOnlyDictionary<string, ICacheGroup>.this[string key] => cacheGroups[key];
 

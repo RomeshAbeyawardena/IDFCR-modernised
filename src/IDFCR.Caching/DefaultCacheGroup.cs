@@ -2,10 +2,10 @@
 
 namespace IDFCR.Caching;
 
-/// <inheritdoc/>
+/// <inheritdoc cref="ICacheGroup"/>
 [Obsolete("Not to be used in consumer code"),
  MessagePack.MessagePackObject(false, AllowPrivate = true)]
-internal record DefaultCacheGroup : ICacheGroupWithLock
+public record DefaultCacheGroup : ICacheGroupWithLock
 {
     /// <inheritdoc/>
     [MessagePack.Key(0)]

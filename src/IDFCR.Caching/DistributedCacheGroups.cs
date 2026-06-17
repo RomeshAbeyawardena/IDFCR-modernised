@@ -7,6 +7,27 @@ namespace IDFCR.Caching;
 internal class DistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
 {
 #pragma warning disable CS0618
+
+    internal async Task<DefaultCacheGroups> DeserializeAsync(byte[] data, CancellationToken cancellationToken)
+    {
+        using var memoryStream = new MemoryStream(data);
+        return await MessagePack.MessagePackSerializer
+            .DeserializeAsync<DefaultCacheGroups>(memoryStream, options, cancellationToken);
+    }
+
+    internal async Task<byte[]> SerializeAsync(ICacheGroups groups, CancellationToken cancellationToken)
+    {
+        using var memoryStream = new MemoryStream();
+
+        var allocGroups = (DefaultCacheGroups)groups;
+
+        await MessagePack.MessagePackSerializer.SerializeAsync(memoryStream,
+            allocGroups, options, cancellationToken: cancellationToken);
+
+        var array = memoryStream.ToArray();
+        return array;
+    }
+
     /// <inheritdoc />
     public ICacheGroups Groups { get; private set; } = new DefaultCacheGroups();
 
@@ -38,8 +59,8 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
             return;
         }
 
-        using var memoryStream = new MemoryStream(data);
-        var result = await MessagePack.MessagePackSerializer.DeserializeAsync<DefaultCacheGroups>(memoryStream, options, cancellationToken);
+        
+        var result = await DeserializeAsync(data, cancellationToken);
         
         if (result is not null)
         {
@@ -51,7 +72,7 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
     public async Task SaveAsync(CancellationToken cancellationToken)
     {
         using var memoryStream = new MemoryStream();
-        await MessagePack.MessagePackSerializer.SerializeAsync(memoryStream, Groups, options, cancellationToken: cancellationToken);
+        await SerializeAsync(Groups, cancellationToken);
         await distributedCache.SetAsync(nameof(DefaultCacheGroups), memoryStream.ToArray(), cancellationToken);
     }
 
