@@ -59,6 +59,44 @@ internal class DefaultCacheGroupsTests
     }
 
     [Test]
+    public void GetCacheKeys_WhenGroupExists_ReturnsAssignedKeys()
+    {
+        DefaultCacheGroups sut = new();
+        sut.TryAssignToGroup("orders", "orders:1", "orders:2");
+
+        var result = sut.GetCacheKeys("orders").ToArray();
+
+        Assert.That(result, Is.EquivalentTo(new[] { "orders:1", "orders:2" }));
+    }
+
+    [Test]
+    public void GetCacheKeys_WhenGroupDoesNotExist_ReturnsEmpty()
+    {
+        DefaultCacheGroups sut = new();
+
+        var result = sut.GetCacheKeys("missing");
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public void GetCacheKeys_WhenGroupChangesAfterRead_ReturnsSnapshot()
+    {
+        DefaultCacheGroups sut = new();
+        sut.TryAssignToGroup("orders", "orders:1", "orders:2");
+
+        var snapshot = sut.GetCacheKeys("orders").ToArray();
+
+        sut.TryRemoveFromGroup("orders", "orders:2");
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(snapshot, Is.EquivalentTo(new[] { "orders:1", "orders:2" }));
+            Assert.That(sut.GetCacheKeys("orders"), Is.EquivalentTo(new[] { "orders:1" }));
+        }
+    }
+
+    [Test]
     public async Task TryAssignToGroup_WhenCalledConcurrently_DeduplicatesCacheKeys()
     {
         DefaultCacheGroups sut = new();
