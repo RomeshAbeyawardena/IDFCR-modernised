@@ -1,42 +1,90 @@
 ﻿using NUnit.Framework;
-using Moq;
-using Microsoft.Extensions.Caching.Distributed;
+
 namespace IDFCR.Caching.Tests;
 
-[TestFixture]
-internal class CachingTests
-{
 #pragma warning disable CS0618
-    private Mock<IDistributedCache> cacheMock;
-    private DistributedCacheGroups distributedCacheGroups;
-    [SetUp]
-    public void SetUp()
+
+[TestFixture]
+internal class DefaultCacheGroupsTests
+{
+    [Test]
+    public void TryAssignToGroup_WhenCacheKeyIsNew_ReturnsTrueAndAddsKey()
     {
-        cacheMock = new();
-        distributedCacheGroups = new(cacheMock.Object, MessagePack.MessagePackSerializerOptions.Standard);
+        DefaultCacheGroups sut = new();
+
+        var result = sut.TryAssignToGroup("orders", "orders:1");
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.True);
+            Assert.That(sut.HasCacheKey("orders", "orders:1"), Is.True);
+        }
     }
 
     [Test]
-    public async Task Test()
+    public void TryAssignToGroup_WhenCacheKeysAlreadyExist_ReturnsFalse()
     {
-        DefaultCacheGroups cacheGroups = new();
+        DefaultCacheGroups sut = new();
+        sut.TryAssignToGroup("orders", "orders:1");
 
-        var result = cacheGroups.TryAssignToGroup("nord.cache", "nord.cache:test");
+        var result = sut.TryAssignToGroup("orders", "orders:1");
 
-        Assert.That(result, Is.True);
+        Assert.That(result, Is.False);
+    }
 
-        cacheMock.Setup(x => x.GetAsync(nameof(DefaultCacheGroups)))
-            .ReturnsAsync(await distributedCacheGroups.SerializeAsync(cacheGroups, CancellationToken.None));
+    [Test]
+    public void TryRemoveFromGroup_WhenCacheKeyExists_ReturnsTrueAndRemovesKey()
+    {
+        DefaultCacheGroups sut = new();
+        sut.TryAssignToGroup("orders", "orders:1", "orders:2");
 
-        await distributedCacheGroups.LoadAsync(CancellationToken.None);
+        var result = sut.TryRemoveFromGroup("orders", "orders:2");
 
-        Assert.That(distributedCacheGroups.Groups.Keys, Is.EquivalentTo(cacheGroups.CacheGroups.Keys));
-            
-        foreach (var key in cacheGroups.CacheGroups.Keys)
+        using (Assert.EnterMultipleScope())
         {
-            Assert.That(distributedCacheGroups.Groups[key].Key, Is.EqualTo(cacheGroups.CacheGroups[key].Key));
-            Assert.That(distributedCacheGroups.Groups[key].CacheKeys, Is.EquivalentTo(cacheGroups.CacheGroups[key].CacheKeys));
+            Assert.That(result, Is.True);
+            Assert.That(sut.HasCacheKey("orders", "orders:2"), Is.False);
+            Assert.That(sut.HasCacheKey("orders", "orders:1"), Is.True);
         }
     }
+
+    [Test]
+    public void TryRemoveFromGroup_WhenGroupDoesNotExist_ReturnsFalse()
+    {
+        DefaultCacheGroups sut = new();
+
+        var result = sut.TryRemoveFromGroup("missing", "orders:1");
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task TryAssignToGroup_WhenCalledConcurrently_DeduplicatesCacheKeys()
+    {
+        DefaultCacheGroups sut = new();
+        var cacheKeys = Enumerable.Range(0, 250)
+            .Select(index => $"orders:{index % 25}")
+            .ToArray();
+
+        await Task.WhenAll(cacheKeys.Select(cacheKey => Task.Run(() => sut.TryAssignToGroup("orders", cacheKey))));
+
+        Assert.That(sut.CacheGroups["orders"].CacheKeys, Is.EquivalentTo(cacheKeys.Distinct()));
+    }
+
+    [Test]
+    public async Task TryRemoveFromGroup_WhenCalledConcurrently_RemovesAllKeys()
+    {
+        DefaultCacheGroups sut = new();
+        var cacheKeys = Enumerable.Range(0, 100)
+            .Select(index => $"orders:{index}")
+            .ToArray();
+
+        sut.TryAssignToGroup("orders", cacheKeys);
+
+        await Task.WhenAll(cacheKeys.Select(cacheKey => Task.Run(() => sut.TryRemoveFromGroup("orders", cacheKey))));
+
+        Assert.That(sut.CacheGroups["orders"].CacheKeys, Is.Empty);
+    }
 }
+
 #pragma warning restore

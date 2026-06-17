@@ -71,9 +71,8 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
     /// <inheritdoc />
     public async Task SaveAsync(CancellationToken cancellationToken)
     {
-        using var memoryStream = new MemoryStream();
-        await SerializeAsync(Groups, cancellationToken);
-        await distributedCache.SetAsync(nameof(DefaultCacheGroups), memoryStream.ToArray(), cancellationToken);
+        var data = await SerializeAsync(Groups, cancellationToken);
+        await distributedCache.SetAsync(nameof(DefaultCacheGroups), data, cancellationToken);
     }
 
     public async Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken)
