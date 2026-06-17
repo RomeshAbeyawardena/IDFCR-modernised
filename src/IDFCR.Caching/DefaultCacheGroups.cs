@@ -1,11 +1,13 @@
 ﻿using IDFCR.Abstractions.Caching;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 
 namespace IDFCR.Caching;
 
 /// <inheritdoc cref="ICacheGroups" />
 [Obsolete("Not to be used in consumer code")]
+[EditorBrowsable(EditorBrowsableState.Never)]
 [MessagePack.MessagePackObject(true)]
 public sealed partial class DefaultCacheGroups : ICacheGroups
 {

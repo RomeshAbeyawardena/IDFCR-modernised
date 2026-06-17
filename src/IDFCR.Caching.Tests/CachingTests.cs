@@ -30,7 +30,13 @@ internal class CachingTests
 
         await distributedCacheGroups.LoadAsync(CancellationToken.None);
 
-        Assert.That(distributedCacheGroups.Groups, Is.SameAs(cacheGroups));
+        Assert.That(distributedCacheGroups.Groups.Keys, Is.EquivalentTo(cacheGroups.CacheGroups.Keys));
+            
+        foreach (var key in cacheGroups.CacheGroups.Keys)
+        {
+            Assert.That(distributedCacheGroups.Groups[key].Key, Is.EqualTo(cacheGroups.CacheGroups[key].Key));
+            Assert.That(distributedCacheGroups.Groups[key].CacheKeys, Is.EquivalentTo(cacheGroups.CacheGroups[key].CacheKeys));
+        }
     }
 }
 #pragma warning restore
