@@ -125,4 +125,17 @@ public sealed partial class DefaultCacheGroups : ICacheGroups
         value = null!;
         return false;
     }
+    /// <inheritdoc />
+    public IEnumerable<string> GetCacheKeys(string key)
+    {
+        if (cacheGroups.TryGetValue(key, out var cacheGroup))
+        {
+            lock (cacheGroup.Lock)
+            {
+                return [.. cacheGroup.CacheKeys];
+            }
+        }
+
+        return [];
+    }
 }
