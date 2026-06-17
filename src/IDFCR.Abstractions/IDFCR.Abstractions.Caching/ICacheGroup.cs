@@ -1,5 +1,11 @@
 ﻿namespace IDFCR.Abstractions.Caching;
 
+internal interface ICacheGroupWithLock : ICacheGroup
+{
+    public Lock @Lock { get; }
+}
+
+
 /// <summary>
 /// Represents a group of cache keys that can be managed together. Each cache group has a unique key and a list of associated cache keys. This interface defines the properties that a cache group must implement, allowing for the organization and management of related cache entries in a structured manner.
 /// </summary>

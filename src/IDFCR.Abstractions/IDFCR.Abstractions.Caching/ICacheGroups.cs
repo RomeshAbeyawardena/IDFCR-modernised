@@ -6,6 +6,13 @@
 public interface ICacheGroups : IReadOnlyDictionary<string, ICacheGroup>
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="cacheKey"></param>
+    /// <returns></returns>
+    bool HasCacheKey(string key, string cacheKey);
+    /// <summary>
     /// Attempts to assign the specified cache keys to the cache group identified by the given key. If the group exists, the method adds the provided cache keys to the group's list of associated cache keys, ensuring that each key is unique within the group. The method returns true if at least one cache key was successfully added to the group; otherwise, it returns false. This allows for organized management of related cache entries by grouping them under a common identifier.
     /// </summary>
     /// <param name="key">The unique key that identifies the cache group to which the cache keys should be assigned.</param>

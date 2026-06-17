@@ -6,14 +6,14 @@ namespace IDFCR.Caching;
 /// <inheritdoc />
 internal class DistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
 {
+#pragma warning disable CS0618
     /// <inheritdoc />
     public ICacheGroups Groups { get; private set; } = new DefaultCacheGroups();
 
     /// <inheritdoc />
     public Task<byte[]?> GetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, CancellationToken cancellationToken)
     {
-        if (Groups.TryGetValue(groupKey, out var cacheGroup)
-            && cacheGroup.CacheKeys.Contains(compositeKey))
+        if (Groups.HasCacheKey(groupKey, compositeKey))
         {
             return distributedCache.GetAsync(format?.Invoke(groupKey, compositeKey) ?? compositeKey, cancellationToken);
         }
@@ -30,6 +30,7 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
     /// <inheritdoc />
     public async Task LoadAsync(CancellationToken cancellationToken)
     {
+
         var data = await distributedCache.GetAsync(nameof(DefaultCacheGroups), cancellationToken);
 
         if(data is null || data.Length < 1)
@@ -51,7 +52,6 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
     {
         using var memoryStream = new MemoryStream();
         await MessagePack.MessagePackSerializer.SerializeAsync(memoryStream, Groups, options, cancellationToken: cancellationToken);
-
         await distributedCache.SetAsync(nameof(DefaultCacheGroups), memoryStream.ToArray(), cancellationToken);
     }
 
@@ -77,3 +77,4 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
         return SetAsync(groupKey, compositeKey, null, data, cancellationToken);
     }
 }
+#pragma warning restore
