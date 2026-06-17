@@ -140,6 +140,44 @@ internal class DistributedCacheGroupsTests
     }
 
     [Test]
+    public async Task GetCacheKeysAsync_WhenGroupExists_ReturnsAssignedKeys()
+    {
+        sut.Groups.TryAssignToGroup("orders", "orders:1", "orders:2");
+
+        var result = await sut.GetCacheKeysAsync("orders", CancellationToken.None);
+
+        Assert.That(result, Is.EquivalentTo(new[] { "orders:1", "orders:2" }));
+    }
+
+    [Test]
+    public async Task GetCacheKeysAsync_WhenGroupDoesNotExist_ReturnsEmpty()
+    {
+        var result = await sut.GetCacheKeysAsync("missing", CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetCacheKeysAsync_AfterSetAsync_ReturnsTrackedKeys()
+    {
+        var payload = new byte[] { 1, 2, 3 };
+
+        cacheMock.Setup(x => x.SetAsync(
+                It.IsAny<string>(),
+                payload,
+                It.IsAny<DistributedCacheEntryOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await sut.SetAsync("orders", "orders:1", payload, CancellationToken.None);
+        await sut.SetAsync("orders", "orders:2", payload, CancellationToken.None);
+
+        var result = await sut.GetCacheKeysAsync("orders", CancellationToken.None);
+
+        Assert.That(result, Is.EquivalentTo(new[] { "orders:1", "orders:2" }));
+    }
+
+    [Test]
     public async Task SetAsync_WhenCalledConcurrentlyForSameKey_WritesToDistributedCacheOnce()
     {
         var payload = new byte[] { 7, 8, 9 };
