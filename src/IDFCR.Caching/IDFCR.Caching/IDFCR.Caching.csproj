@@ -9,6 +9,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Caching\IDFCR.Abstractions.Caching.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Caching\IDFCR.Abstractions.Caching.csproj" />
   </ItemGroup>
  </Project>
