@@ -6,18 +6,23 @@ using Microsoft.Extensions.DependencyInjection;
 namespace IDFCR.Caching.Http.Extensions;
 
 /// <summary>
-/// Defines extension methods for the IServiceCollection interface to facilitate the registration of caching services and related dependencies in a .NET application. These extensions provide a convenient way to configure and add caching functionality, including distributed cache groups, to the application's dependency injection container.
+/// Defines extension methods for the IServiceCollection to add grouped distributed caching services. These methods facilitate the registration of necessary services for managing cache groups and their associated cache entries, enabling organized and efficient caching functionality within an application.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the necessary services for managing grouped distributed caching to the IServiceCollection. This method registers the IDistributedCacheGroups and IDistributedGroupCache implementations, enabling the application to utilize grouped caching functionality. It allows for organized management of cache entries by grouping related cache keys together, facilitating efficient retrieval and storage of cached data.
+    /// Adds the necessary services for grouped distributed caching to the specified IServiceCollection. This method registers the IDistributedCacheGroups and IDistributedGroupCache implementations, and optionally configures the MemoryDistributedCacheOptions if a setup action is provided. If no IDistributedCache implementation is already registered, it adds a default in-memory distributed cache.
+    /// <para>If you are using a custom <see cref="IDistributedCache"/> implementation, ensure you call that before calling this method.</para>
     /// </summary>
     /// <param name="services">The IServiceCollection to which the caching services will be added.</param>
     /// <param name="setupAction">An optional action to configure the MemoryDistributedCacheOptions.</param>
     /// <returns>The updated IServiceCollection with the caching services registered.</returns>
     public static IServiceCollection AddGroupedDistributedCache(this IServiceCollection services, Action<MemoryDistributedCacheOptions>? setupAction = null)
     {
+        services
+            .AddSingleton<IDistributedCacheGroups, DistributedCacheGroups>()
+            .AddSingleton<IDistributedGroupCache, DefaultDistributedGroupCache>();
+
         if (!services.Any(s => s.ServiceType == typeof(IDistributedCache)))
         {
             if (setupAction is null)
@@ -30,8 +35,6 @@ public static class ServiceCollectionExtensions
             }
         }
 
-        services.AddSingleton<IDistributedCacheGroups, DistributedCacheGroups>();
-        services.AddSingleton<IDistributedGroupCache, DefaultDistributedGroupCache>();
         return services;
     }
 }
