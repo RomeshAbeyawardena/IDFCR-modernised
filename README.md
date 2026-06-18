@@ -226,5 +226,3 @@ public sealed class ClientCacheService(
 dotnet build IDFCR.slnx
 dotnet test IDFCR.slnx --no-build
 ```
-
-> Note: there are currently pre-existing `IDFCR.Abstractions.DatabaseUpdater.Tests` newline-sensitive failures in this environment that are unrelated to this README rewrite.
