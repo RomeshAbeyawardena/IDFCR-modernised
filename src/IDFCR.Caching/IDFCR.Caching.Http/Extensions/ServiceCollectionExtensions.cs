@@ -20,8 +20,14 @@ public static class ServiceCollectionExtensions
     {
         if (!services.Any(s => s.ServiceType == typeof(IDistributedCache)))
         {
-            setupAction ??= s => { };
-            services.AddDistributedMemoryCache(setupAction);
+            if (setupAction is null)
+            {
+                services.AddDistributedMemoryCache();
+            }
+            else
+            {
+                services.AddDistributedMemoryCache(setupAction);
+            }
         }
 
         services.AddSingleton<IDistributedCacheGroups, DistributedCacheGroups>();
