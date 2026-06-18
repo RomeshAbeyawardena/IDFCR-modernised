@@ -7,7 +7,10 @@ namespace IDFCR.Caching.Http.Auditing;
 /// </summary>
 public interface IDistributedCacheEvent
 {
-    LogLevel LogLevel { get; }
+    /// <summary>
+    /// Gets the log level associated with the cache event. This property indicates the severity or importance of the event, allowing for appropriate logging and filtering of cache-related events.
+    /// </summary>
+    LogLevel? LogLevel { get; }
     /// <summary>
     /// Gets the type of cache operation that was performed (e.g., "Get", "Set", "Remove"). This property indicates the specific action taken on the distributed cache, allowing for identification and categorization of cache events.
     /// </summary>
