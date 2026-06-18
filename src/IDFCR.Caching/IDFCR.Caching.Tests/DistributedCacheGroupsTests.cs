@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using IDFCR.Abstractions.Caching;
+using IDFCR.Caching.Http;
+using IDFCR.Caching.Http.Extensions;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
@@ -178,6 +182,45 @@ internal class DistributedCacheGroupsTests
     }
 
     [Test]
+    public async Task RemoveAsync_WhenGroupExists_RemovesAllCacheEntriesAndGroup()
+    {
+        var payload = new byte[] { 5, 6, 7 };
+        cacheMock.Setup(x => x.SetAsync(
+                It.IsAny<string>(),
+                payload,
+                It.IsAny<DistributedCacheEntryOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await sut.SetAsync("orders", "orders:1", payload, CancellationToken.None);
+        await sut.SetAsync("orders", "orders:2", payload, CancellationToken.None);
+
+        var result = await sut.RemoveAsync("orders", CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.True);
+            Assert.That(sut.Groups.HasCacheKey("orders", "orders:1"), Is.False);
+            Assert.That(sut.Groups.HasCacheKey("orders", "orders:2"), Is.False);
+            Assert.That(sut.Groups["orders"].CacheKeys, Is.Empty);
+            cacheMock.Verify(x => x.Remove("orders:1"), Times.Once);
+            cacheMock.Verify(x => x.Remove("orders:2"), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task RemoveAsync_WhenGroupDoesNotExist_ReturnsFalseWithoutRemovingEntries()
+    {
+        var result = await sut.RemoveAsync("missing", CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.False);
+            cacheMock.Verify(x => x.Remove(It.IsAny<string>()), Times.Never);
+        }
+    }
+
+    [Test]
     public async Task SetAsync_WhenCalledConcurrentlyForSameKey_WritesToDistributedCacheOnce()
     {
         var payload = new byte[] { 7, 8, 9 };
@@ -232,6 +275,60 @@ internal class DistributedCacheGroupsTests
                 It.IsAny<DistributedCacheEntryOptions>(),
                 It.IsAny<CancellationToken>()), Times.Exactly(compositeKeys.Length));
         }
+    }
+}
+
+[TestFixture]
+internal class DefaultDistributedGroupCacheTests
+{
+    [Test]
+    public async Task RemoveAsync_LoadsThenRemovesAndReturnsTrue()
+    {
+        var distributedCacheGroupsMock = new Mock<IDistributedCacheGroups>();
+        using var serviceProvider = new ServiceCollection()
+            .AddGroupedDistributedCache()
+            .AddSingleton(distributedCacheGroupsMock.Object)
+            .BuildServiceProvider();
+
+        var sut = serviceProvider.GetRequiredService<IDistributedGroupCache>();
+
+        var sequence = new MockSequence();
+        distributedCacheGroupsMock.InSequence(sequence)
+            .Setup(x => x.LoadAsync(CancellationToken.None))
+            .Returns(Task.CompletedTask);
+        distributedCacheGroupsMock.InSequence(sequence)
+            .Setup(x => x.RemoveAsync("orders", CancellationToken.None))
+            .ReturnsAsync(true);
+
+        var result = await sut.RemoveAsync("orders", CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.True);
+            distributedCacheGroupsMock.Verify(x => x.LoadAsync(CancellationToken.None), Times.Once);
+            distributedCacheGroupsMock.Verify(x => x.RemoveAsync("orders", CancellationToken.None), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task RemoveAsync_WhenInnerRemoveReturnsFalse_ReturnsFalse()
+    {
+        var distributedCacheGroupsMock = new Mock<IDistributedCacheGroups>();
+        using var serviceProvider = new ServiceCollection()
+            .AddGroupedDistributedCache()
+            .AddSingleton(distributedCacheGroupsMock.Object)
+            .BuildServiceProvider();
+
+        var sut = serviceProvider.GetRequiredService<IDistributedGroupCache>();
+
+        distributedCacheGroupsMock.Setup(x => x.LoadAsync(CancellationToken.None))
+            .Returns(Task.CompletedTask);
+        distributedCacheGroupsMock.Setup(x => x.RemoveAsync("missing", CancellationToken.None))
+            .ReturnsAsync(false);
+
+        var result = await sut.RemoveAsync("missing", CancellationToken.None);
+
+        Assert.That(result, Is.False);
     }
 }
 

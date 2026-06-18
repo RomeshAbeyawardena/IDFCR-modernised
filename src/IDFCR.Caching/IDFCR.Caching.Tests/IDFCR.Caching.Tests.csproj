@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Caching\IDFCR.Caching.csproj" />
+    <ProjectReference Include="..\IDFCR.Caching.Http\IDFCR.Caching.Http.csproj" />
   </ItemGroup>
  </Project>

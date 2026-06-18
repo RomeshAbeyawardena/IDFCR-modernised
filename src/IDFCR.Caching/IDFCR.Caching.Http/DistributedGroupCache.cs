@@ -22,9 +22,10 @@ internal class DefaultDistributedGroupCache(IDistributedCacheGroups distributedC
         return await distributedCache.GetCacheKeysAsync(groupKey, cancellationToken);
     }
 
-    public Task<bool> RemoveAsync(string group, CancellationToken cancellationToken)
+    public async Task<bool> RemoveAsync(string group, CancellationToken cancellationToken)
     {
-        return distributedCache.RemoveAsync(group, cancellationToken);
+        await distributedCache.LoadAsync(cancellationToken);
+        return await distributedCache.RemoveAsync(group, cancellationToken);
     }
 
     public async Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken)
