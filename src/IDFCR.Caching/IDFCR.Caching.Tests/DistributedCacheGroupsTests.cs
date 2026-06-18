@@ -13,7 +13,7 @@ namespace IDFCR.Caching.Tests;
 internal class DistributedCacheGroupsTests
 {
     private Mock<IDistributedCache> cacheMock = null!;
-    private DistributedCacheGroups sut = null!;
+    private DefaultDistributedCacheGroups sut = null!;
 
     [SetUp]
     public void SetUp()

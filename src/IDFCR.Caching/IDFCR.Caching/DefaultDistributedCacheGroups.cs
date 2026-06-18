@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace IDFCR.Caching;
 
 /// <inheritdoc />
-internal class DistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
+internal class DefaultDistributedCacheGroups(IDistributedCache distributedCache, MessagePack.MessagePackSerializerOptions options) : IDistributedCacheGroups
 {
 #pragma warning disable CS0618
 
