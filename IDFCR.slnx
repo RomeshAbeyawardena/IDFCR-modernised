@@ -8,6 +8,7 @@
   <Folder Name="/src/" />
   <Folder Name="/src/IDFCR.Caching/">
     <Project Path="src/IDFCR.Caching/IDFCR.Caching.Http/IDFCR.Caching.Http.csproj" />
+    <Project Path="src/IDFCR.Caching/IDFCR.Caching.Serialisation/IDFCR.Caching.Serialisation.csproj" />
     <Project Path="src/IDFCR.Caching/IDFCR.Caching.Tests/IDFCR.Caching.Tests.csproj" />
     <Project Path="src/IDFCR.Caching/IDFCR.Caching/IDFCR.Caching.csproj" />
   </Folder>

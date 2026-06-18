@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions\IDFCR.Abstractions.Caching\IDFCR.Abstractions.Caching.csproj" />
+    <ProjectReference Include="..\IDFCR.Caching.Serialisation\IDFCR.Caching.Serialisation.csproj" />
   </ItemGroup>
  </Project>

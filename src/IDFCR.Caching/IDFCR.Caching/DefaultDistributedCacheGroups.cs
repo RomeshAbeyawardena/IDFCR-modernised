@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Caching;
+using IDFCR.Caching.Serialisation.Extensions;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace IDFCR.Caching;
@@ -10,22 +11,15 @@ internal class DefaultDistributedCacheGroups(IDistributedCache distributedCache,
 
     internal async Task<DefaultCacheGroups> DeserializeAsync(byte[] data, CancellationToken cancellationToken)
     {
-        using var memoryStream = new MemoryStream(data);
-        return await MessagePack.MessagePackSerializer
-            .DeserializeAsync<DefaultCacheGroups>(memoryStream, options, cancellationToken);
+        
+        return await data
+            .DeserialiseAsync<DefaultCacheGroups>(options, cancellationToken);
     }
 
     internal async Task<byte[]> SerializeAsync(ICacheGroups groups, CancellationToken cancellationToken)
     {
-        using var memoryStream = new MemoryStream();
-
         var allocGroups = (DefaultCacheGroups)groups;
-
-        await MessagePack.MessagePackSerializer.SerializeAsync(memoryStream,
-            allocGroups, options, cancellationToken: cancellationToken);
-
-        var array = memoryStream.ToArray();
-        return array;
+        return await allocGroups.SerialiseAsync(options, cancellationToken);
     }
 
     /// <inheritdoc />
