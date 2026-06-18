@@ -25,7 +25,7 @@ internal class DefaultDistributedGroupCache(IDistributedCacheGroups distributedC
     public async Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken)
     {
         await distributedCache.LoadAsync(cancellationToken);
-        await distributedCache.SetAsync(groupKey, compositeKey, data, cancellationToken);
+        await distributedCache.SetAsync(groupKey, compositeKey, format, data, cancellationToken);
         await distributedCache.SaveAsync(cancellationToken);
     }
 
