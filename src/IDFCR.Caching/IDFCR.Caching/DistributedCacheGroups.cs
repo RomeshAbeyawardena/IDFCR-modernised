@@ -107,5 +107,22 @@ internal class DistributedCacheGroups(IDistributedCache distributedCache, Messag
 
         return [];
     }
+
+    public async Task<bool> RemoveAsync(string group, CancellationToken cancellationToken)
+    {
+        var cacheKeys = await GetCacheKeysAsync(group, cancellationToken);
+
+        if (cacheKeys is null)
+        {
+            return false;
+        }
+
+        foreach (var key in cacheKeys)
+        {
+            distributedCache.Remove(key);
+        }
+
+        return Groups.TryRemoveFromGroup(group, [.. cacheKeys]);
+    }
 }
 #pragma warning restore

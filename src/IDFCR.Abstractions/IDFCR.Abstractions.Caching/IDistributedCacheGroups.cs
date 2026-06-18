@@ -6,6 +6,13 @@
 public interface IDistributedCacheGroups
 {
     /// <summary>
+    /// Removes the specified cache group and all associated cache entries from the distributed cache. This method allows for efficient cleanup of related cache items within a designated group, ensuring that all entries associated with the specified group key are removed from the cache.
+    /// </summary>
+    /// <param name="group">The key identifying the cache group to be removed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the cache group was successfully removed.</returns>
+    Task<bool> RemoveAsync(string group, CancellationToken cancellationToken);
+    /// <summary>
     /// Gets the collection of cache keys associated with the specified group key. This method retrieves the list of cache keys that are part of the designated cache group, allowing for efficient enumeration of related cache items. If the specified group does not exist, an empty collection is returned.
     /// </summary>
     /// <param name="groupKey">The key that identifies the cache group.</param>
