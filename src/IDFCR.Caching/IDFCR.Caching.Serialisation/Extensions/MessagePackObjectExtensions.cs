@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines extension methods for serializing and deserializing objects using MessagePack.
 /// </summary>
-public static class ObjectExtensions
+public static class MessagePackObjectExtensions
 {
     /// <summary>
     /// Serialises an object of type T to a byte array using MessagePack with the specified options and cancellation token.
