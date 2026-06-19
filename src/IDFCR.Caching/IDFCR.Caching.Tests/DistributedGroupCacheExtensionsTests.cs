@@ -148,4 +148,33 @@ internal class DistributedGroupCacheExtensionsTests
             factory.Verify(x => x(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
+
+    [Test]
+    public async Task GetOrSetAsync_WithFactory_WhenCachePayloadIsEmpty_TreatsAsMiss()
+    {
+        var options = MessagePack.MessagePackSerializerOptions.Standard;
+        const string factoryValue = "factory-value";
+
+        var factory = new Mock<Func<CancellationToken, Task<string>>>(MockBehavior.Strict);
+
+        cacheMock.Setup(x => x.GetAsync("orders", "orders:1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        cacheMock.Setup(x => x.SetAsync("orders", "orders:1", It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        factory.Setup(x => x(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(factoryValue);
+
+        var result = await cacheMock.Object.GetOrSetAsync(
+            "orders",
+            "orders:1",
+            options,
+            factory.Object,
+            CancellationToken.None);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.EqualTo(factoryValue));
+            factory.Verify(x => x(It.IsAny<CancellationToken>()), Times.Once);
+        }
+    }
 }
