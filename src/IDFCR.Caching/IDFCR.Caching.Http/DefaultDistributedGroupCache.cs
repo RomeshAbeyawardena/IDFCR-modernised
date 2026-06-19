@@ -25,7 +25,12 @@ internal class DefaultDistributedGroupCache(IDistributedCacheGroups distributedC
     public virtual async Task<bool> RemoveAsync(string group, CancellationToken cancellationToken)
     {
         await distributedCache.LoadAsync(cancellationToken);
-        return await distributedCache.RemoveAsync(group, cancellationToken);
+        var result = await distributedCache.RemoveAsync(group, cancellationToken);
+        if (result)
+        {
+            await distributedCache.SaveAsync(cancellationToken);
+        }
+        return result;
     }
 
     public virtual async Task SetAsync(string groupKey, string compositeKey, Func<string, string, string>? format, byte[] data, CancellationToken cancellationToken)
