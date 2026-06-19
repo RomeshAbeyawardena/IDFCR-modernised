@@ -27,9 +27,9 @@ public interface IDistributedCacheEvent
     string? CompositeKey { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the cache operation was successful.
+    /// Gets the outcome of the cache operation, indicating whether it was successful or not. This property provides information about the result of the cache operation, allowing for tracking and analysis of cache performance and reliability.
     /// </summary>
-    bool Success { get; }
+    string Outcome { get; }
 
     /// <summary>
     /// Gets the timestamp when the cache event occurred.

@@ -7,7 +7,7 @@ internal record DistributedCacheEvent : IDistributedCacheEvent
     public required string Operation { get; init; }
     public required string GroupKey { get; init; }
     public string? CompositeKey { get; init; }
-    public bool Success { get; init; }
+    public required string Outcome { get; init; }
     public DateTimeOffset Timestamp { get; init; }
     public LogLevel? LogLevel { get; init; }
 }

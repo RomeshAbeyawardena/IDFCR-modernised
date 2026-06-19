@@ -17,7 +17,7 @@ internal class DefaultDistributedGroupCacheWithAuditing(
             Operation = AuditOperations.Get,
             GroupKey = groupKey,
             CompositeKey = compositeKey,
-            Success = result is not null,
+            Outcome = result is null ? AuditOutcome.Miss : AuditOutcome.Hit,
             Timestamp = timeProvider.GetUtcNow()
         }, cancellationToken);
 
@@ -33,7 +33,7 @@ internal class DefaultDistributedGroupCacheWithAuditing(
             Operation = AuditOperations.Get,
             GroupKey = groupKey,
             CompositeKey = compositeKey,
-            Success = result is not null,
+            Outcome = result is null ? AuditOutcome.Miss : AuditOutcome.Hit,
             Timestamp = timeProvider.GetUtcNow()
         }, cancellationToken);
 
@@ -51,7 +51,7 @@ internal class DefaultDistributedGroupCacheWithAuditing(
             Operation = AuditOperations.Remove,
             GroupKey = group,
             CompositeKey = string.Join(',', cacheKeys),
-            Success = result,
+            Outcome = result ? AuditOutcome.Removed : AuditOutcome.Failed,
             Timestamp = timeProvider.GetUtcNow()
         }, cancellationToken);
 
@@ -67,7 +67,7 @@ internal class DefaultDistributedGroupCacheWithAuditing(
             Operation = AuditOperations.Set,
             GroupKey = groupKey,
             CompositeKey = compositeKey,
-            Success = true,
+            Outcome = AuditOutcome.Stored,
             Timestamp = timeProvider.GetUtcNow()
         }, cancellationToken);
     }
@@ -81,7 +81,7 @@ internal class DefaultDistributedGroupCacheWithAuditing(
             Operation = AuditOperations.Set,
             GroupKey = groupKey,
             CompositeKey = compositeKey,
-            Success = true,
+            Outcome = AuditOutcome.Stored,
             Timestamp = timeProvider.GetUtcNow()
         }, cancellationToken);
     }
