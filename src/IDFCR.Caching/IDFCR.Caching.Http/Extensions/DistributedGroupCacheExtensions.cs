@@ -20,7 +20,7 @@ public static class DistributedGroupCacheExtensions
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The item retrieved from the cache or the provided item if it was not found in the cache.</returns>
     public static async Task<T> GetOrSetAsync<T>(
-        IDistributedGroupCache cache,
+        this IDistributedGroupCache cache,
         string groupKey,
         string compositeKey,
         MessagePack.MessagePackSerializerOptions options,
@@ -58,7 +58,7 @@ public static class DistributedGroupCacheExtensions
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The item retrieved from the cache or obtained from the factory function.</returns>
     public static async Task<T> GetOrSetAsync<T>(
-        IDistributedGroupCache cache, 
+        this IDistributedGroupCache cache, 
         string groupKey, 
         string compositeKey, 
         MessagePack.MessagePackSerializerOptions options, 
