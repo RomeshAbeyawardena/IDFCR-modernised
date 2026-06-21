@@ -23,18 +23,22 @@ public static class ServiceCollectionExtensions
             ArgumentOutOfRangeException.ThrowIfNotEqual(genericType.GetGenericArguments().Length, 2, nameof(genericType));
         }
 
-        if (genericType.GetCustomAttribute<GlobalFilterAttribute>() is null)
+        var globalFilterAttribute = genericType.GetCustomAttribute<GlobalFilterAttribute>() 
+            ?? throw new InvalidCastException($"Unable to add a generic filter that has not been marked as a {nameof(GlobalFilterAttribute)}.");
+
+        if (globalFilterAttribute.IsStandard)
         {
-            throw new InvalidCastException($"Unable to add a generic filter that has not been marked as a {nameof(GlobalFilterAttribute)}.");
+            services.AddTransient(typeof(IFilter<,>), genericType);
         }
 
-        services.AddTransient(typeof(IFilter<,>), genericType);
-
-        var interfaces = genericType.GetInterfaces();
-
-        if (interfaces.Any(a => a.Name.StartsWith(nameof(IPagedFilter<,>))))
+        if (globalFilterAttribute.IsPaged)
         {
-            services.AddTransient(typeof(IPagedFilter<,>), genericType);
+            var interfaces = genericType.GetInterfaces();
+
+            if (interfaces.Any(a => a.Name.StartsWith(nameof(IPagedFilter<,>))))
+            {
+                services.AddTransient(typeof(IPagedFilter<,>), genericType);
+            }
         }
 
         return services;
@@ -50,6 +54,7 @@ public static class ServiceCollectionExtensions
     {
         return services
             .AddTransient<IFilterFactory, DefaultFilterFactory>()
-            .ScanGenericServices<IFilter>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies);
+            .ScanGenericServices<IFilter>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies)
+            .AddGenericFilter(typeof(DefaultPagedFilter<,>));
     }
 }

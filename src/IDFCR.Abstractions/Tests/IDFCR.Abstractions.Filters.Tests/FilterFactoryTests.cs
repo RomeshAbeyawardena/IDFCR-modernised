@@ -34,5 +34,16 @@ public class FilterFactoryTests
             Assert.That(filters[0], Is.InstanceOf<TestFilter>());
             Assert.That(filters[1], Is.InstanceOf<GenericTestFilter<TestFilterRequest, Customer>>());
         }
+
+        var pagedFilters = _factory.GetPagedFilters<TestPagedFilterRequest, Customer>().ToArray();
+        Assert.That(pagedFilters, Has.Length.EqualTo(1));
+
+        var defaultPagedFilter = pagedFilters[0];
+
+        Assert.That(defaultPagedFilter, Is.InstanceOf<DefaultPagedFilter<TestPagedFilterRequest, Customer>>());
+
+        List<Customer> customers = [];
+
+        var query = defaultPagedFilter.Apply(customers.AsQueryable(), new TestPagedFilterRequest { PageIndex = 0, PageSize = 200 });
     }
 }
