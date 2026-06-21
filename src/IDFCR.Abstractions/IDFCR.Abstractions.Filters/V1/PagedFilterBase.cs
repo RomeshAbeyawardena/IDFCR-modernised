@@ -8,6 +8,7 @@ namespace IDFCR.Abstractions.Filters.V1;
 /// </summary>
 /// <typeparam name="TRequest">The request type.</typeparam>
 /// <typeparam name="TDb">The queryable element type.</typeparam>
+[Obsolete($"Use {nameof(V2.PagedFilterBase<,>)} with {nameof(DefaultPagedFilter<,>)} registration. V1 remains for compatibility.")]
 public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>, IPagedFilter<TRequest, TDb>
     where TRequest : IPagedQuery
 {
