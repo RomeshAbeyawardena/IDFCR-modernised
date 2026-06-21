@@ -1,7 +1,7 @@
 namespace IDFCR.Abstractions.Filters.Extensions;
 
 /// <summary>
-/// Decorates a generic filter that is intended to be registered as a global filter.
+/// Decorates a generic filter that is intended to be registered as a global filter with fine-tuned control over its filter behavior.
 /// </summary>
 /// <param name="isStandardFilter">Indicates whether the filter is a standard filter.</param>
 /// <param name="isPagedFilter">Indicates whether the filter is a paged filter.</param>

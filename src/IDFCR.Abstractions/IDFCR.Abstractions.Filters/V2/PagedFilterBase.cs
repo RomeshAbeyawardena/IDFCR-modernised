@@ -22,17 +22,17 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
     {
         var pageSize = request.PageSize.GetValueOrDefault(25);
 
-        query = query
-            .Skip(request.PageIndex.GetValueOrDefault() * pageSize)
-            .Take(pageSize);
-
         if (request is IOrderedRequest orderedRequest)
         {
-            if (!string.IsNullOrEmpty(orderedRequest.OrderBy))
+            if (!string.IsNullOrWhiteSpace(orderedRequest.OrderBy))
             {
                 query = query.OrderBy($"{orderedRequest.OrderBy} {orderedRequest.DefaultOrderDirection ?? OrderDirection.Ascending}");
             }
         }
+
+        query = query
+            .Skip(request.PageIndex.GetValueOrDefault() * pageSize)
+            .Take(pageSize);
 
         return query;
     }
