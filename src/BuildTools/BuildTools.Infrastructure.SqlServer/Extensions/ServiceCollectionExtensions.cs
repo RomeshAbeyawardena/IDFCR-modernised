@@ -67,7 +67,7 @@ public static class ServiceCollectionExtensions
             .AddDbContextPool<PackageManagerDbContext>(opt => opt.UseSqlServer(connectionStringBuilder.ToString())
             .EnableDetailedErrors(settings.EnableDetailedErrors))
             .AddInterceptors(currentAssembly)
-            .ScanFilters(currentAssembly);
+            .ScanFilters(true, currentAssembly);
     }
 
     private sealed class NoOpOutboxFileBackupAppender : IOutboxFileBackupAppender
