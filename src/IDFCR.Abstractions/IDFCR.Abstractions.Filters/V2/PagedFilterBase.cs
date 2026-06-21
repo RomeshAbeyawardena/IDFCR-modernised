@@ -43,7 +43,7 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
         var query = Apply(queryable, request);
         int totalEntries = query.Count();
 
-        ApplyPaging(query, request);
+        query = ApplyPaging(query, request);
 
         return (query, totalEntries);
     }
