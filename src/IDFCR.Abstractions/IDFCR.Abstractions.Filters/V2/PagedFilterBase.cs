@@ -14,6 +14,10 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
 {
     /// <summary>
     /// Applies paging to the given query based on the provided request.
+    /// <para>
+    /// This method can be overridden by derived classes to customize paging,
+    /// ordering, or other query shaping behavior before the page is returned.
+    /// </para>
     /// </summary>
     /// <param name="query">The query to apply paging to.</param>
     /// <param name="request">The request containing paging information.</param>
@@ -37,6 +41,17 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
         return query;
     }
 
+    /// <summary>
+    /// Called after paging is applied to the query. Can be overridden to customize the final query and total entries.
+    /// </summary>
+    /// <param name="queryable">The queryable with paging applied.</param>
+    /// <param name="request">The request containing paging information.</param>
+    /// <param name="totalEntries">The total number of entries before paging.</param>
+    /// <returns>The final queryable and total entries after paging is applied.</returns>
+    public virtual (IQueryable<TDb> query, int totalEntries) OnPagingApply(IQueryable<TDb> queryable, TRequest request, int totalEntries)
+    {
+        return (queryable, totalEntries);
+    }
 
     (IQueryable<TDb> query, int totalEntries) IPagedFilter<TRequest, TDb>.Apply(IQueryable<TDb> queryable, TRequest request)
     {
@@ -45,6 +60,6 @@ public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>
 
         query = ApplyPaging(query, request);
 
-        return (query, totalEntries);
+        return OnPagingApply(query, request, totalEntries);
     }
 }
