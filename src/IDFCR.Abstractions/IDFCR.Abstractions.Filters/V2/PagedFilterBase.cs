@@ -1,0 +1,50 @@
+﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
+using System.Linq.Dynamic.Core;
+
+namespace IDFCR.Abstractions.Filters.V2;
+
+/// <summary>
+/// Represents a base class for paged filters that derive their predicate from the request and apply paging to the query.
+/// </summary>
+/// <typeparam name="TRequest">The type of the request.</typeparam>
+/// <typeparam name="TDb">The type of the database entity.</typeparam>
+public abstract class PagedFilterBase<TRequest, TDb> : FilterBase<TRequest, TDb>, IPagedFilter<TRequest, TDb>
+    where TRequest : IPagedQuery
+{
+    /// <summary>
+    /// Applies paging to the given query based on the provided request.
+    /// </summary>
+    /// <param name="query">The query to apply paging to.</param>
+    /// <param name="request">The request containing paging information.</param>
+    /// <returns>The query with paging applied.</returns>
+    public virtual IQueryable<TDb> ApplyPaging(IQueryable<TDb> query, TRequest request)
+    {
+        var pageSize = request.PageSize.GetValueOrDefault(25);
+
+        query = query
+            .Skip(request.PageIndex.GetValueOrDefault() * pageSize)
+            .Take(pageSize);
+
+        if (request is IOrderedRequest orderedRequest)
+        {
+            if (!string.IsNullOrEmpty(orderedRequest.OrderBy))
+            {
+                query = query.OrderBy($"{orderedRequest.OrderBy} {orderedRequest.DefaultOrderDirection ?? OrderDirection.Ascending}");
+            }
+        }
+
+        return query;
+    }
+
+
+    (IQueryable<TDb> query, int totalEntries) IPagedFilter<TRequest, TDb>.Apply(IQueryable<TDb> queryable, TRequest request)
+    {
+        var query = Apply(queryable, request);
+        int totalEntries = query.Count();
+
+        ApplyPaging(query, request);
+
+        return (query, totalEntries);
+    }
+}

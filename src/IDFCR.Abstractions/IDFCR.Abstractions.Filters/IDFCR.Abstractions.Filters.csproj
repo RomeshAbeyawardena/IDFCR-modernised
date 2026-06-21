@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LinqKit" />
+    <PackageReference Include="System.Linq.Dynamic.Core" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions.DependencyInjection\IDFCR.Abstractions.DependencyInjection.csproj" />

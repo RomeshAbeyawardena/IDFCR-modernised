@@ -1,7 +1,7 @@
 using IDFCR.Abstractions.Results;
 using System.Linq.Expressions;
 
-namespace IDFCR.Abstractions.Filters;
+namespace IDFCR.Abstractions.Filters.V1;
 
 /// <summary>
 /// Base class for paged filters that derive their predicate from the request.
