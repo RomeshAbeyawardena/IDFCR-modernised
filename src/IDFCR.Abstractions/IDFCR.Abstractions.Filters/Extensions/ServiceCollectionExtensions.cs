@@ -48,13 +48,22 @@ public static class ServiceCollectionExtensions
     /// Scans assemblies for non-global filters and registers the shared filter factory.
     /// </summary>
     /// <param name="services">The service collection to extend.</param>
+    /// <param name="registerGlobalPagingFilter">
+    /// <see langword="true"/> to register the built-in global paging filter; otherwise, <see langword="false"/> to allow consumers to provide their own paging filter registration.
+    /// </param>
     /// <param name="assemblies">The assemblies to scan.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection ScanFilters(this IServiceCollection services, params Assembly[] assemblies)
+    public static IServiceCollection ScanFilters(this IServiceCollection services, bool registerGlobalPagingFilter = true, params Assembly[] assemblies)
     {
-        return services
+        services = services
             .AddTransient<IFilterFactory, DefaultFilterFactory>()
-            .ScanGenericServices<IFilter>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies)
-            .AddGenericFilter(typeof(DefaultPagedFilter<,>));
+            .ScanGenericServices<IFilter>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies);
+
+        if (registerGlobalPagingFilter)
+        {
+            services.AddGenericFilter(typeof(DefaultPagedFilter<,>));
+        }
+
+        return services;
     }
 }

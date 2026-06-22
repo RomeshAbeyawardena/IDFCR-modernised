@@ -16,7 +16,7 @@ public class FilterFactoryTests
     {
         var services = new ServiceCollection();
         services
-            .ScanFilters(typeof(FilterFactoryTests).Assembly)
+            .ScanFilters(true, typeof(FilterFactoryTests).Assembly)
             .AddGenericFilter(typeof(GenericTestFilter<,>));
 
         _serviceProvider = services.BuildServiceProvider();
@@ -50,6 +50,37 @@ public class FilterFactoryTests
         // Assert
         Assert.That(pagedFilters, Has.Length.EqualTo(1));
         Assert.That(pagedFilters[0], Is.InstanceOf<DefaultPagedFilter<TestPagedFilterRequest, Customer>>());
+    }
+
+    [Test]
+    public void ScanFilters_WithRegisterGlobalPagingFilterTrue_RegistersDefaultPagedFilter()
+    {
+        var services = new ServiceCollection()
+            .ScanFilters(true, typeof(FilterFactoryTests).Assembly)
+            .BuildServiceProvider();
+
+        var factory = services.GetRequiredService<IFilterFactory>();
+
+        var pagedFilters = factory.GetPagedFilters<TestPagedFilterRequest, Customer>().ToArray();
+
+        Assert.That(pagedFilters, Has.Length.EqualTo(1));
+        Assert.That(pagedFilters[0], Is.InstanceOf<DefaultPagedFilter<TestPagedFilterRequest, Customer>>());
+    }
+
+    [Test]
+    public void ScanFilters_WithRegisterGlobalPagingFilterFalse_AllowsConsumerPagedFilterRegistration()
+    {
+        var services = new ServiceCollection()
+            .ScanFilters(false, typeof(FilterFactoryTests).Assembly)
+            .AddTransient(typeof(IPagedFilter<,>), typeof(ConsumerPagedFilter<,>))
+            .BuildServiceProvider();
+
+        var factory = services.GetRequiredService<IFilterFactory>();
+
+        var pagedFilters = factory.GetPagedFilters<TestPagedFilterRequest, Customer>().ToArray();
+
+        Assert.That(pagedFilters, Has.Length.EqualTo(1));
+        Assert.That(pagedFilters[0], Is.InstanceOf<ConsumerPagedFilter<TestPagedFilterRequest, Customer>>());
     }
 
     [Test]

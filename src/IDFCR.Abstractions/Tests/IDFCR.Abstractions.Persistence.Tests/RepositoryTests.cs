@@ -34,7 +34,7 @@ public class RepositoryTests
             .AddTransient<IEntityInterceptor, AuditCreatedTimestampEntityInterceptor>()
             .AddTransient<IEntityInterceptor, AuditModifiedTimestampEntityInterceptor>()
             .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
-            .ScanFilters(typeof(RepositoryTests).Assembly)
+            .ScanFilters(true, typeof(RepositoryTests).Assembly)
             .AddGenericFilter(typeof(PagedGlobalFilter<,>));
 
         _serviceProvider = services.BuildServiceProvider();
