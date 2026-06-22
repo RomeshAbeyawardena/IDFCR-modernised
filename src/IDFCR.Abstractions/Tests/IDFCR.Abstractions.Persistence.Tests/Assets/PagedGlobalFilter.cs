@@ -1,4 +1,4 @@
-﻿using IDFCR.Abstractions.Filters;
+﻿using IDFCR.Abstractions.Filters.V1;
 using IDFCR.Abstractions.Filters.Extensions;
 using IDFCR.Abstractions.Metadata;
 using System.Linq.Expressions;
