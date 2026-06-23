@@ -3,6 +3,29 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace IDFCR.Abstractions.Results;
 
+public class UnitResultBuilder : IUnitResultBuilder
+{
+    private readonly ConcurrentDictionary<string, object?> _metaProperties = [];
+    public IUnitResultBuilder AddMeta(string key, object? value)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
+        _metaProperties.AddOrUpdate(key, value, (_, _) => value);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public virtual IUnitResult<T> As<T>(T? value) => new DefaultUnitResult<T>(value, Action, IsSuccess, Exception);
+
+    /// <inheritdoc />
+    public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
+}
+
+public sealed class UnitResultBuilder<T> : UnitResultBuilder, IUnitResultBuilder<T>
+{
+
+}
+
+
 /// <summary>
 /// Base type for unit results that carry metadata.
 /// </summary>
@@ -22,18 +45,6 @@ public abstract record UnitResultBase(Exception? Exception = null, UnitAction Ac
     public object? this[string key] { get => _metaProperties[key]; }
 
     /// <inheritdoc />
-    public IUnitResult AddMeta(string key, object? value)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
-        _metaProperties.AddOrUpdate(key, value, (_, _) => value);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public virtual IUnitResult<T> As<T>(T? value) => new DefaultUnitResult<T>(value, Action, IsSuccess, Exception);
-
-    /// <inheritdoc />
-    public virtual IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value) => new UnitResultCollection<T>(value, Action, IsSuccess, Exception);
 
     /// <summary>
     /// When inherited by a derived type, attempts to set the modified state of the result by setting the ModifiedState property. Returns true if the value is of the correct type and was set successfully; otherwise, returns false. By default, this method returns false, indicating that the modified state cannot be set for this result type. Derived types that support a modified state should override this method to provide the appropriate logic for setting the modified state based on the specific requirements of that result type.

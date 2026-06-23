@@ -1,7 +1,47 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
 namespace IDFCR.Abstractions.Results;
+
+/// <summary>
+/// Represents a builder for creating unit results. This interface provides methods for adding metadata, casting the result to different types, and building the final result. It allows for flexible construction of unit results with various states and associated data, enabling developers to create results that accurately reflect the outcome of operations and provide additional context through metadata. The builder pattern used here facilitates a fluent and expressive way to construct unit results, making it easier to manage complex result scenarios in a consistent manner.
+/// </summary>
+public interface IUnitResultBuilder
+{
+    /// <summary>
+    /// Adds or replaces a metadata value.
+    /// </summary>
+    IUnitResultBuilder AddMeta(string key, object? value);
+
+    /// <summary>
+    /// Casts the result to another typed unit result.
+    /// </summary>
+    IUnitResult<T> As<T>(T? value = default);
+
+    /// <summary>
+    /// Casts the result to a collection result.
+    /// </summary>
+    IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value = default);
+
+    /// <summary>
+    /// Builds the final unit result based on the current state of the builder. This method consolidates all the information and configurations that have been set on the builder, such as metadata, state, and any other relevant properties, into a single unit result object. The resulting unit result encapsulates the outcome of an operation, including success or failure status, associated data, and any additional context provided through metadata. The Build method is typically called after all necessary configurations have been made to ensure that the final result accurately reflects the intended state and information.
+    /// </summary>
+    /// <returns>The constructed unit result.</returns>
+    IUnitResult Build();
+}
+
+/// <summary>
+/// Represents a builder for creating typed unit results. This interface extends the IUnitResultBuilder interface and provides additional functionality for building unit results that contain a specific type of result value. It allows for the construction of unit results with associated data of type T, enabling developers to create results that accurately reflect the outcome of operations and provide additional context through metadata. The builder pattern used here facilitates a fluent and expressive way to construct typed unit results, making it easier to manage complex result scenarios in a consistent manner.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IUnitResultBuilder<T> : IUnitResultBuilder
+{
+    /// <summary>
+    /// Builds the final typed unit result based on the current state of the builder. This method consolidates all the information and configurations that have been set on the builder, such as metadata, state, and any other relevant properties, into a single typed unit result object. The resulting typed unit result encapsulates the outcome of an operation, including success or failure status, associated data of type T, and any additional context provided through metadata. The Build method is typically called after all necessary configurations have been made to ensure that the final typed result accurately reflects the intended state and information.
+    /// </summary>
+    /// <returns>The constructed typed unit result.</returns>
+    new IUnitResult<T> Build();
+}
+
 
 /// <summary>
 /// Represents the common shape of a unit result.
@@ -43,21 +83,6 @@ public interface IUnitResult
     /// Gets the action associated with the result.
     /// </summary>
     UnitAction Action { get; }
-
-    /// <summary>
-    /// Adds or replaces a metadata value.
-    /// </summary>
-    IUnitResult AddMeta(string key, object? value);
-
-    /// <summary>
-    /// Casts the result to another typed unit result.
-    /// </summary>
-    IUnitResult<T> As<T>(T? value = default);
-
-    /// <summary>
-    /// Casts the result to a collection result.
-    /// </summary>
-    IUnitResultCollection<T> AsCollection<T>(IEnumerable<T>? value = default);
 }
 
 /// <summary>
