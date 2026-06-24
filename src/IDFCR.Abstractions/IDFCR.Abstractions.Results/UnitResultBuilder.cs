@@ -2,7 +2,6 @@
 
 namespace IDFCR.Abstractions.Results;
 
-
 internal class UnitResultBuilder(bool isSuccess,
     UnitAction action,
     Exception? exception,
