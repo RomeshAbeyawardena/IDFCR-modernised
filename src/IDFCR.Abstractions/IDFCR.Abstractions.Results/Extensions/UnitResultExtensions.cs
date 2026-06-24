@@ -137,9 +137,10 @@ public static class UnitResultExtensions
     {
         if (!unitResult.HasValue)
         {
-            var res = new DefaultUnitResult(unitResult.Exception, unitResult.Action, unitResult.IsSuccess).As<TDestination>(default);
-            CloneMeta(unitResult.Meta, res);
-            return res;
+            IUnitResult<TDestination>? converted = default;
+            ResultBuilder.Build(unitResult, cfg => converted = cfg.As<TDestination>());
+
+            return converted!;
         }
 
         var result = new DefaultUnitResult<TDestination>(converter(unitResult.Result), unitResult.Action, unitResult.IsSuccess, unitResult.Exception);

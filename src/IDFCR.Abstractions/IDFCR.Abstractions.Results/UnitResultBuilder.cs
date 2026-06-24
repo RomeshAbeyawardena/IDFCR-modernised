@@ -12,6 +12,17 @@ internal class UnitResultBuilder(bool isSuccess,
     protected (bool IsSuccess, UnitAction Action, Exception? Exception, FailureReason? FailureReason, FailureOrigin? FailureOrigin) Fields { get; }
         = new(isSuccess, action, exception, failureReason, failureOrigin);
 
+    protected void CopyMetaProperties(IUnitResult result)
+    {
+        foreach (var (key, value) in result.Meta)
+        {
+            if (!_metaProperties.TryAdd(key, value))
+            {
+                _metaProperties[key] = value;
+            }
+        }
+    }
+
     public UnitResultBuilder(IUnitResult result)
         : this(result.IsSuccess,
                result.Action,
@@ -19,7 +30,7 @@ internal class UnitResultBuilder(bool isSuccess,
                result.FailureReason,
                result.FailureOrigin)
     {
-
+        CopyMetaProperties(result);
     }
 
     /// <summary>
@@ -72,7 +83,7 @@ internal sealed class UnitResultBuilder<T>(bool isSuccess,
                result.FailureOrigin,
                result.Result)
     {
-
+        CopyMetaProperties(result);
     }
 
     /// <summary>
