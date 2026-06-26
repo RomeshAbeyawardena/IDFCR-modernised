@@ -30,7 +30,7 @@ public class ServiceCollectionExtensionTests
         {
             Assert.That(factoryService.ServiceType, Is.EqualTo(typeof(IEntityInterceptorFactory)));
             Assert.That(factoryService.ImplementationType, Is.EqualTo(typeof(DefaultEntityInterceptorFactory)));
-            Assert.That(factoryService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            Assert.That(factoryService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
         }
 
         var auditCreatedService = services.FirstOrDefault(x => x.ImplementationType == typeof(AuditCreatedTimestampEntityInterceptor));

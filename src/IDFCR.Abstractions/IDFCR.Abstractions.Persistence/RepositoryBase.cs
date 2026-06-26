@@ -261,6 +261,8 @@ namespace IDFCR.Abstractions.Persistence
                     return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                 }
 
+                var oldEntry = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+
                 var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
                 clonedEntity.Apply(dbValue);
 
@@ -284,7 +286,7 @@ namespace IDFCR.Abstractions.Persistence
 
                 id = await OnUpdateAsync(foundEntry, entry, cancellationToken);
                 await InvokeInterceptorsAsync(EntityContextBehaviorStage.Post,
-                    EntityContextBehavior.Update, foundEntry, clonedEntity, cancellationToken);
+                    EntityContextBehavior.Update, foundEntry, oldEntry, cancellationToken);
 
                 var result = UnitResult.FromResult(id, UnitAction.Update, namedResult: resultName);
 
