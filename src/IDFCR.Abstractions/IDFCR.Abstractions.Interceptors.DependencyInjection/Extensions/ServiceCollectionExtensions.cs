@@ -26,8 +26,8 @@ public static class ServiceCollectionExtensions
         allAssemblies.AddRange(assemblies);
 
         return services
-            .AddSingleton<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
-            .AddSingleton<IAuditProcessorProvider, DefaultAuditProcessorProvider>()
+            .AddTransient<IEntityInterceptorFactory, DefaultEntityInterceptorFactory>()
+            .AddTransient<IAuditProcessorProvider, DefaultAuditProcessorProvider>()
             .AddScoped<IScopedResources, DefaultScopedResources>()
             .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, [.. allAssemblies])
             .ScanGenericServices<IAuditProcessor>(ServiceLifetime.Transient, [.. allAssemblies]);
