@@ -10,7 +10,7 @@ interface ISource1 : IMapper<ISource1>
 internal class Source1 : MapperBase<ISource1>, ISource1
 {
     public string Key { get; set; } = null!;
-    public override void Map(ISource1 source)
+    protected override void MapMembers(ISource1 source)
     {
         Key = source.Key;
     }
@@ -19,7 +19,7 @@ internal class Source1 : MapperBase<ISource1>, ISource1
 internal class Source2 : MapperBase<ISource2>, ISource2
 {
     public string? Value { get; set; }
-    public override void Map(ISource2 secondSource)
+    protected override void MapMembers(ISource2 secondSource)
     {
         Value = secondSource.Value;
     }
@@ -41,7 +41,7 @@ internal class DualMappingTestSource : MapperBase<ISource1, ISource2>, IDualMapp
     public string Key { get; set; } = null!;
     public string? Value { get; set; }
 
-    public override void Map(ISource1 source)
+    protected override void MapMembers(ISource1 source)
     {
         Key = source.Key;
     }

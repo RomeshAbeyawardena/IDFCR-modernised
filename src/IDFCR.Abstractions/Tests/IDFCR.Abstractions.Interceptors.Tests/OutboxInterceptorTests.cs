@@ -18,7 +18,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     public DateTimeOffset CreatedTimestampUtc { get; set; }
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
 
-    public override void Map(IOutboxEntity source)
+    protected override void MapMembers(IOutboxEntity source)
     {
         Data = source.Data;
         CompletedTimestampUtc = source.CompletedTimestampUtc;

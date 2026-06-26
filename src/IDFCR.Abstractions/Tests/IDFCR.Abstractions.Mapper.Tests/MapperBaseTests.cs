@@ -19,7 +19,7 @@ public abstract class SharedMapperBase : MapperBase<IShared>, IShared
     public int? PropertyD { get; set; }
     public bool HasProperty { get; set; }
 
-    public override void Map(IShared source)
+    protected override void MapMembers(IShared source)
     {
         PropertyA = source.PropertyA;
         PropertyB = source.PropertyB;

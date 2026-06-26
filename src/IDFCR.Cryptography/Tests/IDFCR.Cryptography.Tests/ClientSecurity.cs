@@ -54,7 +54,7 @@ internal class ClientSecurity : MapperBase<IClientSecurity>, IClientSecurity
         }
     }
 
-    public override void Map(IClientSecurity source)
+    protected override void MapMembers(IClientSecurity source)
     {
         ClientId = source.ClientId;
         Secret = source.Secret;

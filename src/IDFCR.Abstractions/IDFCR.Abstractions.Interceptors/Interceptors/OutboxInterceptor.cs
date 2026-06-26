@@ -27,8 +27,7 @@ public class OutboxInterceptor(IServiceProvider services)
     /// <inheritdoc />
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
-        _handler ??= GetHandler();
-
+        _handler = GetHandler();
         return _handler is not null;
     }
 #pragma warning disable CS0809

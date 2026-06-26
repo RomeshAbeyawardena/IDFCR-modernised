@@ -12,7 +12,7 @@ public class Customer : MapperBase<ICustomer>, ICustomer
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
     public bool Suppressed { get; set; }
 
-    public override void Map(ICustomer source)
+    protected override void MapMembers(ICustomer source)
     {
         Id = source.Id;
         FirstName = source.FirstName;

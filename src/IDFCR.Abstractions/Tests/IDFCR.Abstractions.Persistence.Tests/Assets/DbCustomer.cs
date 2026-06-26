@@ -14,7 +14,7 @@ namespace IDFCR.Abstractions.Persistence.Tests.Assets
         public string LastName { get; set; } = null!;
         public bool Suppressed { get; set; }
 
-        public override void Map(ICustomer source)
+        protected override void MapMembers(ICustomer source)
         {
             Id = source.Id;
             FirstName = source.FirstName;

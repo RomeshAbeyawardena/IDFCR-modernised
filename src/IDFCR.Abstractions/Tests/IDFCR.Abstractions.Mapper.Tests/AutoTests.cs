@@ -25,7 +25,7 @@ public class DtoWithAutoMapping : AutoMapperBase<IDtoWithAutoMapping>, IDtoWithA
     public float C { get; set; }
     public bool IsValue { get; set; }
 
-    public override void Map(IDtoWithAutoMapping source)
+    protected override void MapMembers(IDtoWithAutoMapping source)
     {
         SingularMap(source);
     }
@@ -43,7 +43,7 @@ internal class DtoWithAutoMappingManualClone : MapperBase<IDtoWithAutoMapping>, 
     public float C { get; set; }
     public bool IsValue { get; set; }
 
-    public override void Map(IDtoWithAutoMapping source)
+    protected override void MapMembers(IDtoWithAutoMapping source)
     {
         Name = source.Name;
         A = source.A;
