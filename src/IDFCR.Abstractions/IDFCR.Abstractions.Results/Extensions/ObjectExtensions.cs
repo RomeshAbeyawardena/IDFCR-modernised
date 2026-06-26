@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IDFCR.Abstractions.Results.Extensions;
@@ -24,6 +25,28 @@ public enum And
 /// </summary>
 public static class ObjectExtensions
 {
+    /// <summary>
+    /// Determines whether the specified object is of type Guid. This method checks if the provided object can be cast to a Guid. If the object is of type Guid, it returns true and outputs the value; otherwise, it returns false and outputs null. Additionally, if the object is not of type Guid but can be parsed as a valid Guid string representation, it will also return true and output the parsed Guid value.
+    /// </summary>
+    /// <param name="source">The object to check.</param>
+    /// <param name="value">The output value if the object is of type Guid or can be parsed as a valid Guid string.</param>
+    /// <returns>True if the object is of type Guid or can be parsed as a valid Guid string; otherwise, false.</returns>
+    public static bool IsOfGuid(this object? source, [NotNullWhen(true)] out Guid? value)
+    {
+        if (IsOf(source, out value))
+        {
+            return true;
+        }
+
+        if (Guid.TryParse(source?.ToString(), out var guid))
+        {
+            value = guid;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Determines whether the specified object is of a given type. This method checks if the provided object can be cast to the specified type T. If the object is of the specified type, it returns true and outputs the value; otherwise, it returns false and outputs null.
     /// </summary>
@@ -68,6 +91,29 @@ public static class ObjectExtensions
         if (source.IsOf<T>(out var nullableVal) && (and == And.None || !comparer.Equals(nullableVal.Value, default)))
         {
             value = nullableVal;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether the specified object is of type Guid and not equal to the default value of Guid. This method checks if the provided object can be cast to a Guid and also ensures that the value is not equal to the default value for Guid (Guid.Empty). If both conditions are met, it returns true and outputs the value; otherwise, it returns false and outputs null.
+    /// </summary>
+    /// <param name="source">The object to check.</param>
+    /// <param name="and">Specifies additional conditions to check for the object.</param>
+    /// <param name="value">The output value if the object is of type Guid and not the default value.</param>
+    /// <returns>True if the object is of type Guid and not the default value; otherwise, false.</returns>
+    public static bool IsOfGuid(this object? source, And and, [NotNullWhen(true)] out Guid? value)
+    {
+        if (IsOf(source, and, out value))
+        {
+            return true;
+        }
+
+        if (Guid.TryParse(source?.ToString(), out var guid) && (and == And.None || guid != default))
+        {
+            value = guid;
             return true;
         }
 #pragma warning restore CS0618 // Type or member is obsolete
