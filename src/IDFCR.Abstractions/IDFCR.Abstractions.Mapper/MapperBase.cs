@@ -1,3 +1,5 @@
+using IDFCR.Abstractions.Metadata;
+
 namespace IDFCR.Abstractions.Mapper;
 
 /// <summary>
@@ -63,10 +65,37 @@ public abstract class MapperBase<TSource>() : IMapper<TSource>
     }
 
     /// <summary>
-    /// Maps the values from the specified source object to the current instance. This method must be implemented by derived classes to define the specific mapping logic for the source type. The implementation should copy relevant properties and values from the source object to the current instance, allowing for transformation and mapping of data as needed. The Map method serves as the core mapping function that enables derived classes to perform custom mapping operations based on their specific requirements and use cases.
+    /// Maps the values from the specified source object to the current instance. This method must be implemented by derived classes to define the specific mapping logic for the source type. The implementation should copy relevant properties and values from the source object to the current instance, allowing for transformation and mapping of data as needed.
     /// </summary>
     /// <param name="source">The source object from which values will be mapped to the current instance.</param>
-    public abstract void Map(TSource source);
+    protected abstract void MapMembers(TSource source);
+
+    /// <summary>
+    /// Maps the values from the specified source object to the current instance. This method provides a default implementation that calls the abstract MapMembers method, allowing derived classes to define their specific mapping logic. Additionally, it checks if the current instance and the source object implement the <see cref="IAuditCreatedTimestamp"/> and <see cref="IAuditModifiedTimestamp"/> interfaces, and if so, it copies the corresponding timestamp values from the source to the current instance.
+    /// </summary>
+    /// <param name="source">The source object from which values will be mapped to the current instance.</param>
+    public virtual void Map(TSource source)
+    {
+        if (source is null)
+        {
+            return;
+        }
+
+        MapMembers(source);
+
+        if (this is IAuditCreatedTimestamp auditCreatedTimestamp
+            && source is IAuditCreatedTimestamp sourceCreatedTimestamp)
+        {
+            auditCreatedTimestamp.CreatedTimestampUtc = sourceCreatedTimestamp.CreatedTimestampUtc;
+        }
+
+        if (this is IAuditModifiedTimestamp auditModifiedTimestamp
+                && source is IAuditModifiedTimestamp sourceModifiedTimestamp)
+        {
+            auditModifiedTimestamp.ModifiedTimestampUtc = sourceModifiedTimestamp.ModifiedTimestampUtc;
+        }
+
+    }
 }
 
 

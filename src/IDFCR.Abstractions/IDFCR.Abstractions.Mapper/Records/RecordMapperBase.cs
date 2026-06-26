@@ -1,3 +1,5 @@
+using IDFCR.Abstractions.Metadata;
+
 namespace IDFCR.Abstractions.Mapper.Records;
 
 /// <summary>
@@ -56,9 +58,26 @@ public abstract record RecordMapperBase<TSource>() : IRecordMapper<TSource>
     ///<inheritdoc />
     public virtual void Map(TSource source)
     {
+        if (source is null)
+        {
+            return;
+        }
+
         if (Interlocked.Exchange(ref mappedState, 1) == 1)
         {
             throw new InvalidOperationException("Mapping has already occured once with this record");
+        }
+
+        if (this is IAuditCreatedTimestamp auditCreatedTimestamp
+            && source is IAuditCreatedTimestamp sourceCreatedTimestamp)
+        {
+            auditCreatedTimestamp.CreatedTimestampUtc = sourceCreatedTimestamp.CreatedTimestampUtc;
+        }
+
+        if (this is IAuditModifiedTimestamp auditModifiedTimestamp
+                && source is IAuditModifiedTimestamp sourceModifiedTimestamp)
+        {
+            auditModifiedTimestamp.ModifiedTimestampUtc = sourceModifiedTimestamp.ModifiedTimestampUtc;
         }
 
         MapMembers(Source);
