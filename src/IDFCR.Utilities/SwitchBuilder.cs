@@ -17,6 +17,9 @@ public static class SwitchBuilder
     public static ISwitch<TKey, TValue> Build<TKey, TValue>(ISwitch<TKey, TValue> source, Action<ISwitchBuilder<TKey, TValue>> builderFactory)
         where TKey : notnull
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(builderFactory);
+
         var builder = new DefaultSwitchBuilder<TKey, TValue>(source);
 
         builderFactory(builder);
@@ -34,6 +37,8 @@ public static class SwitchBuilder
     public static ISwitch<TKey, TValue> Build<TKey, TValue>(Action<ISwitchBuilder<TKey, TValue>> builderFactory)
         where TKey : notnull
     {
+        ArgumentNullException.ThrowIfNull(builderFactory);
+
         var builder = new DefaultSwitchBuilder<TKey, TValue>();
 
         builderFactory(builder);
