@@ -96,6 +96,7 @@
     <Project Path="src/IDFCR.Results.Http.Tests/IDFCR.Results.Http.Tests.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Utilities/">
+    <Project Path="src/IDFCR.Utilities.Tests/IDFCR.Utilities.Tests.csproj" />
     <Project Path="src/IDFCR.Utilities/IDFCR.Utilities.csproj" />
   </Folder>
 </Solution>
