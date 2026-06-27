@@ -1,5 +1,6 @@
 ﻿namespace IDFCR.Utilities;
 
+
 internal sealed class DefaultSwitch<TKey, TValue>(IReadOnlyDictionary<TKey, Func<TKey, TValue>> internalDictionary, Func<TKey, TValue>? elseValueFactory) : ISwitch<TKey, TValue>
     where TKey : notnull
 {
