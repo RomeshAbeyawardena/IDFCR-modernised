@@ -6,9 +6,7 @@
     <File Path="README.md" />
     <File Path="update-version.ps1" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/IDFCR.Utilities/IDFCR.Utilities.csproj" />
-  </Folder>
+  <Folder Name="/src/" />
   <Folder Name="/src/IDFCR.Caching/">
     <Project Path="src/IDFCR.Caching/IDFCR.Caching.Http/IDFCR.Caching.Http.csproj" />
     <Project Path="src/IDFCR.Caching/IDFCR.Caching.Serialisation/IDFCR.Caching.Serialisation.csproj">
@@ -96,5 +94,8 @@
   </Folder>
   <Folder Name="/src/IDFCR.Results.Http/Tests/">
     <Project Path="src/IDFCR.Results.Http.Tests/IDFCR.Results.Http.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/IDFCR.Utilities/">
+    <Project Path="src/IDFCR.Utilities/IDFCR.Utilities.csproj" />
   </Folder>
 </Solution>

@@ -1,11 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Frozen;
 
 namespace IDFCR.Utilities;
 
 internal sealed class DefaultSwitchBuilder<TKey, TValue>() : ISwitchBuilder<TKey, TValue>
     where TKey : notnull
 {
-    private readonly ConcurrentDictionary<TKey, Func<TKey, TValue>> internalDictionary = [];
+    private readonly Dictionary<TKey, Func<TKey, TValue>> internalDictionary = [];
 
     public DefaultSwitchBuilder(ISwitch<TKey, TValue> sourceSwitch)
         : this()
@@ -16,22 +16,21 @@ internal sealed class DefaultSwitchBuilder<TKey, TValue>() : ISwitchBuilder<TKey
             {
                 CaseWhen(key, value);
             }
+
+            elseValueFactory = defaultSwitch.ElseValueFactory;
         }
     }
 
     private Func<TKey, TValue>? elseValueFactory;
     public ISwitch<TKey, TValue> Build()
     {
-        return new DefaultSwitch<TKey, TValue>(internalDictionary.AsReadOnly(), elseValueFactory);
+        return new DefaultSwitch<TKey, TValue>(internalDictionary
+            .ToFrozenDictionary(), elseValueFactory);
     }
 
     public ISwitchBuilder<TKey, TValue> CaseWhen(TKey key, Func<TKey, TValue> valueFactory)
     {
-        if (!internalDictionary.TryAdd(key, valueFactory))
-        {
-            internalDictionary[key] = valueFactory;
-        }
-
+        internalDictionary[key] = valueFactory;
         return this;
     }
 
