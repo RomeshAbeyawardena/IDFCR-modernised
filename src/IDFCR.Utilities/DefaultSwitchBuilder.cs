@@ -2,10 +2,22 @@
 
 namespace IDFCR.Utilities;
 
-internal sealed class DefaultSwitchBuilder<TKey, TValue> : ISwitchBuilder<TKey, TValue>
+internal sealed class DefaultSwitchBuilder<TKey, TValue>() : ISwitchBuilder<TKey, TValue>
     where TKey : notnull
 {
     private readonly ConcurrentDictionary<TKey, Func<TKey, TValue>> internalDictionary = [];
+
+    public DefaultSwitchBuilder(ISwitch<TKey, TValue> sourceSwitch)
+        : this()
+    {
+        if (sourceSwitch is DefaultSwitch<TKey,TValue> defaultSwitch)
+        {
+            foreach(var (key, value) in defaultSwitch.InternalDictionary)
+            {
+                CaseWhen(key, value);
+            }
+        }
+    }
 
     private Func<TKey, TValue>? elseValueFactory;
     public ISwitch<TKey, TValue> Build()
