@@ -658,7 +658,7 @@ internal class SwitchBuilderTests
 
     [Test]
     public void Build_WithNullSource_ThrowsArgumentNullException()
-    {
+    { 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
             SwitchBuilder.Build<int, string>(null!, config => { }));
