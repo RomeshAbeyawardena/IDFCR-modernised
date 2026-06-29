@@ -15,7 +15,7 @@ internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterF
         
         var filterType = typeof(IFilter<,>);
         var dbType = typeof(TDb);
-        foreach (var @interface in typeof(TRequest).GetInterfaces())
+        foreach (var @interface in typeof(TRequest).GetInterfaces().Where(x => x.IsAssignableTo(typeof(IFilter))))
         {
             filters.AddRange(
                 serviceProvider.GetServices(filterType.MakeGenericType(dbType, @interface))
