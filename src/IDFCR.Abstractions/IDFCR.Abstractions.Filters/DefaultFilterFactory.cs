@@ -9,9 +9,23 @@ namespace IDFCR.Abstractions.Filters;
 internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterFactory
 {
     /// <inheritdoc />
-    public IEnumerable<IFilter<TRequest, TDb>> GetFilters<TRequest, TDb>()
+    public IEnumerable<IFilter<TDb>> GetFilters<TRequest, TDb>()
     {
-        return serviceProvider.GetServices<IFilter<TRequest, TDb>>();
+        List<IFilter<TDb>> filters = [];
+        
+        var filterType = typeof(IFilter<,>);
+        var dbType = typeof(TDb);
+        foreach (var @interface in typeof(TRequest).GetInterfaces())
+        {
+            filters.AddRange(
+                serviceProvider.GetServices(filterType.MakeGenericType(dbType, @interface))
+                .Where(x => x != null)
+                .Select(x => (IFilter<TDb>)x!));
+        }
+
+        filters.AddRange(serviceProvider.GetServices<IFilter<TRequest, TDb>>());
+
+        return filters;
     }
 
     /// <inheritdoc />

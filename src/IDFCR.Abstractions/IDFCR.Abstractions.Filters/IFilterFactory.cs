@@ -28,7 +28,7 @@ public interface IFilterFactory
     /// <summary>
     /// Resolves standard filters for the supplied request and element types.
     /// </summary>
-    IEnumerable<IFilter<TRequest, TDb>> GetFilters<TRequest, TDb>();
+    IEnumerable<IFilter<TDb>> GetFilters<TRequest, TDb>();
 
     /// <summary>
     /// Resolves paged filters for the supplied request and element types.

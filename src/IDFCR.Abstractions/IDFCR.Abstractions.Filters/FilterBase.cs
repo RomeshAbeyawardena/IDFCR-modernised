@@ -20,4 +20,24 @@ public abstract class FilterBase<TRequest, TDb> : IFilter<TRequest, TDb>
 
     /// <inheritdoc />
     public abstract IQueryable<TDb> Apply(IQueryable<TDb> queryable, TRequest request);
+
+    bool IFilter<TDb>.CanFilter(object? request)
+    {
+        if (request is TRequest requestModel)
+        {
+            return CanFilter(requestModel);
+        }
+
+        return false;
+    }
+
+    IQueryable<TDb> IFilter<TDb>.Apply(IQueryable<TDb> queryable, object? request)
+    {
+        if (request is TRequest requestModel)
+        {
+            queryable = Apply(queryable, requestModel);
+        }
+
+        return queryable;
+    }
 }
