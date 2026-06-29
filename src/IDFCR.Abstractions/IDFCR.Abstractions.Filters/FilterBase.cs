@@ -5,7 +5,7 @@ namespace IDFCR.Abstractions.Filters;
 /// </summary>
 /// <typeparam name="TRequest">The request type.</typeparam>
 /// <typeparam name="TDb">The queryable element type.</typeparam>
-public abstract class FilterBase<TRequest, TDb> : IFilter<TRequest, TDb>
+public abstract class FilterBase<TRequest, TDb> : IFilter<TRequest, TDb>, IFilter<TDb>
 {
     /// <summary>
     /// Gets a new LinqKit predicate starter for composing expressions.

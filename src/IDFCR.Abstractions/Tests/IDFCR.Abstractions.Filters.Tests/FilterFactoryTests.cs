@@ -36,9 +36,10 @@ public class FilterFactoryTests
         var filters = _factory.GetFilters<TestFilterRequest, Customer>().ToArray();
 
         // Assert
-        Assert.That(filters, Has.Length.EqualTo(2), "Should return direct filter + generic filter");
+        Assert.That(filters, Has.Length.EqualTo(3), "Should return direct filter + generic filter + interface variation");
         Assert.That(filters[0], Is.InstanceOf<TestFilter>());
-        Assert.That(filters[1], Is.InstanceOf<GenericTestFilter<TestFilterRequest, Customer>>());
+        Assert.That(filters[2], Is.InstanceOf<GenericTestFilter<TestFilterRequest, Customer>>());
+        Assert.That(filters[1], Is.InstanceOf<GenericTestFilter<ITestFilter, Customer>>());
     }
 
     [Test]

@@ -2,12 +2,17 @@
 
 namespace IDFCR.Abstractions.Filters.Tests.Assets;
 
+public interface ITestFilter : IFilter
+{
+
+}
+
 public record TestPagedFilterRequest : PagedQuery
 {
     
 }
 
-public record TestFilterRequest
+public record TestFilterRequest : ITestFilter
 {
 
 }

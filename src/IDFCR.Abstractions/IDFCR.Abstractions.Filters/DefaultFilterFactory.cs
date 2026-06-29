@@ -12,15 +12,25 @@ internal class DefaultFilterFactory(IServiceProvider serviceProvider) : IFilterF
     public IEnumerable<IFilter<TDb>> GetFilters<TRequest, TDb>()
     {
         List<IFilter<TDb>> filters = [];
-        
+
+        var baseFilter = typeof(IFilter);
         var filterType = typeof(IFilter<,>);
         var dbType = typeof(TDb);
-        foreach (var @interface in typeof(TRequest).GetInterfaces().Where(x => x.IsAssignableTo(typeof(IFilter))))
+        var requestType = typeof(TRequest);
+        foreach (var @interface in requestType.GetInterfaces().Where(x => x.IsAssignableTo(baseFilter)))
         {
+            if (@interface == baseFilter
+                || @interface == requestType)
+            {
+                continue;
+            }
+
+            var genericFilterType = filterType.MakeGenericType(@interface, dbType);
+
             filters.AddRange(
-                serviceProvider.GetServices(filterType.MakeGenericType(dbType, @interface))
+                serviceProvider.GetServices(genericFilterType)
                 .Where(x => x != null)
-                .Select(x => (IFilter<TDb>)x!));
+                .Cast<IFilter<TDb>>());
         }
 
         filters.AddRange(serviceProvider.GetServices<IFilter<TRequest, TDb>>());
