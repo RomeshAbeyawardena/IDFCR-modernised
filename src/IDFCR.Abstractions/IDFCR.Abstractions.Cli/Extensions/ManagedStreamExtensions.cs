@@ -78,7 +78,7 @@ public static class ManagedStreamExtensions
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="tableFields">An array of TableField instances defining the columns and formatting for the table.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public static async Task DisplayPagedTable<T, TDestination>(this IManagedStream managedStream, IUnitPagedResult<T> results,
+    public static async Task DisplayPagedTable<T, TDestination>(this IManagedStream managedStream, IPagedUnitResult<T> results,
         Func<T, TDestination> map, CancellationToken cancellationToken, params TableField<TDestination>[] tableFields)
     {
         var expression = MaximumLengthStringExpressionBuilder<T>.BuildExpression().Compile();
@@ -131,7 +131,7 @@ public static class ManagedStreamExtensions
     /// <param name="formatData">A function to format the mapped data for display.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public static async Task DisplayPaged<T, TDestination>(this IManagedStream managedStream, IUnitPagedResult<T> results,
+    public static async Task DisplayPaged<T, TDestination>(this IManagedStream managedStream, IPagedUnitResult<T> results,
         Func<T, TDestination> map, Func<TDestination, string> formatData, CancellationToken cancellationToken)
     {
         if (!results.IsSuccess)

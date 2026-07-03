@@ -318,7 +318,7 @@ namespace IDFCR.Abstractions.Persistence
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the paged result.</returns>
         /// <exception cref="InvalidOperationException">Thrown when mapping fails.</exception>
-        protected async Task<IUnitPagedResult<TResult>> GetPagedAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken) 
+        protected async Task<IPagedUnitResult<TResult>> GetPagedAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken) 
             where TRequest : IPagedQuery
             where TResult : class, IMapper<TCommon>
         {
@@ -326,18 +326,18 @@ namespace IDFCR.Abstractions.Persistence
 
             var mappedData = data.Select(x => x.Map<TResult>()!) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
-            return UnitPagedResult.FromResult(mappedData!,
+            return PagedUnitResult.FromResult(mappedData!,
                 totalRows, request, UnitAction.Get);
         }
 
         /// <inheritdoc />
-        public async virtual Task<IUnitPagedResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
+        public async virtual Task<IPagedUnitResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
         {
             var (data, totalRows) = await OnGetPagedAsync(request, cancellationToken);
 
             var mappedData = data.Select(Map!) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
-            return UnitPagedResult.FromResult<T>(mappedData!,
+            return PagedUnitResult.FromResult<T>(mappedData!,
                 totalRows, request, UnitAction.Get);
         }
 

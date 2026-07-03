@@ -33,6 +33,6 @@ public interface IRepository<T, TKey> : IUnitOfWork
     /// <summary>
     /// Gets a paged result for the supplied request.
     /// </summary>
-    Task<IUnitPagedResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
+    Task<IPagedUnitResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
         where TRequest : IPagedQuery;
 }

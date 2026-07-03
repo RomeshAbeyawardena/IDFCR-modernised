@@ -4,7 +4,7 @@ namespace IDFCR.Abstractions.Results;
 /// Represents a paged unit result.
 /// </summary>
 /// <typeparam name="TResult">The element type.</typeparam>
-public interface IUnitPagedResult<TResult> : IUnitResult<IEnumerable<TResult>>
+public interface IPagedUnitResult<TResult> : IUnitResult<IEnumerable<TResult>>
 {
     /// <summary>
     /// Gets the total number of rows before paging was applied.

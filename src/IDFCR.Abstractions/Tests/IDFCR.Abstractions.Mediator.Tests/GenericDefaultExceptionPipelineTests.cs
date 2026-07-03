@@ -84,7 +84,7 @@ internal class GenericDefaultExceptionPipelineTests
         var behaviour = new ExceptionBehaviour(UnitAction.Get, FailureReason.ValidationError);
         var request = new PagedRequest();
 
-        var state = await Execute<PagedRequest, IUnitPagedResult<Customer>>(
+        var state = await Execute<PagedRequest, IPagedUnitResult<Customer>>(
             request: request,
             exception: new InvalidOperationException("boom"),
             configuredBehaviour: behaviour);

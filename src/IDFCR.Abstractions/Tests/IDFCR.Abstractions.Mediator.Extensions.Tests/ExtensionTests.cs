@@ -21,7 +21,7 @@ public sealed class CollectionUnitResultRequest : IUnitResultCollectionRequest<C
 {
 }
 
-public sealed record PagedUnitResultRequest() : PagedQuery(2, 1), IUnitPagedResultRequest<Customer>;
+public sealed record PagedUnitResultRequest() : PagedQuery(2, 1), IPagedUnitResultRequest<Customer>;
 
 public sealed class UnsupportedResponseRequest
 {
@@ -193,7 +193,7 @@ public class ExtensionTests
         var exception = new InvalidOperationException("boom");
         var behaviour = new ExceptionBehaviour(UnitAction.Conflict, FailureReason.Forbidden);
 
-        var state = await Execute<PagedUnitResultRequest, IUnitPagedResult<Customer>>(
+        var state = await Execute<PagedUnitResultRequest, IPagedUnitResult<Customer>>(
             request,
             exception,
             registeredBehaviour: behaviour);

@@ -39,8 +39,8 @@ public interface IUnitResultCollectionRequestHandler<TRequest, TResponse> : IReq
 /// </summary>
 /// <typeparam name="TRequest">The type of request being handled.</typeparam>
 /// <typeparam name="TResponse">The type of response returned by the request.</typeparam>
-public interface IUnitPagedResultCollectionRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, IUnitPagedResult<TResponse>>
-    where TRequest : IUnitPagedResultRequest<TResponse>
+public interface IPagedUnitResultCollectionRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, IPagedUnitResult<TResponse>>
+    where TRequest : IPagedUnitResultRequest<TResponse>
 {
 
 }

@@ -50,9 +50,9 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
             var emptyMethodInfo = typeof(Enumerable).GetMethod(nameof(Enumerable.Empty))?.MakeGenericMethod(genericTypes);
             var emptyArray = emptyMethodInfo?.Invoke(null, []);
 
-            if (responseType.IsAssignableTo(typeof(IUnitPagedResult<>).MakeGenericType(genericTypes)))
+            if (responseType.IsAssignableTo(typeof(IPagedUnitResult<>).MakeGenericType(genericTypes)))
             {
-                var methodInfo = typeof(UnitPagedResult).GetMethod(nameof(UnitPagedResult.FromResult))?
+                var methodInfo = typeof(PagedUnitResult).GetMethod(nameof(PagedUnitResult.FromResult))?
                     .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
                 IPagedQuery? pagedQuery = null;

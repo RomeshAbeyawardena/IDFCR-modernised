@@ -5,7 +5,7 @@ namespace IDFCR.Abstractions.Results;
 /// <summary>
 /// Factory helpers for paged unit results.
 /// </summary>
-public static class UnitPagedResult
+public static class PagedUnitResult
 {
     /// <summary>
     /// Creates a paged result from the supplied data and paging request.
@@ -20,7 +20,7 @@ public static class UnitPagedResult
     /// <param name="failureReason">The failure reason.</param>
     /// <param name="namedResult">An optional name for the result.</param>
     /// <returns>A paged unit result.</returns>
-    public static IUnitPagedResult<TResult> FromResult<TResult>(
+    public static IPagedUnitResult<TResult> FromResult<TResult>(
         IEnumerable<TResult>? result,
         int totalRows,
         IPagedQuery pagedQuery,
@@ -30,7 +30,7 @@ public static class UnitPagedResult
         FailureReason? failureReason = null,
         string? namedResult = null)
     {
-        return new UnitPagedResult<TResult>(result, totalRows, pagedQuery, action, isSuccess, exception, failureReason, namedResult);
+        return new PagedUnitResult<TResult>(result, totalRows, pagedQuery, action, isSuccess, exception, failureReason, namedResult);
     }
 }
 
@@ -38,11 +38,11 @@ public static class UnitPagedResult
 /// Represents a paged collection result.
 /// </summary>
 /// <typeparam name="TResult">The element type.</typeparam>
-internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>, IUnitPagedResult<TResult>
+internal sealed record PagedUnitResult<TResult> : UnitResultCollection<TResult>, IPagedUnitResult<TResult>
 {
-    public static explicit operator UnitPagedResult<TResult>(DefaultUnitResult result)
+    public static explicit operator PagedUnitResult<TResult>(DefaultUnitResult result)
     {
-        return new UnitPagedResult<TResult>([], 0, null!, result.Action, result.IsSuccess, result.Exception, result.FailureReason);
+        return new PagedUnitResult<TResult>([], 0, null!, result.Action, result.IsSuccess, result.Exception, result.FailureReason);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
     /// <summary>
     /// Creates a paged result from the supplied data and paging request.
     /// </summary>
-    public UnitPagedResult(
+    public PagedUnitResult(
         IEnumerable<TResult>? result,
         int totalRows,
         IPagedQuery pagedQuery,
@@ -88,7 +88,7 @@ internal sealed record UnitPagedResult<TResult> : UnitResultCollection<TResult>,
     /// <summary>
     /// Creates a paged result without paging metadata.
     /// </summary>
-    public UnitPagedResult(IEnumerable<TResult>? result, UnitAction action = UnitAction.None, bool isSuccess = true, Exception? exception = null,
+    public PagedUnitResult(IEnumerable<TResult>? result, UnitAction action = UnitAction.None, bool isSuccess = true, Exception? exception = null,
         FailureReason? failureReason = null, string? namedResult = null)
         : this(result, 0, null!, action, isSuccess, exception, failureReason, namedResult)
     {

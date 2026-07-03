@@ -177,13 +177,13 @@ internal class ManagedStreamExtensionsTests
         Assert.That(output.ToString(), Is.EqualTo(expected));
     }
 
-    private static IUnitPagedResult<T> CreatePagedResult<T>(
+    private static IPagedUnitResult<T> CreatePagedResult<T>(
         bool isSuccess,
         IEnumerable<T>? rows,
         int totalRows,
         Exception? exception = null)
     {
-        return UnitPagedResult.FromResult(
+        return PagedUnitResult.FromResult(
             result: rows,
             totalRows: totalRows,
             pagedQuery: new PagedQuery(pageSize: 25, pageIndex: 0),

@@ -105,9 +105,9 @@ public static class UnitResultExtensions
     /// <param name="unitResult">The unit result collection to convert.</param>
     /// <param name="pagedQuery">The paged query information.</param>
     /// <returns>A paged result containing the items from the unit result collection.</returns>
-    public static IUnitPagedResult<T> AsPaged<T>(this IUnitResultCollection<T> unitResult, IPagedQuery pagedQuery)
+    public static IPagedUnitResult<T> AsPaged<T>(this IUnitResultCollection<T> unitResult, IPagedQuery pagedQuery)
     {
-        var pagedResult = new UnitPagedResult<T>(unitResult.Result, unitResult.Result?.Count() ?? 0, pagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
+        var pagedResult = new PagedUnitResult<T>(unitResult.Result, unitResult.Result?.Count() ?? 0, pagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
         CloneMeta(unitResult.Meta, pagedResult);
         return pagedResult;
     }
@@ -150,10 +150,10 @@ public static class UnitResultExtensions
     /// <summary>
     /// Converts a paged result using the supplied converter.
     /// </summary>
-    public static IUnitPagedResult<TDestination> Convert<T, TDestination>(this IUnitPagedResult<T> unitResult, Func<T, TDestination> converter)
+    public static IPagedUnitResult<TDestination> Convert<T, TDestination>(this IPagedUnitResult<T> unitResult, Func<T, TDestination> converter)
     {
         var convertedResults = unitResult.Result?.Select(converter).ToList() ?? [];
-        var results = new UnitPagedResult<TDestination>(convertedResults, unitResult.TotalRows, unitResult.PagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
+        var results = new PagedUnitResult<TDestination>(convertedResults, unitResult.TotalRows, unitResult.PagedQuery, unitResult.Action, unitResult.IsSuccess, unitResult.Exception);
         CloneMeta(unitResult.Meta, results);
         return results;
     }
