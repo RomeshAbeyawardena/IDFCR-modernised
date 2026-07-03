@@ -17,7 +17,7 @@ public abstract class MapperBase<TSource>() : IMapper<TSource>
     /// </summary>
     /// <remarks>Use this property to access the current object as the generic source type parameter. This is
     /// useful in scenarios where the derived class needs to expose itself as the generic type.</remarks>
-    protected TSource Source
+    protected virtual TSource Source
     {
         get
         {
