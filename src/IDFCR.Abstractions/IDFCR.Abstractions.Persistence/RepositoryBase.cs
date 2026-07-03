@@ -309,12 +309,32 @@ namespace IDFCR.Abstractions.Persistence
             }
         }
 
+        /// <summary>
+        /// Retrieves a paged result based on the specified request.
+        /// </summary>
+        /// <typeparam name="TRequest">The type of the request.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="request">The request object containing pagination parameters.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the paged result.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when mapping fails.</exception>
+        protected async Task<IUnitPagedResult<TResult>> GetPagedAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
+            where TResult : class, IMapper<TCommon>, TCommon
+        {
+            var (data, totalRows) = await OnGetPagedAsync(request, cancellationToken);
+
+            var mappedData = data.Select(x => x.Map<TResult>()!) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
+
+            return UnitPagedResult.FromResult(mappedData!,
+                totalRows, request, UnitAction.Get);
+        }
+
         /// <inheritdoc />
         public async virtual Task<IUnitPagedResult<T>> GetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
         {
             var (data, totalRows) = await OnGetPagedAsync(request, cancellationToken);
 
-            var mappedData = data.Select(Map) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
+            var mappedData = data.Select(Map!) ?? throw new InvalidOperationException($"Mapping from {typeof(T)} to {typeof(TDb)} failed");
 
             return UnitPagedResult.FromResult<T>(mappedData!,
                 totalRows, request, UnitAction.Get);
