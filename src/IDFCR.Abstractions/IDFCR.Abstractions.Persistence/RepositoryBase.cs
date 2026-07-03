@@ -318,8 +318,9 @@ namespace IDFCR.Abstractions.Persistence
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the paged result.</returns>
         /// <exception cref="InvalidOperationException">Thrown when mapping fails.</exception>
-        protected async Task<IUnitPagedResult<TResult>> GetPagedAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken) where TRequest : IPagedQuery
-            where TResult : class, IMapper<TCommon>, TCommon
+        protected async Task<IUnitPagedResult<TResult>> GetPagedAsync<TRequest, TResult>(TRequest request, CancellationToken cancellationToken) 
+            where TRequest : IPagedQuery
+            where TResult : class, IMapper<TCommon>
         {
             var (data, totalRows) = await OnGetPagedAsync(request, cancellationToken);
 
