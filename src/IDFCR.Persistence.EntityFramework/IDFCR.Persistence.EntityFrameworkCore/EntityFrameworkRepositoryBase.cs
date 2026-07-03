@@ -151,7 +151,7 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     /// <returns>A tuple containing the paged list of entities and the total count of matching entities.</returns>
     protected override async Task<(IEnumerable<TDb> data, int totalRows)> OnGetPagedAsync<TRequest>(TRequest request, CancellationToken cancellationToken)
     {
-        var filteredResult = FilterFactory.ApplyPaged(DbSet, request);
+        var filteredResult = FilterFactory.ApplyPaged(GetSourceQueryForRequest(request), request);
 
         var (query, totalCount) = filteredResult;
 
@@ -220,6 +220,17 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
         }
 
         return query.OrderBy(x => x.Id);
+    }
+
+    /// <summary>
+    /// Gets the source query for a given request. This method is designed to be overridden by derived classes to provide specific implementation details for retrieving the source query based on different types of requests. By default, it returns the DbSet for the specified database entity type, allowing derived classes to perform operations such as filtering, ordering, and paging on the query. This design allows for flexibility in how queries are constructed and executed within the repository while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    /// <typeparam name="TRequest">The type of the request.</typeparam>
+    /// <param name="request">The request object containing any parameters for retrieving the source query.</param>
+    /// <returns>The source queryable for the specified request.</returns>
+    protected virtual IQueryable<TDb> GetSourceQueryForRequest<TRequest>(TRequest request)
+    {
+        return DbSet;
     }
 
     /// <inheritdoc />
