@@ -8,7 +8,7 @@ namespace IDFCR.Persistence.CloudFlare.Queues;
 /// Represents the response received after pulling messages from a Cloudflare queue. The response includes information about the success of the operation, any errors that occurred, messages related to the operation, and the result containing the pulled messages. This class is used to deserialize the JSON response from the Cloudflare API when interacting with queues.
 /// </summary>
 public class CloudflarePullResponse
-    : IQueuePullResponse<QueuePullResult, QueueMessageItem, CloudflareApiError, JsonElement>
+    : IQueuePullResponse<CloudflareQueuePullResult, CloudflareQueueMessageItem, CloudflareApiError, JsonElement>
 {
     /// <summary>
     /// Gets or sets a value indicating whether the pull operation was successful. A value of true indicates that the operation was successful, while false indicates that there were errors during the operation.
@@ -32,7 +32,7 @@ public class CloudflarePullResponse
     /// Gets or sets the result of the pull operation, which contains the pulled messages and any additional information related to the operation. The result is represented by an instance of the QueuePullResult class, which provides details about the messages that were successfully pulled from the queue. This property allows for access to the actual data retrieved from the queue as a result of the pull operation.
     /// </summary>
     [JsonPropertyName("result")]
-    public QueuePullResult? Result { get; set; }
-    IEnumerable<CloudflareApiError> IQueuePullResponse<QueuePullResult, QueueMessageItem, CloudflareApiError, JsonElement>.Errors => Errors;
-    IEnumerable<string> IQueuePullResponse<QueuePullResult, QueueMessageItem, CloudflareApiError, JsonElement>.Messages => Messages;
+    public CloudflareQueuePullResult? Result { get; set; }
+    IEnumerable<CloudflareApiError> IQueuePullResponse<CloudflareQueuePullResult, CloudflareQueueMessageItem, CloudflareApiError, JsonElement>.Errors => Errors;
+    IEnumerable<string> IQueuePullResponse<CloudflareQueuePullResult, CloudflareQueueMessageItem, CloudflareApiError, JsonElement>.Messages => Messages;
 }

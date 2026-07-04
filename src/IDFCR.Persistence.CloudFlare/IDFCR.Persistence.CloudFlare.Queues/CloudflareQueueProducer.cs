@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Persistence.StorageQueues;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace IDFCR.Persistence.CloudFlare.Queues;
@@ -54,10 +55,39 @@ public class CloudflareQueueProducer(
     }
 }
 
-public class CloudFlareQueueConsumer : IQueueConsumer
+public class CloudFlareQueueConsumer(
+    IAccountDetails accountDetails,
+    HttpClient httpClient) 
+    : CloudflareClient(accountDetails, httpClient)
+    , IQueueConsumer<CloudflarePullResponse, CloudflareQueuePullResult, CloudflareQueueMessageItem,
+        CloudflareApiError, JsonElement>
 {
-    public Task AcknowledgeMessageAsync(string messageId, CancellationToken cancellationToken)
+    public async Task AcknowledgeMessageAsync(string messageId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        
+    }
+
+    public async Task<IEnumerable<CloudflareQueueMessageItem>> PullMessagesAsync(
+        int VisibilityTimeout, 
+        int BatchSize, 
+        CancellationToken cancellationToken)
+    {
+        List<CloudflareQueueMessageItem> messages = [];
+        var url = $"{AuthenticatedBaseUrl}/queues/{AccountDetails.QueueIdOrName}/messages/pull";
+
+        var requestBody = new { visibility_timeout = VisibilityTimeout, batch_size = BatchSize };
+        var response = await HttpClient.PostAsJsonAsync(url, requestBody, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<CloudflarePullResponse>(cancellationToken: cancellationToken);
+
+            if (result?.Result?.Messages != null && result.Result.Messages.Count != 0)
+            {
+                messages.AddRange(result.Result.Messages);
+            }
+        }
+
+        return messages;
     }
 }

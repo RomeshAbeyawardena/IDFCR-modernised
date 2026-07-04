@@ -7,7 +7,7 @@ namespace IDFCR.Persistence.CloudFlare.Queues;
 /// <summary>
 /// Represents a message item retrieved from a queue. The QueueMessageItem class contains properties for the unique message ID, lease ID, timestamp, number of delivery attempts, and the message body. The message body is of type JsonElement, allowing it to capture generic JSON data structures dynamically. This class implements the IQueueMessageItem interface, providing a consistent way to represent messages in different queueing systems.
 /// </summary>
-public class QueueMessageItem : IQueueMessageItem<JsonElement>
+public class CloudflareQueueMessageItem : IQueueMessageItem<JsonElement>
 {
     /// <summary>
     /// Gets or sets the unique message ID associated with the queue message. This property is of type object and can hold any value that uniquely identifies the message within the queue. The unique message ID is used for acknowledgment purposes, allowing the system to track and manage the processing of messages. The value of this property can be used to acknowledge the receipt and processing of the message in the queue system.
