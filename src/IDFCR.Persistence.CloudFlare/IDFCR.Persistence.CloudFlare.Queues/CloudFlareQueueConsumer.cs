@@ -15,8 +15,8 @@ public class CloudFlareQueueConsumer(
     IAccountDetails accountDetails,
     HttpClient httpClient) 
     : CloudflareClient(accountDetails, httpClient)
-    , IQueueConsumer<CloudflarePullResponse, CloudflareQueuePullResult, CloudflareQueueMessageItem,
-        CloudflareApiError, JsonElement>
+    , IQueueConsumer<CloudFlarePullResponse, CloudFlareQueuePullResult, CloudFlareQueueMessageItem,
+        CloudFlareApiError, JsonElement>
 {
     /// <summary>
     /// Acknowledges a message with the specified message ID from the Cloudflare queue asynchronously. The method constructs the appropriate URL for the Cloudflare API based on the provided account details and sends an HTTP POST request to acknowledge the message. The method does not return a value, but it ensures that the message is acknowledged and removed from the queue, preventing it from being processed multiple times.
@@ -29,7 +29,7 @@ public class CloudFlareQueueConsumer(
         PrepareClientOnce();
         var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages/ack";
 
-        var ackPayload = new CloudflareAckRequest
+        var ackPayload = new CloudFlareAckRequest
         {
             Acks = [new() { LeaseId = messageId }]
         };
@@ -62,7 +62,7 @@ public class CloudFlareQueueConsumer(
     /// <param name="batchSize">The number of messages to pull in a single request.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of pulled messages.</returns>
-    public async Task<IUnitResultCollection<CloudflareQueueMessageItem>> PullMessagesAsync(
+    public async Task<IUnitResultCollection<CloudFlareQueueMessageItem>> PullMessagesAsync(
         int visibilityTimeout, 
         int batchSize, 
         CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ public class CloudFlareQueueConsumer(
         PrepareClientOnce();
         try
         {
-            List<CloudflareQueueMessageItem> messages = [];
+            List<CloudFlareQueueMessageItem> messages = [];
             var url = $"{ServiceDefinitions.QueueRelativeUrl}/{AccountDetails.QueueIdOrName}/messages/pull";
 
             var requestBody = new { visibility_timeout = visibilityTimeout, batch_size = batchSize };
@@ -78,7 +78,7 @@ public class CloudFlareQueueConsumer(
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<CloudflarePullResponse>(cancellationToken: cancellationToken);
+                var result = await response.Content.ReadFromJsonAsync<CloudFlarePullResponse>(cancellationToken: cancellationToken);
 
                 if (result?.Result?.Messages != null && result.Result.Messages.Count != 0)
                 {
@@ -90,7 +90,7 @@ public class CloudFlareQueueConsumer(
         }
         catch (Exception ex)
         {
-            return UnitResultCollection.Failed<CloudflareQueueMessageItem>(ex);
+            return UnitResultCollection.Failed<CloudFlareQueueMessageItem>(ex);
         }
     }
 }

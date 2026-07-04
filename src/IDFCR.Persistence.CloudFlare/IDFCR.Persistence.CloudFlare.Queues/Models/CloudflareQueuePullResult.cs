@@ -7,10 +7,10 @@ namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 /// <summary>
 /// Represents the result of pulling messages from a Cloudflare queue. The QueuePullResult class contains properties for the count of messages in the backlog and a list of QueueMessageItem objects representing the messages that were pulled from the queue. This class implements the IQueuePullResult interface, allowing for consistent handling of queue pull results across different implementations.
 /// </summary>
-public class CloudflareQueuePullResult 
-    : IQueuePullResult<CloudflareQueueMessageItem, JsonElement>
+public class CloudFlareQueuePullResult 
+    : IQueuePullResult<CloudFlareQueueMessageItem, JsonElement>
 {
-    IEnumerable<CloudflareQueueMessageItem> IQueuePullResult<CloudflareQueueMessageItem, JsonElement>.Messages => Messages;
+    IEnumerable<CloudFlareQueueMessageItem> IQueuePullResult<CloudFlareQueueMessageItem, JsonElement>.Messages => Messages;
 
     /// <summary>
     /// Gets or sets the count of messages in the backlog. This property provides information about the number of messages that are currently waiting to be processed in the queue, allowing for monitoring and management of the queue's state.
@@ -22,5 +22,5 @@ public class CloudflareQueuePullResult
     /// Gets or sets the list of QueueMessageItem objects representing the messages that were pulled from the queue. This property provides access to the actual messages that were retrieved, allowing for processing and handling of the messages as needed.
     /// </summary>
     [JsonPropertyName("messages")]
-    public List<CloudflareQueueMessageItem> Messages { get; set; } = new();
+    public List<CloudFlareQueueMessageItem> Messages { get; set; } = new();
 }
