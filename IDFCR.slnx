@@ -37,6 +37,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator.Extensions/IDFCR.Abstractions.Mediator.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator/IDFCR.Abstractions.Mediator.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence.StorageQueues/IDFCR.Abstractions.Persistence.StorageQueues.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState.Http/IDFCR.Abstractions.RequestState.Http.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState/IDFCR.Abstractions.RequestState.csproj" />
@@ -84,6 +85,9 @@
   </Folder>
   <Folder Name="/src/IDFCR.GRPC.Extensions/">
     <Project Path="src/IDFCR.GRPC.Client.Extensions/IDFCR.GRPC.Client.Extensions.csproj" />
+  </Folder>
+  <Folder Name="/src/IDFCR.Persistence.CloudFlare/">
+    <Project Path="src/IDFCR.Persistence.CloudFlare/IDFCR.Persistence.CloudFlare.Queues/IDFCR.Persistence.CloudFlare.Queues.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Persistence.EntityFramework/">
     <Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Extensions/IDFCR.Persistence.EntityFrameworkCore.Extensions.csproj" />
