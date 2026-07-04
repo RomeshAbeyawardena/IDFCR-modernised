@@ -12,5 +12,5 @@ public interface IApiError
     /// <summary>
     /// Gets the error message associated with the error. This property provides a description of the error, allowing for understanding and reporting of the error as needed.
     /// </summary>
-    string Message { get; }
+    string? Message { get; }
 }

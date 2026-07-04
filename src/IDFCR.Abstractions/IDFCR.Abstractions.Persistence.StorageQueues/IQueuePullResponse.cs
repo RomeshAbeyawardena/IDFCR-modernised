@@ -26,5 +26,5 @@ public interface IQueuePullResponse<TResult, TMessageItem, TError, TBody>
     /// <summary>
     /// Gets the result of the queue pull operation. If the Success property is true, this property contains the result of the operation, including any messages that were pulled from the queue. If the Success property is false, this property is null.
     /// </summary>
-    IEnumerable<TResult> Result { get; }
+    TResult? Result { get; }
 }
