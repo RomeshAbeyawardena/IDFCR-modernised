@@ -1,7 +1,7 @@
 ﻿using IDFCR.Abstractions.Persistence.StorageQueues;
 using System.Text.Json.Serialization;
 
-namespace IDFCR.Persistence.CloudFlare.Queues;
+namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents an error returned by the Cloudflare API. The CloudflareApiError record contains two properties: Code, which is an integer representing the error code, and Message, which is a string providing a description of the error. This record implements the IApiError interface, allowing it to be used in contexts where API errors need to be handled or logged. The properties are initialized using the init accessor, making them immutable after object creation.

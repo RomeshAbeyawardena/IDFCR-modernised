@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace IDFCR.Persistence.CloudFlare.Queues;
+namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents the result of pulling messages from a Cloudflare queue. The QueuePullResult class contains properties for the count of messages in the backlog and a list of QueueMessageItem objects representing the messages that were pulled from the queue. This class implements the IQueuePullResult interface, allowing for consistent handling of queue pull results across different implementations.

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace IDFCR.Persistence.CloudFlare.Queues;
+namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents an item to be acknowledged in a Cloudflare queue. The class contains a single property, LeaseId, which is the unique identifier of the message to be acknowledged. The LeaseId is used by the Cloudflare API to identify and remove the message from the queue upon successful acknowledgment. This class is serialized to JSON when sending the acknowledgment request to the Cloudflare API.

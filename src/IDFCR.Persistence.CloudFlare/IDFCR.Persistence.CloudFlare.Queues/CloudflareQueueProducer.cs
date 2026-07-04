@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Persistence.StorageQueues;
 using IDFCR.Abstractions.Results;
+using IDFCR.Persistence.CloudFlare.Queues.Models;
 using System.Text.Json;
 
 namespace IDFCR.Persistence.CloudFlare.Queues;

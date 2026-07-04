@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Persistence.CloudFlare.Queues;
+﻿namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents the details required to access a Cloudflare account and interact with its queues. This interface defines the necessary properties for account access and queue operations, including the API token, account ID, queue ID or name, and API version. Implementing this interface allows for consistent handling of account details across different components that interact with Cloudflare queues.

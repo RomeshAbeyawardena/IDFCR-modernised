@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace IDFCR.Persistence.CloudFlare.Queues;
+namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents the response received after pulling messages from a Cloudflare queue. The response includes information about the success of the operation, any errors that occurred, messages related to the operation, and the result containing the pulled messages. This class is used to deserialize the JSON response from the Cloudflare API when interacting with queues.

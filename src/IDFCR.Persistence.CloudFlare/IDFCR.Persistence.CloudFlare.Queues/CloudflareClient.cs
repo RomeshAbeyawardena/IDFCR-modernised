@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using IDFCR.Persistence.CloudFlare.Queues.Models;
+using System.Net.Http.Headers;
 
 namespace IDFCR.Persistence.CloudFlare.Queues;
 

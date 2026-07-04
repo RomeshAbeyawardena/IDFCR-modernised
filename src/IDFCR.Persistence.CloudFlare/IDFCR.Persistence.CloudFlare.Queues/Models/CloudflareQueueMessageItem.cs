@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace IDFCR.Persistence.CloudFlare.Queues;
+namespace IDFCR.Persistence.CloudFlare.Queues.Models;
 
 /// <summary>
 /// Represents a message item retrieved from a queue. The QueueMessageItem class contains properties for the unique message ID, lease ID, timestamp, number of delivery attempts, and the message body. The message body is of type JsonElement, allowing it to capture generic JSON data structures dynamically. This class implements the IQueueMessageItem interface, providing a consistent way to represent messages in different queueing systems.
