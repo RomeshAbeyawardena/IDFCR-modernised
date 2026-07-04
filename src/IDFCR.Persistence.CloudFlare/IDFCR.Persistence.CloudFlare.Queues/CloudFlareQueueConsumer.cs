@@ -26,7 +26,8 @@ public class CloudFlareQueueConsumer(
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task<IUnitResult> AcknowledgeMessageAsync(string messageId, CancellationToken cancellationToken)
     {
-        var url = $"{AuthenticatedBaseUrl}/queues/{AccountDetails.QueueIdOrName}/messages/ack";
+        PrepareClientOnce();
+        var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages/ack";
 
         var ackPayload = new CloudflareAckRequest
         {
@@ -66,10 +67,11 @@ public class CloudFlareQueueConsumer(
         int batchSize, 
         CancellationToken cancellationToken)
     {
+        PrepareClientOnce();
         try
         {
             List<CloudflareQueueMessageItem> messages = [];
-            var url = $"{AuthenticatedBaseUrl}/queues/{AccountDetails.QueueIdOrName}/messages/pull";
+            var url = $"{ServiceDefinitions.QueueRelativeUrl}/{AccountDetails.QueueIdOrName}/messages/pull";
 
             var requestBody = new { visibility_timeout = visibilityTimeout, batch_size = batchSize };
             var response = await HttpClient.PostAsJsonAsync(url, requestBody, cancellationToken);

@@ -12,8 +12,7 @@ public abstract class CloudflareClient(
     IAccountDetails accountDetails,
     HttpClient httpClient)
 {
-    private const string BaseUrl = "https://api.cloudflare.com/client/";
-
+    private bool clientPrepared = false;
     private readonly Lazy<AuthenticationHeaderValue> authenticationHeader
         = new(() => new AuthenticationHeaderValue("Bearer",
             accountDetails.ApiToken));
@@ -26,7 +25,7 @@ public abstract class CloudflareClient(
     /// <summary>
     /// Gets the base URL for authenticated requests to the Cloudflare API. This property constructs the URL based on the provided account details, including the API version and account ID. The AuthenticatedBaseUrl property is used by derived classes to construct specific API endpoints for interacting with Cloudflare queues and other resources. It ensures that requests are made to the correct account and API version, allowing for proper authentication and access to the desired resources.
     /// </summary>
-    protected string AuthenticatedBaseUrl { get; } = $"{BaseUrl}/{accountDetails.ApiVersion}/accounts/{accountDetails.AccountId}";
+    
 
     /// <summary>
     /// Gets the HttpClient used to send HTTP requests to the Cloudflare API. This property provides access to the HttpClient instance that is configured with the necessary authentication headers for making requests to the Cloudflare API. Derived classes can use the HttpClient property to send requests to specific API endpoints, such as sending messages to queues or managing queue settings. The HttpClient is prepared with the appropriate authentication headers by calling the PrepareClient method, ensuring that requests are properly authenticated and authorized.
@@ -34,11 +33,21 @@ public abstract class CloudflareClient(
     protected HttpClient HttpClient { get; } = httpClient;
 
     /// <summary>
-    /// Gets the authentication header value used for making authenticated requests to the Cloudflare API. This property is lazily initialized and provides the necessary authentication information, including the API token, for constructing the Authorization header in HTTP requests. The AuthenticationHeader property is used by derived classes to prepare the HttpClient with the appropriate authentication headers before sending requests to the Cloudflare API.
+    /// Gets the service definitions for interacting with the Cloudflare API. This property provides access to the ServiceDefinitions instance, which contains information about the authenticated base URL, queue relative URL, and other service-related details. Derived classes can use the ServiceDefinitions property to construct specific API endpoints for interacting with Cloudflare queues and other resources. It ensures that requests are made to the correct account and API version, allowing for proper authentication and access to the desired resources.
     /// </summary>
-    protected void PrepareClient()
+    protected ServiceDefinitions ServiceDefinitions { get; } = new(accountDetails);
+
+    /// <summary>
+    /// Prepares the HttpClient for making authenticated requests to the Cloudflare API. This method sets the base address of the HttpClient to the authenticated base URL and adds the necessary authorization header using the API token provided in the account details. The PrepareClientOnce method ensures that the HttpClient is only prepared once, preventing redundant configuration and ensuring that subsequent requests are properly authenticated. Derived classes can call this method before making API requests to ensure that the HttpClient is ready for use.
+    /// </summary>
+    protected void PrepareClientOnce()
     {
-        HttpClient.DefaultRequestHeaders.Authorization
-            = authenticationHeader.Value;
+        if (!clientPrepared)
+        {
+            HttpClient.BaseAddress = new Uri(ServiceDefinitions.AuthenticatedBaseUrl);
+            HttpClient.DefaultRequestHeaders.Authorization
+                = authenticationHeader.Value;
+            clientPrepared = true;
+        }
     }
 }

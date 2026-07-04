@@ -22,7 +22,8 @@ public class CloudflareQueueProducer(
     /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the message was sent successfully.</returns>
     public async Task<IUnitResult> SendMessageAsync<T>(T payload)
     {
-        var url = $"{AuthenticatedBaseUrl}/queues/{AccountDetails.QueueIdOrName}/messages";
+        PrepareClientOnce();
+        var url = $"/{ServiceDefinitions.QueueRelativeUrl}/messages";
 
         var envelope = new { body = payload };
         var jsonContent = new StringContent(JsonSerializer.Serialize(envelope), System.Text.Encoding.UTF8, "application/json");
