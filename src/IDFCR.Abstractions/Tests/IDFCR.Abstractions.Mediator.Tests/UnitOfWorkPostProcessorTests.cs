@@ -206,17 +206,16 @@ internal class UnitOfWorkPostProcessorTests
         Assert.That(captured.FailedTimestampUtc, Is.Null);
     }
 
-    // ── Outbox: save throws → failed entity notified and exception re-thrown ──
+    // ── Outbox: save throws → failed entity notified and save exception swallowed
 
     [Test]
-    public async Task Process_WhenSaveThrows_NotifiesWithFailedTimestampsAndRethrows()
+    public async Task Process_WhenSaveThrows_NotifiesWithFailedTimestampsAndDoesNotThrow()
     {
         RegisterOutboxHandler();
         RegisterScopedResourcesWithId(new StubIdentifiable(42));
 
-        var boom = new InvalidOperationException("db exploded");
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                   .ThrowsAsync(boom);
+                   .ThrowsAsync(new InvalidOperationException("db exploded"));
 
         IOutboxEntity? captured = null;
         _outboxHandler
@@ -226,21 +225,20 @@ internal class UnitOfWorkPostProcessorTests
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+        Assert.DoesNotThrowAsync(
             () => sut.Process(new UowRequest(CommitChanges: true),
                 UnitResult.Success(UnitAction.None), CancellationToken.None));
 
-        Assert.That(ex, Is.SameAs(boom));
         Assert.That(captured, Is.Not.Null);
         Assert.That(captured!.FailedTimestampUtc, Is.EqualTo(_time.GetUtcNow()));
         Assert.That(captured.ModifiedTimestampUtc, Is.EqualTo(_time.GetUtcNow()));
         Assert.That(captured.CompletedTimestampUtc, Is.Null);
     }
 
-    // ── Outbox: save throws, notify for failure also throws → original rethrown
+    // ── Outbox: save throws, failure notify throws → notify exception propagates
 
     [Test]
-    public async Task Process_WhenSaveThrowsAndFailureNotifyAlsoThrows_OriginalExceptionPropagates()
+    public async Task Process_WhenSaveThrowsAndFailureNotifyAlsoThrows_NotifyExceptionPropagates()
     {
         RegisterOutboxHandler();
         RegisterScopedResourcesWithId(new StubIdentifiable(1));
@@ -279,7 +277,7 @@ internal class UnitOfWorkPostProcessorTests
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.ThrowsAsync<Exception>(
+        Assert.DoesNotThrowAsync(
             () => sut.Process(new UowRequest(CommitChanges: true),
                 UnitResult.Success(UnitAction.None), CancellationToken.None));
 
