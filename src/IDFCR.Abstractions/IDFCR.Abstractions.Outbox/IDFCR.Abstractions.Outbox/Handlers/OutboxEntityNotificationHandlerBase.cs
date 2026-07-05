@@ -12,7 +12,12 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
     where TEntity : IOutboxEntity<TKey>
     where TKey : struct
 {
-    private void Log(LogLevel logLevel, Action<ILogger> logAction)
+    /// <summary>
+    /// Logs a message with the specified log level and action, allowing for the tracking of events and issues related to outbox entity notifications. This method is responsible for logging messages based on the provided log level and action, enabling developers to implement custom logging logic for handling notifications related to outbox entities. By using this method, developers can ensure that relevant information is logged during the processing of outbox messages and the tracking of their status within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="logLevel">The log level at which the message should be logged.</param>
+    /// <param name="logAction">The action that performs the logging using the provided ILogger instance.</param>
+    protected void Log(LogLevel logLevel, Action<ILogger> logAction)
     {
         if (logger.IsEnabled(logLevel))
         {
