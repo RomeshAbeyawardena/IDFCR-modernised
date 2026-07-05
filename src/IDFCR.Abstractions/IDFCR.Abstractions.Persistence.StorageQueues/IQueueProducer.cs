@@ -12,6 +12,7 @@ public interface IQueueProducer
     /// </summary>
     /// <typeparam name="T">The type of the message payload.</typeparam>
     /// <param name="payload">The message payload to send.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the message was sent successfully.</returns>
-    Task<IUnitResult> SendMessageAsync<T>(T payload);
+    Task<IUnitResult> SendMessageAsync<T>(T payload, CancellationToken cancellationToken);
 }

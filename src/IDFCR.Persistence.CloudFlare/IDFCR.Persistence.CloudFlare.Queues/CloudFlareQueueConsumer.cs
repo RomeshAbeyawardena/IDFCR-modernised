@@ -24,7 +24,9 @@ public class CloudFlareQueueConsumer(
     /// <param name="messageId">The ID of the message to acknowledge.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task<IUnitResult> AcknowledgeMessageAsync(string messageId, CancellationToken cancellationToken)
+    public async Task<IUnitResult> AcknowledgeMessageAsync(
+        string messageId, 
+        CancellationToken cancellationToken)
     {
         PrepareClientOnce();
         var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages/ack";

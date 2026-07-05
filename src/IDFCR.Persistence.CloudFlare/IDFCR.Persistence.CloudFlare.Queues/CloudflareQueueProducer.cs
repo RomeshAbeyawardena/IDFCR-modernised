@@ -19,8 +19,9 @@ public class CloudFlareQueueProducer(
     /// </summary>
     /// <typeparam name="T">The type of the message payload.</typeparam>
     /// <param name="payload">The message payload to send.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the message was sent successfully.</returns>
-    public async Task<IUnitResult> SendMessageAsync<T>(T payload)
+    public async Task<IUnitResult> SendMessageAsync<T>(T payload, CancellationToken cancellationToken)
     {
         PrepareClientOnce();
         var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages";
@@ -28,13 +29,13 @@ public class CloudFlareQueueProducer(
         var envelope = new { body = payload };
         var jsonContent = new StringContent(JsonSerializer.Serialize(envelope), System.Text.Encoding.UTF8, "application/json");
 
-        var response = await HttpClient.PostAsync(url, jsonContent);
+        var response = await HttpClient.PostAsync(url, jsonContent, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
             return UnitResult.Success(UnitAction.Add);
         }
 
-        var errorContent = await response.Content.ReadAsStringAsync();
+        var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
         return UnitResult.Failed(new Exception(errorContent), UnitAction.None, FailureReason.ExternalDependencyError);
     }
 }
