@@ -19,5 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\IDFCR.TestUtilities\IDFCR.TestUtilities.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions.Interceptors.DependencyInjection\IDFCR.Abstractions.Interceptors.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Outbox\IDFCR.Abstractions.Outbox.Interceptors\IDFCR.Abstractions.Outbox.Interceptors.csproj" />
   </ItemGroup>
 </Project>

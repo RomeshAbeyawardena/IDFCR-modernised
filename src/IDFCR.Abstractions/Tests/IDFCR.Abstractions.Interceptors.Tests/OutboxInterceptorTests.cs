@@ -1,8 +1,10 @@
-﻿using IDFCR.Abstractions.Interceptors.Factories;
-using IDFCR.Abstractions.Interceptors.Handlers;
-using IDFCR.Abstractions.Interceptors.Interceptors;
+﻿using IDFCR.Abstractions.DependencyInjection;
+using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Outbox;
+using IDFCR.Abstractions.Outbox.Handlers;
+using IDFCR.Abstractions.Outbox.Interceptors;
 using Moq;
 using NUnit.Framework;
 
@@ -49,10 +51,6 @@ internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHan
         return Task.FromResult(NotifyResult);
     }
 
-    public override Task<Guid?> NotifyAsync(Guid id, OutboxEntity entity, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
 }
 
 [TestFixture]

@@ -1,6 +1,8 @@
-﻿using IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.DependencyInjection;
 using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Outbox;
+using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using MELT;
@@ -43,7 +45,7 @@ internal class UnitOfWorkPostProcessorTests
         _outboxHandler = new Mock<IOutboxEntityNotificationHandler>();
         _outboxHandler.Setup(h => h.Map(It.IsAny<IOutboxEntity>()))
                       .Returns<IOutboxEntity>(e => e);
-        _outboxHandler.Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+        _outboxHandler.Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
                       .ReturnsAsync((object?)null);
 
         _scopedResources = new Mock<IScopedResources>();
@@ -140,7 +142,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -157,7 +159,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -178,7 +180,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -192,8 +194,8 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((_, entity, _) => captured = entity as IOutboxEntity)
+            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
@@ -221,7 +223,7 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, object, CancellationToken>((_, entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
@@ -249,7 +251,7 @@ internal class UnitOfWorkPostProcessorTests
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ThrowsAsync(new InvalidOperationException("db"));
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("notify blew up"));
 
         var sut = BuildSut<UowRequest, IUnitResult>();
@@ -274,8 +276,8 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((_, e, _) => captured = e as IOutboxEntity)
+            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();

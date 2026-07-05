@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions.Interceptors.Extensions\IDFCR.Abstractions.Interceptors.Extensions.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Outbox\IDFCR.Abstractions.Outbox.Interceptors\IDFCR.Abstractions.Outbox.Interceptors.csproj" />
   </ItemGroup>
 </Project>

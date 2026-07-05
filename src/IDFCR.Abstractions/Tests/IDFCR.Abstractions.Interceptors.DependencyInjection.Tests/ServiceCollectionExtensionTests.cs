@@ -2,6 +2,7 @@
 using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
+using IDFCR.Abstractions.Outbox.Interceptors;
 using IDFCR.TestUtilities.Fakes;
 using NUnit.Framework;
 
