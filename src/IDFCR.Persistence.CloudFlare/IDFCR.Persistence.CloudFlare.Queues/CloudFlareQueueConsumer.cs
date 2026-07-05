@@ -73,8 +73,20 @@ public class CloudFlareQueueConsumer(
             List<CloudFlareQueueMessageItem> messages = [];
             var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages/pull";
 
-            var requestBody = new { visibility_timeout = visibilityTimeout, batch_size = batchSize };
-            var response = await HttpClient.PostAsJsonAsync(url, requestBody, cancellationToken);
+            var requestBody = new
+            {
+                visibility_timeout_ms = visibilityTimeout,
+                batch_size = batchSize
+            };
+
+            var json = JsonSerializer.Serialize(requestBody);
+
+            using var content = new StringContent(
+                json, System.Text.Encoding.UTF8, "application/json");
+
+            content.Headers.ContentLength = System.Text.Encoding.UTF8.GetByteCount(json);
+
+            var response = await HttpClient.PostAsync(url, content, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {
@@ -86,7 +98,7 @@ public class CloudFlareQueueConsumer(
                 }
             }
 
-            return UnitResultCollection.FromResult(messages);
+            return UnitResultCollection.Failed<CloudFlareQueueMessageItem>(response);
         }
         catch (Exception ex)
         {
