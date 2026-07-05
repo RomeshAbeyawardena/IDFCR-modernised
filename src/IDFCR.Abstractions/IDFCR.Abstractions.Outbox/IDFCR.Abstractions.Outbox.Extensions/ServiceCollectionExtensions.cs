@@ -1,7 +1,7 @@
 ﻿
 using IDFCR.Abstractions.DependencyInjection.Extensions;
 using IDFCR.Abstractions.Interceptors.Interceptors;
-using IDFCR.Abstractions.Outbox.Handlers;
+using IDFCR.Abstractions.Outbox.Interceptors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Outbox.Extensions;
@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The updated <see cref="IServiceCollection"/> with the outbox services added.</returns>
     public static IServiceCollection AddOutboxPattern(IServiceCollection services)
     {
-        var assembly = typeof(ServiceCollectionExtensions).Assembly;
+        var assembly = typeof(OutboxInterceptor).Assembly;
 
         return services
             .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, assembly);
