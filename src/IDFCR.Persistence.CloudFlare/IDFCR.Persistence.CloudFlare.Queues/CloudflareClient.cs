@@ -8,7 +8,7 @@ namespace IDFCR.Persistence.CloudFlare.Queues;
 /// </summary>
 /// <param name="accountDetails">The account details required to authenticate and interact with the Cloudflare API.</param>
 /// <param name="httpClient">The HttpClient used to send HTTP requests to the Cloudflare API.</param>
-public abstract class CloudflareClient(
+public abstract class CloudFlareClient(
     IAccountDetails accountDetails,
     HttpClient httpClient)
 {

@@ -14,7 +14,7 @@ namespace IDFCR.Persistence.CloudFlare.Queues;
 public class CloudFlareQueueConsumer(
     IAccountDetails accountDetails,
     HttpClient httpClient) 
-    : CloudflareClient(accountDetails, httpClient)
+    : CloudFlareClient(accountDetails, httpClient)
     , IQueueConsumer<CloudFlarePullResponse, CloudFlareQueuePullResult, CloudFlareQueueMessageItem,
         CloudFlareApiError, JsonElement>
 {

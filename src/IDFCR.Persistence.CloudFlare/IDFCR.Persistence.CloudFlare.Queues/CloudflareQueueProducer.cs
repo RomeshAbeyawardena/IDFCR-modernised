@@ -10,9 +10,9 @@ namespace IDFCR.Persistence.CloudFlare.Queues;
 /// </summary>
 /// <param name="accountDetails">The account details required to authenticate and interact with the Cloudflare API.</param>
 /// <param name="httpClient">The HttpClient used to send HTTP requests to the Cloudflare API.</param>
-public class CloudflareQueueProducer(
+public class CloudFlareQueueProducer(
     IAccountDetails accountDetails,
-    HttpClient httpClient) : CloudflareClient(accountDetails, httpClient), IQueueProducer
+    HttpClient httpClient) : CloudFlareClient(accountDetails, httpClient), IQueueProducer
 {
     /// <summary>
     /// Sends a message with the specified payload to the Cloudflare queue asynchronously. The method constructs the appropriate URL for the Cloudflare API based on the provided account details, serializes the payload into JSON format, and sends it as an HTTP POST request. The method returns a boolean indicating whether the message was sent successfully, based on the HTTP response status code.
