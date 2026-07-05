@@ -41,6 +41,39 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     public abstract Task<TKey?> NotifyAsync(TEntity entity, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Updates the notification for the specified outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling updates to notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="key">The key identifying the outbox entity.</param>
+    /// <param name="entity">The outbox entity that has changed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public abstract Task<TKey?> UpdateNotificationAsync(
+        TKey key, 
+        TEntity entity, 
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Updates the notification for the specified outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling updates to notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The implementation of this method checks if the provided entity is of the expected type (TEntity) and if so, it retrieves the key from the scoped resources and calls the UpdateNotificationAsync method with the key and typed entity. If the entity is not of the expected type or if the key cannot be retrieved, it simply returns null, effectively ignoring updates for entities that do not match the expected type or do not have a valid key in the scoped resources.
+    /// </summary>
+    /// <param name="entity">The outbox entity that has changed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task<object?> UpdateNotificationAsync(
+        object entity, 
+        CancellationToken cancellationToken)
+    {
+        if (entity is TEntity typedEntity)
+        {
+            if (ScopedResources?.TryGetScopedResource<TKey>(out var key) ?? false)
+            {
+                return await UpdateNotificationAsync(key, typedEntity, cancellationToken);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Notifies the handler of changes to the outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The implementation of this method checks if the provided entity is of the expected type (TEntity) and if so, it calls the NotifyAsync method with the typed entity. If the entity is not of the expected type, it simply returns a completed task, effectively ignoring notifications for entities that do not match the expected type.
     /// </summary>
     /// <param name="entity">The outbox entity that has changed.</param>
@@ -51,6 +84,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
         if (entity is TEntity typedEntity)
         {
             var id = await NotifyAsync(typedEntity, cancellationToken);
+            ScopedResources?.AddOrUpdate(id);
             return id;
         }
 

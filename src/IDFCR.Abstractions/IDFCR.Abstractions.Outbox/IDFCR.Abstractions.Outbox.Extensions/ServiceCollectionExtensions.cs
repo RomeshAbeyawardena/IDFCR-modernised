@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         var assembly = typeof(OutboxInterceptor).Assembly;
 
         return services
-            .AddTransient<IOutboxEntityNotificationHandler, TOutboxEntityNotificationHandler>()
+            .AddScoped<IOutboxEntityNotificationHandler, TOutboxEntityNotificationHandler>()
             .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, assembly);
     }
 }

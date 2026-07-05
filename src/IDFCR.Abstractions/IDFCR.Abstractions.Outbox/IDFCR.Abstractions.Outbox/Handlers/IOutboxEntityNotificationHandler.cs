@@ -18,6 +18,18 @@ public interface IOutboxEntityNotificationHandler<TEntity, TKey> : IOutboxEntity
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<TKey?> NotifyAsync(TEntity entity, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Updates the notification for the specified outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling updates to notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="key">The key identifying the outbox entity.</param>
+    /// <param name="entity">The outbox entity that has changed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task<TKey?> UpdateNotificationAsync(
+        TKey key,
+        TEntity entity,
+        CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -42,4 +54,14 @@ public interface IOutboxEntityNotificationHandler
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task<object?> NotifyAsync(object entity, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Updates the notification for the specified outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling updates to notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The implementation of this method checks if the provided entity is of the expected type (TEntity) and if so, it retrieves the key from the scoped resources and calls the UpdateNotificationAsync method with the key and typed entity. If the entity is not of the expected type or if the key cannot be retrieved, it simply returns null, effectively ignoring updates for entities that do not match the expected type or do not have a valid key in the scoped resources.
+    /// </summary>
+    /// <param name="entity">The outbox entity that has changed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task<object?> UpdateNotificationAsync(
+        object entity,
+        CancellationToken cancellationToken);
 }
