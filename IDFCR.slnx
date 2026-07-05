@@ -37,6 +37,8 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator.Extensions/IDFCR.Abstractions.Mediator.Extensions.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Mediator/IDFCR.Abstractions.Mediator.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox.Interceptors/IDFCR.Abstractions.Outbox.Interceptors.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence.StorageQueues/IDFCR.Abstractions.Persistence.StorageQueues.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState.Http/IDFCR.Abstractions.RequestState.Http.csproj" />
@@ -58,6 +60,7 @@
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Metadata.Tests/IDFCR.Abstractions.Metadata.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Outbox.Tests/IDFCR.Abstractions.Outbox.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Persistence.Tests/IDFCR.Abstractions.Persistence.Tests.csproj" />
     <Project Path="src/IDFCR.Abstractions/Tests/IDFCR.Abstractions.Results.Tests/IDFCR.Abstractions.Results.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
