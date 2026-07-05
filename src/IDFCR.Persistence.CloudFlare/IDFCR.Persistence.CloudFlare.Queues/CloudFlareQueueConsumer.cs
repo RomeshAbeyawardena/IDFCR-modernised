@@ -71,7 +71,7 @@ public class CloudFlareQueueConsumer(
         try
         {
             List<CloudFlareQueueMessageItem> messages = [];
-            var url = $"{ServiceDefinitions.QueueRelativeUrl}/{AccountDetails.QueueIdOrName}/messages/pull";
+            var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages/pull";
 
             var requestBody = new { visibility_timeout = visibilityTimeout, batch_size = batchSize };
             var response = await HttpClient.PostAsJsonAsync(url, requestBody, cancellationToken);

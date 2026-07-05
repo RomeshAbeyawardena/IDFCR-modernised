@@ -23,7 +23,7 @@ public class CloudFlareQueueProducer(
     public async Task<IUnitResult> SendMessageAsync<T>(T payload)
     {
         PrepareClientOnce();
-        var url = $"/{ServiceDefinitions.QueueRelativeUrl}/messages";
+        var url = $"{ServiceDefinitions.QueueRelativeUrl}/messages";
 
         var envelope = new { body = payload };
         var jsonContent = new StringContent(JsonSerializer.Serialize(envelope), System.Text.Encoding.UTF8, "application/json");

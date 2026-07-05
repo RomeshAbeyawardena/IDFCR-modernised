@@ -14,15 +14,15 @@ public class ServiceDefinitions(IAccountDetails accountDetails)
     /// <returns>A new instance of the ServiceDefinitions class.</returns>
     public static ServiceDefinitions Build(IAccountDetails accountDetails) => new(accountDetails);
 
-    private const string BaseUrl = "https://api.cloudflare.com/client/";
+    private const string BaseUrl = "https://api.cloudflare.com/client";
 
     /// <summary>
     /// Gets the authenticated base URL for making requests to the Cloudflare API. This property constructs the URL based on the provided account details, including the API version and account ID. The AuthenticatedBaseUrl property is used by other components to build specific API endpoints for interacting with Cloudflare queues and other resources, ensuring that requests are made to the correct account and API version.
     /// </summary>
-    public string AuthenticatedBaseUrl { get; } = $"{BaseUrl}/{accountDetails.ApiVersion}/accounts/{accountDetails.AccountId}";
+    public string AuthenticatedBaseUrl { get; } = $"{BaseUrl}/{accountDetails.ApiVersion}/accounts/{accountDetails.AccountId}/";
 
     /// <summary>
     /// Gets the queue relative URL for making requests to the Cloudflare API. This property constructs the URL based on the provided account details, including the queue ID or name. The QueueRelativeUrl property is used by other components to build specific API endpoints for interacting with Cloudflare queues, ensuring that requests are made to the correct queue within the specified account.
     /// </summary>
-    public string QueueRelativeUrl { get; } = $"/queues/{accountDetails.QueueIdOrName}";
+    public string QueueRelativeUrl { get; } = $"queues/{accountDetails.QueueIdOrName}";
 }
