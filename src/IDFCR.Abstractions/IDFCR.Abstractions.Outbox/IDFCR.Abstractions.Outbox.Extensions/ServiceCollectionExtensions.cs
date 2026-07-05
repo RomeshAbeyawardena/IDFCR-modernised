@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// <typeparam name="TOutboxEntityNotificationHandler">The type of the outbox entity notification handler to be registered.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the outbox services will be added.</param>
     /// <returns>The updated <see cref="IServiceCollection"/> with the outbox services added.</returns>
-    public static IServiceCollection AddOutboxPattern<TOutboxEntityNotificationHandler>(IServiceCollection services)
+    public static IServiceCollection AddOutboxPattern<TOutboxEntityNotificationHandler>(this IServiceCollection services)
         where TOutboxEntityNotificationHandler : class, IOutboxEntityNotificationHandler
     {
         var assembly = typeof(OutboxInterceptor).Assembly;

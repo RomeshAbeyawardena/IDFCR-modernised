@@ -83,8 +83,6 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                         FailedTimestampUtc = timeProvider.GetUtcNow(),
                         ModifiedTimestampUtc = timeProvider.GetUtcNow()
                     }, cancellationToken);
-
-                    throw;
                 }
             }
         }

@@ -13,6 +13,7 @@ namespace IDFCR.Abstractions.Interceptors.Tests;
 public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
 {
     public Guid Id { get; set; }
+    public string EntityType { get; set; } = null!;
     public string? Data { get; set; }
     public DateTimeOffset? CompletedTimestampUtc { get; set; }
     public DateTimeOffset? FailedTimestampUtc { get; set; }

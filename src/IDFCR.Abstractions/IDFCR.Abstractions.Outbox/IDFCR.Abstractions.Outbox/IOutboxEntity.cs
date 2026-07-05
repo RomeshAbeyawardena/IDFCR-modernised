@@ -8,6 +8,10 @@ namespace IDFCR.Abstractions.Outbox;
 public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp, IIdentifiable
 {
     /// <summary>
+    /// Gets or sets the name of the outbox message, which can be used to identify or categorize the message being processed. This property allows for the storage of relevant information related to the outbox message, such as a descriptive name or label that can help developers and systems understand the purpose or context of the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    string EntityType { get; set; }
+    /// <summary>
     /// Gets or sets the data associated with the outbox message, which can include the payload or content of the message being processed. This property allows for the storage of relevant information related to the outbox message, such as the message body, metadata, or any other data that is necessary for processing and tracking the status of the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
     string? Data { get; set; }

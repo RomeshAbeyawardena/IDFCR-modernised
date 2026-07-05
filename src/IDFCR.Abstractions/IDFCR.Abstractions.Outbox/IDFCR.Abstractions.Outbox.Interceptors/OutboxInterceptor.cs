@@ -70,6 +70,7 @@ public class OutboxInterceptor(IServiceProvider services)
 
         var outboxModel = _handler.Map(new DefaultOutboxEntity
         {
+            EntityType = context.Model.GetType().Name,
             Data = JsonSerializer.Serialize(context.Model, context.Model.GetType())
         });
 

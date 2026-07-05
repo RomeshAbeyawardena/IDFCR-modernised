@@ -2,6 +2,7 @@
 
 internal class DefaultOutboxEntity : IOutboxEntity
 {
+    public string EntityType { get; set; } = null!;
     public string? Data { get; set; }
     public DateTimeOffset? CompletedTimestampUtc { get; set; }
     public DateTimeOffset? FailedTimestampUtc { get; set; }
