@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Abstractions.Outbox.Handlers;
 
@@ -7,10 +8,18 @@ namespace IDFCR.Abstractions.Outbox.Handlers;
 /// </summary>
 /// <typeparam name="TEntity">The type of the outbox entity.</typeparam>
 /// <typeparam name="TKey">The type of the key for the outbox entity.</typeparam>
-public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutboxEntityNotificationHandler<TEntity, TKey>
+public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger logger) : IOutboxEntityNotificationHandler<TEntity, TKey>
     where TEntity : IOutboxEntity<TKey>
     where TKey : struct
 {
+    private void Log(LogLevel logLevel, Action<ILogger> logAction)
+    {
+        if (logger.IsEnabled(logLevel))
+        {
+            logAction(logger);
+        }
+    }
+
     /// <summary>
     /// Sets the metadata properties of the target outbox entity based on the source outbox entity. This method is responsible for copying the relevant metadata properties (AcknowledgedTimestampUtc, CompletedTimestampUtc, FailedTimestampUtc, ModifiedTimestampUtc) from the source entity to the target entity, allowing for the tracking of the status and timestamps associated with outbox messages. By using this method, developers can ensure that the metadata properties of outbox entities are properly updated and maintained during processing and notification handling within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
@@ -62,13 +71,22 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
         object entity, 
         CancellationToken cancellationToken)
     {
+        string reason = entity is null
+            ? "Entity is null"
+            : $"Unexpected type {entity.GetType().Name}";
+
         if (entity is TEntity typedEntity)
         {
             if (ScopedResources?.TryGetScopedResource<TKey>(out var key) ?? false)
             {
                 return await UpdateNotificationAsync(key, typedEntity, cancellationToken);
             }
+
+            reason = "Key not found!";
         }
+
+        Log(LogLevel.Warning, l => l.LogWarning("{key}: {reason}",
+            nameof(UpdateNotificationAsync), reason));
 
         return null;
     }
@@ -81,12 +99,25 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey> : IOutb
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task<object?> NotifyAsync(object entity, CancellationToken cancellationToken)
     {
+        string reason =
+            entity is null
+            ? "Entity is null"
+            : $"Unexpected type {entity.GetType().Name}";
+
         if (entity is TEntity typedEntity)
         {
             var id = await NotifyAsync(typedEntity, cancellationToken);
-            ScopedResources?.AddOrUpdate(id);
-            return id;
+            if (id.HasValue)
+            {
+                ScopedResources?.AddOrUpdate(id.Value);
+                return id;
+            }
+
+            reason = "Key is null";
         }
+
+        Log(LogLevel.Warning, l => l.LogWarning("{key}: {reason}",
+            nameof(NotifyAsync), reason));
 
         return null;
     }
