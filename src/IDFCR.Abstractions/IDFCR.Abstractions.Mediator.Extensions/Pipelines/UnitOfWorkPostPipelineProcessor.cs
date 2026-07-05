@@ -21,7 +21,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
     IServiceProvider serviceProvider, ILogger<UnitOfWorkPostPipelineProcessor<TRequest, TResponse>> logger) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
-    private async Task NotifyAsync(IOutboxEntity entity, CancellationToken cancellationToken)
+    private async Task UpdateNotificationAsync(IOutboxEntity entity, CancellationToken cancellationToken)
     {
         IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
         IScopedResources? scopedResources = serviceProvider.GetService<IScopedResources>();
@@ -38,7 +38,10 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
 
             var outboxEntity = outboxProcessor.Map(entity);
 
-            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
+            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
+                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
+
+            await outboxProcessor.UpdateNotificationAsync(outboxEntity, cancellationToken);
         }
         else
         {
@@ -70,7 +73,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                 {
                     await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                    await NotifyAsync(new DefaultOutboxEntity
+                    await UpdateNotificationAsync(new DefaultOutboxEntity
                     {
                         CompletedTimestampUtc = timeProvider.GetUtcNow(),
                         ModifiedTimestampUtc = timeProvider.GetUtcNow()
@@ -78,7 +81,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                 }
                 catch (Exception)
                 {
-                    await NotifyAsync(new DefaultOutboxEntity
+                    await UpdateNotificationAsync(new DefaultOutboxEntity
                     {
                         FailedTimestampUtc = timeProvider.GetUtcNow(),
                         ModifiedTimestampUtc = timeProvider.GetUtcNow()

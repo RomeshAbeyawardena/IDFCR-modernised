@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Interceptors;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Outbox.Handlers;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace IDFCR.Abstractions.Outbox.Interceptors;
@@ -8,16 +9,18 @@ namespace IDFCR.Abstractions.Outbox.Interceptors;
 /// <summary>
 /// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This class provides a base implementation for intercepting changes to outbox entities, allowing developers to implement custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor is designed to be applied at the Post stage of Insert and Update behaviors, allowing it to capture changes to outbox entities after they have been made, enabling the tracking of message status and the processing of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
 /// </summary>
-public class OutboxInterceptor(IServiceProvider services)
+public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxInterceptor> logger)
     : EntityInterceptorBase(EntityContextBehaviorStage.Post, EntityContextBehavior.Insert | EntityContextBehavior.Update, int.MaxValue)
 {
     private IOutboxEntityNotificationHandler? _handler;
 
     private IOutboxEntityNotificationHandler? GetHandler()
     {
+        logger.LogInformation("Retrieving IOutboxEntityNotificationHandler from service provider.");
         var service = services.GetService(typeof(IOutboxEntityNotificationHandler));
         if(service is null)
         {
+            logger.LogWarning("IOutboxEntityNotificationHandler service not found in service provider.");
             return null;
         }
 
@@ -26,7 +29,8 @@ public class OutboxInterceptor(IServiceProvider services)
         {
             outboxHandler!.ScopedResources = scopedResources;
         }
-
+        
+        logger.LogInformation("IOutboxEntityNotificationHandler retrieved successfully.");
         return outboxHandler;
     }
 
@@ -34,6 +38,7 @@ public class OutboxInterceptor(IServiceProvider services)
     public override bool ShouldIntercept(IEntityInterceptorContext context)
     {
         _handler = GetHandler();
+        logger.LogInformation("Checking if interceptor should be applied for entity type {EntityType}. Handler is {HandlerStatus}.", context.Model?.GetType().Name, _handler is null ? "not found" : "found");
         return _handler is not null;
     }
 #pragma warning disable CS0809
@@ -56,10 +61,12 @@ public class OutboxInterceptor(IServiceProvider services)
     /// <returns>A task that represents the asynchronous operation.</returns>
     public override async Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Intercepting outbox entity changes for {EntityType}", context.Model?.GetType().Name);
         _handler ??= GetHandler();
 
         if (context.Model is null || _handler is null)
         {
+            logger.LogWarning("No model or handler found for outbox entity interception. Skipping processing.");
             return;
         }
 
@@ -74,6 +81,6 @@ public class OutboxInterceptor(IServiceProvider services)
             Data = JsonSerializer.Serialize(context.Model, context.Model.GetType())
         });
 
-        await _handler.UpdateNotificationAsync(outboxModel, cancellationToken);
+        await _handler.NotifyAsync(outboxModel, cancellationToken);
     }
 }
