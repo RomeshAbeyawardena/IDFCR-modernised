@@ -2,7 +2,6 @@
 using IDFCR.Abstractions.Interceptors.DependencyInjection.Extensions;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
-using IDFCR.Abstractions.Outbox.Interceptors;
 using IDFCR.TestUtilities.Fakes;
 using NUnit.Framework;
 
@@ -61,15 +60,6 @@ public class ServiceCollectionExtensionTests
             Assert.That(auditChangesService.ImplementationType, Is.EqualTo(typeof(AuditEntityChangesInterceptor)));
             Assert.That(auditChangesService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
         }
-
-        //var outboxService = services.FirstOrDefault(x => x.ImplementationType == typeof(OutboxInterceptor));
-        //Assert.That(outboxService, Is.Not.Null);
-        //using (Assert.EnterMultipleScope())
-        //{
-        //    Assert.That(outboxService.ServiceType, Is.EqualTo(typeof(IEntityInterceptor)));
-        //    Assert.That(outboxService.ImplementationType, Is.EqualTo(typeof(OutboxInterceptor)));
-        //    Assert.That(outboxService.Lifetime, Is.EqualTo(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-        //}
 
         var defaultScopedResource = services.FirstOrDefault(x => x.ImplementationType == typeof(DefaultScopedResources));
         Assert.That(defaultScopedResource, Is.Not.Null);

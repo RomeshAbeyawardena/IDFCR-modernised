@@ -1,7 +1,6 @@
 using IDFCR.Caching.Http;
 using IDFCR.Caching.Http.Extensions;
 using IDFCR.Caching.Serialisation.Extensions;
-using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 using NUnit.Framework;
 

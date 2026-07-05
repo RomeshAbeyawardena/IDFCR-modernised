@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.Interceptors;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace IDFCR.Abstractions.Interceptors.Tests.Assets;
 

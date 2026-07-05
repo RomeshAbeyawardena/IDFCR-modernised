@@ -1,6 +1,4 @@
-﻿using IDFCR.Abstractions.RequestState;
-
-namespace IDFCR.Abstractions.RequestState;
+﻿namespace IDFCR.Abstractions.RequestState;
 
 /// <summary>
 /// Represents the context of an authenticated HTTP request, providing access to authentication status, claims, and headers.

@@ -1,6 +1,4 @@
-﻿using System.Collections.Frozen;
-
-namespace IDFCR.Utilities;
+﻿namespace IDFCR.Utilities;
 
 /// <summary>
 /// Represents a builder for creating a switch-like structure that maps keys to values based on specified cases and an optional default case. The <see cref="ISwitchBuilder{TKey, TValue}"/> interface provides methods for defining cases and an optional default case, allowing developers to build a switch-like structure that can be used to retrieve values based on keys. The resulting <see cref="ISwitch{TKey, TValue}"/> instance can be used to evaluate keys and obtain corresponding values based on the defined cases and default case, providing a flexible and extensible way to implement switch-like behavior in applications and systems.

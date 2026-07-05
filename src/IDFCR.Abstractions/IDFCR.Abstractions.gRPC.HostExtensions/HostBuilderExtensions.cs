@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.GRPC;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 

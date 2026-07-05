@@ -1,5 +1,3 @@
-using System.Collections.Frozen;
-
 namespace IDFCR.Utilities;
 
 internal sealed class DefaultContextualSwitch<TKey, TContext, TValue>(

@@ -1,7 +1,6 @@
 ﻿using IDFCR.Abstractions.DependencyInjection;
 using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Mapper;
-using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Outbox.Interceptors;

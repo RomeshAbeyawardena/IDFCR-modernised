@@ -1,6 +1,5 @@
 using IDFCR.Abstractions.Mapper;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace IDFCR.Abstractions.Results.Extensions;
 
