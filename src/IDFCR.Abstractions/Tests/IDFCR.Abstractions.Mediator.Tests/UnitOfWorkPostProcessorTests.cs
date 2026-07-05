@@ -163,16 +163,13 @@ internal class UnitOfWorkPostProcessorTests
             Times.Never);
     }
 
-    // ── Outbox: scoped resources present but no IIdentifiable → no notification
+    // ── Outbox: scoped resources present without IIdentifiable still notifies ──
 
     [Test]
-    public async Task Process_WhenScopedResourcesHasNoIdentifiable_DoesNotNotify()
+    public async Task Process_WhenScopedResourcesHasNoIdentifiable_StillNotifies()
     {
         RegisterOutboxHandler();
         RegisterScopedResources();
-        IIdentifiable? noId = null;
-        _scopedResources.Setup(s => s.TryGetScopedResource(out noId))
-                        .Returns(false);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
@@ -181,7 +178,7 @@ internal class UnitOfWorkPostProcessorTests
 
         _outboxHandler.Verify(
             h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+            Times.Once);
     }
 
     // ── Outbox: full success path → completed entity notified ─────────────────
@@ -224,7 +221,7 @@ internal class UnitOfWorkPostProcessorTests
         IOutboxEntity? captured = null;
         _outboxHandler
             .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, object, CancellationToken>((_, entity, _) => captured = entity as IOutboxEntity)
+            .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
