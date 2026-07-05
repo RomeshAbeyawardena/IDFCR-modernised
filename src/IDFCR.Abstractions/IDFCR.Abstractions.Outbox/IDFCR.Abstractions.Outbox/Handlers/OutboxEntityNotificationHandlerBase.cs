@@ -116,7 +116,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
                 return await UpdateNotificationAsync(key, typedEntity, cancellationToken);
             }
 
-            reason = $"Scoped outbox key not found.";
+            reason = "Scoped outbox key not found.";
         }
 
         LogMethod(LogLevel.Warning, reason);
