@@ -98,7 +98,7 @@ public class CloudFlareQueueConsumer(
                 }
             }
 
-            return UnitResultCollection.Failed<CloudFlareQueueMessageItem>(response);
+            return UnitResultCollection.Failed<CloudFlareQueueMessageItem>(new Exception(response.ReasonPhrase));
         }
         catch (Exception ex)
         {
