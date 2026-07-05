@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IDFCR.Abstractions.DependencyInjection\IDFCR.Abstractions.DependencyInjection.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>

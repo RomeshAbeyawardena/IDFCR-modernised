@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace IDFCR.Abstractions.Interceptors;
+namespace IDFCR.Abstractions.DependencyInjection;
 
 /// <summary>
 /// Represents a collection of scoped resources that can be shared and accessed within the context of entity interceptors. This interface defines the contract for managing and retrieving resources that are specific to the scope of an entity interception operation, allowing for the storage and retrieval of data or services that may be needed during the interception process. The IScopedResources interface provides methods for adding or updating resources, checking for the existence of resources, and retrieving resources based on their type, enabling developers to manage and utilize scoped resources effectively within applications and systems that utilize interception mechanisms for managing entity operations.

@@ -4,4 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
+  </ItemGroup>
  </Project>

@@ -1,43 +1,42 @@
 ﻿using IDFCR.Abstractions.Builders;
 using IDFCR.Abstractions.Interceptors;
 
-namespace IDFCR.Abstractions.Persistence
+namespace IDFCR.Abstractions.Persistence;
+
+internal class RepositoryInterceptorContext
+    : IEntityInterceptorContext
 {
-    internal class RepositoryInterceptorContext
-        : IEntityInterceptorContext
+    private RepositoryInterceptorContext() { }
+
+    public static RepositoryInterceptorContext Create(EntityContextBehaviorStage Stage,
+        EntityContextBehavior Behavior,
+        object Model, Action<IDictionaryBuilder<string, object>>? configureData = null)
     {
-        private RepositoryInterceptorContext() { }
+        var dataDictionary = new DictionaryBuilder<string, object>();
 
-        public static RepositoryInterceptorContext Create(EntityContextBehaviorStage Stage,
-            EntityContextBehavior Behavior,
-            object Model, Action<IDictionaryBuilder<string, object>>? configureData = null)
+        configureData?.Invoke(dataDictionary);
+
+        return new RepositoryInterceptorContext
         {
-            var dataDictionary = new DictionaryBuilder<string, object>();
-
-            configureData?.Invoke(dataDictionary);
-
-            return new RepositoryInterceptorContext
-            {
-                Stage = Stage,
-                Behavior = Behavior,
-                Model = Model,
-                Data = dataDictionary.Build().AsReadOnly()
-            };
-        }
-
-        public EntityContextBehaviorStage Stage { get; init; }
-        public EntityContextBehavior Behavior { get; init; }
-        public object? Model { get; init; }
-        public IReadOnlyDictionary<string, object> Data { get; init; } = new Dictionary<string, object>();
-        /// <summary>
-        /// Indicates that the underlying persistence operation (e.g. Add, Update, Delete)
-        /// should be skipped by the repository where supported.
-        /// 
-        /// Interceptors may still run before and after the operation.
-        /// 
-        /// This is primarily intended for scenarios such as soft deletes,
-        /// no-op updates, or environment-based write suppression.
-        /// </summary>
-        public bool BypassOperation { get; set; }
+            Stage = Stage,
+            Behavior = Behavior,
+            Model = Model,
+            Data = dataDictionary.Build().AsReadOnly()
+        };
     }
+
+    public EntityContextBehaviorStage Stage { get; init; }
+    public EntityContextBehavior Behavior { get; init; }
+    public object? Model { get; init; }
+    public IReadOnlyDictionary<string, object> Data { get; init; } = new Dictionary<string, object>();
+    /// <summary>
+    /// Indicates that the underlying persistence operation (e.g. Add, Update, Delete)
+    /// should be skipped by the repository where supported.
+    /// 
+    /// Interceptors may still run before and after the operation.
+    /// 
+    /// This is primarily intended for scenarios such as soft deletes,
+    /// no-op updates, or environment-based write suppression.
+    /// </summary>
+    public bool BypassOperation { get; set; }
 }

@@ -1,6 +1,4 @@
-﻿using IDFCR.Abstractions.Interceptors.Handlers;
-
-namespace IDFCR.Abstractions.Interceptors.Interceptors;
+﻿namespace IDFCR.Abstractions.Outbox;
 
 internal class DefaultOutboxEntity : IOutboxEntity
 {

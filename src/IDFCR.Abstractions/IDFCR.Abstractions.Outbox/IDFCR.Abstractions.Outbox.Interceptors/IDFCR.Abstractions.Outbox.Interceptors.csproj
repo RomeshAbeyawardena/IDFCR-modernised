@@ -4,4 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Interceptors\IDFCR.Abstractions.Interceptors.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Outbox\IDFCR.Abstractions.Outbox.csproj" />
+  </ItemGroup>
  </Project>

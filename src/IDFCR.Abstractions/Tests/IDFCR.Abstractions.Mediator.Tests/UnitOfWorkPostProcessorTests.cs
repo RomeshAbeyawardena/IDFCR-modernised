@@ -1,5 +1,4 @@
-﻿using IDFCR.Abstractions.Interceptors;
-using IDFCR.Abstractions.Interceptors.Handlers;
+﻿using IDFCR.Abstractions.Interceptors.Handlers;
 using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Persistence;

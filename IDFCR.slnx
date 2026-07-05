@@ -39,6 +39,7 @@
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Metadata/IDFCR.Abstractions.Metadata.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox.Interceptors/IDFCR.Abstractions.Outbox.Interceptors.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox/IDFCR.Abstractions.Outbox.csproj" />
+    <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence.Interceptors/IDFCR.Abstractions.Persistence.Interceptors.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence.StorageQueues/IDFCR.Abstractions.Persistence.StorageQueues.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.Persistence/IDFCR.Abstractions.Persistence.csproj" />
     <Project Path="src/IDFCR.Abstractions/IDFCR.Abstractions.RequestState.Http/IDFCR.Abstractions.RequestState.Http.csproj" />

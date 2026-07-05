@@ -1,7 +1,6 @@
-﻿using IDFCR.Abstractions.Interceptors;
-using IDFCR.Abstractions.Interceptors.Handlers;
-using IDFCR.Abstractions.Interceptors.Interceptors;
-using IDFCR.Abstractions.Metadata;
+﻿using IDFCR.Abstractions.DependencyInjection;
+using IDFCR.Abstractions.Outbox;
+using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,17 +37,8 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
             }
 
             var outboxEntity = outboxProcessor.Map(entity);
-            if (scopedResources.TryGetScopedResource<IIdentifiable>(out var id))
-            {
-                await outboxProcessor.NotifyAsync(id, outboxEntity, cancellationToken);
-            }
-            else
-            {
-                if (logger.IsEnabled(LogLevel.Information))
-                {
-                    logger.LogInformation("Unable to get outbox ID");
-                }
-            }
+
+            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
         }
         else
         {
