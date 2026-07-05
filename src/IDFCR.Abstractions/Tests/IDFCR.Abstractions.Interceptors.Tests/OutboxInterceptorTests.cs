@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Outbox.Interceptors;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -30,10 +31,12 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     }
 }
 
-internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>
+internal class MockOutboxEntityNotificationHandler(ILogger logger) : OutboxEntityNotificationHandlerBase<OutboxEntity, Guid>(logger)
 {
     public IOutboxEntity? LastMapped { get; private set; }
     public OutboxEntity? LastNotified { get; private set; }
+    public OutboxEntity? LastUpdated { get; private set; }
+    public Guid? LastUpdateKey { get; private set; }
     public Guid? NotifyResult { get; set; }
 
     public override IOutboxEntity Map(IOutboxEntity entity)
@@ -50,6 +53,12 @@ internal class MockOutboxEntityNotificationHandler : OutboxEntityNotificationHan
         return Task.FromResult(NotifyResult);
     }
 
+    public override Task<Guid?> UpdateNotificationAsync(Guid key, OutboxEntity entity, CancellationToken cancellationToken)
+    {
+        LastUpdateKey = key;
+        LastUpdated = entity;
+        return Task.FromResult<Guid?>(key);
+    }
 }
 
 [TestFixture]
@@ -57,6 +66,7 @@ internal class OutboxInterceptorTests
 {
     private OutboxInterceptor _interceptor;
     private Mock<IServiceProvider> _serviceProvider;
+    private Mock<ILogger> _loggerMock;
     private DefaultScopedResources _scopedResources;
     private MockOutboxEntityNotificationHandler _handler;
 
@@ -64,8 +74,8 @@ internal class OutboxInterceptorTests
     public void Setup()
     {
         _scopedResources = new();
-        
-        _handler = new MockOutboxEntityNotificationHandler()
+        _loggerMock = new();
+        _handler = new MockOutboxEntityNotificationHandler(_loggerMock.Object)
         {
             ScopedResources = _scopedResources
         };
@@ -149,8 +159,11 @@ internal class OutboxInterceptorTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public async Task InterceptAsync_WithModel_MapsAndNotifiesHandler()
+    public async Task InterceptAsync_WithModelAndScopedKey_MapsAndUpdatesHandler()
     {
+        var key = Guid.NewGuid();
+        _scopedResources.AddOrUpdate(key);
+
         var model = new { Name = "test-payload" };
         var ctx = BuildContext(model).Object;
 
@@ -158,7 +171,9 @@ internal class OutboxInterceptorTests
 
         Assert.That(_handler.LastMapped, Is.Not.Null);
         Assert.That(_handler.LastMapped!.Data, Does.Contain("test-payload"));
-        Assert.That(_handler.LastNotified, Is.Not.Null);
+        Assert.That(_handler.LastUpdated, Is.Not.Null);
+        Assert.That(_handler.LastUpdateKey, Is.EqualTo(key));
+        Assert.That(_handler.LastNotified, Is.Null);
     }
 
     [Test]
@@ -181,6 +196,18 @@ internal class OutboxInterceptorTests
 
         Assert.That(_handler.LastMapped, Is.Null);
         Assert.That(_handler.LastNotified, Is.Null);
+        Assert.That(_handler.LastUpdated, Is.Null);
+    }
+
+    [Test]
+    public async Task InterceptAsync_WithModelAndNoScopedKey_DoesNotUpdateHandler()
+    {
+        var ctx = BuildContext(new { Name = "test-payload" }).Object;
+
+        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
+
+        Assert.That(_handler.LastMapped, Is.Not.Null);
+        Assert.That(_handler.LastUpdated, Is.Null);
     }
 
     [Test]
@@ -218,7 +245,7 @@ internal class OutboxInterceptorTests
     }
 
     [Test]
-    public async Task InterceptAsync_WithNullContext_SetsScopedResourcesToNull()
+    public async Task InterceptAsync_WithNullContext_PreservesExistingScopedResources()
     {
         _interceptor.Context = null;
 
@@ -226,7 +253,7 @@ internal class OutboxInterceptorTests
 
         await _interceptor.InterceptAsync(ctx, CancellationToken.None);
 
-        Assert.That(_handler.ScopedResources, Is.Null);
+        Assert.That(_handler.ScopedResources, Is.SameAs(_scopedResources));
     }
 
     // ---------------------------------------------------------------------------
@@ -234,8 +261,8 @@ internal class OutboxInterceptorTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void OrderIndex_IsSetTo99()
+    public void OrderIndex_IsSetToIntMaxValue()
     {
-        Assert.That(_interceptor.OrderIndex, Is.EqualTo(99));
+        Assert.That(_interceptor.OrderIndex, Is.EqualTo(int.MaxValue));
     }
 }

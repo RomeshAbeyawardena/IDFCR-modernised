@@ -22,7 +22,11 @@ public class OutboxInterceptor(IServiceProvider services)
         }
 
         var outboxHandler = service as IOutboxEntityNotificationHandler;
-        outboxHandler?.ScopedResources = base.Context?.ScopedResources;
+        if (base.Context?.ScopedResources is { } scopedResources)
+        {
+            outboxHandler!.ScopedResources = scopedResources;
+        }
+
         return outboxHandler;
     }
 
@@ -59,7 +63,10 @@ public class OutboxInterceptor(IServiceProvider services)
             return;
         }
 
-        _handler.ScopedResources = base.Context?.ScopedResources;
+        if (base.Context?.ScopedResources is { } scopedResources)
+        {
+            _handler.ScopedResources = scopedResources;
+        }
 
         var outboxModel = _handler.Map(new DefaultOutboxEntity
         {
