@@ -50,6 +50,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
 
     /// <summary>
     /// Generates a new ID for the outbox entity. This method should be implemented by derived classes to provide a specific ID generation strategy.
+    /// <para>This will not be called if usesIdentityGeneration is false.</para>
     /// </summary>
     /// <returns></returns>
     protected virtual TKey GenerateId()
