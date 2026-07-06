@@ -69,6 +69,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             if (response is IUnitResult unitResult && unitResult.IsSuccess)
             {
+                bool isException = false;
                 try
                 {
                     try
@@ -80,21 +81,31 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                             CompletedTimestampUtc = timeProvider.GetUtcNow(),
                             ModifiedTimestampUtc = timeProvider.GetUtcNow()
                         }, cancellationToken);
+
+                        await unitOfWork.SaveChangesAsync(cancellationToken);
                     }
                     catch (Exception)
                     {
+                        isException = true;
                         await UpdateNotificationAsync(new DefaultOutboxEntity
                         {
                             FailedTimestampUtc = timeProvider.GetUtcNow(),
                             ModifiedTimestampUtc = timeProvider.GetUtcNow()
                         }, cancellationToken);
-                    }
 
-                    await unitOfWork.SaveChangesAsync(cancellationToken);
+                        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                        throw;
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "An error occurred while committing changes in the UnitOfWorkPostPipelineProcessor.");
+                    if (isException)
+                    {
+                        throw;
+                    }
                 }
             }
         }
