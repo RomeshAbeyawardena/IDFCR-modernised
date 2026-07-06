@@ -46,9 +46,9 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
     /// <param name="source">The source outbox entity from which metadata properties will be copied.</param>
     protected void SetMetaData(TEntity target, TEntity source)
     {
-        if (source.AcknowledgedTimestampUtc.HasValue)
+        if (source.ProcessedTimestampUtc.HasValue)
         {
-            target.AcknowledgedTimestampUtc = source.AcknowledgedTimestampUtc;
+            target.ProcessedTimestampUtc = source.ProcessedTimestampUtc;
         }
 
         if (source.CompletedTimestampUtc.HasValue)

@@ -17,7 +17,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     public string? Data { get; set; }
     public DateTimeOffset? CompletedTimestampUtc { get; set; }
     public DateTimeOffset? FailedTimestampUtc { get; set; }
-    public DateTimeOffset? AcknowledgedTimestampUtc { get; set; }
+    public DateTimeOffset? ProcessedTimestampUtc { get; set; }
     public DateTimeOffset CreatedTimestampUtc { get; set; }
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
 
@@ -26,7 +26,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
         Data = source.Data;
         CompletedTimestampUtc = source.CompletedTimestampUtc;
         FailedTimestampUtc = source.FailedTimestampUtc;
-        AcknowledgedTimestampUtc = source.AcknowledgedTimestampUtc;
+        ProcessedTimestampUtc = source.ProcessedTimestampUtc;
         CreatedTimestampUtc = source.CreatedTimestampUtc;
         ModifiedTimestampUtc = source.ModifiedTimestampUtc;
     }
