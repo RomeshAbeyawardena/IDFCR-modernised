@@ -45,7 +45,7 @@ internal class UnitOfWorkPostProcessorTests
         _outboxHandler = new Mock<IOutboxEntityNotificationHandler>();
         _outboxHandler.Setup(h => h.Map(It.IsAny<IOutboxEntity>()))
                       .Returns<IOutboxEntity>(e => e);
-        _outboxHandler.Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+        _outboxHandler.Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
                       .ReturnsAsync((object?)null);
 
         _scopedResources = new Mock<IScopedResources>();
@@ -126,7 +126,7 @@ internal class UnitOfWorkPostProcessorTests
 
         await sut.Process(new UowRequest(CommitChanges: true), response, CancellationToken.None);
 
-        _unitOfWork.Verify(u => u.SaveChangesAsync(CancellationToken.None), Times.Once);
+        _unitOfWork.Verify(u => u.SaveChangesAsync(CancellationToken.None), Times.Exactly(2));
     }
 
     // ── Outbox: no handler registered → no notification ───────────────────────
@@ -142,7 +142,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -159,7 +159,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -177,7 +177,7 @@ internal class UnitOfWorkPostProcessorTests
             UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         _outboxHandler.Verify(
-            h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
+            h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -191,7 +191,7 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
@@ -219,15 +219,14 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.DoesNotThrowAsync(
-            () => sut.Process(new UowRequest(CommitChanges: true),
-                UnitResult.Success(UnitAction.None), CancellationToken.None));
+        await sut.Process(new UowRequest(CommitChanges: true),
+            UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         Assert.That(captured, Is.Not.Null);
         Assert.That(captured!.FailedTimestampUtc, Is.EqualTo(_time.GetUtcNow()));
@@ -246,16 +245,15 @@ internal class UnitOfWorkPostProcessorTests
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ThrowsAsync(new InvalidOperationException("db"));
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("notify blew up"));
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        // The catch block re-throws after calling NotifyAsync, so the notify
-        // exception propagates (wrapping or replacing). Either way a throw escapes.
-        Assert.ThrowsAsync<Exception>(
-            () => sut.Process(new UowRequest(CommitChanges: true),
-                UnitResult.Success(UnitAction.None), CancellationToken.None));
+        // The outer try-catch logs and swallows any exception from UpdateNotificationAsync,
+        // so nothing propagates out of Process.
+        await sut.Process(new UowRequest(CommitChanges: true),
+            UnitResult.Success(UnitAction.None), CancellationToken.None);
     }
 
     // ── Outbox: success notify is NOT called when save fails ──────────────────
@@ -271,15 +269,14 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.NotifyAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.DoesNotThrowAsync(
-            () => sut.Process(new UowRequest(CommitChanges: true),
-                UnitResult.Success(UnitAction.None), CancellationToken.None));
+        await sut.Process(new UowRequest(CommitChanges: true),
+            UnitResult.Success(UnitAction.None), CancellationToken.None);
 
         // The one notify that DID fire must be the failure one
         Assert.That(captured?.CompletedTimestampUtc, Is.Null,

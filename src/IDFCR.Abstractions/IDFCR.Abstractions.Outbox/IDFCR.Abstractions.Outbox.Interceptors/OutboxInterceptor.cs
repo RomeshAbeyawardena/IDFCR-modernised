@@ -9,7 +9,7 @@ namespace IDFCR.Abstractions.Outbox.Interceptors;
 /// <summary>
 /// Represents an interceptor for handling outbox entities, allowing for the processing of outbox messages and the tracking of their status. This class provides a base implementation for intercepting changes to outbox entities, allowing developers to implement custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The interceptor is designed to be applied at the Post stage of Insert and Update behaviors, allowing it to capture changes to outbox entities after they have been made, enabling the tracking of message status and the processing of outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
 /// </summary>
-public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxInterceptor> logger)
+public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxInterceptor> logger, TimeProvider timeProvider)
     : EntityInterceptorBase(EntityContextBehaviorStage.Post, EntityContextBehavior.Insert | EntityContextBehavior.Update, int.MaxValue)
 {
     private IOutboxEntityNotificationHandler? _handler;
@@ -78,7 +78,8 @@ public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxIntercep
         var outboxModel = _handler.Map(new DefaultOutboxEntity
         {
             EntityType = context.Model.GetType().Name,
-            Data = JsonSerializer.Serialize(context.Model, context.Model.GetType())
+            Data = JsonSerializer.Serialize(context.Model, context.Model.GetType()),
+            CreatedTimestampUtc = timeProvider.GetUtcNow()
         });
 
         await _handler.NotifyAsync(outboxModel, cancellationToken);

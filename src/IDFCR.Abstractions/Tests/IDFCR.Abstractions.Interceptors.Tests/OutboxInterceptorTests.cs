@@ -67,7 +67,7 @@ internal class OutboxInterceptorTests
 {
     private OutboxInterceptor _interceptor;
     private Mock<IServiceProvider> _serviceProvider;
-    private Mock<ILogger> _loggerMock;
+    private Mock<ILogger<OutboxInterceptor>> _loggerMock;
     private DefaultScopedResources _scopedResources;
     private MockOutboxEntityNotificationHandler _handler;
 
@@ -87,7 +87,7 @@ internal class OutboxInterceptorTests
             .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
             .Returns(_handler);
 
-        _interceptor = new OutboxInterceptor(_serviceProvider.Object);
+        _interceptor = new OutboxInterceptor(_serviceProvider.Object, _loggerMock.Object, TimeProvider.System);
     }
 
     private static Mock<IEntityInterceptorContext> BuildContext(
@@ -119,9 +119,9 @@ internal class OutboxInterceptorTests
     {
         _serviceProvider
             .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
-            .Returns(() => null);
+            .Returns(() => null);   
 
-        var interceptor = new OutboxInterceptor(_serviceProvider.Object);
+        var interceptor = new OutboxInterceptor(_serviceProvider.Object, _loggerMock.Object, TimeProvider.System);
         var ctx = BuildContext().Object;
 
         Assert.That(interceptor.ShouldIntercept(ctx), Is.False);
@@ -218,7 +218,7 @@ internal class OutboxInterceptorTests
             .Setup(s => s.GetService(typeof(IOutboxEntityNotificationHandler)))
             .Returns(() => null);
 
-        var interceptor = new OutboxInterceptor(_serviceProvider.Object);
+        var interceptor = new OutboxInterceptor(_serviceProvider.Object, _loggerMock.Object, TimeProvider.System);
         var ctx = BuildContext(new object()).Object;
 
         Assert.DoesNotThrowAsync(() => interceptor.InterceptAsync(ctx, CancellationToken.None));
