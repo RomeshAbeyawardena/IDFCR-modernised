@@ -12,8 +12,9 @@ namespace IDFCR.Outbox.EntityFramework;
 /// <typeparam name="TDbContext">The type of the Entity Framework DbContext.</typeparam>
 /// <typeparam name="TEntity">The type of the outbox entity.</typeparam>
 /// <typeparam name="TKey">The type of the outbox entity key.</typeparam>
+/// <param name="usesIdentityGeneration">Indicates whether the entity uses identity generation for its key.</param>
 /// <param name="logger">The logger instance.</param>
-public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbContext, TEntity, TKey>(ILogger logger)
+public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbContext, TEntity, TKey>(ILogger logger, bool usesIdentityGeneration = true)
     : OutboxEntityNotificationHandlerBase<TEntity, TKey>(logger)
     where TDbContext : DbContext
     where TEntity : class, IMapper<IOutboxEntity>, IOutboxEntity<TKey>, new()
@@ -71,7 +72,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
         }
 
         
-        if (EqualityComparer<TKey>.Default.Equals(entity.Id, default))
+        if (usesIdentityGeneration && EqualityComparer<TKey>.Default.Equals(entity.Id, default))
         {
             LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
             entity.Id = GenerateId();
