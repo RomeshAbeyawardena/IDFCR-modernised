@@ -91,6 +91,9 @@
   <Folder Name="/src/IDFCR.GRPC.Extensions/">
     <Project Path="src/IDFCR.GRPC.Client.Extensions/IDFCR.GRPC.Client.Extensions.csproj" />
   </Folder>
+  <Folder Name="/src/IDFCR.Outbox/">
+    <Project Path="src/IDFCR.Outbox.EntityFramework/IDFCR.Outbox.EntityFramework.csproj" />
+  </Folder>
   <Folder Name="/src/IDFCR.Persistence.CloudFlare/">
     <Project Path="src/IDFCR.Persistence.CloudFlare/IDFCR.Persistence.CloudFlare.Queues/IDFCR.Persistence.CloudFlare.Queues.csproj" />
   </Folder>
