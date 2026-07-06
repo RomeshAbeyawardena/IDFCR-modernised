@@ -61,7 +61,9 @@ public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxIntercep
     /// <returns>A task that represents the asynchronous operation.</returns>
     public override async Task InterceptAsync(IEntityInterceptorContext context, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Intercepting outbox entity changes for {EntityType}", context.Model?.GetType().Name);
+        var entityType = context.Model?.GetType().Name ?? "unknown";
+
+        logger.LogInformation("Intercepting outbox entity changes for {EntityType}", entityType);
         _handler ??= GetHandler();
 
         if (context.Model is null || _handler is null)
@@ -77,7 +79,8 @@ public class OutboxInterceptor(IServiceProvider services, ILogger<OutboxIntercep
 
         var outboxModel = _handler.Map(new DefaultOutboxEntity
         {
-            EntityType = context.Model.GetType().Name,
+            IsUpdate = State?.Behavior == EntityContextBehavior.Update,
+            EntityType = entityType,
             Data = JsonSerializer.Serialize(context.Model, context.Model.GetType()),
             CreatedTimestampUtc = timeProvider.GetUtcNow()
         });

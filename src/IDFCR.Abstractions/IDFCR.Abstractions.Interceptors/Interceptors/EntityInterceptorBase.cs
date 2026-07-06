@@ -28,6 +28,9 @@ public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, En
         }
     }
 
+    /// <inheritdoc />
+    public IEntityInterceptorContext? State { get; private set; }
+
     /// <summary>
     /// Gets the stage at which the interceptor should be applied. This property is used to determine when the interceptor logic should be executed in relation to the main operation being performed on the entity. The stage can be set to either Pre or Post, indicating whether the interceptor should be applied before or after the main operation, respectively. By defining this property, developers can control the timing of their interceptor logic and ensure that it is executed at the appropriate stage of the entity operation within applications and systems that utilize interception mechanisms.
     /// </summary>
@@ -50,6 +53,8 @@ public abstract class EntityInterceptorBase(EntityContextBehaviorStage stage, En
     /// <returns>True if the interceptor can be applied; otherwise, false.</returns>
     public virtual bool CanIntercept(IEntityInterceptorContext context)
     {
+        State = context;
+
         return context.Stage == stage
             && behavior.HasFlag(context.Behavior)
             && ShouldIntercept(context);

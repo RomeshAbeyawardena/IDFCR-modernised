@@ -8,6 +8,11 @@ namespace IDFCR.Abstractions.Interceptors.Interceptors;
 public interface IEntityInterceptor
 {
     /// <summary>
+    /// Gets the entity interceptor context associated with this interceptor. The context provides information about the stage and behavior of the entity operation being intercepted, as well as any relevant data or state that may be needed for the interception logic. By accessing the context, developers can determine how the interceptor should be applied and execute the appropriate logic based on the specific conditions of the entity operation within applications and systems that utilize interception mechanisms.
+    /// <para>This will remain null until the interceptor is validated.</para>
+    /// </summary>
+    IEntityInterceptorContext? State { get; }
+    /// <summary>
     /// Gets the entity interceptor context factory associated with this interceptor. The context factory is responsible for creating instances of the entity interceptor context, which provides information about the stage and behavior of the entity operation being intercepted. By accessing the context factory, developers can obtain the necessary context information to determine how the interceptor should be applied and to execute the appropriate logic based on the specific conditions of the entity operation within applications and systems that utilize interception mechanisms.
     /// </summary>
     IEntityInterceptorFactory? Context { get; set; }
