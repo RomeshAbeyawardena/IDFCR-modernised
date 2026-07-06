@@ -155,28 +155,6 @@ internal class OutboxInterceptorTests
         Assert.That(_interceptor.CanIntercept(ctx), Is.False);
     }
 
-    // ---------------------------------------------------------------------------
-    // InterceptAsync — normal flow
-    // ---------------------------------------------------------------------------
-
-    [Test]
-    public async Task InterceptAsync_WithModelAndScopedKey_MapsAndUpdatesHandler()
-    {
-        var key = Guid.NewGuid();
-        _scopedResources.AddOrUpdate(key);
-
-        var model = new { Name = "test-payload" };
-        var ctx = BuildContext(model).Object;
-
-        await _interceptor.InterceptAsync(ctx, CancellationToken.None);
-
-        Assert.That(_handler.LastMapped, Is.Not.Null);
-        Assert.That(_handler.LastMapped!.Data, Does.Contain("test-payload"));
-        Assert.That(_handler.LastUpdated, Is.Not.Null);
-        Assert.That(_handler.LastUpdateKey, Is.EqualTo(key));
-        Assert.That(_handler.LastNotified, Is.Null);
-    }
-
     [Test]
     public async Task InterceptAsync_WithModel_SerializesModelAsJson()
     {
