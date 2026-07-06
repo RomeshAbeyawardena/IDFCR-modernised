@@ -206,10 +206,10 @@ internal class UnitOfWorkPostProcessorTests
         Assert.That(captured.FailedTimestampUtc, Is.Null);
     }
 
-    // ── Outbox: save throws → failed entity notified and save exception swallowed
+    // ── Outbox: save throws → failed entity notified and exception propagates
 
     [Test]
-    public async Task Process_WhenSaveThrows_NotifiesWithFailedTimestampsAndDoesNotThrow()
+    public async Task Process_WhenSaveThrows_NotifiesWithFailedTimestampsAndThrows()
     {
         RegisterOutboxHandler();
         RegisterScopedResourcesWithId(new StubIdentifiable(42));
@@ -225,8 +225,9 @@ internal class UnitOfWorkPostProcessorTests
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        await sut.Process(new UowRequest(CommitChanges: true),
-            UnitResult.Success(UnitAction.None), CancellationToken.None);
+        Assert.ThrowsAsync<InvalidOperationException>(
+            () => sut.Process(new UowRequest(CommitChanges: true),
+                UnitResult.Success(UnitAction.None), CancellationToken.None));
 
         Assert.That(captured, Is.Not.Null);
         Assert.That(captured!.FailedTimestampUtc, Is.EqualTo(_time.GetUtcNow()));
@@ -250,10 +251,9 @@ internal class UnitOfWorkPostProcessorTests
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        // The outer try-catch logs and swallows any exception from UpdateNotificationAsync,
-        // so nothing propagates out of Process.
-        await sut.Process(new UowRequest(CommitChanges: true),
-            UnitResult.Success(UnitAction.None), CancellationToken.None);
+        Assert.ThrowsAsync<Exception>(
+            () => sut.Process(new UowRequest(CommitChanges: true),
+                UnitResult.Success(UnitAction.None), CancellationToken.None));
     }
 
     // ── Outbox: success notify is NOT called when save fails ──────────────────
@@ -275,8 +275,9 @@ internal class UnitOfWorkPostProcessorTests
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        await sut.Process(new UowRequest(CommitChanges: true),
-            UnitResult.Success(UnitAction.None), CancellationToken.None);
+        Assert.ThrowsAsync<Exception>(
+            () => sut.Process(new UowRequest(CommitChanges: true),
+                UnitResult.Success(UnitAction.None), CancellationToken.None));
 
         // The one notify that DID fire must be the failure one
         Assert.That(captured?.CompletedTimestampUtc, Is.Null,
