@@ -14,6 +14,7 @@ internal class MapperExtensionsTests
         public int Number { get; set; }
         public string? Text { get; set; }
         public Guid Id { get; set; }
+        public Guid? OptionalId { get; set; }
     }
 
     private sealed class Target
@@ -21,6 +22,7 @@ internal class MapperExtensionsTests
         public int Number { get; set; }
         public string? Text { get; set; }
         public Guid Id { get; set; }
+        public Guid? OptionalId { get; set; }
     }
 
     [Test]
@@ -189,5 +191,36 @@ internal class MapperExtensionsTests
         Target target = new();
 
         Assert.Throws<ArgumentException>(() => source.SetIfNotNullOrDefault(_ => 1, target, true));
+    }
+
+    [Test]
+    public void SetIfNotNullOrDefault_WhenOptionalGuidIsNotDefault_SetsTargetProperty()
+    {
+        Guid expected = Guid.NewGuid();
+        Source source = new()
+        {
+            OptionalId = expected
+        };
+        Target target = new()
+        {
+            OptionalId = null
+        };
+        source.SetIfNotNullOrDefault(n => n.OptionalId, target, true);
+        Assert.That(target.OptionalId, Is.EqualTo(expected));
+    }
+    [Test]
+    public void Does_not_SetIfNotNullOrDefault_WhenOptionalGuidIsNotDefault_SetsTargetProperty()
+    {
+        Guid expected = Guid.NewGuid();
+        Source source = new()
+        {
+            OptionalId = expected
+        };
+        Target target = new()
+        {
+            OptionalId = null
+        };
+        source.SetIfNotNullOrDefault(n => n.OptionalId, target, true);
+        Assert.That(target.OptionalId, Is.EqualTo(expected));
     }
 }
