@@ -3,6 +3,7 @@ using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Persistence;
 using IDFCR.Abstractions.Results;
+using IDFCR.Utilities.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -29,10 +30,8 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         if (outboxProcessor is not null && scopedResources is not null)
         {
             outboxProcessor.ScopedResources = scopedResources;
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation("Scoped resources count: {count}", scopedResources.Items.Count);
-            }
+
+            logger.LogMethod(LogLevel.Information, "Scoped resources count: {count}", args: scopedResources.Items.Count);
 
             await processOutbox(outboxProcessor, scopedResources, cancellationToken);
         }
@@ -40,12 +39,10 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             bool hasOutboxProcessor = outboxProcessor is not null;
             bool hasScopedResources = scopedResources is not null;
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation(@"Outbox pattern not supported: 
+
+            logger.LogMethod(LogLevel.Information, @"Outbox pattern not supported: 
                 Has OutboxProcessor: {hasOutboxProcessor}
-                Has ScopedResources: {hasScopedResources}", hasOutboxProcessor, hasScopedResources);
-            }
+                Has ScopedResources: {hasScopedResources}", args: [hasOutboxProcessor, hasScopedResources]);
         }
     }
 
@@ -55,8 +52,8 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             var outboxEntity = outboxProcessor.Map(entity);
 
-            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
-                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
+            logger.LogMethod(LogLevel.Information, "Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}", args:
+                [outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc]);
 
             await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
         }, cancellationToken);
@@ -68,8 +65,8 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
         {
             var outboxEntity = outboxProcessor.Map(entity);
 
-            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
-                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
+            logger.LogMethod(LogLevel.Information, "Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}", args:
+                [outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc]);
             
             await outboxProcessor.UpdateNotificationAsync(outboxEntity, cancellationToken);
         }, cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.DependencyInjection;
+using IDFCR.Utilities.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 
@@ -14,31 +15,9 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
     where TKey : struct
 {
     /// <summary>
-    /// Logs a message with the specified log level and action, allowing for the tracking of events and issues related to outbox entity notifications. This method is responsible for logging messages based on the provided log level and action, enabling developers to implement custom logging logic for handling notifications related to outbox entities. By using this method, developers can ensure that relevant information is logged during the processing of outbox messages and the tracking of their status within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// Gets the logger instance used for logging.
     /// </summary>
-    /// <param name="logLevel">The log level at which the message should be logged.</param>
-    /// <param name="logAction">The action that performs the logging using the provided ILogger instance.</param>
-    protected void Log(LogLevel logLevel, Action<ILogger> logAction)
-    {
-        if (logger.IsEnabled(logLevel))
-        {
-            logAction(logger);
-        }
-    }
-
-    /// <summary>
-    /// Logs a message with the specified log level and method name, allowing for the tracking of events and issues related to outbox entity notifications. This method is responsible for logging messages based on the provided log level and method name, enabling developers to implement custom logging logic for handling notifications related to outbox entities. By using this method, developers can ensure that relevant information is logged during the processing of outbox messages and the tracking of their status within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
-    /// </summary>
-    /// <param name="logLevel">The log level at which the message should be logged.</param>
-    /// <param name="message">The message to be logged.</param>
-    /// <param name="methodName">The name of the method from which the log is being generated.</param>
-    protected void LogMethod(LogLevel logLevel, string message, [CallerMemberName] string methodName = "")
-    {
-#pragma warning disable CA1873 //The LogLevel enabled check is done inside the invoked method
-        Log(logLevel, l => l.Log(logLevel, "{methodName}: {message}", methodName, message));
-#pragma warning restore CA1873
-    }
-
+    protected ILogger Logger => logger;
     /// <summary>
     /// Sets the metadata properties of the target outbox entity based on the source outbox entity. This method is responsible for copying the relevant metadata properties (AcknowledgedTimestampUtc, CompletedTimestampUtc, FailedTimestampUtc, ModifiedTimestampUtc) from the source entity to the target entity, allowing for the tracking of the status and timestamps associated with outbox messages. By using this method, developers can ensure that the metadata properties of outbox entities are properly updated and maintained during processing and notification handling within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
@@ -122,7 +101,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
             reason = "Scoped outbox key not found.";
         }
 
-        LogMethod(LogLevel.Warning, reason);
+        logger.LogMethod(LogLevel.Warning, reason);
 
         return null;
     }
@@ -152,7 +131,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
             reason = $"{nameof(NotifyAsync)} returned no key";
         }
 
-        LogMethod(LogLevel.Warning, reason);
+        logger.LogMethod(LogLevel.Warning, reason);
 
         return null;
     }
@@ -174,7 +153,7 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
             reason = "Scoped outbox key not found.";
         }
 
-        LogMethod(LogLevel.Warning, reason);
+        logger.LogMethod(LogLevel.Warning, reason);
 
         return null;
     }

@@ -64,6 +64,12 @@ public interface IOutboxEntityNotificationHandler
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task<object?> NotifyAsync(object entity, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Notifies the handler of a failure related to an outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling notifications related to failures in processing outbox entities, enabling developers to implement custom logic for handling failures based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <param name="entity">The outbox entity that has failed.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     Task<object?> NotifyFailureAsync(object entity, CancellationToken cancellationToken);
 
     /// <summary>

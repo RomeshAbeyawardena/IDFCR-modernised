@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Mapper;
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Outbox.Handlers;
+using IDFCR.Utilities.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
@@ -69,20 +70,20 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
     {
         if (!(ScopedResources?.TryGetScopedResource<TDbContext>(out var context) ?? false))
         {
-            LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
+            Logger.LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
             return null;
         }
 
         if (usesIdentityGeneration && EqualityComparer<TKey>.Default.Equals(entity.Id, default))
         {
-            LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
+            Logger.LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
             entity.Id = GenerateId();
         }
 
         var outboxEntitySet = GetOutboxEntity(context);
 
         await outboxEntitySet.AddAsync(entity, cancellationToken);
-        LogMethod(LogLevel.Debug,
+        Logger.LogMethod(LogLevel.Debug,
             $"Created outbox notification '{entity.Id}'.");
         return entity.Id;
     }
@@ -92,7 +93,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
     {
         if (!(ScopedResources?.TryGetScopedResource<TDbContext>(out var context) ?? false))
         {
-            LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
+            Logger.LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
             return null;
         }
 
@@ -101,7 +102,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
 
         if (foundEntity is null)
         {
-            LogMethod(LogLevel.Warning, $"Outbox item '{key}' not found. Unable to mark as failure.");
+            Logger.LogMethod(LogLevel.Warning, $"Outbox item '{key}' not found. Unable to mark as failure.");
             return null;
         }
 
@@ -109,7 +110,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
 
         if (usesIdentityGeneration && EqualityComparer<TKey>.Default.Equals(foundEntity.Id, default))
         {
-            LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
+            Logger.LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
             foundEntity.Id = GenerateId();
         }
 
@@ -123,7 +124,7 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
     {
         if (!(ScopedResources?.TryGetScopedResource<TDbContext>(out var context) ?? false))
         {
-            LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
+            Logger.LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
             return null;
         }
 
@@ -133,14 +134,14 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
 
         if (foundEntity is null)
         {
-            LogMethod(LogLevel.Warning, $"Outbox item '{key}' not found. Unable to update notification.");
+            Logger.LogMethod(LogLevel.Warning, $"Outbox item '{key}' not found. Unable to update notification.");
             return null;
         }
 
         SetMetaData(foundEntity, entity);
         SetAdditionalFields(foundEntity, entity);
 
-        LogMethod(LogLevel.Debug,
+        Logger.LogMethod(LogLevel.Debug,
             $"Updated outbox notification '{foundEntity.Id}'.");
 
         return foundEntity?.Id;
