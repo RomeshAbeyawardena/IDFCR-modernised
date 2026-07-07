@@ -33,7 +33,7 @@ public static class LoggingExtensions
     public static void LogMethod(this ILogger logger, LogLevel logLevel, string message, [CallerMemberName] string methodName = "", params object?[] args)
     {
         List<object> arguments = [methodName];
-        arguments.AddRange(args.Where(x => x != null)!);
+        arguments.AddRange(args!);
 #pragma warning disable CA2254, CA1873 //The LogLevel enabled check is done inside the invoked method
         logger.Log(logLevel, l => l.Log(logLevel, $"{{methodName}}: {message}", [.. arguments]));
 #pragma warning restore CA1873

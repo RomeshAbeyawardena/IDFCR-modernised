@@ -55,7 +55,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
             logger.LogMethod(LogLevel.Information, "Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}", args:
                 [outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc]);
 
-            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
+            await outboxProcessor.NotifyFailureAsync(outboxEntity, cancellationToken);
         }, cancellationToken);
     }
 
