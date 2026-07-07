@@ -20,6 +20,7 @@ public class OutboxEntity : MapperBase<IOutboxEntity>, IOutboxEntity<Guid>
     public DateTimeOffset? ProcessedTimestampUtc { get; set; }
     public DateTimeOffset CreatedTimestampUtc { get; set; }
     public DateTimeOffset? ModifiedTimestampUtc { get; set; }
+    public bool IsUpdate { get; set; }
 
     protected override void MapMembers(IOutboxEntity source)
     {

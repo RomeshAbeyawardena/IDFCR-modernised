@@ -219,14 +219,14 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.NotifyFailureAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.ThrowsAsync<InvalidOperationException>(
-            () => sut.Process(new UowRequest(CommitChanges: true),
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await sut.Process(new UowRequest(CommitChanges: true),
                 UnitResult.Success(UnitAction.None), CancellationToken.None));
 
         Assert.That(captured, Is.Not.Null);
@@ -246,13 +246,13 @@ internal class UnitOfWorkPostProcessorTests
         _unitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ThrowsAsync(new InvalidOperationException("db"));
         _outboxHandler
-            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.NotifyFailureAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("notify blew up"));
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.ThrowsAsync<Exception>(
-            () => sut.Process(new UowRequest(CommitChanges: true),
+        var ex = Assert.ThrowsAsync<Exception>(
+            async () => await sut.Process(new UowRequest(CommitChanges: true),
                 UnitResult.Success(UnitAction.None), CancellationToken.None));
     }
 
@@ -269,14 +269,14 @@ internal class UnitOfWorkPostProcessorTests
 
         IOutboxEntity? captured = null;
         _outboxHandler
-            .Setup(h => h.UpdateNotificationAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            .Setup(h => h.NotifyFailureAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .Callback<object, CancellationToken>((entity, _) => captured = entity as IOutboxEntity)
             .ReturnsAsync((object?)null);
 
         var sut = BuildSut<UowRequest, IUnitResult>();
 
-        Assert.ThrowsAsync<Exception>(
-            () => sut.Process(new UowRequest(CommitChanges: true),
+        var ex = Assert.ThrowsAsync<Exception>(
+            async () => await sut.Process(new UowRequest(CommitChanges: true),
                 UnitResult.Success(UnitAction.None), CancellationToken.None));
 
         // The one notify that DID fire must be the failure one

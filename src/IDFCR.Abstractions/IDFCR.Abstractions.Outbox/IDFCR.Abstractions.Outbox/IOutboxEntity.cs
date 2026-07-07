@@ -9,6 +9,11 @@ namespace IDFCR.Abstractions.Outbox;
 public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp, IIdentifiable
 {
     /// <summary>
+    /// Gets or sets a value indicating whether the outbox message is an update operation. This property allows for the differentiation between create and update operations, providing information about the nature of the message being processed. By utilizing this property, developers can implement logic for handling outbox messages based on whether they represent new data being created or existing data being updated within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    bool IsUpdate { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the outbox message, which can be used to identify or categorize the message being processed. This property allows for the storage of relevant information related to the outbox message, such as a descriptive name or label that can help developers and systems understand the purpose or context of the message within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
     string EntityType { get; set; }
