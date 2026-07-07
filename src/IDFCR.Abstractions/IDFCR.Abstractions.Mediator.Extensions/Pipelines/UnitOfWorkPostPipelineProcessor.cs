@@ -21,12 +21,10 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
     IServiceProvider serviceProvider, ILogger<UnitOfWorkPostPipelineProcessor<TRequest, TResponse>> logger) : MediatR.Pipeline.IRequestPostProcessor<TRequest, TResponse>
     where TRequest : notnull
 {
-    private async Task UpdateNotificationAsync(IOutboxEntity entity, CancellationToken cancellationToken)
+    private async Task ProcessOutbox(Func<IOutboxEntityNotificationHandler, IScopedResources, CancellationToken, Task> processOutbox, CancellationToken cancellationToken)
     {
         IOutboxEntityNotificationHandler? outboxProcessor = serviceProvider.GetService<IOutboxEntityNotificationHandler>();
         IScopedResources? scopedResources = serviceProvider.GetService<IScopedResources>();
-
-        logger.LogInformation("Notifying outbox pattern:");
 
         if (outboxProcessor is not null && scopedResources is not null)
         {
@@ -36,12 +34,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                 logger.LogInformation("Scoped resources count: {count}", scopedResources.Items.Count);
             }
 
-            var outboxEntity = outboxProcessor.Map(entity);
-
-            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
-                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
-
-            await outboxProcessor.UpdateNotificationAsync(outboxEntity, cancellationToken);
+            await processOutbox(outboxProcessor, scopedResources, cancellationToken);
         }
         else
         {
@@ -54,6 +47,32 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                 Has ScopedResources: {hasScopedResources}", hasOutboxProcessor, hasScopedResources);
             }
         }
+    }
+
+    private async Task NotifyAsync(IOutboxEntity entity, CancellationToken cancellationToken)
+    {
+        await ProcessOutbox(async (outboxProcessor, s, ct) =>
+        {
+            var outboxEntity = outboxProcessor.Map(entity);
+
+            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
+                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
+
+            await outboxProcessor.NotifyAsync(outboxEntity, cancellationToken);
+        }, cancellationToken);
+    }
+
+    private async Task UpdateNotificationAsync(IOutboxEntity entity, CancellationToken cancellationToken)
+    {
+        await ProcessOutbox(async(outboxProcessor, s, ct) => 
+        {
+            var outboxEntity = outboxProcessor.Map(entity);
+
+            logger.LogInformation("Mapped outbox entity: {entityType}, CompletedTimestampUtc: {completedTimestamp}, FailedTimestampUtc: {failedTimestamp}, ModifiedTimestampUtc: {modifiedTimestamp}",
+                outboxEntity.EntityType, outboxEntity.CompletedTimestampUtc, outboxEntity.FailedTimestampUtc, outboxEntity.ModifiedTimestampUtc);
+            
+            await outboxProcessor.UpdateNotificationAsync(outboxEntity, cancellationToken);
+        }, cancellationToken);
     }
 
     /// <summary>
@@ -87,7 +106,7 @@ public class UnitOfWorkPostPipelineProcessor<TRequest, TResponse>(IUnitOfWork un
                     catch (Exception)
                     {
                         isException = true;
-                        await UpdateNotificationAsync(new DefaultOutboxEntity
+                        await NotifyAsync(new DefaultOutboxEntity
                         {
                             FailedTimestampUtc = timeProvider.GetUtcNow(),
                             ModifiedTimestampUtc = timeProvider.GetUtcNow()

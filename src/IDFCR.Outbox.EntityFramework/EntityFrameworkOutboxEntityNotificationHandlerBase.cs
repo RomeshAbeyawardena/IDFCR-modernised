@@ -2,6 +2,7 @@
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Outbox.Handlers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Outbox.EntityFramework;
@@ -72,7 +73,6 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
             return null;
         }
 
-        
         if (usesIdentityGeneration && EqualityComparer<TKey>.Default.Equals(entity.Id, default))
         {
             LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
@@ -85,6 +85,37 @@ public abstract class EntityFrameworkOutboxEntityNotificationHandlerBase<TDbCont
         LogMethod(LogLevel.Debug,
             $"Created outbox notification '{entity.Id}'.");
         return entity.Id;
+    }
+
+    /// <inheritdoc />
+    public override async Task<TKey?> NotifyFailureAsync(TKey key, TEntity entity, CancellationToken cancellationToken)
+    {
+        if (!(ScopedResources?.TryGetScopedResource<TDbContext>(out var context) ?? false))
+        {
+            LogMethod(LogLevel.Warning, "Scoped DbContext not found. Unable to notify outbox item.");
+            return null;
+        }
+
+        var outboxEntitySet = GetOutboxEntity(context);
+        var foundEntity = await outboxEntitySet.FindAsync([key], cancellationToken);
+
+        if (foundEntity is null)
+        {
+            LogMethod(LogLevel.Warning, $"Outbox item '{key}' not found. Unable to mark as failure.");
+            return null;
+        }
+
+        context.ChangeTracker.Clear();
+
+        if (usesIdentityGeneration && EqualityComparer<TKey>.Default.Equals(foundEntity.Id, default))
+        {
+            LogMethod(LogLevel.Information, "Entity ID is default. Generating new ID for outbox item.");
+            foundEntity.Id = GenerateId();
+        }
+
+        foundEntity.Map(entity);
+        await outboxEntitySet.AddAsync(foundEntity, cancellationToken);
+        return foundEntity.Id;
     }
 
     /// <inheritdoc />

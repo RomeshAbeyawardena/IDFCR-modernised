@@ -83,6 +83,9 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
     /// <returns>A task representing the asynchronous operation.</returns>
     public abstract Task<TKey?> NotifyAsync(TEntity entity, CancellationToken cancellationToken);
 
+    /// <inheritdoc />
+    public abstract Task<TKey?> NotifyFailureAsync(TKey key, TEntity entity, CancellationToken cancellationToken);
+
     /// <summary>
     /// Updates the notification for the specified outbox entity, allowing for the processing of outbox messages and the tracking of their status. This method is responsible for handling updates to notifications related to outbox entities, enabling developers to implement custom logic for processing outbox messages based on specific requirements and use cases related to message processing and tracking within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
@@ -147,6 +150,28 @@ public abstract class OutboxEntityNotificationHandlerBase<TEntity, TKey>(ILogger
             }
 
             reason = $"{nameof(NotifyAsync)} returned no key";
+        }
+
+        LogMethod(LogLevel.Warning, reason);
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public async Task<object?> NotifyFailureAsync(object entity, CancellationToken cancellationToken)
+    {
+        string reason = entity is null
+            ? "Entity is null"
+            : $"Unexpected type {entity.GetType().Name}";
+
+        if (entity is TEntity typedEntity)
+        {
+            if (ScopedResources?.TryGetScopedResource<TKey>(out var key) ?? false)
+            {
+                return await NotifyFailureAsync(key, typedEntity, cancellationToken);
+            }
+
+            reason = "Scoped outbox key not found.";
         }
 
         LogMethod(LogLevel.Warning, reason);

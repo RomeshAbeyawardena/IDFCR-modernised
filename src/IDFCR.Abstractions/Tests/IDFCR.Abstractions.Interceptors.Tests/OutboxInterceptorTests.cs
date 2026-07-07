@@ -40,6 +40,10 @@ internal class MockOutboxEntityNotificationHandler(ILogger logger) : OutboxEntit
     public Guid? LastUpdateKey { get; private set; }
     public Guid? NotifyResult { get; set; }
 
+    public override Task<Guid?> NotifyFailureAsync(Guid key, OutboxEntity entity, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
     public override IOutboxEntity Map(IOutboxEntity entity)
     {
         var outboxEntity = new OutboxEntity();
