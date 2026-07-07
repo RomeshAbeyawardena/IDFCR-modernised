@@ -214,11 +214,11 @@ internal class MapperExtensionsTests
         Guid expected = Guid.NewGuid();
         Source source = new()
         {
-            OptionalId = expected
+            OptionalId = null
         };
         Target target = new()
         {
-            OptionalId = null
+            OptionalId = expected
         };
         source.SetIfNotNullOrDefault(n => n.OptionalId, target, true);
         Assert.That(target.OptionalId, Is.EqualTo(expected));
