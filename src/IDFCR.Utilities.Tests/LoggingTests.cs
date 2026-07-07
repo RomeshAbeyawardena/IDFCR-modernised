@@ -10,7 +10,7 @@ namespace IDFCR.Utilities.Tests;
 
 public class TestLogger : ILogger
 {
-    StringBuilder loggerBuilder = new();
+    private readonly StringBuilder loggerBuilder = new();
 
     /// <inheritdoc />
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
