@@ -3,7 +3,8 @@
 namespace IDFCR.Abstractions.Outbox;
 
 /// <summary>
-/// Represents an entity that can be used in an outbox pattern for reliable message delivery and tracking of message status. This interface defines the structure of an outbox entity, which includes properties for storing the data of the message, as well as timestamps for when the message was completed, failed, or acknowledged. By implementing this interface, developers can create custom logic for processing outbox messages within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status. The outbox entity can be designed to be stored in a database or other persistent storage mechanism, allowing for the reliable tracking and management of messages as they are processed and delivered within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+/// Represents an entity that can be used in an outbox pattern for reliable message delivery and tracking of message status.
+/// <para>Use SetIfNotNullOrDefault when mapping members to ensure that only non-null and non-default values are set on the target entity.</para>
 /// </summary>
 public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp, IIdentifiable
 {
