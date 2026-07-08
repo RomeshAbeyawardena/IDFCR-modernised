@@ -15,8 +15,3 @@ public abstract class OutboxPublisherBase<TMessage>
         return HandleAsync(messages.Cast<TMessage>(), cancellationToken);
     }
 }
-
-public abstract class OutboxReader
-{
-
-}
