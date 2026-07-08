@@ -16,6 +16,13 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     private CancellationTokenSource? _linkedCts;
     private Task? _loopTask;
 
+    /// <summary>
+    /// Sets the filters for the outbox reader. This method can be overridden to provide custom filtering logic.
+    /// <para>Use <code>with {}</code> to customise the query properties that normally are unavailable to set outside an init.</para>
+    /// </summary>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
     public virtual TPagedQuery SetFilters(int pageIndex, int pageSize)
     {
         var query = new TPagedQuery()
