@@ -3,7 +3,6 @@ using IDFCR.Abstractions.Results;
 
 namespace IDFCR.Abstractions.Outbox;
 
-
 /// <summary>
 /// Represents a reader for retrieving outbox messages.
 /// </summary>
