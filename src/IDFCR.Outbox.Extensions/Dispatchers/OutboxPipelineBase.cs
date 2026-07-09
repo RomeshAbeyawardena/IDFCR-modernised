@@ -1,8 +1,15 @@
 ﻿
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Results;
+using IDFCR.Abstractions.Results.Extensions;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
+
+public class ReaderState
+{
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
+}
 
 /// <inheritdoc cref="IOutboxPipeline"/>
 public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
@@ -34,6 +41,8 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
         return query;
     }
 
+    private IEnumerable<IOutboxReader<TMessage, TPagedQuery>>? readers;
+
     /// <summary>
     /// 
     /// </summary>
@@ -41,11 +50,38 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     /// <returns></returns>
     protected virtual async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        // 1. Resolve readers locally
         var readers = outboxReaderFactory.GetCompatibleReaders<TPagedQuery>();
+        const int pageSize = 20;
 
-        foreach(var reader in readers)
+        foreach (var reader in readers)
         {
-            await reader.GetMessagesAsync(SetFilters(0, 20), cancellationToken);
+            int currentPage = 0;
+            bool hasMorePages = true;
+
+            // 2. Loop through pages for the current reader
+            while (hasMorePages && !cancellationToken.IsCancellationRequested)
+            {
+                var query = SetFilters(currentPage, pageSize);
+
+                // 3. Fetch the messages
+                var messages = await reader.GetMessagesAsync(query, cancellationToken);
+
+                await outboxDispatcher.PushAsync(messages, cancellationToken);
+
+                // 5. Determine if we need to fetch another page
+                // If the number of messages returned is less than the page size, 
+                // we have definitively reached the end of the data.
+                if ((messages?.Result?.Count() ?? 0) < pageSize)
+                {
+                    hasMorePages = false;
+                }
+                else
+                {
+                    // If we got exactly the page size, there MIGHT be more data, so increment and repeat
+                    currentPage++;
+                }
+            }
         }
     }
 

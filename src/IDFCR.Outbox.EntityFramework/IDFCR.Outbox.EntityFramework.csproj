@@ -9,5 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Outbox\IDFCR.Abstractions.Outbox\IDFCR.Abstractions.Outbox.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Persistence\IDFCR.Abstractions.Persistence.csproj" />
+    <ProjectReference Include="..\IDFCR.Outbox.Extensions\IDFCR.Outbox.Extensions.csproj" />
   </ItemGroup>
  </Project>
