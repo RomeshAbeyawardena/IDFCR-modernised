@@ -1,21 +1,13 @@
 ﻿
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Results;
-using IDFCR.Abstractions.Results.Extensions;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
-
-public class ReaderState
-{
-    public int CurrentPage { get; set; }
-    public int TotalPages { get; set; }
-}
-
 /// <inheritdoc cref="IOutboxPipeline"/>
 public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     IOutboxReaderFactory<TMessage> outboxReaderFactory,
     IOutboxDispatcher<TMessage, TPagedQuery> outboxDispatcher,
-    int delay = 1000) : IOutboxPipeline
+    int delay = 1000, int pageSize = 20) : IOutboxPipeline
     where TMessage: IOutboxEntity
     where TPagedQuery : IPagedQuery, new()
 {
@@ -41,8 +33,6 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
         return query;
     }
 
-    private IEnumerable<IOutboxReader<TMessage, TPagedQuery>>? readers;
-
     /// <summary>
     /// 
     /// </summary>
@@ -52,8 +42,7 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     {
         // 1. Resolve readers locally
         var readers = outboxReaderFactory.GetCompatibleReaders<TPagedQuery>();
-        const int pageSize = 20;
-
+        
         foreach (var reader in readers)
         {
             int currentPage = 0;
