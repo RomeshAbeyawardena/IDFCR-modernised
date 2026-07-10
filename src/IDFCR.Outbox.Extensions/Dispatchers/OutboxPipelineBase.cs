@@ -1,10 +1,12 @@
 ﻿
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Results;
+using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
 /// <inheritdoc cref="IOutboxPipeline"/>
 public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
+    ILogger logger,
     IOutboxReaderFactory<TMessage> outboxReaderFactory,
     IOutboxDispatcher<TMessage, TPagedQuery> outboxDispatcher,
     int delay = 1000, int pageSize = 20) : IOutboxPipeline

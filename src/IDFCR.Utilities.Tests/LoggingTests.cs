@@ -1,9 +1,7 @@
 ﻿using IDFCR.Utilities.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Moq;
 using NUnit.Framework;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace IDFCR.Utilities.Tests;

@@ -23,19 +23,20 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// 
+    /// Logs a message with the specified log level, message, and method name, allowing for the tracking of events and issues related to outbox entity notifications. This method is responsible for logging messages based on the provided log level, message, and method name, enabling developers to implement custom logging logic for handling notifications related to outbox entities. By using this method, developers can ensure that relevant information is logged during the processing of outbox messages and the tracking of their status within applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="logLevel"></param>
-    /// <param name="message"></param>
-    /// <param name="methodName"></param>
-    /// <param name="args"></param>
+    /// <param name="logger">The ILogger instance used for logging.</param>
+    /// <param name="logLevel">The log level at which the message should be logged.</param>
+    /// <param name="message">The message to be logged.</param>
+    /// <param name="methodName">The name of the method from which the log is being generated.</param>
+    /// <param name="args">Additional arguments to be included in the log message.</param>
     public static void LogMethod(this ILogger logger, LogLevel logLevel, string message, [CallerMemberName] string methodName = "", params object?[] args)
     {
-        List<object> arguments = [methodName];
-        arguments.AddRange(args!);
-#pragma warning disable CA2254, CA1873 //The LogLevel enabled check is done inside the invoked method
-        logger.Log(logLevel, l => l.Log(logLevel, $"{{methodName}}: {message}", [.. arguments]));
+        // A single, perfectly sized array allocation. Order is strictly preserved.
+        object?[] arguments = [methodName, .. args];
+
+#pragma warning disable CA2254, CA1873
+        logger.Log(logLevel, l => l.Log(logLevel, $"{{methodName}}: {message}", arguments));
 #pragma warning restore CA1873
     }
 
