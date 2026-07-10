@@ -9,6 +9,10 @@ namespace IDFCR.Abstractions.Outbox;
 public interface IOutboxReader
 {
     /// <summary>
+    /// 
+    /// </summary>
+    string Name { get; }
+    /// <summary>
     /// Retrieves a paged collection of outbox messages asynchronously based on the specified query parameters.
     /// </summary>
     /// <param name="request">The query parameters for retrieving outbox messages.</param>

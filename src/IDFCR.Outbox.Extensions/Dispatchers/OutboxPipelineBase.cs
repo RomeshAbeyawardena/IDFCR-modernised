@@ -1,6 +1,7 @@
 ﻿
 using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Results;
+using IDFCR.Utilities.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
@@ -44,7 +45,7 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     {
         // 1. Resolve readers locally
         var readers = outboxReaderFactory.GetCompatibleReaders<TPagedQuery>();
-        
+        logger.LogMethod(LogLevel.Information, "Executing outbox pipeline with {ReaderCount} readers", args: readers.Count());
         foreach (var reader in readers)
         {
             int currentPage = 0;
