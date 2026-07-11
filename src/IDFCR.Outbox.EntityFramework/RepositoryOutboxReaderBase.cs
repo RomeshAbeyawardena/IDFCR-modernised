@@ -11,8 +11,9 @@ namespace IDFCR.Outbox.EntityFramework;
 /// <typeparam name="TMessage">The type of the outbox message.</typeparam>
 /// <typeparam name="TPagedQuery">The type of the paged query.</typeparam>
 /// <typeparam name="TKey">The type of the key.</typeparam>
+/// <param name="name">The name of the outbox reader, typically representing the type of messages it handles.</param>
 /// <param name="repository">The repository instance.</param>
-public class RepositoryOutboxReaderBase<TMessage, TPagedQuery, TKey>(IRepository<TMessage, TKey> repository) : OutboxReaderBase<TMessage, TPagedQuery>
+public class RepositoryOutboxReaderBase<TMessage, TPagedQuery, TKey>(string name, IRepository<TMessage, TKey> repository) : OutboxReaderBase<TMessage, TPagedQuery>($"{name}RepositoryOutboxReader")
     where TMessage : class, IOutboxEntity
     where TPagedQuery : IPagedQuery
     where TKey : struct

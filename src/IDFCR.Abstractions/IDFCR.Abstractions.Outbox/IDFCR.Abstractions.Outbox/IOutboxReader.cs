@@ -9,7 +9,7 @@ namespace IDFCR.Abstractions.Outbox;
 public interface IOutboxReader
 {
     /// <summary>
-    /// 
+    /// The name of the outbox reader, typically representing the type of messages it handles.
     /// </summary>
     string Name { get; }
     /// <summary>
