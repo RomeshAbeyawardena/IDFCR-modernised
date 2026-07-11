@@ -9,7 +9,7 @@ namespace IDFCR.Outbox.Extensions.Dispatchers;
 public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     ILogger logger,
     IOutboxReaderFactory<TMessage> outboxReaderFactory,
-    IOutboxDispatcher<TMessage, TPagedQuery> outboxDispatcher,
+    IOutboxDispatcherFactory<TMessage, TPagedQuery> outboxDispatcherFactory,
     int delay = 1000, int pageSize = 20) : IOutboxPipeline
     where TMessage : IOutboxEntity
     where TPagedQuery : IPagedQuery, new()
@@ -96,7 +96,7 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
                 {
                     logger.LogMethod(LogLevel.Information, "Pushing {MessageCount} outbox messages of type {MessageType} to the dispatcher.", args: [currentBatchCount, _messageTypeName]);
 
-                    await outboxDispatcher.PushAsync(messages, cancellationToken);
+                    await outboxDispatcherFactory.PushAsync(messages, cancellationToken);
                 }
                 else
                 {
