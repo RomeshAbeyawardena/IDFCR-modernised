@@ -76,7 +76,9 @@ public static class ServiceCollectionExtensions
         assemblies = GetAssembliesOrDefault(descriptor, OutboxServiceType.Reader, defaultFallbackAssemblies);
         services.ScanGenericServices<IOutboxReader>(ServiceLifetime.Scoped, [.. assemblies]);
 
-        return services.AddScoped(typeof(IOutboxDispatcherFactory<,>), typeof(DefaultOutboxDispatcherFactory<,>));
+        return services
+            .AddScoped(typeof(IOutboxDispatcherFactory<,>), typeof(DefaultOutboxDispatcherFactory<,>))
+            .AddScoped(typeof(IOutboxReaderFactory<>), typeof(DefaultOutboxReaderFactory<>));
     }
 
     /// <summary>
@@ -91,10 +93,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddOutboxPatternBackgroundServices<TOutboxPipeline, TMessage, TPagedQuery>(this IServiceCollection services, params Assembly[] assemblies)
         where TOutboxPipeline : class, IOutboxPipeline
     {
-        return services.AddSingleton<IOutboxPipeline, TOutboxPipeline>()
+        services.AddSingleton<IOutboxPipeline, TOutboxPipeline>()
                 .ScanGenericServices<IOutboxReader>(ServiceLifetime.Scoped, assemblies)
                 .ScanGenericServices<IOutboxPublisher>(ServiceLifetime.Scoped, assemblies)
                 .ScanGenericServices<IOutboxDispatcher>(ServiceLifetime.Scoped, assemblies);
+
+        return services
+            .AddScoped(typeof(IOutboxDispatcherFactory<,>), typeof(DefaultOutboxDispatcherFactory<,>))
+            .AddScoped(typeof(IOutboxReaderFactory<>), typeof(DefaultOutboxReaderFactory<>));
 
     }
 }
