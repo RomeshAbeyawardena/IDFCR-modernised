@@ -8,6 +8,7 @@
 - Use `IScopedResources`/`DefaultScopedResources` as the scoped bag for heavy resources shared between interceptors and processors, rather than constructor-injecting those heavy scoped dependencies into child components.
 - In this codebase, outbox handling intentionally uses two scoped resource channels: DI-injected scoped resources for handler persistence side effects and a separate flow-scoped resources path from repository -> interceptor -> factory/processor.
 - Avoid calling `SaveChangesAsync` prematurely; commits must occur after pipeline/interceptor/processor flow completes to prevent inconsistent state and hard rollback scenarios.
+- Ensure high-quality test changes include a multi-pass review before completion.
 
 ## Serialization Guidelines
 - For result serialization shape, use consumer-provided names for scalar/container values (e.g., Guid as clientId), while keeping POCO results represented as property key-value dictionaries.

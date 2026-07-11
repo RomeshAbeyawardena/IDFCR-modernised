@@ -9,6 +9,15 @@ internal enum Category
     Data
 }
 
+[Flags]
+internal enum CategoryWithFlags
+{
+    None = 0,
+    Application = 1,
+    Infrastructure = 2,
+    Data = 4
+}
+
 [TestFixture]
 internal class AssemblyDescriptorTests
 {
@@ -59,5 +68,58 @@ internal class AssemblyDescriptorTests
         Assert.That(
             descriptor.GetAssemblies(Category.Application),
             Is.EqualTo(new[] { typeof(AssemblyDescriptorTests).Assembly, typeof(System.IO.Stream).Assembly }));
+    }
+}
+
+[TestFixture]
+internal class AssemblyDescriptorFlagsTests
+{
+    [Test]
+    public void Build_WhenEnumHasFlags_ReturnsAssembliesForExactAndCompositeMatches()
+    {
+        var descriptor = AssemblyDescriptorBuilder.Build<CategoryWithFlags>(builder =>
+        {
+            builder.Append(CategoryWithFlags.Infrastructure, typeof(System.IO.Stream).Assembly);
+            builder.Append(CategoryWithFlags.Data, typeof(System.Data.DataTable).Assembly);
+            builder.Append(CategoryWithFlags.Infrastructure | CategoryWithFlags.Data, typeof(AssemblyDescriptorFlagsTests).Assembly);
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                descriptor.GetAssemblies(CategoryWithFlags.Infrastructure),
+                Is.EquivalentTo(new[] { typeof(System.IO.Stream).Assembly, typeof(AssemblyDescriptorFlagsTests).Assembly }));
+
+            Assert.That(
+                descriptor.GetAssemblies(CategoryWithFlags.Data),
+                Is.EquivalentTo(new[] { typeof(System.Data.DataTable).Assembly, typeof(AssemblyDescriptorFlagsTests).Assembly }));
+        });
+    }
+
+    [Test]
+    public void Build_WhenCombinedFlagRequested_ReturnsAssembliesForCombinedEntriesOnly()
+    {
+        var descriptor = AssemblyDescriptorBuilder.Build<CategoryWithFlags>(builder =>
+        {
+            builder.Append(CategoryWithFlags.Infrastructure, typeof(System.IO.Stream).Assembly);
+            builder.Append(CategoryWithFlags.Data, typeof(System.Data.DataTable).Assembly);
+            builder.Append(CategoryWithFlags.Infrastructure | CategoryWithFlags.Data, typeof(AssemblyDescriptorFlagsTests).Assembly);
+        });
+
+        Assert.That(
+            descriptor.GetAssemblies(CategoryWithFlags.Infrastructure | CategoryWithFlags.Data),
+            Is.EqualTo(new[] { typeof(AssemblyDescriptorFlagsTests).Assembly }));
+    }
+
+    [Test]
+    public void Build_WhenFlagValueHasNoMatchingConfiguredEntries_ReturnsEmptySequence()
+    {
+        var descriptor = AssemblyDescriptorBuilder.Build<CategoryWithFlags>(builder =>
+        {
+            builder.Append(CategoryWithFlags.Infrastructure, typeof(System.IO.Stream).Assembly);
+            builder.Append(CategoryWithFlags.Data, typeof(System.Data.DataTable).Assembly);
+        });
+
+        Assert.That(descriptor.GetAssemblies(CategoryWithFlags.Application), Is.Empty);
     }
 }
