@@ -4,6 +4,26 @@ using IDFCR.Abstractions.Results.Extensions;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
 
+internal class DefaultOutboxDispatcherFactory<TMessage, TPagedQuery>(IEnumerable<IOutboxDispatcher<TMessage, TPagedQuery>> dispatchers) 
+    : IOutboxDispatcherFactory<TMessage, TPagedQuery>
+    where TMessage : IOutboxEntity
+    where TPagedQuery : IPagedQuery
+{
+    public async Task PushAsync(IPagedUnitResult<TMessage> messages, CancellationToken cancellationToken)
+    {
+        foreach(var dispatcher in dispatchers)
+        {
+            await dispatcher.PushAsync(messages, cancellationToken);
+        }
+    }
+
+    Task IOutboxDispatcher.PushAsync(IPagedUnitResult<IOutboxEntity> messages, CancellationToken cancellationToken)
+    {
+        var collection = messages.AsCollection<TMessage>();
+        return PushAsync(collection.AsPaged(messages.PagedQuery), cancellationToken);
+    }
+}
+
 ///<inheritdoc cref="IOutboxDispatcher{TMessage, TPagedQuery}" />
 public abstract class OutboxDispatcherBase<TMessage, TPagedQuery>(IOutboxPublisher<TMessage> publisher) 
     : IOutboxDispatcher<TMessage, TPagedQuery>

@@ -2,6 +2,7 @@
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Outbox.Interceptors;
+using IDFCR.Outbox.Extensions.Dispatchers;
 using IDFCR.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -75,7 +76,7 @@ public static class ServiceCollectionExtensions
         assemblies = GetAssembliesOrDefault(descriptor, OutboxServiceType.Reader, defaultFallbackAssemblies);
         services.ScanGenericServices<IOutboxReader>(ServiceLifetime.Scoped, [.. assemblies]);
 
-        return services;
+        return services.AddScoped(typeof(IOutboxDispatcherFactory<,>), typeof(DefaultOutboxDispatcherFactory<,>));
     }
 
     /// <summary>

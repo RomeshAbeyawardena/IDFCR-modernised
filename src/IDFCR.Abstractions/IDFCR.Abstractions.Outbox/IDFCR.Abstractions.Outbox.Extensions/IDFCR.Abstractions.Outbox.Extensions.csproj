@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\IDFCR.Outbox.Extensions\IDFCR.Outbox.Extensions.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions.Outbox.Interceptors\IDFCR.Abstractions.Outbox.Interceptors.csproj" />
   </ItemGroup>
  </Project>
