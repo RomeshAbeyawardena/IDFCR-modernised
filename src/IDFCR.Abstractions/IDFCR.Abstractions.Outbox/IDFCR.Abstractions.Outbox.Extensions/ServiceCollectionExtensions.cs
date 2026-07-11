@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Adds background services related to the outbox pattern to the specified <see cref="IServiceCollection"/>. This method registers the necessary services for processing outbox messages and tracking their status in a background context, allowing developers to easily integrate outbox functionality into their applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// <para>This method uses dynamic assembly scanning by <see cref="OutboxServiceType"/> to discover and register the appropriate services via a builder pattern.</para>
     /// </summary>
     /// <typeparam name="TOutboxPipeline">The type of the outbox pipeline to be registered.</typeparam>
     /// <typeparam name="TMessage">The type of the message to be processed by the outbox pipeline.</typeparam>
