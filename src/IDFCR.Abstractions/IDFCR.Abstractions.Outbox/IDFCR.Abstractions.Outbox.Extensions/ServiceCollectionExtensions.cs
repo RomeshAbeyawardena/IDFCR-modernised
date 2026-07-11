@@ -4,6 +4,7 @@ using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Outbox.Handlers;
 using IDFCR.Abstractions.Outbox.Interceptors;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace IDFCR.Abstractions.Outbox.Extensions;
 
@@ -26,5 +27,23 @@ public static class ServiceCollectionExtensions
         return services
             .AddScoped<IOutboxEntityNotificationHandler, TOutboxEntityNotificationHandler>()
             .ScanGenericServices<IEntityInterceptor>(ServiceLifetime.Transient, assembly);
+    }
+
+    /// <summary>
+    /// Adds background services related to the outbox pattern to the specified <see cref="IServiceCollection"/>. This method registers the necessary services for processing outbox messages and tracking their status in a background context, allowing developers to easily integrate outbox functionality into their applications and systems that utilize an outbox pattern for reliable message delivery and tracking of message status.
+    /// </summary>
+    /// <typeparam name="TOutboxPipeline"></typeparam>
+    /// <typeparam name="TMessage"></typeparam>
+    /// <typeparam name="TPagedQuery"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="assemblies"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddOutboxPatternBackgroundServices<TOutboxPipeline, TMessage, TPagedQuery>(this IServiceCollection services, params Assembly[] assemblies)
+        where TOutboxPipeline : class, IOutboxPipeline
+    {
+        return services.AddSingleton<IOutboxPipeline, TOutboxPipeline>()
+                .ScanGenericServices<IOutboxReader>(ServiceLifetime.Scoped, assemblies)
+                .ScanGenericServices<IOutboxDispatcher>(ServiceLifetime.Scoped, assemblies);
+
     }
 }

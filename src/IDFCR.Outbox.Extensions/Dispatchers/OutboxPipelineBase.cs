@@ -1,6 +1,7 @@
 ﻿using IDFCR.Abstractions.Outbox;
 using IDFCR.Abstractions.Results;
 using IDFCR.Utilities.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Outbox.Extensions.Dispatchers;
@@ -8,8 +9,7 @@ namespace IDFCR.Outbox.Extensions.Dispatchers;
 /// <inheritdoc cref="IOutboxPipeline"/>
 public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     ILogger logger,
-    IOutboxReaderFactory<TMessage> outboxReaderFactory,
-    IOutboxDispatcherFactory<TMessage, TPagedQuery> outboxDispatcherFactory,
+    IServiceScopeFactory serviceScopeFactory,
     int delay = 1000, int pageSize = 20) : IOutboxPipeline
     where TMessage : IOutboxEntity
     where TPagedQuery : IPagedQuery, new()
@@ -67,6 +67,12 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
     /// <returns>A task representing the asynchronous operation.</returns>
     protected virtual async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        await using var scope = serviceScopeFactory.CreateAsyncScope();
+
+        // 2. Resolve factories out of the fresh scope
+        var outboxReaderFactory = scope.ServiceProvider.GetRequiredService<IOutboxReaderFactory<TMessage>>();
+        var outboxDispatcherFactory = scope.ServiceProvider.GetRequiredService<IOutboxDispatcherFactory<TMessage, TPagedQuery>>();
+
         var readers = outboxReaderFactory.GetCompatibleReaders<TPagedQuery>();
 
         logger.LogMethod(LogLevel.Debug, "Executing processing cycle for outbox entity type {MessageType} across {ReaderCount} compatible readers.", args: [_messageTypeName, readers.Count()]);
