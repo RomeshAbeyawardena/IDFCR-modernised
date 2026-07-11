@@ -43,6 +43,7 @@ public static class ServiceCollectionExtensions
     {
         return services.AddSingleton<IOutboxPipeline, TOutboxPipeline>()
                 .ScanGenericServices<IOutboxReader>(ServiceLifetime.Scoped, assemblies)
+                .ScanGenericServices<IOutboxPublisher>(ServiceLifetime.Scoped, assemblies)
                 .ScanGenericServices<IOutboxDispatcher>(ServiceLifetime.Scoped, assemblies);
 
     }
