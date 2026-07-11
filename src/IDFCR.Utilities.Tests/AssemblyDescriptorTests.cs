@@ -108,7 +108,10 @@ internal class AssemblyDescriptorFlagsTests
 
         Assert.That(
             descriptor.GetAssemblies(CategoryWithFlags.Infrastructure | CategoryWithFlags.Data),
-            Is.EqualTo(new[] { typeof(AssemblyDescriptorFlagsTests).Assembly }));
+            Is.EqualTo([
+                typeof(System.IO.Stream).Assembly,
+                typeof(System.Data.DataTable).Assembly,
+                typeof(AssemblyDescriptorFlagsTests).Assembly]));
     }
 
     [Test]
