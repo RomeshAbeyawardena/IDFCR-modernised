@@ -1,38 +1,32 @@
-﻿using System.Collections.Frozen;
-using System.Reflection;
+﻿namespace IDFCR.Utilities;
 
-namespace IDFCR.Utilities;
-
-internal class AssemblyDescriptorBuilder<TEnum> : IAssemblyDescriptorBuilder<TEnum>
-    where TEnum : Enum
+/// <summary>
+/// Defines a static class for building assembly descriptors based on a specific enum type.
+/// </summary>
+public static class AssemblyDescriptorBuilder
 {
-    private readonly Dictionary<TEnum, List<Assembly>> groupedAssemblies = [];
-
-    public IAssemblyDescriptorBuilder<TEnum> Append(TEnum type, params Assembly[] assemblies)
+    /// <summary>
+    /// Creates a new instance of an assembly descriptor builder for the specified enum type.
+    /// </summary>
+    /// <typeparam name="TEnum">The enum type for which to create the assembly descriptor builder.</typeparam>
+    /// <returns>A new instance of an assembly descriptor builder for the specified enum type.</returns>
+    public static IAssemblyDescriptorBuilder<TEnum> Create<TEnum>()
+        where TEnum : Enum
     {
-        // If the type doesn't exist, create the list and add it to the dictionary immediately
-        if (!groupedAssemblies.TryGetValue(type, out var assemblyList))
-        {
-            assemblyList = [];
-            groupedAssemblies[type] = assemblyList;
-        }
-
-        // Now safely append the new assemblies
-        assemblyList.AddRange(assemblies);
-
-        return this;
+        return new DefaultAssemblyDescriptorBuilder<TEnum>();
     }
 
-    public IAssemblyDescriptorBuilder<TEnum> Append<T>(TEnum type)
+    /// <summary>
+    /// Builds an assembly descriptor for the specified enum type using the provided configuration action.
+    /// </summary>
+    /// <typeparam name="TEnum">The enum type for which to build the assembly descriptor.</typeparam>
+    /// <param name="configure">The action to configure the assembly descriptor builder.</param>
+    /// <returns>The constructed assembly descriptor.</returns>
+    public static IAssemblyDescriptor<TEnum> Build<TEnum>(Action<IAssemblyDescriptorBuilder<TEnum>> configure)
+        where TEnum : Enum
     {
-        return Append(type, typeof(T).Assembly);
-    }
-
-    public IAssemblyDescriptor<TEnum> Build()
-    {
-        IReadOnlyDictionary<TEnum, Assembly[]> dict = groupedAssemblies
-            .ToFrozenDictionary(x => x.Key, x => x.Value.Distinct().ToArray());
-
-        return new DefaultAssemblyDescriptor<TEnum>(dict);
+        var builder = Create<TEnum>();
+        configure(builder);
+        return builder.Build();
     }
 }
