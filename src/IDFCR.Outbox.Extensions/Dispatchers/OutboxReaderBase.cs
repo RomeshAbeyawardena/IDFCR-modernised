@@ -26,4 +26,14 @@ public abstract class OutboxReaderBase<TMessage, TPagedQuery>(string name) : IOu
 
         return outboxEntities.AsPaged(messages.PagedQuery);
     }
+
+    Task<IUnitResult> IOutboxReader.HasPagesAsync(IPagedQuery request, CancellationToken cancellationToken)
+    {
+        if (request is TPagedQuery pagedQuery)
+        {
+            return HasPagesAsync(pagedQuery, cancellationToken);
+        }
+        
+        return Task.FromResult(UnitResult.Failed(new InvalidCastException($"Invalid query type. Expected {typeof(TPagedQuery).Name}."), UnitAction.None, FailureReason.ValidationError));
+    }
 }
