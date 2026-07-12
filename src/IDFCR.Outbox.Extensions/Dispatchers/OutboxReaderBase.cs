@@ -11,6 +11,9 @@ public abstract class OutboxReaderBase<TMessage, TPagedQuery>(string name) : IOu
 {
     ///<inheritdoc />
     public abstract Task<IPagedUnitResult<TMessage>> GetMessagesAsync(TPagedQuery request, CancellationToken cancellationToken);
+    
+    ///<inheritdoc />
+    public abstract Task<IUnitResult> HasPagesAsync(TPagedQuery request, CancellationToken cancellationToken);
 
     ///<inheritdoc />
     public string Name { get; } = name;

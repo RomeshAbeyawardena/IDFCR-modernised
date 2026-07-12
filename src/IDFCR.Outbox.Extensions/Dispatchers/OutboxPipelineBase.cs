@@ -80,14 +80,15 @@ public abstract class OutboxPipelineBase<TMessage, TPagedQuery>(
         foreach (var reader in readers)
         {
             int currentPage = 0;
-            bool hasMorePages = true;
+            var query = SetFilters(currentPage, pageSize);
+            bool hasMorePages = (await reader.HasPagesAsync(query, cancellationToken)).IsSuccess;
             string readerName = reader.GetType().Name;
 
             while (hasMorePages && !cancellationToken.IsCancellationRequested)
             {
                 logger.LogMethod(LogLevel.Debug, "Fetching page {PageIndex} (Size: {PageSize}) for {MessageType} via {ReaderName}.", args: [currentPage, pageSize, _messageTypeName, readerName]);
 
-                var query = SetFilters(currentPage, pageSize);
+                query = SetFilters(currentPage, pageSize);
                 var messages = await reader.GetMessagesAsync(query, cancellationToken);
 
                 if (messages is null || !messages.HasValue)
