@@ -32,6 +32,19 @@ public static class PagedUnitResult
     {
         return new PagedUnitResult<TResult>(result, totalRows, pagedQuery, action, isSuccess, exception, failureReason, namedResult);
     }
+
+    /// <summary>
+    /// Creates a failed paged result with the specified exception and failure reason.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="exception">The captured exception.</param>
+    /// <param name="failureReason">The failure reason.</param>
+    /// <param name="unitAction">The associated action.</param>
+    /// <returns>A failed paged unit result.</returns>
+    public static IPagedUnitResult<TResult> Failed<TResult>(Exception exception, FailureReason failureReason, UnitAction unitAction = UnitAction.None)
+    {
+        return FromResult<TResult>([], 0, null!, isSuccess: false, exception: exception, failureReason: failureReason, action: unitAction);
+    }
 }
 
 /// <summary>
