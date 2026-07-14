@@ -34,6 +34,7 @@ internal class SetOnce<T> : ISetOnce<T>
 {
     private readonly Lock _lock = new();
     private T? _value;
+    private bool _isSet;
     private T? GetValue()
     {
         lock (_lock)
@@ -42,8 +43,16 @@ internal class SetOnce<T> : ISetOnce<T>
         }
     }
 
+    private bool GetIsSetValue()
+    {
+        lock (_lock)
+        {
+            return _isSet;
+        }
+    }
+
     public T? Value => GetValue();
-    public bool IsSet { get; private set; }
+    public bool IsSet => GetIsSetValue();
     object? ISetOnce.Value => Value;
 
     public void SetValue(T? value)
@@ -61,7 +70,7 @@ internal class SetOnce<T> : ISetOnce<T>
             }
 
             _value = value;
-            IsSet = true;
+            _isSet = true;
         }
     }
 

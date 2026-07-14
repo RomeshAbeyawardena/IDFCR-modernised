@@ -13,5 +13,6 @@
     <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.gRPC.Extensions\IDFCR.Abstractions.GRPC.Extensions.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.gRPC.Generated\IDFCR.Abstractions.GRPC.Generated.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
+    <ProjectReference Include="..\IDFCR.Utilities\IDFCR.Utilities.csproj" />
   </ItemGroup>
  </Project>

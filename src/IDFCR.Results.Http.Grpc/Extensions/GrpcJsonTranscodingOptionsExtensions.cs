@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf.Reflection;
+using IDFCR.Utilities;
 using Microsoft.AspNetCore.Grpc.JsonTranscoding;
 using V1Common = IDFCR.Abstractions.GRPC.Contracts.Common.V1;
 
@@ -9,6 +10,8 @@ namespace IDFCR.Results.Http.Grpc.Extensions;
 /// </summary>
 public static class GrpcJsonTranscodingOptionsExtensions
 {
+    public static Lazy<ISetOnce<bool>> IsSet = new(SetOnce.CreateInstance<bool>);
+
     /// <summary>
     /// Defines an extension method to configure the TypeRegistry for gRPC JSON transcoding options with the UnitResult type and any additional message descriptors.
     /// </summary>
@@ -17,9 +20,7 @@ public static class GrpcJsonTranscodingOptionsExtensions
     /// <returns>The configured gRPC JSON transcoding options.</returns>
     public static GrpcJsonTranscodingOptions ConfigureUnitResultTypeRegistries(this GrpcJsonTranscodingOptions options, params MessageDescriptor[] descriptors)
     {
-        
-        
-        if (options.TypeRegistry is not null)
+        if (IsSet.Value.IsSet && IsSet.Value.Value)
         {
             throw new InvalidOperationException("TypeRegistry is already configured. Please configure it only once.");
         }
