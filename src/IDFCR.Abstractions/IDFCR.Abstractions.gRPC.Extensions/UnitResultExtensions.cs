@@ -18,7 +18,7 @@ public static class UnitResultExtensions
         {
             Action = Enum.Parse<V1Common.UnitAction>(unitResult.Action.ToString()),
             IsSuccess = unitResult.IsSuccess,
-            ErrorMessage = unitResult?.Exception?.Message ?? ""
+            ErrorMessage = unitResult?.Exception?.Message ?? "",
         };
 
         if (unitResult!.FailureReason.HasValue)
@@ -36,7 +36,15 @@ public static class UnitResultExtensions
     /// <returns>An IUnitResult representing the converted unit result.</returns>
     public static IUnitResult From(this V1Common.UnitResult unitResult)
     {
-        return UnitResult.Create(unitResult.IsSuccess, new Exception(unitResult.ErrorMessage), 
-            Enum.Parse<UnitAction>(unitResult.Action.ToString()));
+        FailureReason? failureReason = unitResult.HasFailureReason
+            ? Enum.Parse<FailureReason>(unitResult.FailureReason.ToString())
+            : null;
+
+        Exception? exception = string.IsNullOrWhiteSpace(unitResult.ErrorMessage)
+            ? null
+            : new Exception(unitResult.ErrorMessage);
+
+        return UnitResult.Create(unitResult.IsSuccess, exception, 
+            Enum.Parse<UnitAction>(unitResult.Action.ToString()), failureReason);
     }
 }
