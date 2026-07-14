@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using IDFCR.Abstractions.Results;
 
+
 namespace IDFCR.Results.Http.Grpc.Extensions;
 
 /// <summary>
@@ -9,11 +10,30 @@ namespace IDFCR.Results.Http.Grpc.Extensions;
 public static class ServerCallContextExtensions
 {
     /// <summary>
-    /// Maps the <see cref="FailureReason"/> of an <see cref="IUnitResult"/> to a corresponding gRPC <see cref="StatusCode"/>. This method provides a way to translate the outcome of an operation into a gRPC status code that can be returned to the client, ensuring that the client receives meaningful feedback about the result of their request.
+    /// Maps the result of an operation represented by an <see cref="IUnitResult"/> to a corresponding gRPC <see cref="StatusCode"/>. This method evaluates the success or failure of the operation and returns the appropriate gRPC status code that reflects the outcome. If the operation was successful, it returns a status code based on the action performed; if it failed, it delegates to <see cref="GetFailedStatusCode(IUnitResult)"/> to determine the appropriate failure status code.
     /// </summary>
     /// <param name="result">The result of the operation.</param>
     /// <returns>The corresponding gRPC status code.</returns>
     public static StatusCode? GetStatusCode(IUnitResult result)
+    {
+        if (!result.IsSuccess)
+        {
+            return GetFailedStatusCode(result);
+        }
+
+        return result.Action switch
+        {
+            UnitAction.Conflict => StatusCode.InvalidArgument,
+            _ => StatusCode.OK
+        };
+    }
+
+    /// <summary>
+    /// Maps the <see cref="FailureReason"/> of an <see cref="IUnitResult"/> to a corresponding gRPC <see cref="StatusCode"/>. This method provides a way to translate the outcome of an operation into a gRPC status code that can be returned to the client, ensuring that the client receives meaningful feedback about the result of their request.
+    /// </summary>
+    /// <param name="result">The result of the operation.</param>
+    /// <returns>The corresponding gRPC status code.</returns>
+    public static StatusCode? GetFailedStatusCode(IUnitResult result)
     {
         return result.FailureReason switch
         {
@@ -25,14 +45,13 @@ public static class ServerCallContextExtensions
             FailureReason.NotFound => StatusCode.NotFound,
             FailureReason.Unauthorized => StatusCode.Unauthenticated,
             FailureReason.ValidationError => StatusCode.InvalidArgument,
-            FailureReason.Unknown => StatusCode.Unknown,
-            FailureReason.None => StatusCode.OK,
             _ => null
         };
     }
 
     /// <summary>
     /// Sets the status of a gRPC call based on the provided <see cref="IUnitResult"/>. This method updates the <see cref="ServerCallContext.Status"/> property with a new <see cref="Status"/> object that reflects the outcome of the operation. If the result contains an exception, its message is used as the status detail; otherwise, a fallback detail can be provided. This allows for clear communication of operation results to gRPC clients.
+    /// <para>May throw <see cref="RpcException"/> if the operation result indicates a failure.</para>
     /// </summary>
     /// <param name="context">The gRPC server call context.</param>
     /// <param name="result">The result of the operation.</param>
@@ -43,8 +62,13 @@ public static class ServerCallContextExtensions
         string? fallbackdetails = null, 
         StatusCode fallbackStatusCode = StatusCode.Unknown)
     {
-        context.Status = new Status(
-            GetStatusCode(result).GetValueOrDefault(fallbackStatusCode), 
-            result.Exception?.Message ?? fallbackdetails ?? string.Empty);
+        if (result.IsSuccess)
+        {
+            context.Status = new Status(GetStatusCode(result).GetValueOrDefault(fallbackStatusCode), string.Empty);
+        }
+
+        var detail = result.Exception?.Message ?? fallbackdetails ?? string.Empty;
+
+        throw new RpcException(new Status(GetFailedStatusCode(result).GetValueOrDefault(fallbackStatusCode), detail));
     }
 }
