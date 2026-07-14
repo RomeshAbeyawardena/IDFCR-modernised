@@ -17,6 +17,11 @@ public static class GrpcJsonTranscodingOptionsExtensions
     /// <returns>The configured gRPC JSON transcoding options.</returns>
     public static GrpcJsonTranscodingOptions ConfigureUnitResultTypeRegistries(this GrpcJsonTranscodingOptions options, params MessageDescriptor[] descriptors)
     {
+        if (options.TypeRegistry is not null)
+        {
+            throw new InvalidOperationException("TypeRegistry is already configured. Please configure it only once.");
+        }
+
         options.TypeRegistry = TypeRegistry.FromMessages(
            [V1Common.UnitResult.Descriptor, ..descriptors]);
         return options;
