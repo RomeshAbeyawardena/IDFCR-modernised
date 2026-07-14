@@ -106,6 +106,7 @@
     <Project Path="src/IDFCR.Persistence.EntityFramework/IDFCR.Persistence.EntityFrameworkCore.Tests/IDFCR.Persistence.EntityFrameworkCore.Tests.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Results.Http/">
+    <Project Path="src/IDFCR.Results.Http.Grpc/IDFCR.Results.Http.Grpc.csproj" />
     <Project Path="src/IDFCR.Results.Http/IDFCR.Results.Http.csproj" />
   </Folder>
   <Folder Name="/src/IDFCR.Results.Http/Tests/">
