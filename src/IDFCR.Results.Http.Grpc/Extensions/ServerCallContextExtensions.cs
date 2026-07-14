@@ -1,6 +1,9 @@
-﻿using Grpc.Core;
+﻿using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using IDFCR.Abstractions.GRPC.Extensions;
 using IDFCR.Abstractions.Results;
-
 
 namespace IDFCR.Results.Http.Grpc.Extensions;
 
@@ -9,6 +12,27 @@ namespace IDFCR.Results.Http.Grpc.Extensions;
 /// </summary>
 public static class ServerCallContextExtensions
 {
+    /// <summary>
+    /// Converts an <see cref="IUnitResult"/> into a gRPC <see cref="Google.Rpc.Status"/> object. This method evaluates the result of an operation and constructs a corresponding gRPC status that reflects the outcome. If the operation was successful, it returns a status code based on the action performed; if it failed, it includes details about the failure, such as exception messages or fallback details. This allows for clear communication of operation results to gRPC clients.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="fallbackDetails"></param>
+    /// <returns></returns>
+    public static Google.Rpc.Status ToUnitResultStatus(this IUnitResult result, string? fallbackDetails)
+    {
+        var statusCode = GetStatusCode(result) ?? StatusCode.Unknown;
+        var detail = result.Exception?.Message ?? string.Empty;
+        return new Google.Rpc.Status
+        {
+            Code = (int)statusCode,
+            Message = detail ?? fallbackDetails,
+            Details =
+            {
+                Any.Pack(result.From())
+            }
+        };
+    }
+
     /// <summary>
     /// Maps the result of an operation represented by an <see cref="IUnitResult"/> to a corresponding gRPC <see cref="StatusCode"/>. This method evaluates the success or failure of the operation and returns the appropriate gRPC status code that reflects the outcome. If the operation was successful, it returns a status code based on the action performed; if it failed, it delegates to <see cref="GetFailedStatusCode(IUnitResult)"/> to determine the appropriate failure status code.
     /// </summary>
@@ -67,8 +91,6 @@ public static class ServerCallContextExtensions
             context.Status = new Status(GetStatusCode(result).GetValueOrDefault(fallbackStatusCode), string.Empty);
         }
 
-        var detail = result.Exception?.Message ?? fallbackdetails ?? string.Empty;
-
-        throw new RpcException(new Status(GetFailedStatusCode(result).GetValueOrDefault(fallbackStatusCode), detail));
+        throw result.ToUnitResultStatus(fallbackdetails).ToRpcException();
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -6,8 +6,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" />
+    <PackageReference Include="Grpc.StatusProto" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.gRPC.Extensions\IDFCR.Abstractions.GRPC.Extensions.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.gRPC.Generated\IDFCR.Abstractions.GRPC.Generated.csproj" />
     <ProjectReference Include="..\IDFCR.Abstractions\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>
  </Project>
