@@ -18,13 +18,13 @@ public static class ServerCallContextExtensions
         return result.FailureReason switch
         {
             FailureReason.AuthorizationError => StatusCode.Unauthenticated,
-            FailureReason.Conflict => StatusCode.DataLoss,
+            FailureReason.Conflict => StatusCode.AlreadyExists,
             FailureReason.ExternalDependencyError => StatusCode.FailedPrecondition,
             FailureReason.Forbidden => StatusCode.PermissionDenied,
             FailureReason.InternalError => StatusCode.Internal,
             FailureReason.NotFound => StatusCode.NotFound,
             FailureReason.Unauthorized => StatusCode.Unauthenticated,
-            FailureReason.ValidationError => StatusCode.DataLoss,
+            FailureReason.ValidationError => StatusCode.InvalidArgument,
             FailureReason.Unknown => StatusCode.Unknown,
             FailureReason.None => StatusCode.OK,
             _ => null
