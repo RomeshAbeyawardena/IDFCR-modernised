@@ -35,24 +35,28 @@ internal class SetOnce<T> : ISetOnce<T>
     private readonly Lock _lock = new();
     private T? _value;
     private bool _isSet;
-    private T? GetValue()
+    
+    public T? Value
     {
-        lock (_lock)
+        get
         {
-            return _value;
+            lock (_lock)
+            {
+                return _value;
+            }
+        }
+    }
+    public bool IsSet
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _isSet;
+            }
         }
     }
 
-    private bool GetIsSetValue()
-    {
-        lock (_lock)
-        {
-            return _isSet;
-        }
-    }
-
-    public T? Value => GetValue();
-    public bool IsSet => GetIsSetValue();
     object? ISetOnce.Value => Value;
 
     public void SetValue(T? value)
@@ -80,5 +84,25 @@ internal class SetOnce<T> : ISetOnce<T>
         {
             SetValue(val);
         }
+    }
+
+    public T? GetValueOrDefault(T? defaultValue)
+    {
+        if(IsSet)
+        {
+            return Value;
+        }
+
+        return defaultValue ?? default;
+    }
+
+    object? ISetOnce.GetValueOrDefault(object? defaultValue)
+    {
+        if (defaultValue is T val)
+        {
+            return GetValueOrDefault(val);
+        }
+
+        return GetValueOrDefault(default);
     }
 }

@@ -18,6 +18,13 @@ public interface ISetOnce
     /// </summary>
     /// <param name="value"></param>
     void SetValue(object? value);
+
+    /// <summary>
+    /// Gets the value if it has been set; otherwise, returns the specified default value.
+    /// </summary>
+    /// <param name="defaultValue">The default value to return if the value has not been set.</param>
+    /// <returns>The value if it has been set; otherwise, the specified default value.</returns>
+    object? GetValueOrDefault(object? defaultValue);
 }
 
 /// <summary>
@@ -35,4 +42,10 @@ public interface ISetOnce<T> : ISetOnce
     /// </summary>
     /// <param name="value">The value to set.</param>
     void SetValue(T? value);
+    /// <summary>
+    /// Gets the value if it has been set; otherwise, returns the specified default value.
+    /// </summary>
+    /// <param name="defaultValue">The default value to return if the value has not been set.</param>
+    /// <returns>The value if it has been set; otherwise, the specified default value.</returns>
+    T? GetValueOrDefault(T? defaultValue = default);
 }
