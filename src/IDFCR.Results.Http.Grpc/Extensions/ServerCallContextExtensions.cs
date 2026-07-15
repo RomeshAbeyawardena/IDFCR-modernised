@@ -1,6 +1,4 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.Reflection;
-using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using IDFCR.Abstractions.GRPC.Extensions;
 using IDFCR.Abstractions.Results;
@@ -21,11 +19,11 @@ public static class ServerCallContextExtensions
     public static Google.Rpc.Status ToUnitResultStatus(this IUnitResult result, string? fallbackDetails)
     {
         var statusCode = GetStatusCode(result) ?? StatusCode.Unknown;
-        var detail = result.Exception?.Message ?? string.Empty;
+        var detail = result.Exception?.Message ?? fallbackDetails ?? string.Empty;
         return new Google.Rpc.Status
         {
             Code = (int)statusCode,
-            Message = detail ?? fallbackDetails,
+            Message = detail,
             Details =
             {
                 Any.Pack(result.From())
@@ -45,11 +43,7 @@ public static class ServerCallContextExtensions
             return GetFailedStatusCode(result);
         }
 
-        return result.Action switch
-        {
-            UnitAction.Conflict => StatusCode.InvalidArgument,
-            _ => StatusCode.OK
-        };
+        return StatusCode.OK;
     }
 
     /// <summary>
@@ -86,11 +80,11 @@ public static class ServerCallContextExtensions
         string? fallbackdetails = null, 
         StatusCode fallbackStatusCode = StatusCode.Unknown)
     {
-        if (result.IsSuccess)
+        if (!result.IsSuccess)
         {
-            context.Status = new Status(GetStatusCode(result).GetValueOrDefault(fallbackStatusCode), string.Empty);
+            throw result.ToUnitResultStatus(fallbackdetails).ToRpcException();
         }
 
-        throw result.ToUnitResultStatus(fallbackdetails).ToRpcException();
+        context.Status = new Status(GetStatusCode(result).GetValueOrDefault(fallbackStatusCode), string.Empty);
     }
 }
