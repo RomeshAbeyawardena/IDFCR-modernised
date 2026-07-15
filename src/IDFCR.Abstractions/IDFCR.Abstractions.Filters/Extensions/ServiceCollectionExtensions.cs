@@ -44,6 +44,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static void AddAsyncLookupFactoryAndLookups(this IServiceCollection services, params Assembly[] assemblies)
+    {
+        services
+            .AddTransient<IAsyncLookupFactory, DefaultAsyncLookupFactory>();
+
+        services.ScanGenericServices<IAsyncLookup>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies);
+    }
+
     /// <summary>
     /// Scans assemblies for non-global filters and registers the shared filter factory.
     /// </summary>

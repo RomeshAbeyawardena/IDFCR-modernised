@@ -2,7 +2,7 @@
 
 namespace IDFCR.Abstractions.Filters;
 
-internal sealed class AsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
+internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
     public async Task<IEnumerable<TEntity>> LookupAsync<TEntity>(object filter, CancellationToken cancellationToken)
         where TEntity : class
