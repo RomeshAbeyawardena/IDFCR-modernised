@@ -18,7 +18,12 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
         {
             if (await lookup.CanLookupAsync(filter, cancellationToken))
             {
-                lookedUpEntities.Add(await lookup.LookupAsync(filter, cancellationToken));
+                var entity = await lookup.LookupAsync(filter, cancellationToken);
+
+                if (entity is not null)
+                {
+                    lookedUpEntities.Add(entity);
+                }
             }
         }
 
@@ -37,9 +42,11 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
         foreach(var lookup in lookupProviders)
         {
-            if (await lookup.CanLookupAsync(filter, cancellationToken))
+            var entity = await lookup.LookupAsync(filter, cancellationToken);
+
+            if (entity is not null)
             {
-                lookedUpEntities.Add(await lookup.LookupAsync(filter, cancellationToken));
+                lookedUpEntities.Add(entity);
             }
         }
 

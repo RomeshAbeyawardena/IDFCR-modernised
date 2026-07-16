@@ -11,7 +11,7 @@ public abstract class AsyncLookupBase<TEntity, TFilter> : IAsyncLookup<TEntity, 
     where TEntity : class
     where TFilter : IFilter
 {
-    Task<TEntity> IAsyncLookup<TEntity>.LookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<TEntity?> IAsyncLookup<TEntity>.LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         if (filter is not TFilter typedFilter)
         {
@@ -27,7 +27,7 @@ public abstract class AsyncLookupBase<TEntity, TFilter> : IAsyncLookup<TEntity, 
     /// <param name="filter">The filter criteria to apply for the lookup.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The entity that matches the filter criteria.</returns>
-    public abstract Task<TEntity> LookupAsync(TFilter filter, CancellationToken cancellationToken);
+    public abstract Task<TEntity?> LookupAsync(TFilter filter, CancellationToken cancellationToken);
 
     /// <summary>
     /// Determines whether the provided filter can be used for lookup.
