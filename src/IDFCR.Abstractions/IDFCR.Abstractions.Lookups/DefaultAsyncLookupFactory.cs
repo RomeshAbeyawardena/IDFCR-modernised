@@ -42,11 +42,14 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
         foreach(var lookup in lookupProviders)
         {
-            var entity = await lookup.LookupAsync(filter, cancellationToken);
-
-            if (entity is not null)
+            if (await lookup.CanLookupAsync(filter, cancellationToken))
             {
-                lookedUpEntities.Add(entity);
+                var entity = await lookup.LookupAsync(filter, cancellationToken);
+
+                if (entity is not null)
+                {
+                    lookedUpEntities.Add(entity);
+                }
             }
         }
 
