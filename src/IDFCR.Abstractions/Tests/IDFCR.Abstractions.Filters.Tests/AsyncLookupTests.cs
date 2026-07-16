@@ -393,9 +393,7 @@ internal sealed class AsyncLookupTests
     private static IAsyncLookupFactory CreateFactory(IServiceProvider serviceProvider)
     {
         var assembly = typeof(IAsyncLookupFactory).Assembly;
-        var factoryType = assembly.GetType("IDFCR.Abstractions.Filters.DefaultAsyncLookupFactory")
-            ?? assembly.GetType("IDFCR.Abstractions.Filters.AsyncLookupFactory")
-            ?? throw new TypeLoadException("Unable to locate the async lookup factory implementation type.");
+        var factoryType = typeof(DefaultAsyncLookupFactory);
 
         var constructor = factoryType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, binder: null, [typeof(IServiceProvider)], modifiers: null)
             ?? throw new MissingMethodException(factoryType.FullName, ".ctor(IServiceProvider)");
