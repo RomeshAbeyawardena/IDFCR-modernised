@@ -22,6 +22,14 @@ public interface IAsyncLookup<TEntity>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The entity that matches the filter criteria.</returns>
     Task<TEntity?> LookupAsync(object? filter, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Determines whether an entity of type <typeparamref name="TEntity"/> exists based on the provided filter.
+    /// </summary>
+    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
+    Task<bool> HasAsync(object? filter, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -40,4 +48,12 @@ public interface IAsyncLookup<TEntity, TFilter> : IAsyncLookup<TEntity>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The entity that matches the filter criteria.</returns>
     Task<TEntity?> LookupAsync(TFilter filter, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Determines whether an entity of type <typeparamref name="TEntity"/> exists based on the provided filter of type <typeparamref name="TFilter"/>.
+    /// </summary>
+    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
+    Task<bool> HasAsync(TFilter filter, CancellationToken cancellationToken);
 }
