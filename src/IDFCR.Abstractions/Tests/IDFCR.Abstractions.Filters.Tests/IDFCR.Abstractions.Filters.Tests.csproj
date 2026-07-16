@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IDFCR.Abstractions.Filters\IDFCR.Abstractions.Filters.csproj" />
+    <ProjectReference Include="..\..\IDFCR.Abstractions.Lookups\IDFCR.Abstractions.Lookups.csproj" />
     <ProjectReference Include="..\..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
   </ItemGroup>
 </Project>

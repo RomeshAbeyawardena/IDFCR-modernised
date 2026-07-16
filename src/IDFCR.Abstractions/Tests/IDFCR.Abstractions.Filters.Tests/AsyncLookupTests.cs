@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 
 using IDFCR.Abstractions.Filters.Tests.Assets;
+using IDFCR.Abstractions.Lookups;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
