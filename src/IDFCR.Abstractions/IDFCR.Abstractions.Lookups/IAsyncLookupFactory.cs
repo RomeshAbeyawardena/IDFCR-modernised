@@ -8,6 +8,23 @@ namespace IDFCR.Abstractions.Lookups;
 public interface IAsyncLookupFactory
 {
     /// <summary>
+    /// Determines whether an entity exists based on the provided filter.
+    /// </summary>
+    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
+    Task<bool> HasAsync<TEntity>(object? filter, CancellationToken cancellationToken);
+    
+    /// <summary>
+    /// Determines whether an entity exists based on the provided filter of type <typeparamref name="TFilter"/>.
+    /// </summary>
+    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
+    Task<bool> HasAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
+        where TFilter : class;
+
+    /// <summary>
     /// Looks up entities of type <typeparamref name="TEntity"/> based on the provided filter.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entities to look up.</typeparam>

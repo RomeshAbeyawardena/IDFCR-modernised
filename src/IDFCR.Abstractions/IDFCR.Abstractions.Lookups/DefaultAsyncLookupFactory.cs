@@ -5,6 +5,44 @@ namespace IDFCR.Abstractions.Lookups;
 
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
+    private async Task<IEnumerable<TResult>> InScope<TResult, TEntity>(
+        Func<IAsyncLookup<TEntity>, CancellationToken, Task<TResult>> resultFactory, 
+        CancellationToken cancellationToken)
+    {
+        using var scope = serviceProvider.CreateScope();
+
+        var lookupProviders = scope.ServiceProvider.GetServices<IAsyncLookup<TEntity>>();
+        List<TResult> collectiveResults = [];
+
+        foreach (var lookup in lookupProviders)
+        {
+            var result = await resultFactory(lookup, cancellationToken);
+            collectiveResults.Add(result);
+        }
+
+        return collectiveResults;
+    }
+
+    public async Task<bool> HasAsync<TEntity>(object? filter, CancellationToken cancellationToken)
+    {
+        var results = await InScope<bool, TEntity>(async (provider, ct) =>
+        {
+            return await provider.HasAsync(filter, cancellationToken);
+        }, cancellationToken);
+
+        return results.Any(x => x);
+    }
+
+    public async Task<bool> HasAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken) where TFilter : class
+    {
+        var results = await InScope<bool, TEntity>(async(provider, ct) =>
+        {
+            return await provider.HasAsync(filter, cancellationToken);
+        },cancellationToken);
+
+        return results.Any(x => x);
+    }
+    
     public async Task<IEnumerable<TEntity>> LookupAsync<TEntity>(object filter, CancellationToken cancellationToken)
         where TEntity : class
     {
