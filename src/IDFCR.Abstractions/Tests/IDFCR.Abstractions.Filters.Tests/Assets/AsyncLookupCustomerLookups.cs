@@ -225,3 +225,49 @@ public sealed class ThrowingCanLookupTypedCustomerLookup : AsyncLookupBase<Custo
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupTypedCustomerLookup), nameof(Dispose), null, default);
     }
 }
+
+public sealed class InterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IDisposable
+{
+    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    {
+        AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
+        return base.CanLookupAsync(filter, cancellationToken);
+    }
+
+    public override Task<Customer> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    {
+        AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
+        return Task.FromResult(new Customer
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000201"),
+            FirstName = "Interface",
+            LastName = "Typed",
+            CreatedTimestampUtc = DateTimeOffset.UtcNow
+        });
+    }
+
+    public void Dispose()
+    {
+        AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(Dispose), null, default);
+    }
+}
+
+public sealed class SkippingInterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IDisposable
+{
+    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    {
+        AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
+        return Task.FromResult(false);
+    }
+
+    public override Task<Customer> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    {
+        AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
+        throw new InvalidOperationException("LookupAsync should not be called when CanLookupAsync returns false.");
+    }
+
+    public void Dispose()
+    {
+        AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(Dispose), null, default);
+    }
+}

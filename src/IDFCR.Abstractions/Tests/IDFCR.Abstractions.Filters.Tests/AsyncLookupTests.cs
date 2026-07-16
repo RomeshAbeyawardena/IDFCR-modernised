@@ -291,6 +291,68 @@ internal sealed class AsyncLookupTests
     }
 
     [Test]
+    public async Task LookupAsync_TypedOverload_WithInterfaceGenericAndConcreteFilter_ReturnsMatches()
+    {
+        using var serviceProvider = BuildServiceProvider(services =>
+        {
+            services.AddScoped<IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>, InterfaceFilterTypedCustomerLookup>();
+        });
+
+        var factory = CreateFactory(serviceProvider);
+        var filter = new AsyncLookupConcreteInterfaceFilter();
+
+        var results = (await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(filter, CancellationToken.None)).ToArray();
+
+        Assert.That(results, Has.Length.EqualTo(1));
+        Assert.That(results[0].FirstName, Is.EqualTo("Interface"));
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>.LookupAsync)}"
+        }));
+        Assert.That(GetDisposeCount(nameof(InterfaceFilterTypedCustomerLookup)), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task LookupAsync_TypedOverload_WithInterfaceGenericAndConcreteFilter_ProcessesAllProvidersInOrder()
+    {
+        using var serviceProvider = BuildServiceProvider(services =>
+        {
+            services.AddScoped<IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>, InterfaceFilterTypedCustomerLookup>();
+            services.AddScoped<IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>, SkippingInterfaceFilterTypedCustomerLookup>();
+        });
+
+        var factory = CreateFactory(serviceProvider);
+
+        var results = (await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(new AsyncLookupDifferentInterfaceFilter(), CancellationToken.None)).ToArray();
+
+        Assert.That(results, Has.Length.EqualTo(1));
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>.LookupAsync)}",
+            $"{nameof(SkippingInterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}"
+        }));
+        Assert.That(GetDisposeCount(nameof(InterfaceFilterTypedCustomerLookup)), Is.EqualTo(1));
+        Assert.That(GetDisposeCount(nameof(SkippingInterfaceFilterTypedCustomerLookup)), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task AsyncLookupBase_ObjectLookup_WithInterfaceGenericAndConcreteFilter_Succeeds()
+    {
+        using var lookup = new InterfaceFilterTypedCustomerLookup();
+        var asyncLookup = (IAsyncLookup<Customer>)lookup;
+
+        var result = await asyncLookup.LookupAsync(new AsyncLookupConcreteInterfaceFilter(), CancellationToken.None);
+
+        Assert.That(result.FirstName, Is.EqualTo("Interface"));
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, IAsyncLookupInterfaceFilter>.LookupAsync)}"
+        }));
+    }
+
+    [Test]
     public void AsyncLookupBase_ObjectLookup_WithInvalidFilterType_ThrowsArgumentException()
     {
         using var lookup = new FirstTypedCustomerLookup();
@@ -329,7 +391,11 @@ internal sealed class AsyncLookupTests
 
     private static IAsyncLookupFactory CreateFactory(IServiceProvider serviceProvider)
     {
-        var factoryType = typeof(IAsyncLookupFactory).Assembly.GetType("IDFCR.Abstractions.Filters.AsyncLookupFactory", throwOnError: true)!;
+        var assembly = typeof(IAsyncLookupFactory).Assembly;
+        var factoryType = assembly.GetType("IDFCR.Abstractions.Filters.DefaultAsyncLookupFactory")
+            ?? assembly.GetType("IDFCR.Abstractions.Filters.AsyncLookupFactory")
+            ?? throw new TypeLoadException("Unable to locate the async lookup factory implementation type.");
+
         var constructor = factoryType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, binder: null, [typeof(IServiceProvider)], modifiers: null)
             ?? throw new MissingMethodException(factoryType.FullName, ".ctor(IServiceProvider)");
 

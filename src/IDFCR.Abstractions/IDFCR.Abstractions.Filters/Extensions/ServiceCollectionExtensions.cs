@@ -1,5 +1,6 @@
 using IDFCR.Abstractions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Scrutor;
 using System.Reflection;
 
 namespace IDFCR.Abstractions.Filters.Extensions;
@@ -44,12 +45,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registers the default async lookup factory and scans assemblies for implementations of <see cref="IAsyncLookup{T}"/>.
+    /// </summary>
+    /// <param name="services">The service collection to extend.</param>
+    /// <param name="assemblies">The assemblies to scan for async lookup implementations.</param>
     public static void AddAsyncLookupFactoryAndLookups(this IServiceCollection services, params Assembly[] assemblies)
     {
-        services
-            .AddTransient<IAsyncLookupFactory, DefaultAsyncLookupFactory>();
+        services.AddTransient<IAsyncLookupFactory, DefaultAsyncLookupFactory>();
 
-        services.ScanGenericServices<IAsyncLookup>(ServiceLifetime.Transient, f => f.WithoutAttribute<GlobalFilterAttribute>(), assemblies);
+        services.Scan(scan => scan
+            .FromAssemblies(assemblies)
+            .AddClasses(filter => filter
+                .AssignableTo(typeof(IAsyncLookup<>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
     }
 
     /// <summary>
