@@ -22,7 +22,8 @@ public interface IAsyncLookupFactory
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
     Task<bool> HasAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
-        where TFilter : class;
+        where TEntity : class
+        where TFilter : IFilter;
 
     /// <summary>
     /// Looks up entities of type <typeparamref name="TEntity"/> based on the provided filter.
