@@ -6,7 +6,7 @@ namespace IDFCR.Abstractions.Lookups;
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
     private async Task<IEnumerable<TResult>> InScope<TResult, TEntity>(
-        Func<IAsyncLookup<TEntity>, CancellationToken, Task<TResult>> resultFactory, 
+        Func<IAsyncLookup<TEntity>, CancellationToken, Task<TResult?>> resultFactory, 
         CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
@@ -17,7 +17,11 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
         foreach (var lookup in lookupProviders)
         {
             var result = await resultFactory(lookup, cancellationToken);
-            collectiveResults.Add(result);
+
+            if (result is not null)
+            {
+                collectiveResults.Add(result);
+            }
         }
 
         return collectiveResults;
@@ -35,62 +39,47 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
     public async Task<bool> HasAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken) where TFilter : class
     {
-        var results = await InScope<bool, TEntity>(async(provider, ct) =>
+        var results = await InScope<bool?, TEntity>(async(provider, ct) =>
         {
+            if (await provider.CanLookupAsync(filter, ct))
+            {
+                return null;
+            }
+
             return await provider.HasAsync(filter, cancellationToken);
         },cancellationToken);
 
-        return results.Any(x => x);
+        return results.Any(x => x.GetValueOrDefault());
     }
     
     public async Task<IEnumerable<TEntity>> LookupAsync<TEntity>(object filter, CancellationToken cancellationToken)
         where TEntity : class
     {
-        using var scope = serviceProvider.CreateScope();
-
-        var lookupProviders = scope.ServiceProvider.GetServices<IAsyncLookup<TEntity>>();
-
-        List<TEntity> lookedUpEntities = [];
-
-        foreach (var lookup in lookupProviders)
+        var results = await InScope<TEntity, TEntity>(async (provider, ct) =>
         {
-            if (await lookup.CanLookupAsync(filter, cancellationToken))
+            if (await provider.CanLookupAsync(filter, ct))
             {
-                var entity = await lookup.LookupAsync(filter, cancellationToken);
-
-                if (entity is not null)
-                {
-                    lookedUpEntities.Add(entity);
-                }
+                return null;
             }
-        }
+            return await provider.LookupAsync(filter, cancellationToken);
+        }, cancellationToken);
 
-        return lookedUpEntities;
+        return results;
     }
 
     public async Task<IEnumerable<TEntity>> LookupAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
         where TEntity : class
         where TFilter : IFilter
     {
-        using var scope = serviceProvider.CreateScope();
-
-        var lookupProviders = scope.ServiceProvider.GetServices<IAsyncLookup<TEntity, TFilter>>();
-
-        List<TEntity> lookedUpEntities = [];
-
-        foreach(var lookup in lookupProviders)
+        var results = await InScope<TEntity, TEntity>(async (provider, ct) =>
         {
-            if (await lookup.CanLookupAsync(filter, cancellationToken))
+            if (await provider.CanLookupAsync(filter, ct))
             {
-                var entity = await lookup.LookupAsync(filter, cancellationToken);
-
-                if (entity is not null)
-                {
-                    lookedUpEntities.Add(entity);
-                }
+                return null;
             }
-        }
+            return await provider.LookupAsync(filter, cancellationToken);
+        }, cancellationToken);
 
-        return lookedUpEntities;
+        return results;
     }
 }
