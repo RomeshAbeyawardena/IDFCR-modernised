@@ -37,6 +37,14 @@ public abstract class EntityFrameworkRepositoryBase<TDbContext, TCommon, TDb, T,
     where T : class, IMapper<TCommon>, TCommon
 {
     /// <summary>
+    /// Gets the filtered DbSet for the specified database entity type based on the provided filter. This method applies the filtering logic defined in the filter factory to the DbSet, allowing for retrieval of entities that match the specified criteria. By using this method, derived classes can easily obtain a filtered set of entities from the database while adhering to the repository pattern and leveraging Entity Framework Core's capabilities for data management.
+    /// </summary>
+    /// <param name="filter">The filter criteria to apply to the DbSet.</param>
+    /// <returns>A queryable collection of entities that match the filter criteria.</returns>
+    public IQueryable<TDb> GetFilteredDbSet<TRequest>(TRequest filter) => FilterFactory
+        .Apply(GetSourceQueryForRequest(filter), filter);
+
+    /// <summary>
     /// Gets a boolean value indicating whether the repository should default to using no tracking for queries. This property is set to true by default, meaning that when retrieving entities from the database, the repository will not track changes to those entities in the DbContext. This can improve performance for read-only scenarios where tracking is not necessary. However, derived classes can override this property to change the default behavior if they require tracking for certain operations. By providing this property, the repository base class allows for flexibility in how entities are managed and tracked within the context of Entity Framework Core while adhering to the repository pattern.
     /// <para>⚠️ Unless you know what you're doing it is advisable to leave this field alone as it can impact the behavior of the repository and the performance of database operations.</para>
     /// </summary>
