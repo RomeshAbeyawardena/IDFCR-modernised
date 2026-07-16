@@ -1,4 +1,4 @@
-using IDFCR.Abstractions.Filters;
+using IDFCR.Abstractions.Metadata;
 
 namespace IDFCR.Abstractions.Filters.Tests.Assets;
 

@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Filters;
+﻿using IDFCR.Abstractions.Metadata;
+
+namespace IDFCR.Abstractions.Lookups;
 
 /// <summary>
 /// Represents a base class for implementing asynchronous lookup services for entities of type <typeparamref name="TEntity"/> with a specific filter of type <typeparamref name="TFilter"/>.

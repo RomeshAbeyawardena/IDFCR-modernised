@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Filters;
+﻿using IDFCR.Abstractions.Metadata;
+
+namespace IDFCR.Abstractions.Lookups;
 
 /// <summary>
 /// Represents a factory for creating instances of <see cref="IAsyncLookup{TEntity}"/> and <see cref="IAsyncLookup{TEntity, TFilter}"/>.

@@ -1,3 +1,4 @@
+using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
 

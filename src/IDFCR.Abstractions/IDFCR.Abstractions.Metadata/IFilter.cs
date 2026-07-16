@@ -1,4 +1,4 @@
-namespace IDFCR.Abstractions.Filters;
+﻿namespace IDFCR.Abstractions.Metadata;
 
 /// <summary>
 /// Marker interface for filters.

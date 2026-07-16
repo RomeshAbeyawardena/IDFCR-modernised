@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IDFCR.Abstractions.Metadata;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace IDFCR.Abstractions.Filters;
+namespace IDFCR.Abstractions.Lookups;
 
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
