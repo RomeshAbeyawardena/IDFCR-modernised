@@ -383,6 +383,43 @@ internal sealed class AsyncLookupTests
         }));
     }
 
+    [Test]
+    public async Task AsyncLookupBase_HasAsync_ObjectOverload_WithMatchingFilter_InvokesTypedHasAsync()
+    {
+        using var lookup = new FirstTypedCustomerLookup();
+
+        var hasEntity = await lookup.HasAsync(new AsyncLookupTypedFilter(), CancellationToken.None);
+
+        Assert.That(hasEntity, Is.True);
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(FirstTypedCustomerLookup)}.{nameof(FirstTypedCustomerLookup.HasAsync)}"
+        }));
+    }
+
+    [Test]
+    public void AsyncLookupBase_HasAsync_ObjectOverload_WithInvalidFilterType_ThrowsArgumentException()
+    {
+        using var lookup = new FirstTypedCustomerLookup();
+
+        Assert.That(async () => await lookup.HasAsync(new AsyncLookupObjectFilter(), CancellationToken.None),
+            Throws.TypeOf<ArgumentException>().With.Message.Contain($"Expected {nameof(AsyncLookupTypedFilter)}"));
+    }
+
+    [Test]
+    public async Task AsyncLookupBase_HasAsync_ObjectOverload_WithInterfaceGenericAndConcreteFilter_Succeeds()
+    {
+        using var lookup = new InterfaceFilterTypedCustomerLookup();
+
+        var hasEntity = await lookup.HasAsync(new AsyncLookupConcreteInterfaceFilter(), CancellationToken.None);
+
+        Assert.That(hasEntity, Is.True);
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(InterfaceFilterTypedCustomerLookup.HasAsync)}"
+        }));
+    }
+
     private static ServiceProvider BuildServiceProvider(Action<IServiceCollection>? configure = null)
     {
         var services = new ServiceCollection();

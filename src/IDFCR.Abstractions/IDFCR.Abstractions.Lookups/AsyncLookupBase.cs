@@ -48,14 +48,7 @@ public abstract class AsyncLookupBase<TEntity, TFilter> : IAsyncLookup<TEntity, 
     /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
     public abstract Task<bool> HasAsync(TFilter filter, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Determines whether an entity exists that matches the provided filter of type <typeparamref name="TFilter"/>.
-    /// </summary>
-    /// <param name="filter">The filter criteria to apply for the lookup.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
-    /// <exception cref="ArgumentException">Thrown when the provided filter is not of the expected type <typeparamref name="TFilter"/>.</exception>
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<TEntity>.HasAsync(object? filter, CancellationToken cancellationToken)
     {
         if (filter is not TFilter typedFilter)
         {
