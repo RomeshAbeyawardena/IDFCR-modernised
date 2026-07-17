@@ -25,7 +25,7 @@ internal sealed class AsyncLookupTests
 
         var results = await factory.LookupAsync<Customer>(new AsyncLookupObjectFilter(), CancellationToken.None);
 
-        Assert.That(results, Is.Empty);
+        Assert.That(results.Results, Is.Empty);
         Assert.That(AsyncLookupTestLog.Events, Is.Empty);
     }
 
@@ -42,10 +42,16 @@ internal sealed class AsyncLookupTests
         var factory = CreateFactory(serviceProvider);
         var filter = new AsyncLookupObjectFilter();
 
-        var results = (await factory.LookupAsync<Customer>(filter, CancellationToken.None)).Results.Select(x => x.Result).ToArray();
+        var lookupResults = await factory.LookupAsync<Customer>(filter, CancellationToken.None);
+        var results = lookupResults.Results.Select(x => x.Result).ToArray();
 
         Assert.That(results, Has.Length.EqualTo(2));
         Assert.That(results.Select(customer => customer.FirstName), Is.EqualTo(new[] { "First", "Second" }));
+        Assert.That(lookupResults.Results.Select(x => x.Provider), Is.EqualTo(new[]
+        {
+            typeof(FirstObjectCustomerLookup),
+            typeof(SecondObjectCustomerLookup)
+        }));
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(FirstObjectCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
@@ -72,10 +78,16 @@ internal sealed class AsyncLookupTests
         var factory = CreateFactory(serviceProvider);
         var filter = new AsyncLookupTypedFilter();
 
-        var results = (await factory.LookupAsync<Customer, AsyncLookupTypedFilter>(filter, CancellationToken.None)).ToArray();
+        var lookupResults = await factory.LookupAsync<Customer, AsyncLookupTypedFilter>(filter, CancellationToken.None);
+        var results = lookupResults.Results.Select(x => x.Result).ToArray();
 
         Assert.That(results, Has.Length.EqualTo(2));
         Assert.That(results.Select(customer => customer.FirstName), Is.EqualTo(new[] { "First", "Second" }));
+        Assert.That(lookupResults.Results.Select(x => x.Provider), Is.EqualTo(new[]
+        {
+            typeof(FirstTypedCustomerLookup),
+            typeof(SecondTypedCustomerLookup)
+        }));
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(FirstTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
@@ -101,7 +113,7 @@ internal sealed class AsyncLookupTests
 
         var results = await factory.LookupAsync<Customer>(null!, CancellationToken.None);
 
-        Assert.That(results, Is.Empty);
+        Assert.That(results.Results, Is.Empty);
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(FirstObjectCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}"
@@ -122,7 +134,7 @@ internal sealed class AsyncLookupTests
 
         var results = await factory.LookupAsync<Customer, AsyncLookupTypedFilter>(filter!, CancellationToken.None);
 
-        Assert.That(results, Is.Empty);
+        Assert.That(results.Results, Is.Empty);
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(FirstTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}"
@@ -182,7 +194,7 @@ internal sealed class AsyncLookupTests
 
         var results = await factory.LookupAsync<Customer>(new AsyncLookupObjectFilter(), CancellationToken.None);
 
-        Assert.That(results, Is.Empty);
+        Assert.That(results.Results, Is.Empty);
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(SkippingObjectCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}"
@@ -202,7 +214,7 @@ internal sealed class AsyncLookupTests
 
         var results = await factory.LookupAsync<Customer, AsyncLookupTypedFilter>(new AsyncLookupTypedFilter(), CancellationToken.None);
 
-        Assert.That(results, Is.Empty);
+        Assert.That(results.Results, Is.Empty);
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(SkippingTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}"
@@ -303,10 +315,15 @@ internal sealed class AsyncLookupTests
         var factory = CreateFactory(serviceProvider);
         var filter = new AsyncLookupConcreteInterfaceFilter();
 
-        var results = (await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(filter, CancellationToken.None)).ToArray();
+        var lookupResults = await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(filter, CancellationToken.None);
+        var results = lookupResults.Results.Select(x => x.Result).ToArray();
 
         Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].FirstName, Is.EqualTo("Interface"));
+        Assert.That(lookupResults.Results.Select(x => x.Provider), Is.EqualTo(new[]
+        {
+            typeof(InterfaceFilterTypedCustomerLookup)
+        }));
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
@@ -326,9 +343,14 @@ internal sealed class AsyncLookupTests
 
         var factory = CreateFactory(serviceProvider);
 
-        var results = (await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(new AsyncLookupDifferentInterfaceFilter(), CancellationToken.None)).ToArray();
+        var lookupResults = await factory.LookupAsync<Customer, IAsyncLookupInterfaceFilter>(new AsyncLookupDifferentInterfaceFilter(), CancellationToken.None);
+        var results = lookupResults.Results.Select(x => x.Result).ToArray();
 
         Assert.That(results, Has.Length.EqualTo(1));
+        Assert.That(lookupResults.Results.Select(x => x.Provider), Is.EqualTo(new[]
+        {
+            typeof(InterfaceFilterTypedCustomerLookup)
+        }));
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer>.CanLookupAsync)}",
