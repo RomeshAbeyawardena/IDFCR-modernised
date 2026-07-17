@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Metadata.Attributes;
 using System.ComponentModel;
 
 namespace IDFCR.Abstractions.Interceptors.Tests;

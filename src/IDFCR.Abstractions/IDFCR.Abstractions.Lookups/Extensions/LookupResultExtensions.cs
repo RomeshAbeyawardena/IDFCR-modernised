@@ -8,7 +8,8 @@ namespace IDFCR.Abstractions.Lookups.Extensions;
 public static class LookupResultExtensions
 {
     /// <summary>
-    /// Gets the first result from the lookup results.
+    /// Gets the first result from the lookup results or <c>null</c> if no results are available.
+    /// If multiple providers were invoked their results will be omitted.
     /// </summary>
     /// <typeparam name="TResult">The type of the lookup result.</typeparam>
     /// <param name="lookup">The lookup results.</param>

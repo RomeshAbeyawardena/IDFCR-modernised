@@ -3,6 +3,7 @@ using IDFCR.Abstractions.Interceptors.Factories;
 using IDFCR.Abstractions.Interceptors.Interceptors;
 using IDFCR.Abstractions.Interceptors.Providers;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Metadata.Attributes;
 using NUnit.Framework;
 using System.ComponentModel;
 
