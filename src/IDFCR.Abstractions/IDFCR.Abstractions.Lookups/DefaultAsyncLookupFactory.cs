@@ -3,6 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Lookups;
 
+internal record LookupResult
+{
+
+}
+
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
     private async Task<IEnumerable<TResult>> InScope<TResult, TEntity, TFilter>(TFilter filter,
