@@ -3,14 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Lookups;
 
-internal record LookupResult
-{
-
-}
-
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
-    private async Task<IEnumerable<TResult>> InScope<TResult, TEntity, TFilter>(TFilter filter,
+    private async Task<ILookupResults<TResult>> InScope<TResult, TEntity, TFilter>(TFilter filter,
         Func<IAsyncLookup<TEntity, TFilter>, CancellationToken, Task<TResult?>> resultFactory,
         CancellationToken cancellationToken)
         where TEntity : class
@@ -19,7 +14,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
         using var scope = serviceProvider.CreateScope();
 
         var lookupProviders = scope.ServiceProvider.GetServices<IAsyncLookup<TEntity, TFilter>>();
-        List<TResult> collectiveResults = [];
+        LookupResultsBuilder<TResult> collectiveResults = new();
 
         foreach (var lookup in lookupProviders)
         {
@@ -32,21 +27,21 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
             if (result is not null)
             {
-                collectiveResults.Add(result);
+                collectiveResults.Add(lookup.GetType(), result);
             }
         }
 
-        return collectiveResults;
+        return new LookupResults<TResult>(collectiveResults.Build());
     }
 
-    private async Task<IEnumerable<TResult>> InScope<TResult, TEntity>(object? filter,
+    private async Task<ILookupResults<TResult>> InScope<TResult, TEntity>(object? filter,
         Func<IAsyncLookup<TEntity>, CancellationToken, Task<TResult?>> resultFactory, 
         CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
 
         var lookupProviders = scope.ServiceProvider.GetServices<IAsyncLookup<TEntity>>();
-        List<TResult> collectiveResults = [];
+        LookupResultsBuilder<TResult> collectiveResults = new();
 
         foreach (var lookup in lookupProviders)
         {
@@ -59,11 +54,11 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
             if (result is not null)
             {
-                collectiveResults.Add(result);
+                collectiveResults.Add(lookup.GetType(), result);
             }
         }
 
-        return collectiveResults;
+        return new LookupResults<TResult>(collectiveResults.Build());
     }
 
     public async Task<bool> HasAsync<TEntity>(object? filter, CancellationToken cancellationToken)
@@ -73,7 +68,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
             return await provider.HasAsync(filter, ct);
         }, cancellationToken);
 
-        return results.Any(x => x);
+        return results.Results.Any(x => x.Result);
     }
 
     public async Task<bool> HasAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
@@ -85,10 +80,10 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
             return await provider.HasAsync(filter, ct);
         }, cancellationToken);
 
-        return results.Any(x => x);
+        return results.Results.Any(x => x.Result);
     }
     
-    public async Task<IEnumerable<TEntity>> LookupAsync<TEntity>(object filter, CancellationToken cancellationToken)
+    public async Task<ILookupResults<TEntity>> LookupAsync<TEntity>(object filter, CancellationToken cancellationToken)
         where TEntity : class
     {
         var results = await InScope<TEntity, TEntity>(filter, async (provider, ct) =>
@@ -99,7 +94,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
         return results;
     }
 
-    public async Task<IEnumerable<TEntity>> LookupAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
+    public async Task<ILookupResults<TEntity>> LookupAsync<TEntity, TFilter>(TFilter filter, CancellationToken cancellationToken)
         where TEntity : class
         where TFilter : IFilter
     {
