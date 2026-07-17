@@ -2,6 +2,7 @@
 
 using IDFCR.Abstractions.Filters.Tests.Assets;
 using IDFCR.Abstractions.Lookups;
+using IDFCR.Abstractions.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -418,6 +419,32 @@ internal sealed class AsyncLookupTests
         {
             $"{nameof(InterfaceFilterTypedCustomerLookup)}.{nameof(InterfaceFilterTypedCustomerLookup.HasAsync)}"
         }));
+    }
+
+    [Test]
+    public void IAsyncLookupFactory_HasAsyncTypedOverload_ConstrainsTFilterToIFilter()
+    {
+        var method = typeof(IAsyncLookupFactory)
+            .GetMethods()
+            .Single(candidate => candidate.Name == nameof(IAsyncLookupFactory.HasAsync) && candidate.GetGenericArguments().Length == 2);
+
+        var tFilterArgument = method.GetGenericArguments().Single(argument => argument.Name == "TFilter");
+        var constraints = tFilterArgument.GetGenericParameterConstraints();
+
+        Assert.That(constraints, Has.Some.EqualTo(typeof(IFilter)));
+    }
+
+    [Test]
+    public void IAsyncLookupFactory_LookupAsyncTypedOverload_ConstrainsTFilterToIFilter()
+    {
+        var method = typeof(IAsyncLookupFactory)
+            .GetMethods()
+            .Single(candidate => candidate.Name == nameof(IAsyncLookupFactory.LookupAsync) && candidate.GetGenericArguments().Length == 2);
+
+        var tFilterArgument = method.GetGenericArguments().Single(argument => argument.Name == "TFilter");
+        var constraints = tFilterArgument.GetGenericParameterConstraints();
+
+        Assert.That(constraints, Has.Some.EqualTo(typeof(IFilter)));
     }
 
     private static ServiceProvider BuildServiceProvider(Action<IServiceCollection>? configure = null)
