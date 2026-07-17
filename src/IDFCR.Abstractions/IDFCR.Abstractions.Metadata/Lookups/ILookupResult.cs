@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Metadata;
+﻿namespace IDFCR.Abstractions.Metadata.Lookups;
 
 /// <summary>
 /// Represents the result of a lookup operation, including the provider type and the result object.

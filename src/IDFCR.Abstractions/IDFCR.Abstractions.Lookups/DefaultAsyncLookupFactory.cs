@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Metadata.Lookups;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Lookups;

@@ -42,7 +42,7 @@ internal sealed class AsyncLookupTests
         var factory = CreateFactory(serviceProvider);
         var filter = new AsyncLookupObjectFilter();
 
-        var results = (await factory.LookupAsync<Customer>(filter, CancellationToken.None)).ToArray();
+        var results = (await factory.LookupAsync<Customer>(filter, CancellationToken.None)).Results.Select(x => x.Result).ToArray();
 
         Assert.That(results, Has.Length.EqualTo(2));
         Assert.That(results.Select(customer => customer.FirstName), Is.EqualTo(new[] { "First", "Second" }));

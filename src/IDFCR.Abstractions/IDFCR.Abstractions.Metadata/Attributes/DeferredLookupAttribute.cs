@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Metadata;
+﻿namespace IDFCR.Abstractions.Metadata.Attributes;
 
 /// <summary>
 /// Represents a custom attribute that can be applied to properties or fields to indicate that they should be treated as deferred lookups during auditing processes. This attribute allows developers to specify a lookup key that can be used to perform asynchronous lookups for the property or field when generating audit descriptions. By applying this attribute to a property or field, developers can enable the inclusion of additional information in audit logs by performing deferred lookups based on the specified key, enhancing the auditing capabilities and providing more comprehensive audit records for applications and systems that utilize auditing mechanisms for tracking entity modifications.

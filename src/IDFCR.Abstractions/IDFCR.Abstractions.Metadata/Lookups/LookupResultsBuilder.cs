@@ -1,4 +1,4 @@
-﻿namespace IDFCR.Abstractions.Metadata;
+﻿namespace IDFCR.Abstractions.Metadata.Lookups;
 
 /// <summary>
 /// Represents a builder for constructing lookup results, allowing the addition and removal of individual lookup results before building the final collection of results.

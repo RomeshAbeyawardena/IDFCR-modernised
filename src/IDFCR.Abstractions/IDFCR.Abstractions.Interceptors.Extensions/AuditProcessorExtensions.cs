@@ -1,6 +1,6 @@
 ﻿using FastMember;
 using IDFCR.Abstractions.Interceptors.Processors;
-using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Metadata.Attributes;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text;

@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Metadata.Lookups;
 
 namespace IDFCR.Abstractions.Lookups;
 
