@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 
 namespace IDFCR.Abstractions.Lookups;
 
@@ -11,57 +12,91 @@ public abstract class AsyncLookupBase<TEntity, TFilter> : IAsyncLookup<TEntity, 
     where TEntity : class
     where TFilter : IFilter
 {
-    Task<TEntity?> IAsyncLookup<TEntity>.LookupAsync(object? filter, CancellationToken cancellationToken)
-    {
-        if (filter is not TFilter typedFilter)
-        {
-            throw new ArgumentException($"Invalid filter type. Expected {typeof(TFilter).Name}.", nameof(filter));
-        }
-
-        return LookupAsync(typedFilter, cancellationToken);
-    }
-
-    /// <summary>
-    /// Looks up an entity of type <typeparamref name="TEntity"/> based on the provided filter of type <typeparamref name="TFilter"/>.
-    /// </summary>
-    /// <param name="filter">The filter criteria to apply for the lookup.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>The entity that matches the filter criteria.</returns>
-    public abstract Task<TEntity?> LookupAsync(TFilter filter, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Determines whether the provided filter can be used for lookup.
-    /// </summary>
-    /// <param name="filter">The filter criteria to check.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>True if the filter can be used for lookup; otherwise, false.</returns>
-    public virtual Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         return Task.FromResult(filter is TFilter);
     }
 
     /// <summary>
-    /// Determines whether an entity exists that matches the provided filter of type <typeparamref name="TFilter"/>.
+    /// Determines whether an entity of type <typeparamref name="TEntity"/> exists based on the provided filter of type <typeparamref name="TFilter"/>.
     /// </summary>
-    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="filter">The filter to apply for the lookup.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
-    public abstract Task<bool> HasAsync(TFilter filter, CancellationToken cancellationToken);
+    /// <returns>A task that represents the asynchronous operation. The task result contains a unit result indicating whether the entity exists.</returns>
+    protected virtual async Task<IUnitResult<bool>> HasResultAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        var result = await HasAsync(filter, cancellationToken);
+
+        return UnitResult.FromResult(result);
+    }
 
     /// <summary>
-    /// Determines whether an entity exists that matches the provided filter of type <typeparamref name="TFilter"/>.
+    /// Looks up an entity of type <typeparamref name="TEntity"/> based on the provided filter of type <typeparamref name="TFilter"/>.
     /// </summary>
-    /// <param name="filter">The filter criteria to apply for the lookup.</param>
+    /// <param name="filter">The filter to apply for the lookup.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>True if an entity exists that matches the filter criteria; otherwise, false.</returns>
-    /// <exception cref="ArgumentException">Thrown when the provided filter is not of the expected type <typeparamref name="TFilter"/>.</exception>
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    /// <returns>A task that represents the asynchronous operation. The task result contains a unit result with the found entity or an indication that the entity was not found.</returns>
+    protected virtual async Task<IUnitResult<TEntity>> LookupResultAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        var result = await LookupAsync(filter, cancellationToken);
+
+        if (result is null)
+        {
+            return UnitResult.NotFound<TEntity>(filter, new NullReferenceException("Entity not found"));
+        }
+
+        return UnitResult.FromResult(result);
+    }
+
+    /// <summary>
+    /// Determines whether an entity of type <typeparamref name="TEntity"/> exists based on the provided filter of type <typeparamref name="TFilter"/>.
+    /// </summary>
+    /// <param name="filter">The filter to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the entity exists.</returns>
+    protected virtual Task<bool> HasAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(false);
+    }
+    /// <summary>
+    /// Looks up an entity of type <typeparamref name="TEntity"/> based on the provided filter of type <typeparamref name="TFilter"/>.
+    /// </summary>
+    /// <param name="filter">The filter to apply for the lookup.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the found entity or null if not found.</returns>
+    protected virtual Task<TEntity?> LookupAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(default(TEntity));
+    }
+
+    Task<IUnitResult<bool>> IAsyncLookup<TEntity, TFilter>.HasAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        return HasResultAsync(filter, cancellationToken);
+    }
+
+    Task<IUnitResult<bool>> IAsyncLookup<TEntity>.HasAsync(object? filter, CancellationToken cancellationToken)
     {
         if (filter is not TFilter typedFilter)
         {
             throw new ArgumentException($"Invalid filter type. Expected {typeof(TFilter).Name}.", nameof(filter));
         }
 
-        return HasAsync(typedFilter, cancellationToken);
+        return HasResultAsync(typedFilter, cancellationToken);
+    }
+
+    Task<IUnitResult<TEntity>> IAsyncLookup<TEntity, TFilter>.LookupAsync(TFilter filter, CancellationToken cancellationToken)
+    {
+        return LookupResultAsync(filter, cancellationToken);
+    }
+
+    Task<IUnitResult<TEntity>> IAsyncLookup<TEntity>.LookupAsync(object? filter, CancellationToken cancellationToken)
+    {
+        if (filter is not TFilter typedFilter)
+        {
+            throw new ArgumentException($"Invalid filter type. Expected {typeof(TFilter).Name}.", nameof(filter));
+        }
+
+        return LookupResultAsync(typedFilter, cancellationToken);
     }
 }

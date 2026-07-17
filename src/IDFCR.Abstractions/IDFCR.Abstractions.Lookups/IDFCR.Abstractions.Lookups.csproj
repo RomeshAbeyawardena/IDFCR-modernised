@@ -9,6 +9,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IDFCR.Abstractions.Metadata\IDFCR.Abstractions.Metadata.csproj" />
+    <ProjectReference Include="..\IDFCR.Abstractions.Results\IDFCR.Abstractions.Results.csproj" />
   </ItemGroup>
  </Project>

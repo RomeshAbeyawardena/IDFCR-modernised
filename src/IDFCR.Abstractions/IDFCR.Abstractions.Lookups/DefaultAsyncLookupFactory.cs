@@ -1,5 +1,6 @@
 ﻿using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Metadata.Lookups;
+using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Lookups;
@@ -7,7 +8,7 @@ namespace IDFCR.Abstractions.Lookups;
 internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider) : IAsyncLookupFactory
 {
     private async Task<ILookupResults<TResult>> InScope<TResult, TEntity, TFilter>(TFilter filter,
-        Func<IAsyncLookup<TEntity, TFilter>, CancellationToken, Task<TResult?>> resultFactory,
+        Func<IAsyncLookup<TEntity, TFilter>, CancellationToken, Task<IUnitResult<TResult>>> resultFactory,
         CancellationToken cancellationToken)
         where TEntity : class
         where TFilter : IFilter
@@ -28,7 +29,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
             if (result is not null)
             {
-                collectiveResults.Add(lookup.GetType(), result);
+                collectiveResults.Add(new LookupUnitResult<TResult>(lookup.GetType(), result));
             }
         }
 
@@ -36,7 +37,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
     }
 
     private async Task<ILookupResults<TResult>> InScope<TResult, TEntity>(object? filter,
-        Func<IAsyncLookup<TEntity>, CancellationToken, Task<TResult?>> resultFactory, 
+        Func<IAsyncLookup<TEntity>, CancellationToken, Task<IUnitResult<TResult>>> resultFactory, 
         CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
@@ -55,7 +56,7 @@ internal sealed class DefaultAsyncLookupFactory(IServiceProvider serviceProvider
 
             if (result is not null)
             {
-                collectiveResults.Add(lookup.GetType(), result);
+                collectiveResults.Add(new LookupUnitResult<TResult>(lookup.GetType(), result));
             }
         }
 

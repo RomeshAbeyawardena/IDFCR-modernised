@@ -17,7 +17,17 @@ public class LookupResultsBuilder<T>
     /// <returns>The current instance of the builder, allowing for method chaining.</returns>
     public ILookupResultsBuilder<T> Add(Type provider, T? item)
     {
-        results.Add(new LookupResult<T>(provider, item));
+        return Add(new LookupResult<T>(provider, item));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public ILookupResultsBuilder<T> Add(ILookupResult<T> result)
+    {
+        results.Add(result);
         return this;
     }
 
