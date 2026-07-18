@@ -26,7 +26,8 @@ public static class ServerCallContextExtensions
             Message = detail,
             Details =
             {
-                Any.Pack(result.From())
+                Any.Pack(result.From(),
+                "https://schema.idfcr.net/common/")
             }
         };
     }
