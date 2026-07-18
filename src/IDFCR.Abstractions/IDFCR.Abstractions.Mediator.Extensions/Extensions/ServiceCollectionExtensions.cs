@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
+using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -45,6 +46,11 @@ public static class ServiceCollectionExtensions
         }
 
         services.TryAdd(ServiceDescriptor.Singleton(TimeProvider.System));
+
+        if (options.UseFluentValidationProcessor)
+        {
+            services.TryAddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
+        }
 
         return services
             .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))

@@ -18,4 +18,9 @@ public record MediatorServiceCollectionOptions
     /// Gets or sets a value indicating whether to use the AuditEntityPostPipelineProcessor in the MediatR pipeline. If set to true, the AuditEntityPostPipelineProcessor will be added as an open request post-processor, allowing it to handle auditing of entities after request processing. If set to false, the AuditEntityPostPipelineProcessor will not be included in the pipeline, and you will need to handle entity auditing manually if needed. The default value is false, which means that the AuditEntityPostPipelineProcessor will not be used by default.
     /// </summary>
     public bool UseAuditEntityPostPipelineProcessor { get; init; } = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to use the FluentValidationProcessor in the MediatR pipeline. If set to true, the FluentValidationProcessor will be added as an open request pre-processor, allowing it to handle validation of requests using FluentValidation before request processing. If set to false, the FluentValidationProcessor will not be included in the pipeline, and you will need to handle request validation manually if needed. The default value is false, which means that the FluentValidationProcessor will not be used by default.
+    /// </summary>
+    public bool UseFluentValidationProcessor { get; init; } = false;
 }
