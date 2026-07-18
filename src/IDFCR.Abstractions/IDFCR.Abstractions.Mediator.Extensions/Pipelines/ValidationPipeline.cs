@@ -1,21 +1,29 @@
 ﻿using FluentValidation;
+using IDFCR.Utilities.Extensions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
-public class ValidationPipeline<TRequest, TResponse>(
+internal class ValidationPipeline;
+
+internal class ValidationPipeline<TRequest, TResponse>(
+    ILogger<ValidationPipeline> logger,
     IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
+    where TRequest: notnull
 {
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
+        logger.LogMethod(LogLevel.Information, "Validating request of type {RequestType}", args: typeof(TRequest).Name);
         IValidator<TRequest>[] validatorsArray = [.. validators];
 
         if (validatorsArray.Length == 0)
         {
+            logger.LogMethod(LogLevel.Information, "No validators found for request of type {RequestType}", args: typeof(TRequest).Name);
             return await next(cancellationToken);
         }
 
@@ -25,13 +33,16 @@ public class ValidationPipeline<TRequest, TResponse>(
             validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
         var errors = results.Where(x => !x.IsValid)
-            .SelectMany(x => x.Errors);
+            .SelectMany(x => x.Errors)
+            .ToArray();
 
-        if (errors.Any())
+        if (errors.Length > 0)
         {
+            logger.LogMethod(LogLevel.Information, "Validation failed for request of type {RequestType}: Total {count} errors", args: [typeof(TRequest).Name, errors.Length]);
             throw new ValidationException("Validation errors have occurred", errors);
         }
 
+        logger.LogMethod(LogLevel.Information, "Validation completed for request of type {RequestType}: No errors found.", args: typeof(TRequest).Name);
         return await next(cancellationToken);
     }
 }
