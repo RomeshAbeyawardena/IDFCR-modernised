@@ -1,4 +1,5 @@
 using IDFCR.Abstractions.Lookups;
+using IDFCR.Abstractions.Results;
 
 namespace IDFCR.Abstractions.Filters.Tests.Assets;
 
@@ -10,22 +11,23 @@ public sealed class FirstObjectCustomerLookup : IAsyncLookup<Customer>, IDisposa
         return Task.FromResult(filter is AsyncLookupObjectFilter);
     }
 
-    public Task<Customer> LookupAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<Customer>> LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(FirstObjectCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult(new Customer
+
+        return Task.FromResult<IUnitResult<Customer>>(UnitResult.FromResult(new Customer
         {
             Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
             FirstName = "First",
             LastName = "Object",
             CreatedTimestampUtc = DateTimeOffset.UtcNow
-        });
+        }));
     }
 
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<bool>> HasAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(FirstObjectCustomerLookup), nameof(HasAsync), filter, cancellationToken);
-        return Task.FromResult(filter is AsyncLookupObjectFilter);
+        return Task.FromResult<IUnitResult<bool>>(UnitResult.FromResult(filter is AsyncLookupObjectFilter));
     }
 
     public void Dispose()
@@ -42,22 +44,23 @@ public sealed class SecondObjectCustomerLookup : IAsyncLookup<Customer>, IDispos
         return Task.FromResult(filter is AsyncLookupObjectFilter);
     }
 
-    public Task<Customer> LookupAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<Customer>> LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SecondObjectCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult(new Customer
+
+        return Task.FromResult<IUnitResult<Customer>>(UnitResult.FromResult(new Customer
         {
             Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
             FirstName = "Second",
             LastName = "Object",
             CreatedTimestampUtc = DateTimeOffset.UtcNow
-        });
+        }));
     }
 
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<bool>> HasAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SecondObjectCustomerLookup), nameof(HasAsync), filter, cancellationToken);
-        return Task.FromResult(filter is AsyncLookupObjectFilter);
+        return Task.FromResult<IUnitResult<bool>>(UnitResult.FromResult(filter is AsyncLookupObjectFilter));
     }
 
     public void Dispose()
@@ -74,16 +77,16 @@ public sealed class SkippingObjectCustomerLookup : IAsyncLookup<Customer>, IDisp
         return Task.FromResult(false);
     }
 
-    public Task<Customer> LookupAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<Customer>> LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingObjectCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("LookupAsync should not be called when CanLookupAsync returns false.");
     }
 
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<bool>> HasAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingObjectCustomerLookup), nameof(HasAsync), filter, cancellationToken);
-        return Task.FromResult(false);
+        return Task.FromResult<IUnitResult<bool>>(UnitResult.FromResult(false));
     }
 
     public void Dispose()
@@ -100,16 +103,16 @@ public sealed class ThrowingObjectCustomerLookup : IAsyncLookup<Customer>, IDisp
         return Task.FromResult(filter is AsyncLookupObjectFilter);
     }
 
-    public Task<Customer> LookupAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<Customer>> LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingObjectCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("Object lookup failure.");
     }
 
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<bool>> HasAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingObjectCustomerLookup), nameof(HasAsync), filter, cancellationToken);
-        return Task.FromResult(filter is AsyncLookupObjectFilter);
+        return Task.FromResult<IUnitResult<bool>>(UnitResult.FromResult(filter is AsyncLookupObjectFilter));
     }
 
     public void Dispose()
@@ -118,18 +121,18 @@ public sealed class ThrowingObjectCustomerLookup : IAsyncLookup<Customer>, IDisp
     }
 }
 
-public sealed class FirstTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IDisposable
+public sealed class FirstTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(FirstTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
-        return base.CanLookupAsync(filter, cancellationToken);
+        return Task.FromResult(filter is AsyncLookupTypedFilter);
     }
 
-    public override Task<Customer> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(FirstTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult(new Customer
+        return Task.FromResult<Customer?>(new Customer
         {
             Id = Guid.Parse("00000000-0000-0000-0000-000000000101"),
             FirstName = "First",
@@ -138,7 +141,7 @@ public sealed class FirstTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLo
         });
     }
 
-    public override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(FirstTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(true);
@@ -150,18 +153,18 @@ public sealed class FirstTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLo
     }
 }
 
-public sealed class SecondTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IDisposable
+public sealed class SecondTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SecondTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
-        return base.CanLookupAsync(filter, cancellationToken);
+        return Task.FromResult(filter is AsyncLookupTypedFilter);
     }
 
-    public override Task<Customer> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SecondTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult(new Customer
+        return Task.FromResult<Customer?>(new Customer
         {
             Id = Guid.Parse("00000000-0000-0000-0000-000000000102"),
             FirstName = "Second",
@@ -170,7 +173,7 @@ public sealed class SecondTypedCustomerLookup : AsyncLookupBase<Customer, AsyncL
         });
     }
 
-    public override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SecondTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(true);
@@ -182,21 +185,21 @@ public sealed class SecondTypedCustomerLookup : AsyncLookupBase<Customer, AsyncL
     }
 }
 
-public sealed class SkippingTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IDisposable
+public sealed class SkippingTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
         return Task.FromResult(false);
     }
 
-    public override Task<Customer> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("LookupAsync should not be called when CanLookupAsync returns false.");
     }
 
-    public override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(false);
@@ -208,21 +211,21 @@ public sealed class SkippingTypedCustomerLookup : AsyncLookupBase<Customer, Asyn
     }
 }
 
-public sealed class ThrowingTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IDisposable
+public sealed class ThrowingTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
-        return base.CanLookupAsync(filter, cancellationToken);
+        return Task.FromResult(filter is AsyncLookupTypedFilter);
     }
 
-    public override Task<Customer> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("Typed lookup failure.");
     }
 
-    public override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(true);
@@ -242,13 +245,13 @@ public sealed class ThrowingCanLookupObjectCustomerLookup : IAsyncLookup<Custome
         throw new InvalidOperationException("Object can-lookup failure.");
     }
 
-    public Task<Customer> LookupAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<Customer>> LookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupObjectCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("LookupAsync should not be called after CanLookupAsync throws.");
     }
 
-    public Task<bool> HasAsync(object? filter, CancellationToken cancellationToken)
+    public Task<IUnitResult<bool>> HasAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupObjectCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         throw new InvalidOperationException("HasAsync should not be called in this scenario.");
@@ -260,21 +263,21 @@ public sealed class ThrowingCanLookupObjectCustomerLookup : IAsyncLookup<Custome
     }
 }
 
-public sealed class ThrowingCanLookupTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IDisposable
+public sealed class ThrowingCanLookupTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("Typed can-lookup failure.");
     }
 
-    public override Task<Customer> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("LookupAsync should not be called after CanLookupAsync throws.");
     }
 
-    public override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(ThrowingCanLookupTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(true);
@@ -286,18 +289,18 @@ public sealed class ThrowingCanLookupTypedCustomerLookup : AsyncLookupBase<Custo
     }
 }
 
-public sealed class InterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IDisposable
+public sealed class InterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
-        return base.CanLookupAsync(filter, cancellationToken);
+        return Task.FromResult(filter is IAsyncLookupInterfaceFilter);
     }
 
-    public override Task<Customer> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult(new Customer
+        return Task.FromResult<Customer?>(new Customer
         {
             Id = Guid.Parse("00000000-0000-0000-0000-000000000201"),
             FirstName = "Interface",
@@ -306,7 +309,7 @@ public sealed class InterfaceFilterTypedCustomerLookup : AsyncLookupBase<Custome
         });
     }
 
-    public override Task<bool> HasAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(InterfaceFilterTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(true);
@@ -318,21 +321,21 @@ public sealed class InterfaceFilterTypedCustomerLookup : AsyncLookupBase<Custome
     }
 }
 
-public sealed class SkippingInterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IDisposable
+public sealed class SkippingInterfaceFilterTypedCustomerLookup : AsyncLookupBase<Customer, IAsyncLookupInterfaceFilter>, IAsyncLookup<Customer>, IDisposable
 {
-    public override Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
         return Task.FromResult(false);
     }
 
-    public override Task<Customer> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    protected override Task<Customer?> LookupAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
         throw new InvalidOperationException("LookupAsync should not be called when CanLookupAsync returns false.");
     }
 
-    public override Task<bool> HasAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
+    protected override Task<bool> HasAsync(IAsyncLookupInterfaceFilter filter, CancellationToken cancellationToken)
     {
         AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
         return Task.FromResult(false);
