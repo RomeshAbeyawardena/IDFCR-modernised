@@ -3,6 +3,7 @@
 using IDFCR.Abstractions.Filters.Tests.Assets;
 using IDFCR.Abstractions.Lookups;
 using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -444,6 +445,23 @@ internal sealed class AsyncLookupTests
         Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
         {
             $"{nameof(InterfaceFilterTypedCustomerLookup)}.HasAsync"
+        }));
+    }
+
+    [Test]
+    public async Task AsyncLookupBase_ObjectLookup_WithNullTypedLookupResult_ReturnsNotFoundUnitResult()
+    {
+        using var lookup = new NullReturningTypedCustomerLookup();
+        var asyncLookup = (IAsyncLookup<Customer>)lookup;
+
+        var result = await asyncLookup.LookupAsync(new AsyncLookupTypedFilter(), CancellationToken.None);
+
+        Assert.That(result.IsSuccess, Is.False);
+        Assert.That(result.Result, Is.Null);
+        Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NotFound));
+        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+        {
+            $"{nameof(NullReturningTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, AsyncLookupTypedFilter>.LookupAsync)}"
         }));
     }
 
