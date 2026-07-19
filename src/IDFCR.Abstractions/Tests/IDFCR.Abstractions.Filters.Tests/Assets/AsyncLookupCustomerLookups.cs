@@ -346,29 +346,3 @@ public sealed class SkippingInterfaceFilterTypedCustomerLookup : AsyncLookupBase
         AsyncLookupTestLog.Record(nameof(SkippingInterfaceFilterTypedCustomerLookup), nameof(Dispose), null, default);
     }
 }
-
-public sealed class NullReturningTypedCustomerLookup : AsyncLookupBase<Customer, AsyncLookupTypedFilter>, IAsyncLookup<Customer>, IDisposable
-{
-    Task<bool> IAsyncLookup<Customer>.CanLookupAsync(object? filter, CancellationToken cancellationToken)
-    {
-        AsyncLookupTestLog.Record(nameof(NullReturningTypedCustomerLookup), nameof(CanLookupAsync), filter, cancellationToken);
-        return Task.FromResult(filter is AsyncLookupTypedFilter);
-    }
-
-    protected override Task<Customer?> LookupAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
-    {
-        AsyncLookupTestLog.Record(nameof(NullReturningTypedCustomerLookup), nameof(LookupAsync), filter, cancellationToken);
-        return Task.FromResult<Customer?>(null);
-    }
-
-    protected override Task<bool> HasAsync(AsyncLookupTypedFilter filter, CancellationToken cancellationToken)
-    {
-        AsyncLookupTestLog.Record(nameof(NullReturningTypedCustomerLookup), nameof(HasAsync), filter, cancellationToken);
-        return Task.FromResult(false);
-    }
-
-    public void Dispose()
-    {
-        AsyncLookupTestLog.Record(nameof(NullReturningTypedCustomerLookup), nameof(Dispose), null, default);
-    }
-}

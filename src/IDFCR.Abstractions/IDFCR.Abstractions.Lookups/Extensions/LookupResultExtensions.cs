@@ -8,6 +8,29 @@ namespace IDFCR.Abstractions.Lookups.Extensions;
 public static class LookupResultExtensions
 {
     /// <summary>
+    /// Attempts to cast the <see cref="ILookupResults{TResult}"/> to an <see cref="ILookupUnitResult{TResult}"/>.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the lookup result.</typeparam>
+    /// <param name="lookup">The lookup results.</param>
+    /// <returns>The lookup unit result.</returns>
+    /// <exception cref="InvalidCastException">Thrown when the lookup cannot be cast to <see cref="ILookupUnitResult{TResult}"/>.</exception>
+    public static ILookupUnitResult<TResult> RequireLookupUnitResult<TResult>(this ILookupResults<TResult> lookup)
+        where TResult : class
+    {
+        if (lookup is ILookupUnitResult<TResult> lookupUnitResult)
+        {
+            return lookupUnitResult;
+        }
+
+        throw new InvalidCastException("""
+            The default IDFCR lookup infrastructure returns lookup results that implement
+            ILookupUnitResult<TResult>. This exception typically occurs when the default
+            IAsyncLookupFactory has been replaced with a custom implementation that
+            returns only ILookupResults<TResult>.
+            """);
+    }
+
+    /// <summary>
     /// Gets the first result from the lookup results or <c>null</c> if no results are available.
     /// If multiple providers were invoked their results will be omitted.
     /// </summary>
