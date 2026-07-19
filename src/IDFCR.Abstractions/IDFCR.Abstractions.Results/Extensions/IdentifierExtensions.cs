@@ -9,6 +9,26 @@ namespace IDFCR.Abstractions.Results.Extensions;
 public static class IdentifierExtensions
 {
     /// <summary>
+    /// Determines whether the specified entity state is considered new.
+    /// </summary>
+    /// <param name="entityState">The entity state to check.</param>
+    /// <returns><c>true</c> if the entity state is new; otherwise, <c>false</c>.</returns>
+    public static bool IsNew(this EntityState entityState)
+    {
+        return entityState == EntityState.New;
+    }
+
+    /// <summary>
+    /// Determines whether the specified entity state is considered an update.
+    /// </summary>
+    /// <param name="entityState">The entity state to check.</param>
+    /// <returns><c>true</c> if the entity state is an update; otherwise, <c>false</c>.</returns>
+    public static bool IsUpdate(this EntityState entityState)
+    {
+        return entityState == EntityState.Update;
+    }
+
+    /// <summary>
     /// Gets the considered entity state of an identifiable entity based on its Id and returns the result along with the Id.
     /// </summary>
     /// <param name="identifiable">The identifiable entity to check.</param>
