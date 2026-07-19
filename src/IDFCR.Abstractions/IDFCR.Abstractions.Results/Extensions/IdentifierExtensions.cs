@@ -9,6 +9,15 @@ namespace IDFCR.Abstractions.Results.Extensions;
 public static class IdentifierExtensions
 {
     /// <summary>
+    /// Determines whether the specified entity state is considered invalid.
+    /// </summary>
+    /// <param name="entityState">The entity state to check.</param>
+    /// <returns><c>true</c> if the entity state is invalid; otherwise, <c>false</c>.</returns>
+    public static bool IsInvalid(this EntityState entityState)
+    {
+        return entityState == EntityState.Invalid;
+    }
+    /// <summary>
     /// Determines whether the specified entity state is considered new.
     /// </summary>
     /// <param name="entityState">The entity state to check.</param>
