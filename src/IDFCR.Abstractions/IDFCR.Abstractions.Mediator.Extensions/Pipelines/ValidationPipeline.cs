@@ -46,7 +46,8 @@ internal class ValidationPipeline<TRequest, TResponse>(
             foreach(var error in errors)
             {
                 errorMessageBuilder.AppendLine($"\tProperty {error.PropertyName} failed validation. Error: {error.ErrorMessage}");
-                logger.LogMethod(LogLevel.Information, "Validation error for request of type {RequestType}: Property {PropertyName} failed validation. Error: {ErrorMessage}", args: [typeof(TRequest).Name, error.PropertyName, error.ErrorMessage]);
+                logger.LogMethod(LogLevel.Information, "Validation error for request of type {RequestType}: Property {PropertyName} failed validation. Error: {ErrorMessage}", 
+                    args: [typeof(TRequest).Name, error.PropertyName, error.ErrorMessage]);
             }
 
             var newLine = Environment.NewLine;
