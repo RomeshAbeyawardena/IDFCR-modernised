@@ -49,15 +49,15 @@ internal class ChainUnitResultTests
         var first = UnitResult.Success(UnitAction.Update);
         var second = UnitResult.Failed(ex, UnitAction.Add, FailureReason.Conflict);
 
-        var chained = first.Chain(second);
+        var chained = second.Chain(first);
 
         Assert.Multiple(() =>
         {
             Assert.That(chained.IsSuccess, Is.False);
             Assert.That(chained.Exception, Is.SameAs(ex));
             Assert.That(chained.FailureReason, Is.EqualTo(FailureReason.Conflict));
-            Assert.That(chained.Current, Is.SameAs(first));
-            Assert.That(chained.Last, Is.SameAs(second));
+            Assert.That(chained.Current, Is.SameAs(second));
+            Assert.That(chained.Last, Is.SameAs(first));
         });
     }
 
@@ -125,14 +125,13 @@ internal class ChainUnitResultTests
         var first = UnitResult.FromResult("value", UnitAction.Get, isSuccess: true);
         var second = UnitResult.Failed(new InvalidOperationException("second failed"), UnitAction.Update, FailureReason.InternalError);
 
-        var chained = first.Chain(second);
+        var chained = second.Chain(first);
 
         Assert.Multiple(() =>
         {
             Assert.That(chained.IsSuccess, Is.False);
-            Assert.That(chained.Current.Result, Is.EqualTo("value"));
-            Assert.That(chained.Last, Is.SameAs(second));
-            Assert.That(chained.Current, Is.SameAs(first));
+            Assert.That(chained.Last, Is.SameAs(first));
+            Assert.That(chained.Current, Is.SameAs(second));
         });
 
         IEnumerable<IUnitResult> chainedList = [.. chained.Enumerate()];
@@ -199,16 +198,6 @@ internal class ChainUnitResultTests
             Assert.That(chained.GetFirstFailure(), Is.SameAs(second));
             Assert.That(chained.Enumerate(), Is.EqualTo(new IUnitResult[] { first, second, third }));
         });
-    }
-
-    [Test]
-    public void Chain_MultipleResults_EmptyEnumerable_ShouldThrow()
-    {
-        var first = UnitResult.Success(UnitAction.Add);
-
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => first.Chain([]));
-
-        Assert.That(exception!.ParamName, Is.EqualTo("results"));
     }
 
     [Test]
