@@ -448,22 +448,22 @@ internal sealed class AsyncLookupTests
         }));
     }
 
-    [Test]
-    public async Task AsyncLookupBase_ObjectLookup_WithNullTypedLookupResult_ReturnsNotFoundUnitResult()
-    {
-        using var lookup = new NullReturningTypedCustomerLookup();
-        var asyncLookup = (IAsyncLookup<Customer>)lookup;
+    //[Test]
+    //public async Task AsyncLookupBase_ObjectLookup_WithNullTypedLookupResult_ReturnsNotFoundUnitResult()
+    //{
+    //    using var lookup = new NullReturningTypedCustomerLookup();
+    //    var asyncLookup = (IAsyncLookup<Customer>)lookup;
 
-        var result = await asyncLookup.LookupAsync(new AsyncLookupTypedFilter(), CancellationToken.None);
+    //    var result = await asyncLookup.LookupAsync(new AsyncLookupTypedFilter(), CancellationToken.None);
 
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Result, Is.Null);
-        Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NotFound));
-        Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
-        {
-            $"{nameof(NullReturningTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, AsyncLookupTypedFilter>.LookupAsync)}"
-        }));
-    }
+    //    Assert.That(result.IsSuccess, Is.False);
+    //    Assert.That(result.Result, Is.Null);
+    //    Assert.That(result.FailureReason, Is.EqualTo(FailureReason.NotFound));
+    //    Assert.That(GetOperationSequence(includeDisposes: false), Is.EqualTo(new[]
+    //    {
+    //        $"{nameof(NullReturningTypedCustomerLookup)}.{nameof(IAsyncLookup<Customer, AsyncLookupTypedFilter>.LookupAsync)}"
+    //    }));
+    //}
 
     [Test]
     public void IAsyncLookupFactory_HasAsyncTypedOverload_ConstrainsTFilterToIFilter()

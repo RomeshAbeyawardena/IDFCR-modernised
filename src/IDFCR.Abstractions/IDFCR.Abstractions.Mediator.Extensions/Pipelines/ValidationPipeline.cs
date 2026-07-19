@@ -2,6 +2,7 @@
 using IDFCR.Utilities.Extensions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 
@@ -39,7 +40,17 @@ internal class ValidationPipeline<TRequest, TResponse>(
         if (errors.Length > 0)
         {
             logger.LogMethod(LogLevel.Information, "Validation failed for request of type {RequestType}: Total {count} errors", args: [typeof(TRequest).Name, errors.Length]);
-            throw new ValidationException("Validation errors have occurred", errors);
+
+            StringBuilder errorMessageBuilder = new();
+
+            foreach(var error in errors)
+            {
+                errorMessageBuilder.AppendLine($"\tProperty {error.PropertyName} failed validation. Error: {error.ErrorMessage}");
+                logger.LogMethod(LogLevel.Information, "Validation error for request of type {RequestType}: Property {PropertyName} failed validation. Error: {ErrorMessage}", args: [typeof(TRequest).Name, error.PropertyName, error.ErrorMessage]);
+            }
+
+            var newLine = Environment.NewLine;
+            throw new ValidationException($"The following validation errors have occurred:{newLine}{errorMessageBuilder}", errors);
         }
 
         logger.LogMethod(LogLevel.Information, "Validation completed for request of type {RequestType}: No errors found.", args: typeof(TRequest).Name);

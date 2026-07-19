@@ -59,11 +59,6 @@ public static class ServiceCollectionExtensions
 
         services.TryAdd(ServiceDescriptor.Singleton(TimeProvider.System));
 
-        if (options.UseFluentValidationProcessor)
-        {
-            services.TryAddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipeline<,>));
-        }
-
         return services
             .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))
             .AddMediatR(cfg =>
@@ -72,6 +67,12 @@ public static class ServiceCollectionExtensions
                 {
                     cfg.AddOpenRequestPostProcessor(typeof(UnitOfWorkPostPipelineProcessor<,>));
                 }
+
+                if (options.UseFluentValidationProcessor)
+                {
+                    cfg.AddOpenBehavior(typeof(ValidationPipeline<,>));
+                }
+
                 configuration?.Invoke(cfg);
                 if (options.RegisterServicesFromAssemblies)
                 {
