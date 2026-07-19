@@ -12,7 +12,7 @@ public static class IdentifierExtensions
     /// Gets the considered entity state of an identifiable entity based on its Id and returns the result along with the Id.
     /// </summary>
     /// <param name="identifiable">The identifiable entity to check.</param>
-    /// <param name="output">The output tuple containing the Id and the result of the state check.</param>
+    /// <param name="output">The output tuple containing the Id and the original result of the state check.</param>
     /// <returns>The considered state of the entity.</returns>
     public static EntityState GetEntityState(this IIdentifiable? identifiable,
         out (Guid? Id, IUnitResult Result) output)
