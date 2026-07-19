@@ -1,4 +1,6 @@
-﻿using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
+﻿using FluentValidation;
+using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
+using IDFCR.Abstractions.Results;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,16 @@ namespace IDFCR.Abstractions.Mediator.Extensions.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Configures the exception behavior manager to handle FluentValidation exceptions by setting a specific behavior for ValidationException. This extension method allows you to define how ValidationException should be handled within the exception behavior manager, specifying the unit action and failure reason associated with this type of exception. By calling this method, you can ensure that any ValidationException thrown during request processing is handled consistently according to the defined behavior.
+    /// </summary>
+    /// <param name="builder">The exception behavior manager builder.</param>
+    /// <returns>The updated exception behavior manager builder.</returns>
+    public static IExceptionBehaviourManagerBuilder SetFluentValidationBehaviours(this IExceptionBehaviourManagerBuilder builder)
+    {
+        return builder.Set<ValidationException>(new ExceptionBehaviour(UnitAction.Conflict, FailureReason.ValidationError));
+    }
+
     /// <summary>
     /// Configures and registers an exception behavior manager as a singleton service in the dependency injection
     /// container.

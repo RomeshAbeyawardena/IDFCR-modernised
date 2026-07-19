@@ -13,7 +13,7 @@ public abstract class AsyncLookupBase<TEntity, TFilter> : IAsyncLookup<TEntity, 
     where TFilter : IFilter
 {
     /// <inheritdoc />
-    public Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
+    public virtual Task<bool> CanLookupAsync(object? filter, CancellationToken cancellationToken)
     {
         return Task.FromResult(filter is TFilter);
     }
