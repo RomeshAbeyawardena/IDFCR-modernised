@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <NoWarn>
+      $(NoWarn);
+      IDE0130
+    </NoWarn>
+  </PropertyGroup>
+</Project>
