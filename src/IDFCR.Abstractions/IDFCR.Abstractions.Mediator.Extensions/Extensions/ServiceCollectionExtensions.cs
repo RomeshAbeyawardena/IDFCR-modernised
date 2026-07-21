@@ -3,6 +3,7 @@ using IDFCR.Abstractions.Mediator.Extensions.Pipelines;
 using IDFCR.Abstractions.Results;
 using MediatR;
 using MediatR.Pipeline;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
@@ -48,11 +49,13 @@ public static class ServiceCollectionExtensions
     /// <para>Use this if you want to control the registration of MediatR services and exception handling pipelines.</para>
     /// </summary>
     /// <param name="services">The service collection to which MediatR services will be added.</param>
+    /// <param name="configuration">The configuration instance used to obtain MediatR license keys and other settings.</param>
     /// <param name="configureMediatr">A delegate that configures the MediatR services.</param>
     /// <param name="configureOptions">A delegate that configures the IDFCR service options.</param>
     /// <param name="assemblies">The assemblies from which MediatR services will be registered.</param>
     /// <returns>The service collection with MediatR services and exception handling pipelines registered.</returns>
     public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services, 
+        IConfiguration? configuration = null,
         Action<MediatRServiceConfiguration>? configureMediatr = null, 
         Action<IMediatorServiceCollectionOptionsBuilder>? configureOptions = null, 
         params Assembly[] assemblies)
@@ -64,14 +67,19 @@ public static class ServiceCollectionExtensions
 
         services.TryAdd(ServiceDescriptor.Singleton(TimeProvider.System));
 
-        var optionsBuilder = new DefaultMediatorServiceCollectionOptions();
+        var optionsBuilder = new DefaultMediatorServiceCollectionOptionsBuilder();
         configureOptions?.Invoke(optionsBuilder);
-        var options = optionsBuilder.Build();
+        var options = optionsBuilder.Build(configuration);
 
         return services
             .AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(GenericDefaultExceptionPipeline<,,>))
             .AddMediatR(cfg =>
             {
+                if (!string.IsNullOrWhiteSpace(options.MediatrLicenseKey))
+                {
+                    cfg.LicenseKey = options.MediatrLicenseKey;
+                }
+
                 if (options.UseUnitOfWorkPostPipelineProcessor)
                 {
                     cfg.AddOpenRequestPostProcessor(typeof(UnitOfWorkPostPipelineProcessor<,>));
@@ -82,11 +90,12 @@ public static class ServiceCollectionExtensions
                     cfg.AddOpenBehavior(typeof(ValidationPipeline<,>));
                 }
 
-                configureMediatr?.Invoke(cfg);
                 if (options.RegisterServicesFromAssemblies)
                 {
                     cfg.RegisterServicesFromAssemblies(assemblies);
                 }
+
+                configureMediatr?.Invoke(cfg);
             });
     }
 
@@ -94,14 +103,16 @@ public static class ServiceCollectionExtensions
     /// Adds MediatR services to the specified service collection, along with a default exception handling pipeline. This method allows you to configure MediatR services and register them from the provided assemblies, while also ensuring that any exceptions thrown during request processing are handled by the DefaultExceptionPipeline. The configuration action can be used to further customize the MediatR setup, such as adding additional behaviors or configuring options. By using this extension method, you can easily integrate MediatR with consistent exception handling across your application.
     /// </summary>
     /// <param name="services">The service collection to which MediatR services will be added.</param>
+    /// <param name="configuration">The configuration from which MediatR options can be retrieved.</param>
     /// <param name="configureOptions">A delegate that configures the IDFCR service options.</param>
     /// <param name="assemblies">The assemblies from which MediatR services will be registered.</param>
     /// <returns>The service collection with MediatR services and exception handling pipelines registered.</returns>
     public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services,
+        IConfiguration? configuration,
         Action<IMediatorServiceCollectionOptionsBuilder>? configureOptions = null,
         params Assembly[] assemblies)
     {
-        return services.AddMediatorServicesAndPipelines(null, configureOptions, assemblies);
+        return services.AddMediatorServicesAndPipelines(configuration, null, configureOptions, assemblies);
     }
 
     /// <summary>
@@ -111,9 +122,11 @@ public static class ServiceCollectionExtensions
     /// <param name="configureMediatr">A delegate that configures the MediatR services.</param>
     /// <param name="assemblies">The assemblies from which MediatR services will be registered.</param>
     /// <returns>The service collection with MediatR services and exception handling pipelines registered.</returns>
-    public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services, Action<MediatRServiceConfiguration>? configureMediatr, params Assembly[] assemblies)
+    public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services, 
+        Action<MediatRServiceConfiguration>? configureMediatr, 
+        params Assembly[] assemblies)
     {
-        return services.AddMediatorServicesAndPipelines(configureMediatr, null, assemblies);
+        return services.AddMediatorServicesAndPipelines(null, configureMediatr, null, assemblies);
     }
 
     /// <summary>
@@ -124,6 +137,6 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection with MediatR services and exception handling pipelines registered.</returns>
     public static IServiceCollection AddMediatorServicesAndPipelines(this IServiceCollection services, params Assembly[] assemblies)
     {
-        return services.AddMediatorServicesAndPipelines(null, null, assemblies);
+        return services.AddMediatorServicesAndPipelines(null, null, null, assemblies);
     }
 }
