@@ -1,4 +1,6 @@
-﻿namespace IDFCR.Abstractions.Mediator.Extensions.Extensions;
+﻿#pragma warning disable IDE0130
+namespace IDFCR.Abstractions.Mediator.Extensions;
+#pragma warning restore IDE0130
 
 /// <summary>
 /// Represents configuration options for adding MediatR services and pipelines to the dependency injection container. This record allows you to specify whether to register services from assemblies and whether to use a unit of work post-pipeline processor. By configuring these options, you can control the behavior of the MediatR service registration and the inclusion of specific pipelines, such as the UnitOfWorkPostPipelineProcessor, which handles unit of work operations after request processing. This provides flexibility in how MediatR services are set up and how they interact with other components in your application.
@@ -13,11 +15,6 @@ public record MediatorServiceCollectionOptions
     /// Gets or sets a value indicating whether to use the UnitOfWorkPostPipelineProcessor in the MediatR pipeline. If set to true, the UnitOfWorkPostPipelineProcessor will be added as an open request post-processor, allowing it to handle unit of work operations after request processing. If set to false, the UnitOfWorkPostPipelineProcessor will not be included in the pipeline, and you will need to handle unit of work operations manually if needed. The default value is true, which means that the UnitOfWorkPostPipelineProcessor will be used by default.
     /// </summary>
     public bool UseUnitOfWorkPostPipelineProcessor { get; init; } = true;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to use the AuditEntityPostPipelineProcessor in the MediatR pipeline. If set to true, the AuditEntityPostPipelineProcessor will be added as an open request post-processor, allowing it to handle auditing of entities after request processing. If set to false, the AuditEntityPostPipelineProcessor will not be included in the pipeline, and you will need to handle entity auditing manually if needed. The default value is false, which means that the AuditEntityPostPipelineProcessor will not be used by default.
-    /// </summary>
-    public bool UseAuditEntityPostPipelineProcessor { get; init; } = false;
 
     /// <summary>
     /// Gets or sets a value indicating whether to use the FluentValidationProcessor in the MediatR pipeline. If set to true, the FluentValidationProcessor will be added as an open request pre-processor, allowing it to handle validation of requests using FluentValidation before request processing. If set to false, the FluentValidationProcessor will not be included in the pipeline, and you will need to handle request validation manually if needed. The default value is false, which means that the FluentValidationProcessor will not be used by default.

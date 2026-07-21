@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
-using IDFCR.Abstractions.Metadata;
 using IDFCR.Abstractions.Results.Extensions;
 
+#pragma warning disable IDE0130
 namespace IDFCR.Abstractions.Mediator.Extensions;
+#pragma warning restore IDE0130
 
 /// <summary>
 /// Defines extension methods for FluentValidation's rule builder to add custom validation rules for identifiable entities.
