@@ -1,4 +1,5 @@
-﻿using IDFCR.Abstractions.Results;
+﻿using IDFCR.Abstractions.Metadata;
+using IDFCR.Abstractions.Results;
 using V1Common = IDFCR.Abstractions.GRPC.Contracts.Common.V1;
 namespace IDFCR.Abstractions.GRPC.Extensions;
 
@@ -8,10 +9,24 @@ namespace IDFCR.Abstractions.GRPC.Extensions;
 public static class UnitResultExtensions
 {
     /// <summary>
-    /// Defines an extension method to convert an IUnitResult from the gRPC contract type to the common UnitResult type.
+    /// Converts a gRPC contract StringListDelta to a common StringListDelta.
     /// </summary>
-    /// <param name="unitResult"></param>
-    /// <returns></returns>
+    /// <param name="delta">The gRPC contract StringListDelta to convert.</param>
+    /// <returns>A common StringListDelta representing the converted delta.</returns>
+    public static StringListDelta From(this V1Common.StringListDelta delta)
+    {
+        return new StringListDelta
+        {
+            Add = delta.Add,
+            Remove = delta.Remove
+        };
+    }
+
+    /// <summary>
+    /// Converts a common StringListDelta to a gRPC contract StringListDelta.
+    /// </summary>
+    /// <param name="unitResult">The common StringListDelta to convert.</param>
+    /// <returns>A gRPC contract StringListDelta representing the converted delta.</returns>
     public static V1Common.UnitResult From(this IUnitResult unitResult)
     {
         var result = new V1Common.UnitResult
