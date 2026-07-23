@@ -62,8 +62,14 @@ public static class UnitResult
     /// <param name="failureReason">The reason for the failure.</param>
     /// <param name="failureOrigin">The origin of the failure, if any.</param>
     /// <param name="namedResult">The name of the result, if any.</param>
-    public static IUnitResult<T> Failed<T>(Exception exception, UnitAction action = UnitAction.None, FailureReason? failureReason = null, FailureOrigin? failureOrigin = null, string? namedResult = null)
-        => new DefaultUnitResult<T>(default, action, false, exception, failureReason, namedResult, failureOrigin);
+    /// <param name="defaultValue">The default value to use for the result, if any.</param>
+    public static IUnitResult<T> Failed<T>(Exception exception, 
+        UnitAction action = UnitAction.None, 
+        FailureReason? failureReason = null, 
+        FailureOrigin? failureOrigin = null, 
+        string? namedResult = null, 
+        T? defaultValue = default)
+        => new DefaultUnitResult<T>(defaultValue, action, false, exception, failureReason, namedResult, failureOrigin);
 
     /// <summary>
     /// Creates a unit result from the supplied value.

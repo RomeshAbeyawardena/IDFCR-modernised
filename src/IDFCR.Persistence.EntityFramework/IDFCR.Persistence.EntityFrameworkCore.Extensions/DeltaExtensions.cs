@@ -22,7 +22,7 @@ public static class DeltaExtensions
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation, containing the result of the delta operation.</returns>
     public static async Task<RelationshipDeltaResult> PerformDeltaAsync<TEntity, TJoinEntity, TParentKey, TChildKey>(
-     this StringListDelta delta,
+     this IStringListDelta delta,
      DbContext context,
      TParentKey parentId,
      NamedDeltaOptions<TEntity, TJoinEntity, TParentKey, TChildKey> options,

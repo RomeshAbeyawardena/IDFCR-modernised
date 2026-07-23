@@ -268,7 +268,7 @@ namespace IDFCR.Abstractions.Persistence
 
                 if (!HasChanges(clonedEntity, foundEntry))
                 {
-                    return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
+                    return UnitResult.Failed(new InvalidOperationException("No changes detected"), UnitAction.Update, FailureReason.Conflict, defaultValue: clonedEntity.Id);
                 }
 
                 OnUpdate(foundEntry, entry);
