@@ -86,7 +86,7 @@ public sealed class GenericDefaultExceptionPipeline<TRequest, TResponse, TExcept
                     .FirstOrDefault(x => x.IsGenericMethod && x.Name.StartsWith(nameof(UnitResult.Failed)))?
                     .MakeGenericMethod(genericTypes) ?? throw new InvalidOperationException($"{GenericExceptionMessage}");
 
-                result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason, FailureOrigin.Internal, string.Empty])!;
+                result = (TResponse)methodInfo.Invoke(null, [finalException, behaviour.UnitAction, _saferException?.FailureReason ?? behaviour.FailureReason, FailureOrigin.Internal, string.Empty, null])!;
 
                 state.SetHandled(result);
 

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package idfcr.abstractions.grpc.contracts.common;
+
+option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common.V1";
+
+message StringListDelta {
+	repeated string add = 1;
+	repeated string remove = 2;
+}
