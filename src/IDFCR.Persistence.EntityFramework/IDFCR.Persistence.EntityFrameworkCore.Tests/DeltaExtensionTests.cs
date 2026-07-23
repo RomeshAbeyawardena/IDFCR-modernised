@@ -2,7 +2,7 @@
 using IDFCR.Persistence.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-
+using MSEntityState = Microsoft.EntityFrameworkCore.EntityState;
 namespace IDFCR.Persistence.EntityFrameworkCore.Tests;
 
 public class PackageDbContext(DbContextOptions<PackageDbContext> options) : DbContext(options)
@@ -352,8 +352,10 @@ internal class DeltaExtensionTests
         {
             Assert.That(result.EntitiesCreated, Is.EqualTo(0));
             Assert.That(result.RelationshipsAdded, Is.EqualTo(0));
-            Assert.That(result.RelationshipsRemoved, Is.EqualTo(1));
-            Assert.That(context.Entry(localJoin).State, Is.EqualTo(EntityState.Deleted));
+            Assert.That(result.RelationshipsRemoved, Is.EqualTo(1)); // Your method successfully caught and removed it!
+
+            // Fix: Unsaved entities become Detached when removed, not Deleted.
+            Assert.That(context.Entry(localJoin).State, Is.EqualTo(MSEntityState.Detached));
         }
     }
 
@@ -378,7 +380,7 @@ internal class DeltaExtensionTests
         {
             Assert.That(result.EntitiesCreated, Is.EqualTo(1));
             Assert.That(result.RelationshipsAdded, Is.EqualTo(1));
-            Assert.That(context.ChangeTracker.Entries<Tag>().Count(entry => entry.State == EntityState.Added), Is.EqualTo(1));
+            Assert.That(context.ChangeTracker.Entries<Tag>().Count(entry => entry.State == MSEntityState.Added), Is.EqualTo(1));
         }
     }
 
