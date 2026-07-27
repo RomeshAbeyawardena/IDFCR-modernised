@@ -16,6 +16,7 @@ namespace IDFCR.Abstractions.DatabaseUpdater.Tests;
 
 internal class ListDatabaseMigrationsCommandTests
 {
+    private static readonly string NewLine = Environment.NewLine;
     private IServiceProvider serviceProvider;
     private Mock<IHost> host;
     private StringReader sr;
@@ -79,7 +80,7 @@ internal class ListDatabaseMigrationsCommandTests
 
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nNo pending migrations found. The database is already up to date.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo($"Migration Assistant v.1.0{NewLine}Good afternoon. The current time is 14:30.{NewLine}No pending migrations found. The database is already up to date.{NewLine}"));
     }
 
     [Test]
@@ -89,7 +90,7 @@ internal class ListDatabaseMigrationsCommandTests
         databaseFascade.Setup(d => d.GetPendingMigrationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(["Migration1", "Migration2"]);
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nPending Migrations:\r\n\t- Migration1\r\n\t- Migration2\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo($"Migration Assistant v.1.0{NewLine}Good afternoon. The current time is 14:30.{NewLine}Pending Migrations:{NewLine}\t- Migration1{NewLine}\t- Migration2{NewLine}"));
     }
 
     [Test]
@@ -102,7 +103,7 @@ internal class ListDatabaseMigrationsCommandTests
         await host.Object.RunCommandsAsync(args);
 
         Assert.That(esw.ToString(), Does.Contain("An error occurred during database migration: DB unavailable"));
-        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo($"Migration Assistant v.1.0{NewLine}Good afternoon. The current time is 14:30.{NewLine}"));
     }
 
     [Test]
@@ -111,7 +112,7 @@ internal class ListDatabaseMigrationsCommandTests
         var args = CommandLineParser.SplitCommandLine("extension feature");
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Featured command executed successfully.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo($"Featured command executed successfully.{NewLine}"));
     }
 
     [Test]
@@ -120,7 +121,7 @@ internal class ListDatabaseMigrationsCommandTests
         var args = CommandLineParser.SplitCommandLine("database extension-feature");
         await host.Object.RunCommandsAsync(args);
 
-        Assert.That(sw.ToString(), Is.EqualTo("Migration Assistant v.1.0\r\nGood afternoon. The current time is 14:30.\r\nExtension for database command executed successfully.\r\n"));
+        Assert.That(sw.ToString(), Is.EqualTo($"Migration Assistant v.1.0{NewLine}Good afternoon. The current time is 14:30.{NewLine}Extension for database command executed successfully.{NewLine}"));
     }
 
 
