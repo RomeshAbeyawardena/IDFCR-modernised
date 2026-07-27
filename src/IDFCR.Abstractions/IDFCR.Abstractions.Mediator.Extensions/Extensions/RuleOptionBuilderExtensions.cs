@@ -16,9 +16,8 @@ public static class RuleOptionBuilderExtensions
     /// <typeparam name="TEntity">The type of the entity being validated.</typeparam>
     /// <param name="builder">The rule builder.</param>
     /// <returns>The rule builder options.</returns>
-    public static IRuleBuilderOptions<TEntity, object?> MustBeOfGuid<TEntity>(
-        this IRuleBuilderInitial<TEntity, object?> builder)
-    {
+public static IRuleBuilderOptions<TEntity, TProperty> MustBeOfGuid<TEntity, TProperty>(
+    this IRuleBuilderInitial<TEntity, TProperty> builder)
         return builder
             .Must(x => x.IsOfGuid(out _))
             .WithMessage("The provided value for {PropertyName} is not a valid GUID.");
