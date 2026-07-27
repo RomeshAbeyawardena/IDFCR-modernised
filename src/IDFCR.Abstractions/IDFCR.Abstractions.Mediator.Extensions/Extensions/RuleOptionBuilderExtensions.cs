@@ -14,10 +14,12 @@ public static class RuleOptionBuilderExtensions
     /// Validates that the provided value is a valid GUID. This extension method can be used in FluentValidation rules to ensure that the value being validated can be parsed as a GUID. If the value is not a valid GUID, a validation error message will be generated indicating that the provided ID is not valid.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity being validated.</typeparam>
+    /// <typeparam name="TProperty">The type of the property being validated.</typeparam>
     /// <param name="builder">The rule builder.</param>
     /// <returns>The rule builder options.</returns>
 public static IRuleBuilderOptions<TEntity, TProperty> MustBeOfGuid<TEntity, TProperty>(
     this IRuleBuilderInitial<TEntity, TProperty> builder)
+    { 
         return builder
             .Must(x => x.IsOfGuid(out _))
             .WithMessage("The provided value for {PropertyName} is not a valid GUID.");
@@ -27,6 +29,7 @@ public static IRuleBuilderOptions<TEntity, TProperty> MustBeOfGuid<TEntity, TPro
     /// Validates that the provided value is a valid GUID, with an additional condition specified by the 'and' parameter. This extension method can be used in FluentValidation rules to ensure that the value being validated can be parsed as a GUID and meets the specified condition. If the value is not a valid GUID or does not meet the condition, a validation error message will be generated indicating that the provided ID is not valid.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity being validated.</typeparam>
+    /// <typeparam name="TProperty">The type of the property being validated.</typeparam>
     /// <param name="builder">The rule builder.</param>
     /// <param name="and">The additional condition to be met.</param>
     /// <returns>The rule builder options.</returns>
