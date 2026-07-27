@@ -1,7 +1,9 @@
 ﻿using IDFCR.Abstractions.Results;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IDFCR.Abstractions.Mediator.Extensions.Extensions;
+#pragma warning disable IDE0130
+namespace IDFCR.Abstractions.Mediator.Extensions;
+#pragma warning restore IDE0130
 
 /// <summary>
 /// Defines extension methods for configuring and registering a safer exception provider in the dependency injection container. These extensions provide a convenient way to set up a provider that can generate safer exceptions based on the configurations provided through the builder. By using these extension methods, developers can easily integrate a consistent and customizable approach to handling exceptions in their applications, allowing for better control over the information exposed in exceptions and improving overall application security and reliability.

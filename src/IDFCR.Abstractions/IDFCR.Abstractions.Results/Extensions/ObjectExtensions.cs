@@ -25,6 +25,24 @@ public enum And
 public static class ObjectExtensions
 {
     /// <summary>
+    /// Converts an enumerable of objects to an array of Guids. This method iterates through the provided collection of objects, checks if each object can be cast to a Guid (or parsed as a valid Guid string), and collects the valid Guid values into an array. If an object cannot be converted to a Guid, it is ignored in the resulting array.
+    /// </summary>
+    /// <param name="ids">The enumerable of objects to convert.</param>
+    /// <returns>An array of Guids.</returns>
+    public static Guid[] ToGuidArray(this IEnumerable<object?> ids)
+    {
+        return [.. ids.Select(x => {
+            if (x.IsOfGuid(out var id))
+            {
+                return id;
+            }
+
+            return null;
+        }).Where(x => x.HasValue)
+        .Select(x => x!.Value)];
+    }
+
+    /// <summary>
     /// Determines whether the specified object is of type Guid. This method checks if the provided object can be cast to a Guid. If the object is of type Guid, it returns true and outputs the value; otherwise, it returns false and outputs null. Additionally, if the object is not of type Guid but can be parsed as a valid Guid string representation, it will also return true and output the parsed Guid value.
     /// </summary>
     /// <param name="source">The object to check.</param>

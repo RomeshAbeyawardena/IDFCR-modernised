@@ -261,14 +261,15 @@ namespace IDFCR.Abstractions.Persistence
                     return UnitResult.NotFound<TKey>(dbValue.Id, new EntityNotFoundException(typeof(T), dbValue.Id));
                 }
 
-                var oldEntry = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+                var oldEntry = foundEntry.Map<TDb>() ?? throw new NullReferenceException(ErrorMessages.MappingFailure);
 
-                var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException("Unable to map");
+                var clonedEntity = foundEntry.Map<TDb>() ?? throw new NullReferenceException(ErrorMessages.MappingFailure);
                 clonedEntity.Apply(dbValue);
 
                 if (!HasChanges(clonedEntity, foundEntry))
                 {
-                    return UnitResult.Failed<TKey>(new InvalidOperationException("No changes detected"), UnitAction.None, FailureReason.None);
+                    return UnitResult.Failed(new InvalidOperationException(ErrorMessages.HasNoChanges), 
+                        UnitAction.Update, FailureReason.Conflict, defaultValue: clonedEntity.Id);
                 }
 
                 OnUpdate(foundEntry, entry);
