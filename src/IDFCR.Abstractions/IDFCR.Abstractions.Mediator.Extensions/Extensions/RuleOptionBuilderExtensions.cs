@@ -36,6 +36,6 @@ public static class RuleOptionBuilderExtensions
     {
         return builder
             .Must(x => x.IsOfGuid(and, out _))
-            .WithMessage("The provided ID for {propertyName} is not a valid GUID.");
+            .WithMessage("The provided value for {PropertyName} is not a valid GUID.");
     }
 }
