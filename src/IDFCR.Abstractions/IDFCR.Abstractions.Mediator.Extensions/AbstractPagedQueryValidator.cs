@@ -25,6 +25,9 @@ public abstract class AbstractPagedQueryValidator<T> : AbstractValidator<T>
             .When(x => !x.PageSize.HasValue)
             .WithMessage("A page index cannot be specified without a page size.");
 
+        RuleFor(x => x.PageIndex)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.PageIndex.HasValue);
         if (maximumPageSize.HasValue)
         {
             RuleFor(x => x.PageSize)
