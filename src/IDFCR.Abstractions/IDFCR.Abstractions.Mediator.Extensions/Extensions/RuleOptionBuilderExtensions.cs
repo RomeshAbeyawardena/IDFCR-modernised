@@ -30,8 +30,8 @@ public static IRuleBuilderOptions<TEntity, TProperty> MustBeOfGuid<TEntity, TPro
     /// <param name="builder">The rule builder.</param>
     /// <param name="and">The additional condition to be met.</param>
     /// <returns>The rule builder options.</returns>
-    public static IRuleBuilderOptions<TEntity, object?> MustBeOfGuid<TEntity>(
-        this IRuleBuilderInitial<TEntity, object?> builder, And and)
+public static IRuleBuilderOptions<TEntity, TProperty> MustBeOfGuid<TEntity, TProperty>(
+    this IRuleBuilderInitial<TEntity, TProperty> builder, And and)
     {
         return builder
             .Must(x => x.IsOfGuid(and, out _))
