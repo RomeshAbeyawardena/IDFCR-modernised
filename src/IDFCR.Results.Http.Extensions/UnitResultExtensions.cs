@@ -1,6 +1,6 @@
 ﻿using IDFCR.Abstractions.Results;
 
-namespace IDFCR.Results.Http.Grpc.Extensions;
+namespace IDFCR.Results.Http.Extensions;
 
 /// <summary>
 /// Defines extension methods for converting gRPC UnitResult messages into IUnitResult instances. These extension methods allow you to easily convert gRPC UnitResult messages into IUnitResult instances that can be used within your application, providing a convenient way to handle the conversion between gRPC messages and the corresponding result objects.
