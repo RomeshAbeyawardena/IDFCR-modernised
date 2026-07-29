@@ -30,7 +30,7 @@ public abstract record StructuredOrderedRequestBase : IStructuredOrderedRequest
     /// <summary>
     /// Sets the collection of <see cref="ISort"/> objects that represent the sorting specifications for the request. This property is used internally to populate the <see cref="Fields"/> property and should not be exposed publicly, as it is intended for use within the implementation of the <see cref="ParseFields"/> method to convert JSON-based sorting specifications into a structured format that can be easily processed by query handlers or services throughout the application.
     /// </summary>
-    protected IEnumerable<ISort> SortedFields { 
+    protected internal IEnumerable<ISort> SortedFields { 
         set 
         {
             if (!ValidateFields(value))
