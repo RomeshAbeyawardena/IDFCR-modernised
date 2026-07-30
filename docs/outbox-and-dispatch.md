@@ -141,10 +141,7 @@ public sealed class OrderOutboxReader(AppDbContext db)
 
 ## IOutboxDispatcher
 
-`IOutboxDispatcher` orchestrates the read → publish cycle. It calls `IOutboxReader.GetMessagesAsync`, then passes the paged result to `IOutboxPublisher.HandleAsync`.
-
-`DefaultOutboxReaderFactory` discovers all registered `IOutboxReader` implementations and routes dispatch calls by name.
-
+`DefaultOutboxReaderFactory<TMessage>` resolves all registered `IOutboxReader` implementations and filters them by compatible message + paged-query types via `IOutboxReaderFactory<TMessage>.GetCompatibleReaders<TPagedQuery>()`.
 ---
 
 ## Background dispatch
