@@ -66,35 +66,33 @@ Groups multiple related operation results into a single traceable chain. Useful 
 
 `FailureReason` describes why an operation failed. IDFCR maps these to HTTP status codes via `.AsHttp()`.
 
-| Value | Meaning | Default HTTP status |
+| Value | Meaning | HTTP status (via `.AsHttp()`) |
 |---|---|---|
-| `None` | No failure | — |
-| `NotFound` | Entity was not found | 404 |
-| `Conflict` | Operation conflicted with current state | 409 |
-| `ValidationError` | Input failed validation | 422 |
-| `Unauthorized` | Caller is not authenticated | 401 |
-| `Forbidden` | Caller is authenticated but not permitted | 403 |
-| `InternalError` | Unexpected internal failure | 500 |
-| `ExternalDependencyError` | A dependency failed | 502 |
-| `AuthorizationError` | Authorisation-specific failure | 403 |
-| `NotSupported` | Operation or media type not supported | 415 / 501 |
-| `Unknown` | Reason could not be determined | 500 |
+| `None` | No failure | 200 OK |
+| `ValidationError` | Input failed validation | 400 Bad Request |
+| `AuthorizationError` / `Unauthorized` | Caller is not authenticated | 401 Unauthorized |
+| `Forbidden` | Caller is authenticated but not permitted | 403 Forbidden |
+| `NotFound` | Entity was not found | 404 Not Found |
+| `Conflict` | Operation conflicted with current state | 409 Conflict |
+| `ExternalDependencyError` | A dependency failed | 424 Failed Dependency |
+| `InternalError` | Unexpected internal failure | 500 Internal Server Error |
+| `Unknown` | Reason could not be determined | 503 Service Unavailable |
 
 ---
 
 ## `UnitAction`
 
-`UnitAction` is a flags enum describing what kind of operation produced the result. HTTP bridges use it to choose between 200 OK and 201 Created.
+`UnitAction` is a flags enum describing what kind of operation produced the result. It is included in the serialised response body so callers can determine the type of operation that ran. It does **not** affect the HTTP status code — all successful results return 200 OK regardless of action.
 
 ```csharp
 [Flags]
 public enum UnitAction
 {
     None    = 0,
-    Add     = 1,   // → 201 Created
-    Get     = 2,   // → 200 OK
-    Update  = 4,   // → 200 OK
-    Delete  = 8,   // → 204 No Content
+    Add     = 1,
+    Get     = 2,
+    Update  = 4,
+    Delete  = 8,
     Pending = 16,
     Conflict = 32
 }

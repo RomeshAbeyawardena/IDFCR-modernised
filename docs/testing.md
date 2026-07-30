@@ -145,7 +145,7 @@ Test interceptors by constructing the factory and calling `InterceptAsync` with 
 
 ```csharp
 [Test]
-public async Task AuditCreatedTimestampInterceptor_Sets_CreatedAt_On_Insert()
+public async Task AuditCreatedTimestampInterceptor_Sets_CreatedTimestampUtc_On_Insert()
 {
     var timeProvider = new ManualTimeProvider();
     timeProvider.SetCurrentTime(DateTimeOffset.UtcNow);
@@ -160,7 +160,7 @@ public async Task AuditCreatedTimestampInterceptor_Sets_CreatedAt_On_Insert()
 
     await interceptor.InterceptAsync(context, CancellationToken.None);
 
-    Assert.That(entity.CreatedAt, Is.EqualTo(timeProvider.GetUtcNow()));
+    Assert.That(entity.CreatedTimestampUtc, Is.EqualTo(timeProvider.GetUtcNow()));
 }
 ```
 

@@ -45,20 +45,20 @@ IUnitHttpResult http = chainedResult.AsChainedHttp<OrderDto>();
 
 ### Status code mapping
 
-| Condition | HTTP status |
+`UnitHttpResult` maps `FailureReason` to HTTP status codes as follows. `UnitAction` does **not** influence the status code — the body JSON always contains the action value for the caller to inspect.
+
+| `FailureReason` | HTTP status |
 |---|---|
-| `IsSuccess && Action == Add` | 201 Created |
-| `IsSuccess && Action == Delete` | 204 No Content |
-| `IsSuccess` (other actions) | 200 OK |
-| `FailureReason.NotFound` | 404 Not Found |
-| `FailureReason.ValidationError` | 422 Unprocessable Entity |
-| `FailureReason.Conflict` | 409 Conflict |
-| `FailureReason.Unauthorized` | 401 Unauthorized |
-| `FailureReason.Forbidden` / `AuthorizationError` | 403 Forbidden |
-| `FailureReason.NotSupported` | 415 / 501 (context-dependent) |
-| `FailureReason.InternalError` | 500 Internal Server Error |
-| `FailureReason.ExternalDependencyError` | 502 Bad Gateway |
-| Other failures | 500 Internal Server Error |
+| `None` (success) | 200 OK |
+| `ValidationError` | 400 Bad Request |
+| `AuthorizationError` / `Unauthorized` | 401 Unauthorized |
+| `Forbidden` | 403 Forbidden |
+| `NotFound` | 404 Not Found |
+| `Conflict` | 409 Conflict |
+| `ExternalDependencyError` | 424 Failed Dependency |
+| `InternalError` | 500 Internal Server Error |
+| `Unknown` | 503 Service Unavailable |
+| `None` (default) | 200 OK |
 
 ### Minimal API example
 

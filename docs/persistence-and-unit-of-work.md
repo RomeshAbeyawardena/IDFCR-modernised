@@ -42,22 +42,33 @@ Every repository method returns an `IUnitResult*`. Successful operations carry t
 
 ### Implementing a repository
 
-Extend `RepositoryBase<T, TKey>` to get the interceptor wiring for free, then add domain-specific query methods.
+Extend `RepositoryBase<TCommon, TDb, T, TKey>` to get the interceptor wiring for free, then add domain-specific query methods.
+
+The four type parameters are:
+- `TCommon` — shared abstraction implemented by both the DB model and the domain model (typically an interface).
+- `TDb` — the EF Core / persistence entity (must implement `TCommon`, `IMapper<TCommon>`, and `IIdentifiable<TKey>`).
+- `T` — the domain model returned to callers (must implement `TCommon` and `IMapper<TCommon>`).
+- `TKey` — the key type (must be a value type, e.g., `Guid`).
 
 ```csharp
-public sealed class OrderRepository(AppDbContext db, IEntityInterceptorFactory interceptors)
-    : RepositoryBase<Order, Guid>(db, interceptors), IOrderRepository
+// Shared abstraction
+public interface IOrderCommon
 {
-    public async Task<IUnitResultCollection<Order>> GetByStatusAsync(
-        string status,
-        CancellationToken cancellationToken)
-    {
-        var orders = await db.Orders
-            .Where(o => o.Status == status)
-            .ToListAsync(cancellationToken);
+    string Reference { get; }
+    string Status { get; }
+}
 
-        return UnitResultCollection.FromResult(orders);
-    }
+// Domain model
+public sealed class Order : IOrderCommon, IMapper<IOrderCommon> { ... }
+
+// EF Core entity
+public sealed class OrderEntity : IOrderCommon, IMapper<IOrderCommon>, IIdentifiable<Guid> { ... }
+
+public sealed class OrderRepository(AppDbContext db, IEntityInterceptorFactory interceptors)
+    : RepositoryBase<IOrderCommon, OrderEntity, Order, Guid>(interceptors), IOrderRepository
+{
+    // Implement the required OnAddAsync, OnUpdateAsync, OnFindAsync, OnDeleteAsync,
+    // OnGetPagedAsync, OnUpdate, OnReloadEntityAsync, and IsHandled members.
 }
 ```
 

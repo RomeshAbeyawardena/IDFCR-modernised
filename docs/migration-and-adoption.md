@@ -55,7 +55,7 @@ IDFCR is designed to be adopted incrementally. You do not need to rewrite an exi
 
 **Steps (after path 1):**
 
-1. Implement `IRepository<T, TKey>` on your repositories, extending `RepositoryBase<T, TKey>`.
+1. Implement `IRepository<T, TKey>` on your repositories, extending `RepositoryBase<TCommon, TDb, T, TKey>` (four type parameters: shared abstraction, DB entity, domain model, key type).
 2. Implement `IUnitOfWork` on or alongside your `DbContext`.
 3. Enable the UoW post-processor:
 

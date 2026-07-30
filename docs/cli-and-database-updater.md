@@ -17,7 +17,7 @@ IDFCR provides two related CLI capabilities:
 |---|---|
 | `ICommandOperation` | Base contract for a CLI command |
 | `IInjectableCommandOperation` | Command that receives services from DI |
-| `InjectableCommandOperationBase` | Convenience base class for DI-enabled commands |
+| `InjectableCommandOperationBase` | Convenience base class for DI-enabled commands (`InjectableCommandOperationBase<T>`) |
 | `ICommandRouteDispatcher` | Routes parsed arguments to the correct command |
 | `DefaultCommandRouteDispatcher` | Default implementation backed by assembly scanning |
 | `IArgumentParameters` | Parsed key-value argument bag |
@@ -26,30 +26,35 @@ IDFCR provides two related CLI capabilities:
 
 ### Writing a command
 
+Commands derive from `InjectableCommandOperationBase<T>` (where `T` is your own command type) and override `InvokeWhenContextIsOwned` to run command logic. Arguments are available through the `Parameters` dictionary populated by the base class.
+
 ```csharp
 using IDFCR.Abstractions.Cli.Operations;
 
 [FeatureCommand("orders", "create")]   // prefix + key matched by the router
-public sealed class CreateOrderCliCommand(IMediator mediator) : InjectableCommandOperationBase
+public sealed class CreateOrderCliCommand(IServiceProvider serviceProvider, IMediator mediator)
+    : InjectableCommandOperationBase<CreateOrderCliCommand>(serviceProvider, "orders", "create")
 {
-    public override async Task<ReturnResult> ExecuteAsync(
-        IArgumentParameters parameters,
-        IManagedStream output,
+    protected override async Task InvokeWhenContextIsOwned(
+        IEnumerable<string> command,
         CancellationToken cancellationToken)
     {
-        var reference = parameters.GetRequired<string>("reference");
+        // Parameters is populated by the base class from the command tokens.
+        var reference = Parameters?["reference"].Value?.ToString()
+            ?? throw new ArgumentException("--reference is required");
 
         var result = await mediator.Send(
             new CreateOrderCommand(reference), cancellationToken);
 
+        // Use IManagedStream to write output. It is typically available via
+        // the scoped IInjectableCommandOperation context or DI.
         if (!result.IsSuccess)
         {
-            await output.WriteLineAsync($"Failed: {result.FailureReason}", cancellationToken);
-            return ReturnResult.Failure;
+            Console.Error.WriteLine($"Failed: {result.FailureReason}");
+            return;
         }
 
-        await output.WriteLineAsync($"Created order {result.Result!.Id}", cancellationToken);
-        return ReturnResult.Success;
+        Console.WriteLine($"Created order {result.Result!.Id}");
     }
 }
 ```
@@ -150,17 +155,16 @@ Create a class implementing `IInjectableCommandOperation` and pass its assembly 
 
 ```csharp
 [FeatureCommand("db", "seed")]
-public sealed class SeedDatabaseCommand(AppDbContext db) : InjectableCommandOperationBase
+public sealed class SeedDatabaseCommand(IServiceProvider serviceProvider, AppDbContext db)
+    : InjectableCommandOperationBase<SeedDatabaseCommand>(serviceProvider, "db", "seed")
 {
-    public override async Task<ReturnResult> ExecuteAsync(
-        IArgumentParameters parameters,
-        IManagedStream output,
+    protected override async Task InvokeWhenContextIsOwned(
+        IEnumerable<string> command,
         CancellationToken cancellationToken)
     {
         // seed logic
         await db.SaveChangesAsync(cancellationToken);
-        await output.WriteLineAsync("Seed complete.", cancellationToken);
-        return ReturnResult.Success;
+        Console.WriteLine("Seed complete.");
     }
 }
 ```

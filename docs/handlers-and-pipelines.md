@@ -98,7 +98,11 @@ services.AddMediatorServicesAndPipelines(
     assemblies: typeof(Program).Assembly);
 ```
 
-Register your validators alongside your handlers in the same assembly. They are discovered automatically.
+Register your validators with the DI container explicitly. The IDFCR pipeline consumes registered `IValidator<T>` instances; it does not scan for them automatically. Use FluentValidation's own helper:
+
+```csharp
+services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+```
 
 ### 3. UnitOfWorkPostPipelineProcessor
 

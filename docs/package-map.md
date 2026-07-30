@@ -43,12 +43,12 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 
 | Package | Purpose |
 |---|---|
-| `IDFCR.Abstractions.Persistence` | `IRepository<T, TKey>`, `IUnitOfWork`, `ITransactionalUnitOfWork`, `IDbTransaction`, `RepositoryBase<T, TKey>`, `RepositoryInterceptorContext`, `IHasRowVersion`, `DatabaseConfiguration`, `MaximumLengthStringExpressionBuilder` |
+| `IDFCR.Abstractions.Persistence` | `IRepository<T, TKey>`, `IUnitOfWork`, `ITransactionalUnitOfWork`, `IDbTransaction`, `RepositoryBase<TCommon, TDb, T, TKey>`, `RepositoryInterceptorContext`, `IHasRowVersion`, `DatabaseConfiguration`, `MaximumLengthStringExpressionBuilder` |
 | `IDFCR.Abstractions.Persistence.Interceptors` | `SoftDeletionEntityInterceptor` (marks entities as deleted rather than removing rows) |
 | `IDFCR.Abstractions.Persistence.StorageQueues` | `IQueueProducer`, `IQueueConsumer`, `IQueueMessageItem`, `IQueuePullResponse` (storage queue abstractions) |
 | `IDFCR.Persistence.EntityFrameworkCore` | EF Core implementation of `IRepository<T, TKey>` and `IUnitOfWork` |
 | `IDFCR.Persistence.EntityFrameworkCore.Extensions` | `DeltaExtensions.PerformDeltaAsync` and EF Core-specific helpers |
-| `IDFCR.Persistence.CloudFlare` | Cloudflare D1 / R2 persistence helpers |
+| `IDFCR.Persistence.CloudFlare.Queues` | Cloudflare queue persistence helpers |
 
 ---
 
@@ -74,7 +74,7 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 
 | Package | Purpose |
 |---|---|
-| `IDFCR.Abstractions.Outbox` | `IOutboxEntity`, `IOutboxEntity<TKey>`, `DefaultOutboxEntity`, `IOutboxPublisher`, `IOutboxDispatcher`, `IOutboxReader`, `IOutboxReaderFactory`, `IOutboxPipeline`, `IOutboxEntityNotificationHandler`, `OutboxEntityNotificationHandlerBase` |
+| `IDFCR.Abstractions.Outbox` | `IOutboxEntity`, `IOutboxEntity<TKey>`, `IOutboxPublisher`, `IOutboxDispatcher`, `IOutboxReader`, `IOutboxReaderFactory<TMessage>`, `IOutboxPipeline`, `IOutboxEntityNotificationHandler`, `OutboxEntityNotificationHandlerBase` |
 | `IDFCR.Abstractions.Outbox.Extensions` | Service registration helpers for outbox components |
 | `IDFCR.Abstractions.Outbox.Interceptors` | `OutboxInterceptor` — stages messages in `IScopedResources` during entity saves |
 | `IDFCR.Outbox.EntityFramework` | EF Core-backed `RepositoryOutboxReaderBase` and `EntityFrameworkOutboxEntityNotificationHandlerBase` |
@@ -110,7 +110,7 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 
 | Package | Purpose |
 |---|---|
-| `IDFCR.Abstractions.Cli` | `ICommandOperation`, `IInjectableCommandOperation`, `InjectableCommandOperationBase`, `ICommandRouteDispatcher`, `DefaultCommandRouteDispatcher`, `IArgumentParameters`, `ArgumentParameters`, `IManagedStream`, `IIOReadableStream`, `IIOWriteableStream`, `ConsoleStream`, `IPromptGreeter`, `FeatureCommandAttribute`, `ReturnResult` |
+| `IDFCR.Abstractions.Cli` | `ICommandOperation`, `IInjectableCommandOperation`, `InjectableCommandOperationBase<T>`, `ICommandRouteDispatcher`, `DefaultCommandRouteDispatcher`, `IArgumentParameters`, `ArgumentParameters`, `IManagedStream`, `IIOReadableStream`, `IIOWriteableStream`, `ConsoleStream`, `IPromptGreeter`, `FeatureCommandAttribute`, `ReturnResult` |
 | `IDFCR.Abstractions.Cli.Extensions` | `AddInjectableCommandServices(assemblies)`, `RunCommandsAsync`, `ScrutorExtensions` |
 
 ---
@@ -128,9 +128,9 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 
 | Package | Purpose |
 |---|---|
-| `IDFCR.AI.Abstractions` | `IAIService`, `IAIServiceConfiguration`, `ITextGeneration`, `AIServiceRequest`, `AIServiceResponse`, `VerifiedConnectionResult` |
+| `IDFCR.AI.Abstractions` | `IAIService`, `IAIServiceConfiguration`, `AIServiceRequest`, `AIServiceResponse`, `VerifiedConnectionResult` |
 | `IDFCR.AI.Http` | `HttpAIService`, `HttpAIServiceConfiguration`, `AddHttpAIService` |
-| `IDFCR.AI.OpenAI` | `OpenAIService`, `IOpenAIService`, `OpenAIConfiguration`, `AddOpenAIService` |
+| `IDFCR.AI.OpenAI` | `OpenAIService`, `IOpenAIService`, `OpenAIConfiguration`, `OpenAITextRequest`, `OpenAITextResponse`, `AddOpenAI` |
 
 ---
 
@@ -140,6 +140,16 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 |---|---|
 | `IDFCR.Abstractions.Cryptography` | `IPasswordDerivedKeyGenerator`, `ITokenPayloadProtector` |
 | `IDFCR.Cryptography` | Default implementations of the cryptography abstractions |
+| `IDFCR.Cryptography.Extensions` | `AddCryptographyServices` — registers all cryptography services |
+
+---
+
+## Request state and lookups
+
+| Package | Purpose |
+|---|---|
+| `IDFCR.Abstractions.RequestState.Http` | `AddHttpRequestStateServices` — registers HTTP request state tracking (ambient request context for scoped operations) |
+| `IDFCR.Abstractions.Lookups` | `AddAsyncLookupFactoryAndLookups` — registers async lookup factories for code tables and reference data |
 
 ---
 

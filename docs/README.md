@@ -45,7 +45,7 @@ Return to the [repository root](../README.md) for a quick introduction and quick
 | [Caching](caching.md) | `IDistributedGroupCache`, group-keyed invalidation, MessagePack serialisation, and auditing |
 | [HTTP and gRPC](http-and-grpc.md) | Mapping results to HTTP via `.AsHttp()`, gRPC result extensions, and assembly-scanned service hosting |
 | [CLI and database updater](cli-and-database-updater.md) | `ICommandOperation`, interactive CLI hosting, and `ConfigureDatabaseUpdaterHost` for EF Core migrations |
-| [AI integrations](ai-integrations.md) | `IAIService`, `ITextGeneration`, HTTP and OpenAI providers |
+| [AI integrations](ai-integrations.md) | `IAIService`, `IOpenAIService`, HTTP and OpenAI providers |
 
 ### Testing and operations
 

@@ -93,9 +93,9 @@ app.MapPost("/orders", async (CreateOrderCommand cmd, IMediator mediator, Cancel
 {
     var result = await mediator.Send(cmd, ct);
     return result.AsHttp();
-    // IsSuccess + UnitAction.Add  → 201 Created  (body: the OrderDto)
-    // FailureReason.ValidationError → 422 Unprocessable Entity
-    // FailureReason.NotFound        → 404 Not Found
+    // FailureReason.None (success)    → 200 OK  (body: the OrderDto)
+    // FailureReason.ValidationError  → 400 Bad Request
+    // FailureReason.NotFound         → 404 Not Found
 });
 ```
 
@@ -135,7 +135,12 @@ services
         assemblies: typeof(Program).Assembly);
 ```
 
-Register validators alongside handlers in the same assembly. The pipeline discovers them automatically.
+Register validators alongside handlers in the same assembly. The FluentValidation pipeline will consume any `IValidator<T>` that is registered with the DI container. Register them explicitly:
+
+```csharp
+// Using FluentValidation's own registration helper:
+services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+```
 
 ### Write a validator
 

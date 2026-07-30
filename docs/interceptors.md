@@ -51,7 +51,7 @@ public interface IEntityInterceptorContext
 }
 ```
 
-Use `context.Entity as MyEntityType` to determine applicability inside `CanIntercept`.
+Use `context.Model as MyEntityType` to determine applicability inside `CanIntercept`.
 
 ---
 
@@ -59,8 +59,8 @@ Use `context.Entity as MyEntityType` to determine applicability inside `CanInter
 
 | Interceptor | What it does |
 |---|---|
-| `AuditCreatedTimestampEntityInterceptor` | Sets `CreatedAt` on new entities implementing `IAuditCreatedTimestamp` |
-| `AuditModifiedTimestampEntityInterceptor` | Updates `ModifiedAt` on every change for entities implementing `IAuditModifiedTimestamp` |
+| `AuditCreatedTimestampEntityInterceptor` | Sets `CreatedTimestampUtc` on new entities implementing `IAuditCreatedTimestamp` |
+| `AuditModifiedTimestampEntityInterceptor` | Updates `ModifiedTimestampUtc` on every change for entities implementing `IAuditModifiedTimestamp` |
 | `AuditEntityChangesInterceptor` | Records property-level changes via `IAuditProcessor` for auditing |
 | `SoftDeletionEntityInterceptor` | Sets a `DeletedAt` timestamp instead of removing the row (from `IDFCR.Abstractions.Persistence.Interceptors`) |
 | `OutboxInterceptor` | Stages an `IOutboxEntity` in `IScopedResources` when an entity change occurs (from `IDFCR.Abstractions.Outbox.Interceptors`) |
@@ -93,22 +93,29 @@ It also registers:
 ```csharp
 using IDFCR.Abstractions.Interceptors.Interceptors;
 
-public sealed class OrderApprovedInterceptor : EntityInterceptorBase
+public sealed class OrderApprovedInterceptor(
+    // Pass the required stage and behavior to the base constructor.
+    // This interceptor runs after an update operation.
+) : EntityInterceptorBase(EntityContextBehaviorStage.Post, EntityContextBehavior.Update)
 {
-    public override int? OrderIndex => 100;
+    public override bool ShouldIntercept(IEntityInterceptorContext context)
+        => context.Model is Order order && order.Status == OrderStatus.Approved;
 
-    public override bool CanIntercept(IEntityInterceptorContext context)
-        => context.Behavior == EntityContextBehavior.Update
-        && context.Entity is Order order
-        && order.Status == OrderStatus.Approved;
+    public override void Intercept(IEntityInterceptorContext context)
+    {
+        if (context.Model is Order order)
+        {
+            // Synchronous interception logic here.
+            // Use InterceptAsync for async work.
+        }
+    }
 
     public override async Task InterceptAsync(
         IEntityInterceptorContext context,
         CancellationToken cancellationToken)
     {
-        var order = (Order)context.Entity;
-        // Example: stage a notification via scoped resources
-        // Access IScopedResources through the Context factory if needed
+        Intercept(context);
+        // Additional async logic if needed.
         await Task.CompletedTask;
     }
 }

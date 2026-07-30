@@ -6,111 +6,130 @@ IDFCR provides a thin set of AI abstractions and provider implementations, follo
 
 ---
 
-## Abstractions
+## Core abstraction
 
 ### IAIService
 
-`IAIService` is the top-level contract for an AI provider. It exposes:
-
-- `VerifyConnectionAsync` — checks that the configured provider is reachable and authenticated.
-- Configuration access via `IAIServiceConfiguration`.
+`IAIService` (in `IDFCR.AI.Abstractions`) is the low-level transport contract for AI providers. It exposes two generic methods that accept a provider-specific configuration:
 
 ```csharp
 public interface IAIService
 {
-    IAIServiceConfiguration Configuration { get; }
-    Task<VerifiedConnectionResult> VerifyConnectionAsync(CancellationToken cancellationToken);
+    // Checks that the configured AI provider is reachable and accepting requests.
+    Task<VerifiedConnectionResult> VerifyConnection<TConfiguration>(
+        TConfiguration configuration, CancellationToken cancellationToken)
+        where TConfiguration : IAIServiceConfiguration;
+
+    // Sends a raw request to the provider and returns the HTTP-level response.
+    Task<AIServiceResponse> SendAsync<TConfiguration>(
+        TConfiguration configuration,
+        AIServiceRequest request,
+        CancellationToken cancellationToken)
+        where TConfiguration : IAIServiceConfiguration;
 }
 ```
 
-### ITextGeneration
-
-`ITextGeneration` extends `IAIService` with text generation:
+`AIServiceRequest` is a transport-level record:
 
 ```csharp
-public interface ITextGeneration : IAIService
+var request = new AIServiceRequest
 {
-    Task<AIServiceResponse> GenerateTextAsync(AIServiceRequest request, CancellationToken cancellationToken);
-}
+    Method  = "POST",
+    RelativePath = "v1/completions",
+    Content = """{"model":"gpt-4.1-mini","input":"Hello"}""",
+    ContentType = "application/json"
+};
 ```
 
-`AIServiceRequest` carries the prompt and any generation parameters. `AIServiceResponse` returns the generated text and any relevant metadata.
+`AIServiceResponse` returns `StatusCode`, `Content`, `Headers`, and `IsSuccessStatusCode`.
 
 ---
 
 ## HTTP provider
 
-`IDFCR.AI.Http` provides `HttpAIService`, a generic HTTP-backed implementation that routes to any AI endpoint that accepts JSON.
+`IDFCR.AI.Http` provides `HttpAIService`, a generic HTTP-backed implementation that routes to any AI endpoint.
 
 ### Registration
 
 ```csharp
 using IDFCR.AI.Http.Extensions;
 
-services.AddHttpAIService(configuration);
+services.AddHttpAIService();
 ```
 
-The extension method binds `HttpAIServiceConfiguration` from configuration and registers `ITextGeneration` as `HttpAIService`.
-
-### Configuration
-
-```json
-{
-  "AIService": {
-    "BaseUrl": "https://api.example-ai.com",
-    "ApiKey": "...",
-    "Model": "text-generation-model"
-  }
-}
-```
+This registers `IAIService` as `HttpAIService` via `HttpClient`.
 
 ---
 
 ## OpenAI provider
 
-`IDFCR.AI.OpenAI` provides `OpenAIService`, backed by the OpenAI API.
+`IDFCR.AI.OpenAI` provides `OpenAIService` and the higher-level `IOpenAIService` contract, which exposes OpenAI-specific operations built on top of `IAIService`.
 
 ### Registration
 
 ```csharp
 using IDFCR.AI.OpenAI.Extensions;
 
-services.AddOpenAIService(configuration);
+services.AddOpenAI();
 ```
 
-### Configuration
+`AddOpenAI()` calls `AddHttpAIService()` internally and registers `IOpenAIService`.
 
-```json
+### IOpenAIService
+
+```csharp
+public interface IOpenAIService
 {
-  "OpenAI": {
-    "ApiKey": "sk-...",
-    "Model": "gpt-4o"
-  }
+    Task<VerifiedConnectionResult> VerifyConnection(
+        OpenAIConfiguration configuration,
+        CancellationToken cancellationToken);
+
+    Task<OpenAITextResponse> GenerateTextAsync(
+        OpenAIConfiguration configuration,
+        OpenAITextRequest request,
+        CancellationToken cancellationToken);
 }
 ```
 
-`IOpenAIService` extends `ITextGeneration` with any OpenAI-specific capabilities. Use `ITextGeneration` in your application code when possible to remain provider-agnostic.
-
----
-
-## Usage in a handler
+`OpenAITextRequest` carries the prompt and generation parameters:
 
 ```csharp
-public sealed class GenerateOrderSummaryCommandHandler(ITextGeneration ai)
+var request = new OpenAITextRequest
+{
+    Prompt       = "Summarise this order: ...",
+    Model        = "gpt-4o",      // optional; defaults to gpt-4.1-mini
+    Instructions = "Be concise.", // optional system instructions
+    Temperature  = 0.7            // optional
+};
+```
+
+`OpenAITextResponse` returns `OutputText`, `Id`, `Status`, `RawContent`, and `StatusCode`.
+
+`OpenAIConfiguration` holds `ApiKey`, `Model`, `Organization`, `Project`, and the base address. The static factory method provides sensible defaults:
+
+```csharp
+var config = OpenAIConfiguration.Create(apiKey: "sk-...");
+```
+
+### Usage in a handler
+
+```csharp
+public sealed class GenerateOrderSummaryCommandHandler(IOpenAIService ai)
     : IUnitResultRequestHandler<GenerateOrderSummaryCommand, string>
 {
     public async Task<IUnitResult<string>> Handle(
         GenerateOrderSummaryCommand request,
         CancellationToken cancellationToken)
     {
-        var aiRequest = new AIServiceRequest
+        var config = OpenAIConfiguration.Create(request.ApiKey);
+        var aiRequest = new OpenAITextRequest
         {
             Prompt = $"Summarise this order: {request.OrderDescription}"
         };
 
-        var response = await ai.GenerateTextAsync(aiRequest, cancellationToken);
+        var response = await ai.GenerateTextAsync(config, aiRequest, cancellationToken);
 
-        return UnitResult.FromResult(response.Text, UnitAction.Get);
+        return UnitResult.FromResult(response.OutputText ?? string.Empty, UnitAction.Get);
     }
 }
 ```
@@ -119,19 +138,18 @@ public sealed class GenerateOrderSummaryCommandHandler(ITextGeneration ai)
 
 ## Connection verification
 
-Call `VerifyConnectionAsync` at startup or as a health check:
-
 ```csharp
-var result = await textGeneration.VerifyConnectionAsync(cancellationToken);
+var config = OpenAIConfiguration.Create(apiKey);
+var result = await openAIService.VerifyConnection(config, cancellationToken);
 if (!result.IsConnected)
-    logger.LogWarning("AI service is not reachable: {Reason}", result.FailureReason);
+    logger.LogWarning("AI service unreachable: {Reason}", result.FailureReason);
 ```
 
 ---
 
 ## Uncertainty note
 
-> The AI packages are present in the repository but do not yet have detailed integration tests. The public API shape described above is accurate as of the current codebase, but the exact provider behaviour (retry policies, streaming support, etc.) has not been fully verified. Review the source in `src/IDFCR.AI/` and confirm with the maintainer before relying on these packages in production.
+> The AI packages are present in the repository but do not yet have detailed integration tests. The `ITextGeneration` interface exists in the source but is `internal` and intentionally unexposed — use `IOpenAIService` for OpenAI-specific work and `IAIService` for custom provider integrations. Confirm provider behaviour (retry policies, streaming support, etc.) with the maintainer before relying on these packages in production.
 
 ---
 

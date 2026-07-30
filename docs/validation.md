@@ -35,7 +35,14 @@ services
 
 ## Writing a validator
 
-Write a standard FluentValidation `AbstractValidator<T>` for your request type. Register it in the same assembly you pass to `AddMediatorServicesAndPipelines`; it is discovered automatically.
+Write a standard FluentValidation `AbstractValidator<T>` for your request type. Register it with the DI container explicitly (the IDFCR pipeline consumes already-registered `IValidator<T>` instances but does not scan for them itself):
+
+```csharp
+// Using FluentValidation's own helper:
+services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+// Or individually:
+services.AddScoped<IValidator<CreateOrderCommand>, CreateOrderCommandValidator>();
+```
 
 ```csharp
 using FluentValidation;
@@ -87,13 +94,13 @@ When validation fails, the caller receives an `IUnitResult<T>` where:
 - `FailureReason == FailureReason.ValidationError`
 - `Exception` is the `FluentValidation.ValidationException` (containing the individual `ValidationFailure` entries)
 
-If you call `.AsHttp()` on the result, it maps to **422 Unprocessable Entity**.
+If you call `.AsHttp()` on the result, it maps to **400 Bad Request**.
 
 ---
 
 ## Validators with dependency injection
 
-Validators can depend on services resolved from the DI container. Register them as transient services (or let the assembly scanning do it automatically).
+Validators can depend on services resolved from the DI container. Register them explicitly (for example using `AddValidatorsFromAssembly`) so FluentValidation can inject constructor dependencies.
 
 ```csharp
 public sealed class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>

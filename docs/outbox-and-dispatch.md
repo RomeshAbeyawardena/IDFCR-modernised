@@ -53,17 +53,27 @@ public interface IOutboxEntity : IAuditCreatedTimestamp, IAuditModifiedTimestamp
 
 `IOutboxEntity<TKey>` adds a typed identifier property.
 
-### DefaultOutboxEntity
+### Implementing your own outbox entity
 
-`DefaultOutboxEntity` is a ready-made implementation of `IOutboxEntity<Guid>` that you can use directly or extend:
+`DefaultOutboxEntity` is an internal implementation used by the framework. Consumers create their own implementation of `IOutboxEntity`:
 
 ```csharp
-public sealed class MyOutboxMessage : DefaultOutboxEntity
+public sealed class MyOutboxMessage : IOutboxEntity<Guid>
 {
-    // All IOutboxEntity properties inherited
-    // Add any domain-specific properties here
+    public Guid Id { get; set; }
+    public bool IsUpdate { get; set; }
+    public string EntityType { get; set; } = null!;
+    public string? Data { get; set; }
+    public DateTimeOffset? CompletedTimestampUtc { get; set; }
+    public DateTimeOffset? FailedTimestampUtc { get; set; }
+    public DateTimeOffset? ProcessedTimestampUtc { get; set; }
+    public DateTimeOffset CreatedTimestampUtc { get; set; }
+    public DateTimeOffset? ModifiedTimestampUtc { get; set; }
+    object? IOutboxEntity.Id { get => Id; set => Id = (Guid)(value ?? Guid.Empty); }
 }
 ```
+
+In practice you will back this with an EF Core entity and persist it inside your `DbContext`.
 
 ---
 
@@ -139,7 +149,7 @@ public sealed class OrderOutboxReader(AppDbContext db)
 
 ## Background dispatch
 
-IDFCR provides `OutboxPipelineBase<TMessage, TPagedQuery>` (from `IDFCR.Outbox.Extensions`) as a base class for background pipelines. It manages the polling loop internally.
+IDFCR provides `OutboxPipelineBase<TMessage, TPagedQuery>` (from `IDFCR.Outbox.Extensions`) as a base class for background pipelines. It manages the polling loop internally and implements `IOutboxPipeline` (which provides `StartAsync` / `StopAsync` / `DisposeAsync`).
 
 ```csharp
 using IDFCR.Outbox.Extensions.Dispatchers;
@@ -155,13 +165,20 @@ public sealed class OrderOutboxPipeline(
 }
 ```
 
-`TPagedQuery` must have a public parameterless constructor. `OutboxPipelineBase` calls `SetFilters(pageIndex, pageSize)` on each polling iteration, which you can override for custom filtering.
+`TPagedQuery` must have a public parameterless constructor. `OutboxPipelineBase` calls the virtual `SetFilters(pageIndex, pageSize)` on each polling iteration, which you can override for custom filtering.
 
-Register as a hosted service:
+`AddOutboxPatternBackgroundServices<TOutboxPipeline, TMessage, TPagedQuery>(assemblies)` registers the pipeline as a **singleton** `IOutboxPipeline`. To drive its lifecycle from ASP.NET Core hosting, wrap it in a hosted service that delegates to `StartAsync` and `StopAsync`:
 
 ```csharp
-services.AddHostedService<OrderOutboxPipeline>();
+// Register with background service registration
+services.AddOutboxPatternBackgroundServices<OrderOutboxPipeline, MyOutboxMessage, GetPendingOutboxQuery>(
+    typeof(Program).Assembly);
+
+// Wire the IOutboxPipeline singleton into the host lifecycle:
+services.AddHostedService<OutboxPipelineHostedService<OrderOutboxPipeline>>();
 ```
+
+Where `OutboxPipelineHostedService<T>` is a thin adapter you implement (or provide) that resolves `IOutboxPipeline` and calls `StartAsync`/`StopAsync`. This keeps the pipeline's lifecycle cleanly separated from `BackgroundService`.
 
 ---
 
