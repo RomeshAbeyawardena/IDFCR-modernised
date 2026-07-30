@@ -29,10 +29,15 @@ IDFCR provides two related CLI capabilities:
 Commands derive from `InjectableCommandOperationBase<T>` (where `T` is your own command type) and override `InvokeWhenContextIsOwned` to run command logic. Arguments are available through the `Parameters` dictionary populated by the base class.
 
 ```csharp
+using IDFCR.Abstractions.Cli.Extensions;
+using IDFCR.Abstractions.Cli.ManagedStreams;
 using IDFCR.Abstractions.Cli.Operations;
 
 [FeatureCommand("orders", "create")]   // prefix + key matched by the router
-public sealed class CreateOrderCliCommand(IServiceProvider serviceProvider, IMediator mediator)
+public sealed class CreateOrderCliCommand(
+    IServiceProvider serviceProvider,
+    IMediator mediator,
+    IManagedStream managedStream)
     : InjectableCommandOperationBase<CreateOrderCliCommand>(serviceProvider, "orders", "create")
 {
     protected override async Task InvokeWhenContextIsOwned(
@@ -46,15 +51,17 @@ public sealed class CreateOrderCliCommand(IServiceProvider serviceProvider, IMed
         var result = await mediator.Send(
             new CreateOrderCommand(reference), cancellationToken);
 
-        // Use IManagedStream to write output. It is typically available via
-        // the scoped IInjectableCommandOperation context or DI.
         if (!result.IsSuccess)
         {
-            Console.Error.WriteLine($"Failed: {result.FailureReason}");
+            await managedStream.Error.WriteLineAsync(
+                $"Failed: {result.FailureReason}",
+                cancellationToken);
             return;
         }
 
-        Console.WriteLine($"Created order {result.Result!.Id}");
+        await managedStream.Out.WriteLineAsync(
+            $"Created order {result.Result!.Id}",
+            cancellationToken);
     }
 }
 ```
@@ -155,7 +162,10 @@ Create a class implementing `IInjectableCommandOperation` and pass its assembly 
 
 ```csharp
 [FeatureCommand("db", "seed")]
-public sealed class SeedDatabaseCommand(IServiceProvider serviceProvider, AppDbContext db)
+public sealed class SeedDatabaseCommand(
+    IServiceProvider serviceProvider,
+    AppDbContext db,
+    IManagedStream managedStream)
     : InjectableCommandOperationBase<SeedDatabaseCommand>(serviceProvider, "db", "seed")
 {
     protected override async Task InvokeWhenContextIsOwned(
@@ -164,7 +174,7 @@ public sealed class SeedDatabaseCommand(IServiceProvider serviceProvider, AppDbC
     {
         // seed logic
         await db.SaveChangesAsync(cancellationToken);
-        Console.WriteLine("Seed complete.");
+        await managedStream.Out.WriteLineAsync("Seed complete.", cancellationToken);
     }
 }
 ```

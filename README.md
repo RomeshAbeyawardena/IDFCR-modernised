@@ -31,7 +31,7 @@ IDFCR provides a set of focused, composable packages that replace that boilerpla
 | **gRPC** | Assembly-scanned gRPC service registration and result-to-status-code mapping |
 | **CLI** | `ICommandOperation` and `ICommandRouteDispatcher` for interactive or batch command-line tools |
 | **Database updater** | Self-contained CLI host for running EF Core migrations via `ConfigureDatabaseUpdaterHost` |
-| **AI** | `IAIService` / `ITextGeneration` contracts backed by HTTP or OpenAI providers |
+| **AI** | `IAIService` + `IOpenAIService` contracts backed by HTTP or OpenAI providers |
 
 ---
 
@@ -57,9 +57,11 @@ IDFCR provides a set of focused, composable packages that replace that boilerpla
 ### 2. Register MediatR with IDFCR pipelines
 
 ```csharp
-services
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
     .ConfigureExceptionBehaviourManager(b => b.SetFluentValidationBehaviours())
-    .AddMediatorServicesAndPipelines(configuration, assemblies: typeof(Program).Assembly);
+    .AddMediatorServicesAndPipelines(builder.Configuration, assemblies: typeof(Program).Assembly);
 ```
 
 ### 3. Define a command and handler

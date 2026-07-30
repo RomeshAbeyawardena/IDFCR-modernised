@@ -118,7 +118,7 @@ IDFCR is designed to be adopted incrementally. You do not need to rewrite an exi
 1. Register outbox services and implement `IOutboxPublisher`, `IOutboxReader`.
 2. Add a background service to poll and dispatch outbox records.
 3. Add `AddGroupedDistributedCache` and implement cache invalidation on writes.
-4. Register gRPC services with `app.DiscoverGRPCServices(configuration, assembly)` if needed.
+4. Register gRPC services with `app.DiscoverGRPCServices(builder.Configuration, assembly)` if needed.
 5. Replace manual migration scripts with `ConfigureDatabaseUpdaterHost`.
 
 ---

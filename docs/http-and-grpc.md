@@ -10,7 +10,7 @@ IDFCR provides thin adapters that convert `IUnitResult*` values into HTTP respon
 
 ### IUnitHttpResult
 
-`IUnitHttpResult` implements ASP.NET Core's `IResult`, so it can be returned directly from Minimal API endpoints and MVC action methods.
+`IUnitHttpResult` implements ASP.NET Core's `IResult`, so it is a natural return type for Minimal API endpoints. MVC controllers can also return it as `IResult`, though many MVC codebases prefer wrapping responses as `IActionResult`.
 
 ```csharp
 public interface IUnitHttpResult : IResult
@@ -130,7 +130,7 @@ public sealed class OrderGrpcService : Orders.OrdersBase
 }
 
 // In app setup (after builder.Build())
-app.DiscoverGRPCServices(configuration, typeof(OrderGrpcService).Assembly);
+app.DiscoverGRPCServices(builder.Configuration, typeof(OrderGrpcService).Assembly);
 ```
 
 `IRegisteredGRPCServiceImplementationTypeDiscoveryService` is the interface that `DiscoverGRPCServices` uses internally; you can inject it to discover registered service types programmatically.
