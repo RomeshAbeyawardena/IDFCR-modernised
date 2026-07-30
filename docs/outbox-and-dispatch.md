@@ -137,35 +137,30 @@ public sealed class OrderOutboxReader(AppDbContext db)
 
 ---
 
-## Background dispatch with a hosted service
+## Background dispatch
 
-Run a background service that periodically polls the outbox:
+IDFCR provides `OutboxPipelineBase<TMessage, TPagedQuery>` (from `IDFCR.Outbox.Extensions`) as a base class for background pipelines. It manages the polling loop internally.
 
 ```csharp
-public sealed class OutboxDispatchWorker(
-    IServiceScopeFactory scopeFactory,
-    ILogger<OutboxDispatchWorker> logger) : BackgroundService
+using IDFCR.Outbox.Extensions.Dispatchers;
+using Microsoft.Extensions.Logging;
+
+public sealed class OrderOutboxPipeline(
+    ILogger<OrderOutboxPipeline> logger,
+    IServiceScopeFactory serviceScopeFactory)
+    : OutboxPipelineBase<MyOutboxMessage, GetPendingOutboxQuery>(
+        logger, serviceScopeFactory, delay: 5000, pageSize: 50)
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            using var scope = scopeFactory.CreateScope();
-            var factory = scope.ServiceProvider.GetRequiredService<IOutboxReaderFactory>();
-            var dispatcher = scope.ServiceProvider.GetRequiredService<IOutboxDispatcher>();
-
-            // IOutboxReaderFactory resolves the reader by name
-            foreach (var reader in factory.GetAll())
-            {
-                var query = new GetPendingOutboxQuery { PageSize = 50, PageIndex = 0 };
-                var messages = await reader.GetMessagesAsync(query, stoppingToken);
-                await dispatcher.PushAsync(messages, stoppingToken);
-            }
-
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-        }
-    }
+    // Override SetFilters to customise paging or add extra query parameters
 }
+```
+
+`TPagedQuery` must have a public parameterless constructor. `OutboxPipelineBase` calls `SetFilters(pageIndex, pageSize)` on each polling iteration, which you can override for custom filtering.
+
+Register as a hosted service:
+
+```csharp
+services.AddHostedService<OrderOutboxPipeline>();
 ```
 
 ---
@@ -186,20 +181,27 @@ Key fields for tracking delivery:
 
 ## Registering outbox services
 
+IDFCR provides two registration helpers via `IDFCR.Abstractions.Outbox.Extensions`:
+
+### Write-side (handler / interceptor)
+
 ```csharp
 using IDFCR.Abstractions.Outbox.Extensions;
 
-services
-    .AddScoped<IOutboxReader, OrderOutboxReader>()
-    .AddScoped<IOutboxPublisher<MyOutboxMessage>, OrderEventPublisher>()
-    .AddSingleton<IOutboxReaderFactory, DefaultOutboxReaderFactory>();
+// Registers IOutboxEntityNotificationHandler and the OutboxInterceptor:
+services.AddOutboxPattern<MyOutboxEntityNotificationHandler>();
 ```
 
-If you use the EF Core outbox package:
+### Dispatch-side (background services)
 
 ```csharp
-services.AddOutboxEntityFramework<AppDbContext, MyOutboxMessage>();
+services.AddOutboxPatternBackgroundServices<MyOutboxPipeline, MyOutboxMessage, GetPendingOutboxQuery>(
+    typeof(Program).Assembly);
 ```
+
+This scans the supplied assembly for `IOutboxReader`, `IOutboxPublisher`, and `IOutboxDispatcher` implementations and registers them as scoped services alongside `IOutboxReaderFactory<TMessage>`.
+
+Implement `OutboxPipelineBase<TMessage, TPagedQuery>` (from `IDFCR.Outbox.Extensions`) for the background pipeline that calls `IOutboxReaderFactory<TMessage>` to page messages and passes them to the registered publishers.
 
 ---
 

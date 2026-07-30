@@ -29,7 +29,7 @@ IDFCR provides two related CLI capabilities:
 ```csharp
 using IDFCR.Abstractions.Cli.Operations;
 
-[FeatureCommand("create-order")]   // matched by the router
+[FeatureCommand("orders", "create")]   // prefix + key matched by the router
 public sealed class CreateOrderCliCommand(IMediator mediator) : InjectableCommandOperationBase
 {
     public override async Task<ReturnResult> ExecuteAsync(
@@ -54,7 +54,7 @@ public sealed class CreateOrderCliCommand(IMediator mediator) : InjectableComman
 }
 ```
 
-`[FeatureCommand("create-order")]` sets the command name matched by `DefaultCommandRouteDispatcher`.
+`[FeatureCommand("orders", "create")]` sets the prefix and key used by `DefaultCommandRouteDispatcher` to route arguments to this command.
 
 ### Registering commands
 
@@ -149,7 +149,7 @@ await HostExtensions.ConfigureDatabaseUpdaterHost(
 Create a class implementing `IInjectableCommandOperation` and pass its assembly to `assembliesToScan`. The updater discovers it alongside the built-in commands.
 
 ```csharp
-[FeatureCommand("db seed")]
+[FeatureCommand("db", "seed")]
 public sealed class SeedDatabaseCommand(AppDbContext db) : InjectableCommandOperationBase
 {
     public override async Task<ReturnResult> ExecuteAsync(

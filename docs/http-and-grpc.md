@@ -119,7 +119,7 @@ IStringListDelta delta = protoMessage.ToStringListDelta();
 
 ### Assembly-scanned gRPC service hosting
 
-`IDFCR.Abstractions.GRPC.HostExtensions` provides `HostBuilderExtensions.AddGrpcServices`, which discovers all classes decorated with `[RegisteredGRPCServiceImplementation]` and maps them as gRPC service endpoints.
+`IDFCR.Abstractions.GRPC.HostExtensions` provides `DiscoverGRPCServices` on `WebApplication`, which discovers all classes decorated with `[RegisteredGRPCServiceImplementation]` and maps them as gRPC endpoints.
 
 ```csharp
 // Attribute marks a gRPC service implementation for discovery
@@ -129,11 +129,11 @@ public sealed class OrderGrpcService : Orders.OrdersBase
     // ...
 }
 
-// In host setup
-hostBuilder.AddGrpcServices(typeof(OrderGrpcService).Assembly);
+// In app setup (after builder.Build())
+app.DiscoverGRPCServices(configuration, typeof(OrderGrpcService).Assembly);
 ```
 
-`IRegisteredGRPCServiceImplementationTypeDiscoveryService` is the interface that `AddGrpcServices` uses internally; you can inject it to discover registered service types programmatically.
+`IRegisteredGRPCServiceImplementationTypeDiscoveryService` is the interface that `DiscoverGRPCServices` uses internally; you can inject it to discover registered service types programmatically.
 
 ### gRPC client factory extensions
 

@@ -10,7 +10,7 @@ A flags enum describing what kind of operation produced a result: `Add`, `Get`, 
 ---
 
 **Assembly scanning**  
-A registration pattern where a single extension method call discovers and registers all types implementing a given interface from one or more assemblies. IDFCR uses it for interceptors (`AddInterceptors`), filters (`AddFilterFactory`), CLI commands (`AddInjectableCommandServices`), and MediatR handlers (`AddMediatorServicesAndPipelines`).
+A registration pattern where a single extension method call discovers and registers all types implementing a given interface from one or more assemblies. IDFCR uses it for interceptors (`AddInterceptors`), filters (`ScanFilters`), CLI commands (`AddInjectableCommandServices`), and MediatR handlers (`AddMediatorServicesAndPipelines`).
 
 ---
 

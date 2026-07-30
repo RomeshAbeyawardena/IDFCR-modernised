@@ -56,7 +56,7 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 
 | Package | Purpose |
 |---|---|
-| `IDFCR.Abstractions.Filters` | `FilterBase<TRequest, TDb>`, `IFilterFactory`, `DefaultFilterFactory`, `DefaultPagedFilter`, `GlobalFilterAttribute`, `AddFilterFactory` |
+| `IDFCR.Abstractions.Filters` | `FilterBase<TRequest, TDb>`, `IFilterFactory`, `DefaultFilterFactory`, `DefaultPagedFilter`, `GlobalFilterAttribute`, `ScanFilters` |
 
 ---
 
@@ -101,7 +101,7 @@ These packages form the minimum viable dependency for any IDFCR-aware applicatio
 | `IDFCR.Abstractions.GRPC.Contracts` | Shared `.proto` definitions for `UnitResult`, `UnitAction`, `FailureReason`, `StringListDelta` |
 | `IDFCR.Abstractions.GRPC.Generated` | Pre-generated C# from the shared proto contracts |
 | `IDFCR.Abstractions.GRPC.Extensions` | `UnitResultExtensions` (result → gRPC status mapping), `SortOrderExtensions`, `StringListDelta` proto conversion |
-| `IDFCR.Abstractions.GRPC.HostExtensions` | `AddGrpcServices(assemblies)` — assembly-scanned gRPC service registration |
+| `IDFCR.Abstractions.GRPC.HostExtensions` | `DiscoverGRPCServices(app, configuration, assemblies)` — assembly-scanned gRPC endpoint registration on `WebApplication` |
 | `IDFCR.GRPC.Client.Extensions` | gRPC client factory helpers with service discovery |
 
 ---

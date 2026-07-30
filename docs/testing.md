@@ -124,7 +124,7 @@ public async Task Pipeline_Returns_ValidationError_Result_When_Validator_Fails()
         .ConfigureExceptionBehaviourManager(b => b.SetFluentValidationBehaviours())
         .AddMediatorServicesAndPipelines(
             configuration: null,
-            configureOptions: o => o.UseFluentValidationProcessor(),
+            configureOptions: o => o.UseFluentValidation(),
             assemblies: typeof(CreateOrderCommandHandler).Assembly);
 
     await using var provider = services.BuildServiceProvider();

@@ -100,15 +100,15 @@ services.AddTransient<IFilter<Order>, OrderCustomerFilter>();
 
 ### Assembly scanning
 
-Use the `AddFilters` extension method from `IDFCR.Abstractions.Filters.Extensions`:
+Use the `ScanFilters` extension method from `IDFCR.Abstractions.Filters.Extensions`:
 
 ```csharp
 using IDFCR.Abstractions.Filters.Extensions;
 
-services.AddFilterFactory(typeof(Program).Assembly);
+services.ScanFilters(registerGlobalPagingFilter: true, typeof(Program).Assembly);
 ```
 
-This registers all `FilterBase<TRequest, TDb>` implementations from the supplied assemblies, along with `DefaultFilterFactory` and `DefaultPagedFilter`.
+This scans the supplied assemblies for non-global `IFilter` implementations, registers `DefaultFilterFactory`, and optionally registers the built-in `DefaultPagedFilter` for paging.
 
 ---
 

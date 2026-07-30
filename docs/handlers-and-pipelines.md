@@ -94,7 +94,7 @@ Enable it via `AddMediatorServicesAndPipelines`:
 ```csharp
 services.AddMediatorServicesAndPipelines(
     configuration,
-    configureOptions: o => o.UseFluentValidationProcessor(),
+    configureOptions: o => o.UseFluentValidation(),
     assemblies: typeof(Program).Assembly);
 ```
 
@@ -116,7 +116,7 @@ Enable it via `AddMediatorServicesAndPipelines`:
 ```csharp
 services.AddMediatorServicesAndPipelines(
     configuration,
-    configureOptions: o => o.UseUnitOfWorkPostPipelineProcessor(),
+    configureOptions: o => o.UseUnitOfWorkPostPipeline(),
     assemblies: typeof(Program).Assembly);
 ```
 
@@ -137,8 +137,8 @@ services
         },
         configureOptions: o =>
         {
-            o.UseFluentValidationProcessor();
-            o.UseUnitOfWorkPostPipelineProcessor();
+            o.UseFluentValidation();
+            o.UseUnitOfWorkPostPipeline();
         },
         assemblies: typeof(Program).Assembly);
 ```

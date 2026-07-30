@@ -62,7 +62,7 @@ IDFCR is designed to be adopted incrementally. You do not need to rewrite an exi
    ```csharp
    services.AddMediatorServicesAndPipelines(
        configuration,
-       configureOptions: o => o.UseUnitOfWorkPostPipelineProcessor(),
+       configureOptions: o => o.UseUnitOfWorkPostPipeline(),
        assemblies: typeof(Program).Assembly);
    ```
 
@@ -82,7 +82,7 @@ IDFCR is designed to be adopted incrementally. You do not need to rewrite an exi
    services.AddInterceptors(typeof(Program).Assembly);
    ```
 
-6. Write filters for your queries and register them via `AddFilterFactory`.
+6. Write filters for your queries and register them via `ScanFilters`.
 
 **Effort:** Medium. Requires changing repository interfaces and moving `SaveChangesAsync` calls from handler bodies to the framework post-processor.
 
@@ -118,7 +118,7 @@ IDFCR is designed to be adopted incrementally. You do not need to rewrite an exi
 1. Register outbox services and implement `IOutboxPublisher`, `IOutboxReader`.
 2. Add a background service to poll and dispatch outbox records.
 3. Add `AddGroupedDistributedCache` and implement cache invalidation on writes.
-4. Map gRPC services with `AddGrpcServices(assembly)` if needed.
+4. Register gRPC services with `app.DiscoverGRPCServices(configuration, assembly)` if needed.
 5. Replace manual migration scripts with `ConfigureDatabaseUpdaterHost`.
 
 ---
@@ -145,7 +145,7 @@ If your API currently returns raw objects (`T`) instead of `IUnitResult<T>`, you
 |---|---|
 | Calling `SaveChangesAsync` inside the handler | Remove it. The `UnitOfWorkPostPipelineProcessor` handles commits. |
 | Returning exceptions instead of `FailureReason.NotFound` | Return `UnitResult.NotFound<T>(id)` instead of throwing. |
-| Registering filters but not the filter factory | Call `AddFilterFactory(assembly)` — this also registers `DefaultFilterFactory`. |
+| Registering filters but not the filter factory | Call `ScanFilters(assemblies)` — this also registers `DefaultFilterFactory`. |
 | Registering `IExceptionBehaviourManager` after `AddMediatorServicesAndPipelines` | `ConfigureExceptionBehaviourManager` must come first. |
 | Missing `IScopedResources` registration when using interceptors | `AddInterceptors` registers it. Do not register it manually unless you replace the default. |
 

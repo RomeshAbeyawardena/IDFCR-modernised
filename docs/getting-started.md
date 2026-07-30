@@ -131,7 +131,7 @@ services
     .ConfigureExceptionBehaviourManager(b => b.SetFluentValidationBehaviours())
     .AddMediatorServicesAndPipelines(
         configuration,
-        configureOptions: o => o.UseFluentValidationProcessor(),
+        configureOptions: o => o.UseFluentValidation(),
         assemblies: typeof(Program).Assembly);
 ```
 
