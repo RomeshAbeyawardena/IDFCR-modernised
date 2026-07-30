@@ -1,222 +1,128 @@
-# IDFCR: Intent-Driven Flow Composition Runtime
+# IDFCR — Intent-Driven Flow Composition Runtime
 
-IDFCR is a modular .NET application framework/toolkit for **result-driven, handler-oriented, infrastructure-light** application development.
+IDFCR is a composable .NET toolkit for building handler-oriented applications with explicit, typed operation outcomes.
 
-It helps teams (and coding agents) build predictable application flows by standardising result contracts, MediatR handler conventions, and infrastructure registration patterns—without forcing you to adopt every package.
-
-> Install only what you need. IDFCR is intentionally opt-in.
+> **Install only what you need.** Every capability is an independent, opt-in package.
 
 ---
 
-## What is IDFCR?
+## What problem does IDFCR solve?
 
-IDFCR (Intent-Driven Flow Composition Runtime) is a set of composable packages for building clean .NET applications around explicit intent and explicit outcomes.
+Most .NET applications share the same boilerplate: handler plumbing, result shapes that differ per endpoint, exception-driven control flow for expected failures, repetitive DI registration, and no standard way to compose infrastructure concerns such as auditing, outbox persistence, or distributed caching.
 
-Core value:
-- **Consistent results** (`IUnitResult*`) across handlers, HTTP, and infrastructure boundaries.
-- **Handler conventions** for commands/queries using MediatR-compatible abstractions.
-- **Clean registration** through extension methods that hide repetitive plumbing.
-- **Optional capabilities** (persistence, caching, AI, gRPC, CLI, database updater) you can add only when needed.
-
-This is not “magic”. It is architecture-guided acceleration: boring correctness under wraps, interesting business logic on top.
+IDFCR provides a set of focused, composable packages that replace that boilerplate with consistent contracts and conventions, while keeping the framework out of your business logic.
 
 ---
 
-## The IDFCR philosophy
+## Key capabilities
 
-- **Make the common thing easy**: standard result contracts and registration extensions remove boilerplate.
-- **Make the complex thing possible**: compose interceptors, persistence, caching, gRPC, and AI without rewriting foundations.
-- **Keep consumer applications clean**: app code should mostly express business intent, not infrastructure ceremony.
-- **Prefer explicit opt-in**: use packages by concern; do not pull the whole solution by default.
-- **Prefer result-driven flow**: expected failures should travel as result states, not exception/control-flow spaghetti.
-
----
-
-## Package map / choose what you need
-
-Use package groups as building blocks.
-
-### Results + flow contracts
-- **[Abstractions]** `IDFCR.Abstractions.Results`, `IDFCR.Abstractions.Mediator`
-- **[Implementation bridge]** `IDFCR.Abstractions.Mediator.Extensions`
-- **[HTTP bridge]** `IDFCR.Results.Http`
-
-Use when you want consistent operation outcomes and MediatR request/handler conventions.
-
-### Persistence
-- **[Abstractions]** `IDFCR.Abstractions.Persistence`, `IDFCR.Abstractions.Filters`, `IDFCR.Abstractions.Interceptors`
-- **[Implementations]** `IDFCR.Persistence.EntityFrameworkCore`, `IDFCR.Persistence.EntityFrameworkCore.Extensions`
-- **[Tooling]** `IDFCR.DatabaseUpdater`, `IDFCR.Abstractions.DatabaseUpdater`
-
-Use when you want repository/unit-of-work patterns with interceptor/filter support and migration automation.
-
-### Caching
-- **[Abstractions]** `IDFCR.Abstractions.Caching`
-- **[Implementations]** `IDFCR.Caching`, `IDFCR.Caching.Http`, `IDFCR.Caching.Serialisation`
-
-Use when you need grouped distributed cache invalidation and MessagePack-backed cache payload handling.
-
-### AI
-- **[Abstractions]** `IDFCR.AI.Abstractions`
-- **[Implementations]** `IDFCR.AI.Http`, `IDFCR.AI.OpenAI`
-
-Use when you want provider-backed AI integration behind stable contracts.
-
-### gRPC
-- **[Abstractions/contracts]** `IDFCR.Abstractions.gRPC`, `IDFCR.Abstractions.gRPC.Contracts`
-- **[Generated/bridge/host]** `IDFCR.Abstractions.gRPC.Generated`, `IDFCR.Abstractions.gRPC.Extensions`, `IDFCR.Abstractions.gRPC.HostExtensions`
-
-Use when you want shared result contracts plus assembly-driven gRPC service hosting.
-
-### CLI + build/runtime tooling
-- `IDFCR.Abstractions.Cli`, `IDFCR.Abstractions.Cli.Extensions`
-- `BuildTools.*` projects for packaged CLI + backend orchestration workflows.
-
-### Test support
-- `IDFCR.TestUtilities`
-
-Use for reusable in-memory test helpers and shared test infrastructure primitives.
-
-### Common package selection examples
-
-- **Results only**  
-  `IDFCR.Abstractions.Results`
-
-- **MediatR handler applications**  
-  `IDFCR.Abstractions.Results` + `IDFCR.Abstractions.Mediator` + `IDFCR.Abstractions.Mediator.Extensions`
-
-- **ASP.NET Core HTTP results**  
-  add `IDFCR.Results.Http`
-
-- **EF Core persistence**  
-  add `IDFCR.Abstractions.Persistence` + `IDFCR.Persistence.EntityFrameworkCore`
-
-- **Grouped distributed caching**  
-  add `IDFCR.Caching.Http` + `IDFCR.Caching.Serialisation`
-
-- **AI integrations**  
-  add `IDFCR.AI.Abstractions` + `IDFCR.AI.Http` (+ `IDFCR.AI.OpenAI` when using OpenAI)
-
-- **gRPC hosting**  
-  add `IDFCR.Abstractions.gRPC.HostExtensions` + required gRPC contracts/bridges
-
-- **CLI tooling**  
-  add `IDFCR.Abstractions.Cli` (+ `.Cli.Extensions` for host wiring)
+| Capability | What you get |
+|---|---|
+| **Results** | `IUnitResult<T>`, `IUnitResultCollection<T>`, `IPagedUnitResult<T>`, `FailureReason` — a single result shape across all layers |
+| **Handlers** | MediatR-compatible request/handler interfaces with typed results and an automatic exception pipeline |
+| **Validation** | FluentValidation pipeline integration, paged-query base validators |
+| **Persistence** | `IRepository<T, TKey>` + `IUnitOfWork` abstractions with optional EF Core implementations |
+| **Filters** | Composable, assembly-scanned query filters with LinqKit predicate builders |
+| **Interceptors** | Entity-lifecycle interceptors (audit timestamps, custom processing) registered via assembly scanning |
+| **Delta operations** | `StringListDelta` + `PerformDeltaAsync` for efficient many-to-many relationship sync |
+| **Outbox** | `IOutboxEntity`, `IOutboxPublisher`, `IOutboxReader`, `OutboxInterceptor` for reliable background dispatch |
+| **Caching** | `IDistributedGroupCache` for group-keyed distributed cache with optional auditing and MessagePack serialisation |
+| **HTTP mapping** | `.AsHttp()` converts any `IUnitResult*` to an `IResult` for Minimal APIs or MVC |
+| **gRPC** | Assembly-scanned gRPC service registration and result-to-status-code mapping |
+| **CLI** | `ICommandOperation` and `ICommandRouteDispatcher` for interactive or batch command-line tools |
+| **Database updater** | Self-contained CLI host for running EF Core migrations via `ConfigureDatabaseUpdaterHost` |
+| **AI** | `IAIService` + `IOpenAIService` contracts backed by HTTP or OpenAI providers |
 
 ---
 
-## Golden path: minimal application setup
+## Why IDFCR?
 
-Use extension methods to keep `Program.cs` thin and intention-revealing.
+- **Consistent results everywhere.** One result shape travels through handlers, HTTP responses, gRPC status codes, and outbox messages without translation ceremony.
+- **Explicit failures, not exceptions.** Expected failures (`NotFound`, `ValidationError`, `Conflict`) are first-class result states, not thrown exceptions.
+- **Low-boilerplate registration.** One extension method call — `AddInterceptors(assembly)`, `AddGroupedDistributedCache()`, `AddMediatorServicesAndPipelines(...)` — replaces pages of manual DI wiring.
+- **Gradual adoption.** Start with just the results package. Add persistence, caching, or outbox only when you need them.
+
+---
+
+## Quick start
+
+### 1. Add the core packages
+
+```xml
+<PackageReference Include="IDFCR.Abstractions.Results" />
+<PackageReference Include="IDFCR.Abstractions.Mediator" />
+<PackageReference Include="IDFCR.Abstractions.Mediator.Extensions" />
+```
+
+### 2. Register MediatR with IDFCR pipelines
 
 ```csharp
-using IDFCR.Caching.Http.Extensions;
-using MessagePack;
-
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
 
-services
-    .AddSingleton(MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray))
-    .AddGroupedDistributedCacheWithLogAuditing()
-    .AddHandlers(typeof(Program).Assembly)
-    .AddDatabaseInfrastructure(builder.Configuration)
-    .AddRazorPages();
+builder.Services
+    .ConfigureExceptionBehaviourManager(b => b.SetFluentValidationBehaviours())
+    .AddMediatorServicesAndPipelines(builder.Configuration, assemblies: typeof(Program).Assembly);
 ```
 
-`AddHandlers(...)` and `AddDatabaseInfrastructure(...)` are consumer-facing composition extensions (defined in your application layer) that encapsulate infrastructure plumbing; cache extensions from IDFCR do the same.
-
----
-
-## Golden path: handlers and results
-
-Write handlers around `IUnitResult*` outcomes.
+### 3. Define a command and handler
 
 ```csharp
-using IDFCR.Abstractions.Mediator;
-using IDFCR.Abstractions.Mediator.Extensions;
-using IDFCR.Abstractions.Results;
+// Command (a MediatR request)
+public sealed record CreateOrderCommand(string Reference) : IUnitResultRequest<OrderDto>;
 
-public sealed record CreateClientCommand(string Name) : IUnitResultRequest<ClientDto>;
-public sealed record GetClientsQuery(IEnumerable<string> Names) : IUnitResultCollectionRequest<ClientDto>;
-public sealed record GetPagedClientsQuery : PagedUnitResultRequestBase<ClientDto>;
-
-public sealed class CreateClientCommandHandler(IClientRepository clients)
-    : IUnitResultRequestHandler<CreateClientCommand, ClientDto>
+// Handler
+public sealed class CreateOrderCommandHandler : IUnitResultRequestHandler<CreateOrderCommand, OrderDto>
 {
-    public async Task<IUnitResult<ClientDto>> Handle(CreateClientCommand request, CancellationToken cancellationToken)
+    public Task<IUnitResult<OrderDto>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            return UnitResult.Failed<ClientDto>(new ArgumentException("Name is required"), failureReason: FailureReason.ValidationError);
-        }
+        if (string.IsNullOrWhiteSpace(request.Reference))
+            return Task.FromResult(
+                UnitResult.Failed<OrderDto>(
+                    new ArgumentException("Reference is required"),
+                    failureReason: FailureReason.ValidationError));
 
-        // call your repository/service here
-        var created = new ClientDto(Guid.NewGuid(), request.Name);
-        return UnitResult.FromResult(created, UnitAction.Add);
+        var order = new OrderDto(Guid.NewGuid(), request.Reference);
+        return Task.FromResult(UnitResult.FromResult(order, UnitAction.Add));
     }
 }
 ```
 
-When to use which result type:
-- **`IUnitResult<T>`**: single item/value outcome for a command or query.
-- **`IUnitResultCollection<T>`**: non-paged list/collection outcomes.
-- **`IUnitPagedResult<T>`**: paged list outcomes including paging metadata.
-- **`ChainedResult`**: combine related operation results into one traceable chain.
-
-Expected domain/application failures should be represented as result states (`FailureReason`, success flag, optional exception payload), not thrown as raw control-flow exceptions.
-Use `GenericDefaultExceptionPipeline` as the fallback exception pipeline so unexpected exceptions are translated into clean `IUnitResult*` responses.
-
----
-
-## Golden path: grouped distributed caching
-
-Grouped distributed caching uses:
-- **group key** (e.g., `clients`)
-- **composite key** (e.g., `tenant-42:active`)
-- **payload bytes** (usually MessagePack)
-
-You usually invalidate by **group** when source data changes, instead of trying to track every derived cache key manually.
+### 4. Map the result to HTTP (Minimal API)
 
 ```csharp
-using IDFCR.Caching.Http;
-using IDFCR.Caching.Serialisation.Extensions;
-using MessagePack;
-
-public sealed class ClientCacheService(
-    IDistributedGroupCache groupCache,
-    MessagePackSerializerOptions serializerOptions)
+app.MapPost("/orders", async (CreateOrderCommand cmd, IMediator mediator, CancellationToken ct) =>
 {
-    public async Task<IReadOnlyList<ClientDto>> GetAsync(string tenantId, CancellationToken cancellationToken)
-    {
-        const string groupKey = "clients";
-        var compositeKey = $"{tenantId}:active";
-
-        var cachedValue = await groupCache.GetAsync(groupKey, compositeKey, cancellationToken);
-        if (cachedValue is not null)
-        {
-            var results = await cachedValue.DeserialiseAsync<List<ClientDto>>(serializerOptions, cancellationToken);
-            return results;
-        }
-
-        // ...query source, then cache with SetAsync(groupKey, compositeKey, bytes, cancellationToken)
-        return [];
-    }
-
-    public Task InvalidateClientsAsync(CancellationToken cancellationToken)
-        => groupCache.RemoveAsync("clients", cancellationToken);
-}
+    var result = await mediator.Send(cmd, ct);
+    return result.AsHttp();   // automatically maps FailureReason → HTTP status code
+});
 ```
 
 ---
 
-## Anti-patterns to avoid
+## Documentation
 
-- Installing every IDFCR package “just in case”.
-- Throwing exceptions for expected validation/not-found paths instead of returning failed `IUnitResult` states.
-- Returning ad-hoc response shapes per handler instead of using shared result contracts.
-- Hand-writing infrastructure registration in `Program.cs` when existing extension methods already provide it.
-- Invalidating individual derived cache keys when a group-level invalidation is the safer intent.
+Full developer guide is in [`docs/`](docs/README.md).
+
+| Section | Contents |
+|---|---|
+| [Getting started](docs/getting-started.md) | Installation, first handler, first HTTP endpoint |
+| [Architecture overview](docs/architecture-overview.md) | How the packages fit together |
+| [Results and flow](docs/results-and-flow.md) | `IUnitResult`, `FailureReason`, `UnitAction`, chained results |
+| [Handlers and pipelines](docs/handlers-and-pipelines.md) | MediatR request types, exception pipeline, UoW post-processor |
+| [Validation](docs/validation.md) | FluentValidation pipeline, `AbstractPagedQueryValidator` |
+| [Persistence and unit of work](docs/persistence-and-unit-of-work.md) | `IRepository`, `IUnitOfWork`, EF Core |
+| [Filters and paging](docs/filters-and-paging.md) | `FilterBase`, `IFilterFactory`, paged queries |
+| [Interceptors](docs/interceptors.md) | `IEntityInterceptor`, audit interceptors, `AddInterceptors` |
+| [Delta operations](docs/delta-operations.md) | `StringListDelta`, `PerformDeltaAsync`, many-to-many sync |
+| [Outbox and dispatch](docs/outbox-and-dispatch.md) | `IOutboxEntity`, `IOutboxPublisher`, `OutboxInterceptor` |
+| [Caching](docs/caching.md) | `IDistributedGroupCache`, group invalidation, serialisation |
+| [HTTP and gRPC](docs/http-and-grpc.md) | `.AsHttp()`, gRPC result extensions, service hosting |
+| [CLI and database updater](docs/cli-and-database-updater.md) | `ICommandOperation`, `ConfigureDatabaseUpdaterHost` |
+| [AI integrations](docs/ai-integrations.md) | `IAIService`, HTTP and OpenAI providers |
+| [Package map](docs/package-map.md) | Full list of packages by concern |
+| [Testing](docs/testing.md) | `IDFCR.TestUtilities`, testing patterns |
+| [Migration and adoption](docs/migration-and-adoption.md) | Incremental adoption paths |
+| [Glossary](docs/glossary.md) | Key terms defined |
 
 ---
 
@@ -224,5 +130,13 @@ public sealed class ClientCacheService(
 
 ```bash
 dotnet build IDFCR.slnx
-dotnet test IDFCR.slnx --no-build
+dotnet test IDFCR.slnx
 ```
+
+---
+
+## Project status
+
+Current version: **3.1.x** · Target framework: **.NET 10**
+
+This repository is under active development. Public APIs within a major version are stable; breaking changes are introduced only on major version increments.
