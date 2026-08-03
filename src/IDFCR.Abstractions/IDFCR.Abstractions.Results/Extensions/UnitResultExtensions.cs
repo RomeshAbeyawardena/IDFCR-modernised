@@ -418,12 +418,14 @@ public static class UnitResultExtensions
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A unit result representing the outcome of the action.</returns>
     public static IUnitResult FromExceptionHandlerFlow(Action action, 
         UnitAction unitAction, 
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
-        Action<Exception>? exceptionHandler = null)
+        Action<Exception>? exceptionHandler = null,
+        Action? finallyHandler = null)
     {
         try
         {
@@ -434,6 +436,10 @@ public static class UnitResultExtensions
         {
             exceptionHandler?.Invoke(ex);
             return UnitResult.Failed(ex, unitAction, failureReason, failureOrigin);
+        }
+        finally
+        {
+            finallyHandler?.Invoke();
         }
     }
 
@@ -446,12 +452,14 @@ public static class UnitResultExtensions
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A typed unit result representing the outcome of the action.</returns>
     public static IUnitResult<T> FromExceptionHandlerFlow<T>(Func<T> action,
         UnitAction unitAction,
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
-        Action<Exception>? exceptionHandler = null)
+        Action<Exception>? exceptionHandler = null,
+        Action? finallyHandler = null)
     {
         try
         {
@@ -463,6 +471,10 @@ public static class UnitResultExtensions
             exceptionHandler?.Invoke(ex);
             return UnitResult.Failed<T>(ex, unitAction, failureReason, failureOrigin);
         }
+        finally
+        {
+            finallyHandler?.Invoke();
+        }
     }
 
     /// <summary>
@@ -473,12 +485,14 @@ public static class UnitResultExtensions
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A unit result representing the outcome of the asynchronous action.</returns>
     public static async Task<IUnitResult> FromExceptionHandlerFlowAsync(Func<Task> action,
         UnitAction unitAction,
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
-        Func<Exception, Task>? exceptionHandler = null)
+        Func<Exception, Task>? exceptionHandler = null,
+        Func<Task>? finallyHandler = null)
     {
         try
         {
@@ -497,6 +511,13 @@ public static class UnitResultExtensions
             }
             return UnitResult.Failed(ex, unitAction, failureReason, failureOrigin);
         }
+        finally
+        {
+            if (finallyHandler != null)
+            {
+                await finallyHandler().ConfigureAwait(false);
+            }
+        }
     }
 
     /// <summary>
@@ -508,12 +529,14 @@ public static class UnitResultExtensions
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A typed unit result representing the outcome of the asynchronous action.</returns>
     public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<Task<T>> action,
         UnitAction unitAction,
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
-        Func<Exception, Task>? exceptionHandler = null)
+        Func<Exception, Task>? exceptionHandler = null,
+        Func<Task>? finallyHandler = null)
     {
         try
         {
@@ -532,6 +555,13 @@ public static class UnitResultExtensions
             }
 
             return UnitResult.Failed<T>(ex, unitAction, failureReason, failureOrigin);
+        }
+        finally
+        {
+            if (finallyHandler != null)
+            {
+                await finallyHandler().ConfigureAwait(false);
+            }
         }
     }
 }
