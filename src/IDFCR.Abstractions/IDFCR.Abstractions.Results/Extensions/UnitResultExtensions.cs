@@ -409,4 +409,129 @@ public static class UnitResultExtensions
 
         return derivedResult;
     }
+
+    /// <summary>
+    /// Produces a new unit result from an action that may throw an exception. If the action completes successfully, it returns a successful unit result. If the action throws an exception, it invokes the provided exception handler (if any) and returns a failed unit result with the exception and specified failure reason and origin. This method is useful for wrapping code that may throw exceptions and converting those exceptions into structured unit results.
+    /// </summary>
+    /// <param name="action">The action to execute.</param>
+    /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
+    /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
+    /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <returns>A unit result representing the outcome of the action.</returns>
+    public static IUnitResult FromExceptionHandlerFlow(Action action, 
+        UnitAction unitAction, 
+        FailureReason failureReason = FailureReason.InternalError,
+        FailureOrigin failureOrigin = FailureOrigin.CallerCode,
+        Action<Exception>? exceptionHandler = null)
+    {
+        try
+        {
+            action();
+            return UnitResult.Success(unitAction);
+        }
+        catch (Exception ex)
+        {
+            exceptionHandler?.Invoke(ex);
+            return UnitResult.Failed(ex, unitAction, failureReason, failureOrigin);
+        }
+    }
+
+    /// <summary>
+    /// Produces a new typed unit result from an action that may throw an exception. If the action completes successfully, it returns a successful typed unit result with the result of the action. If the action throws an exception, it invokes the provided exception handler (if any) and returns a failed typed unit result with the exception and specified failure reason and origin. This method is useful for wrapping code that may throw exceptions and converting those exceptions into structured typed unit results.
+    /// </summary>
+    /// <typeparam name="T">The type of the result value.</typeparam>
+    /// <param name="action">The action to execute.</param>
+    /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
+    /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
+    /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <returns>A typed unit result representing the outcome of the action.</returns>
+    public static IUnitResult<T> FromExceptionHandlerFlow<T>(Func<T> action,
+        UnitAction unitAction,
+        FailureReason failureReason = FailureReason.InternalError,
+        FailureOrigin failureOrigin = FailureOrigin.CallerCode,
+        Action<Exception>? exceptionHandler = null)
+    {
+        try
+        {
+            var result = action();
+            return UnitResult.FromResult(result, unitAction);
+        }
+        catch (Exception ex)
+        {
+            exceptionHandler?.Invoke(ex);
+            return UnitResult.Failed<T>(ex, unitAction, failureReason, failureOrigin);
+        }
+    }
+
+    /// <summary>
+    /// Produces a new unit result from an asynchronous action that may throw an exception. If the action completes successfully, it returns a successful unit result. If the action throws an exception, it invokes the provided exception handler (if any) and returns a failed unit result with the exception and specified failure reason and origin. This method is useful for wrapping asynchronous code that may throw exceptions and converting those exceptions into structured unit results.
+    /// </summary>
+    /// <param name="action">The asynchronous action to execute.</param>
+    /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
+    /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
+    /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <returns>A unit result representing the outcome of the asynchronous action.</returns>
+    public static async Task<IUnitResult> FromExceptionHandlerFlowAsync(Func<Task> action,
+        UnitAction unitAction,
+        FailureReason failureReason = FailureReason.InternalError,
+        FailureOrigin failureOrigin = FailureOrigin.CallerCode,
+        Func<Exception, Task>? exceptionHandler = null)
+    {
+        try
+        {
+            await action().ConfigureAwait(false);
+            return UnitResult.Success(unitAction);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            if (exceptionHandler != null)
+            {
+                await exceptionHandler(ex).ConfigureAwait(false);
+            }
+            return UnitResult.Failed(ex, unitAction, failureReason, failureOrigin);
+        }
+    }
+
+    /// <summary>
+    /// Produces a new typed unit result from an asynchronous action that may throw an exception. If the action completes successfully, it returns a successful typed unit result with the result of the action. If the action throws an exception, it invokes the provided exception handler (if any) and returns a failed typed unit result with the exception and specified failure reason and origin. This method is useful for wrapping asynchronous code that may throw exceptions and converting those exceptions into structured typed unit results.
+    /// </summary>
+    /// <typeparam name="T">The type of the result produced by the asynchronous action.</typeparam>
+    /// <param name="action">The asynchronous action to execute.</param>
+    /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
+    /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
+    /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
+    /// <returns>A typed unit result representing the outcome of the asynchronous action.</returns>
+    public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<Task<T>> action,
+        UnitAction unitAction,
+        FailureReason failureReason = FailureReason.InternalError,
+        FailureOrigin failureOrigin = FailureOrigin.CallerCode,
+        Func<Exception, Task>? exceptionHandler = null)
+    {
+        try
+        {
+            var result = await action().ConfigureAwait(false);
+            return UnitResult.FromResult(result, unitAction);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            if (exceptionHandler != null)
+            {
+                await exceptionHandler(ex).ConfigureAwait(false);
+            }
+
+            return UnitResult.Failed<T>(ex, unitAction, failureReason, failureOrigin);
+        }
+    }
 }
