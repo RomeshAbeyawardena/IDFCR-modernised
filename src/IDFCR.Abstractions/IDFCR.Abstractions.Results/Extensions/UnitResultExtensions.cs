@@ -499,8 +499,12 @@ public static class UnitResultExtensions
             await action().ConfigureAwait(false);
             return UnitResult.Success(unitAction);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
+            if (exceptionHandler != null)
+            {
+                await exceptionHandler(ex).ConfigureAwait(false);
+            }
             throw;
         }
         catch (Exception ex)
@@ -543,8 +547,13 @@ public static class UnitResultExtensions
             var result = await action().ConfigureAwait(false);
             return UnitResult.FromResult(result, unitAction);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
+            if (exceptionHandler != null)
+            {
+                await exceptionHandler(ex).ConfigureAwait(false);
+            }
+
             throw;
         }
         catch (Exception ex)
