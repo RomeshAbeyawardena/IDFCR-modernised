@@ -580,6 +580,12 @@ public static class UnitResultExtensions
         }
     }
 
+    /// <summary>
+    /// Builds a dictionary of exception handlers for a specific result type. The provided builder action is used to configure the dictionary by adding or updating exception types and their corresponding handler functions. Each handler function takes an exception and returns a typed unit result of the specified type. This allows for centralized exception handling logic that can be applied to different types of exceptions and results.
+    /// </summary>
+    /// <typeparam name="T">The result type of the unit result</typeparam>
+    /// <param name="builder">The action used to configure the dictionary of exception handlers</param>
+    /// <returns>A read-only dictionary of exception handlers</returns>
     public static IReadOnlyDictionary<Type, Func<Exception, IUnitResult<T>>> BuildExceptionHandlers<T>(Action<IDictionaryBuilder<Type, Func<Exception, IUnitResult<T>>>> builder)
     {
         DictionaryBuilder<Type, Func<Exception, IUnitResult<T>>> exceptionHandlers = new();
@@ -587,10 +593,19 @@ public static class UnitResultExtensions
         return exceptionHandlers.Build();
     }
 
+    /// <summary>
+    /// Executes an asynchronous action and handles exceptions using a provided dictionary of exception handlers. If the action completes successfully, it returns the result. If an exception is thrown, it checks if there is a corresponding handler in the dictionary for the exception type. If a handler is found, it invokes the handler and returns its result. If no handler is found, it invokes a default exception result function and returns its result. This allows for centralized exception handling logic that can be applied to different types of exceptions and results.
+    /// </summary>
+    /// <typeparam name="T">The result type of the unit result</typeparam>
+    /// <param name="action">The asynchronous action to execute</param>
+    /// <param name="cancellationToken">The cancellation token to observe</param>
+    /// <param name="exceptionHandlers">A dictionary of exception handlers</param>
+    /// <param name="defaultExceptionResult">A function that returns a default exception result if no handler is found</param>
+    /// <returns>The result of the action or the result of an exception handler</returns>
     public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<CancellationToken, Task<IUnitResult<T>>> action,
-        CancellationToken cancellationToken,
         IReadOnlyDictionary<Type, Func<Exception, IUnitResult<T>>> exceptionHandlers,
-        Func<IUnitResult<T>> defaultExceptionResult)
+        Func<IUnitResult<T>> defaultExceptionResult,
+        CancellationToken cancellationToken)
     {
         
         try
