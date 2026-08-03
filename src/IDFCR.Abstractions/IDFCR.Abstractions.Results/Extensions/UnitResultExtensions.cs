@@ -1,3 +1,4 @@
+using IDFCR.Abstractions.Builders;
 using IDFCR.Abstractions.Mapper;
 using System.Diagnostics.CodeAnalysis;
 
@@ -482,13 +483,15 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="action">The asynchronous action to execute.</param>
     /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="cancellationToken">An optional cancellation token to observe while waiting for the task to complete.</param>
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
     /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A unit result representing the outcome of the asynchronous action.</returns>
-    public static async Task<IUnitResult> FromExceptionHandlerFlowAsync(Func<Task> action,
+    public static async Task<IUnitResult> FromExceptionHandlerFlowAsync(Func<CancellationToken, Task> action,
         UnitAction unitAction,
+        CancellationToken? cancellationToken = null,
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
         Func<Exception, Task>? exceptionHandler = null,
@@ -496,7 +499,7 @@ public static class UnitResultExtensions
     {
         try
         {
-            await action().ConfigureAwait(false);
+            await action(cancellationToken.GetValueOrDefault()).ConfigureAwait(false);
             return UnitResult.Success(unitAction);
         }
         catch (OperationCanceledException ex)
@@ -530,13 +533,15 @@ public static class UnitResultExtensions
     /// <typeparam name="T">The type of the result produced by the asynchronous action.</typeparam>
     /// <param name="action">The asynchronous action to execute.</param>
     /// <param name="unitAction">The unit action associated with the result.</param>
+    /// <param name="cancellationToken">An optional cancellation token to observe while waiting for the task to complete.</param>
     /// <param name="failureReason">The reason for failure if the action throws an exception.</param>
     /// <param name="failureOrigin">The origin of the failure if the action throws an exception.</param>
     /// <param name="exceptionHandler">An optional exception handler to invoke if the action throws an exception.</param>
     /// <param name="finallyHandler">An optional finally handler to invoke after the action completes, regardless of success or failure.</param>
     /// <returns>A typed unit result representing the outcome of the asynchronous action.</returns>
-    public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<Task<T>> action,
+    public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<CancellationToken, Task<T>> action,
         UnitAction unitAction,
+        CancellationToken? cancellationToken = null,
         FailureReason failureReason = FailureReason.InternalError,
         FailureOrigin failureOrigin = FailureOrigin.CallerCode,
         Func<Exception, Task>? exceptionHandler = null,
@@ -544,7 +549,8 @@ public static class UnitResultExtensions
     {
         try
         {
-            var result = await action().ConfigureAwait(false);
+            var result = await action(cancellationToken.GetValueOrDefault())
+                .ConfigureAwait(false);
             return UnitResult.FromResult(result, unitAction);
         }
         catch (OperationCanceledException ex)
@@ -571,6 +577,34 @@ public static class UnitResultExtensions
             {
                 await finallyHandler().ConfigureAwait(false);
             }
+        }
+    }
+
+    public static IReadOnlyDictionary<Type, Func<Exception, IUnitResult<T>>> BuildExceptionHandlers<T>(Action<IDictionaryBuilder<Type, Func<Exception, IUnitResult<T>>>> builder)
+    {
+        DictionaryBuilder<Type, Func<Exception, IUnitResult<T>>> exceptionHandlers = new();
+        builder(exceptionHandlers);
+        return exceptionHandlers.Build();
+    }
+
+    public static async Task<IUnitResult<T>> FromExceptionHandlerFlowAsync<T>(Func<CancellationToken, Task<IUnitResult<T>>> action,
+        CancellationToken cancellationToken,
+        IReadOnlyDictionary<Type, Func<Exception, IUnitResult<T>>> exceptionHandlers,
+        Func<IUnitResult<T>> defaultExceptionResult)
+    {
+        
+        try
+        {
+            return await action(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            if (exceptionHandlers.TryGetValue(ex.GetType(), out var handler))
+            {
+                return handler(ex);
+            }
+
+            return defaultExceptionResult();
         }
     }
 }
