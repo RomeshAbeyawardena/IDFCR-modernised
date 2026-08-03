@@ -12,11 +12,19 @@ public static class UnitResultExtensions
     /// </summary>
     /// <param name="result">The gRPC UnitResult message to convert.</param>
     /// <returns>An IUnitResult instance representing the converted result.</returns>
-    public static IUnitResult From (this Abstractions.GRPC.Contracts.Common.V1.UnitResult result)
+    public static IUnitResult From(this IDFCR.Abstractions.GRPC.Contracts.Common.V1.UnitResult result)
     {
+        FailureReason? failureReason = result.HasFailureReason
+            ? Enum.Parse<FailureReason>(result.FailureReason.ToString())
+            : null;
+
+        Exception? exception = string.IsNullOrWhiteSpace(result.ErrorMessage)
+            ? null
+            : new Exception(result.ErrorMessage);
+
         return UnitResult.Create(result.IsSuccess,
-            new Exception(result.ErrorMessage),
+            exception,
             Enum.Parse<UnitAction>(result.Action.ToString()),
-            Enum.TryParse<FailureReason>(result.FailureReason.ToString(), out var failureReason) ? failureReason : FailureReason.None);
+            failureReason);
     }
 }

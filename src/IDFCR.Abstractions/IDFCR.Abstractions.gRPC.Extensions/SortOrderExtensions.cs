@@ -15,7 +15,7 @@ public static class SortOrderExtensions
     /// <param name="target">The target structured ordered request to populate with the mapped sort fields.</param>
     /// <returns>The target structured ordered request with the mapped sort fields.</returns>
     public static TStructuredOrderedRequest MapSortFields<TStructuredOrderedRequest>(this V1Common.OrderSet orderedRequest, TStructuredOrderedRequest target)
-        where TStructuredOrderedRequest : StructuredOrderedRequestBase, new()
+        where TStructuredOrderedRequest : StructuredOrderedRequestBase
     {
 
         target.SortedFields = orderedRequest.Sorts.Select(sort => new DefaultSort

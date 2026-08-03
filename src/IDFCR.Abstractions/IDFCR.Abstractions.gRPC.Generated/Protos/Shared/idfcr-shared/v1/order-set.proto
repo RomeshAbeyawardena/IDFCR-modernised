@@ -5,9 +5,9 @@ package idfcr.abstractions.grpc.contracts.common;
 option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common.V1";
 
 enum SortDirection {
-	ORDERDIRECTION_ASCENDING = 0;
-	ORDERDIRECTION_NONE = -1;
-	ORDERDIRECTION_DESCENDING = 2;
+	ORDERDIRECTION_NONE = 0;
+	ORDERDIRECTION_ASCENDING = 1;
+	ORDERDIRECTION_DESCENDING = -1;
 }
 
 message Sort {
