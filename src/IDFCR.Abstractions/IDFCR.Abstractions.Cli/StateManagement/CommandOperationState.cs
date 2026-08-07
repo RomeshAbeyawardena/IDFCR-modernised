@@ -63,4 +63,14 @@ public class CommandOperationState
     {
         _stateDictionary[key] = value;
     }
+
+    internal CommandOperationState Clone(CommandOperationState operationState)
+    {
+        foreach(var (key, value) in operationState._stateDictionary)
+        {
+            _stateDictionary[key] = value;
+        }
+
+        return this;
+    }
 }
