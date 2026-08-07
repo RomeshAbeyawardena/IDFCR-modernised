@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package idfcr.abstractions.grpc.contracts.common;
+
+option csharp_namespace = "IDFCR.Abstractions.GRPC.Contracts.Common.V1";
+
+enum SortDirection {
+	ORDERDIRECTION_NONE = 0;
+	ORDERDIRECTION_ASCENDING = 1;
+	ORDERDIRECTION_DESCENDING = -1;
+}
+
+message Sort {
+	string field_name = 1;
+	optional int32 order = 2;
+	SortDirection direction = 3;
+}
+
+message OrderSet {
+	repeated Sort sorts = 1;
+}

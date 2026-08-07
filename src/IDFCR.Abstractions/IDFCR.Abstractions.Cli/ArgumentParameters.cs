@@ -70,7 +70,7 @@ public class ArgumentParameters(IEnumerable<string> arguments) : IArgumentParame
     /// <returns><see langword="true"/> if the collection contains a parameter with the specified key; otherwise, <see langword="false"/>.</returns>
     public bool TryGetValue(string key, [MaybeNullWhen(false)] out Parameter value)
     {
-        return TryGetValue(key, out value);
+        return _dictionary.TryGetValue(key, out value);
     }
 
     /// <summary>
