@@ -28,14 +28,14 @@ public sealed class DefaultCommandRouteDispatcher(IServiceProvider services) : I
         foreach (var operation in operations)
         {
             operation.ListOperations = ListOperations;
-            
+
             if (lastState is not null)
             {
-                lastState = operation.State.Clone(lastState);
+                operation.State.MergeFrom(lastState);
             }
-            
+
             await operation.InvokeAsync(commands, cancellationToken);
-            
+
             lastState = operation.State;
         }
     }

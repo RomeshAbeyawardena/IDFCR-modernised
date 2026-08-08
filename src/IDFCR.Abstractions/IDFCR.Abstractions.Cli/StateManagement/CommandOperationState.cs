@@ -64,9 +64,9 @@ public class CommandOperationState
         _stateDictionary[key] = value;
     }
 
-    internal CommandOperationState Clone(CommandOperationState operationState)
+    internal CommandOperationState MergeFrom(CommandOperationState source)
     {
-        foreach(var (key, value) in operationState._stateDictionary)
+        foreach (var (key, value) in source._stateDictionary)
         {
             _stateDictionary[key] = value;
         }
