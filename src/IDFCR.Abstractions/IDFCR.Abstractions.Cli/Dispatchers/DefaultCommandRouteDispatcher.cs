@@ -1,4 +1,5 @@
 ﻿using IDFCR.Abstractions.Cli.Operations;
+using IDFCR.Abstractions.Cli.StateManagement;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IDFCR.Abstractions.Cli.Dispatchers;
@@ -22,11 +23,20 @@ public sealed class DefaultCommandRouteDispatcher(IServiceProvider services) : I
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task ExecuteAsync(IEnumerable<string> commands, CancellationToken cancellationToken)
     {
+        CommandOperationState? lastState = null;
         var operations = GetOperations(commands);
         foreach (var operation in operations)
         {
             operation.ListOperations = ListOperations;
+
+            if (lastState is not null)
+            {
+                operation.State.MergeFrom(lastState);
+            }
+
             await operation.InvokeAsync(commands, cancellationToken);
+
+            lastState = operation.State;
         }
     }
 

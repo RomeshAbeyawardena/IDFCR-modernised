@@ -63,4 +63,14 @@ public class CommandOperationState
     {
         _stateDictionary[key] = value;
     }
+
+    internal CommandOperationState MergeFrom(CommandOperationState source)
+    {
+        foreach (var (key, value) in source._stateDictionary)
+        {
+            _stateDictionary[key] = value;
+        }
+
+        return this;
+    }
 }
