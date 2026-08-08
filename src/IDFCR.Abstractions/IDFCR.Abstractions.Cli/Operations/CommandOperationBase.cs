@@ -147,7 +147,7 @@ public abstract class CommandOperationBase(string name, params string[] aliases)
             }
 
             var nextElements = commands.Skip(1);
-            currentOperation.State.Clone(State);
+            currentOperation.State.MergeFrom(State);
             await currentOperation.InvokeAsync(nextElements, cancellationToken);
         }
     }
